@@ -46,3 +46,6 @@ app.*.map.json
 
 # OMC agent state (local scratch)
 .omc/
+
+# Distribuição (binários gerados localmente)
+dist/

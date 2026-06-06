@@ -10,6 +10,23 @@ Quando chega a hora da pausa, ela fica vermelha e piscando, toca um alerta e
 exibe um overlay de **"vidro líquido"** (blur + transparência) centralizado, com
 um cronômetro regressivo guiando a pausa.
 
+## 📥 Instalação (macOS)
+
+Baixe o instalador `.dmg` mais recente:
+
+**➡️ [Baixar DryEyeWidget-1.0.0.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-1.0.0.dmg)**
+(ou veja todas as versões em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**)
+
+1. Abra o `.dmg` e **arraste** o `dry_eye_widget.app` para a pasta **Applications**.
+2. Na **primeira abertura**, como o app ainda não é assinado com Developer ID,
+   o macOS pode bloquear: clique com o **botão direito → Abrir** (ou
+   *Ajustes do Sistema → Privacidade e Segurança → Abrir mesmo assim*).
+3. Pronto — a bolinha azul aparece num canto da tela e o ícone de olho na barra
+   de menu.
+
+> O `.dmg` é gerado por `scripts/make_dmg.sh` a partir de
+> `flutter build macos --release`.
+
 ## Funcionalidades
 
 - **Bolinha flutuante** always-on-top: azul no estado normal, vermelha piscando
