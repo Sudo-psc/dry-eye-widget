@@ -1,189 +1,136 @@
 # Dry Eye Widget 👁️💧
 
-Widget flutuante de desktop (**macOS** e **Windows**), feito em **Flutter**, que
-aplica a **regra 20-20-20** para conforto ocular e alívio do olho seco: a cada
-ciclo de trabalho (padrão 20 minutos), ele lembra você de fazer uma pausa,
-descansar os olhos e olhar para uma distância de ~6 metros por 20 segundos.
+### Seus olhos também merecem uma pausa.
 
-Uma pequena bolinha azul fica sempre visível (always-on-top) num canto da tela.
-Quando chega a hora da pausa, ela fica vermelha e piscando, toca um alerta e
-exibe um overlay de **"vidro líquido"** (blur + transparência) centralizado, com
-um cronômetro regressivo guiando a pausa.
+Um pequeno companheiro que vive no canto da sua tela e, de tempos em tempos, te
+convida a respirar, olhar para longe e cuidar da sua visão — para que você
+trabalhe o dia inteiro com mais conforto e menos cansaço nos olhos.
 
-## 📥 Instalação (macOS)
+---
 
-Baixe o instalador `.dmg` mais recente:
+## Por que isso importa
 
-**➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** (universal: Apple Silicon + Intel)
-(ou veja todas as versões em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**)
+Passamos horas e horas diante de telas. E acontece algo curioso: quando estamos
+muito concentrados no computador ou no celular, **piscamos bem menos** — em
+alguns casos, até cerca de dois terços menos do que o normal. Piscar é o que
+espalha a lágrima que mantém os olhos lubrificados e protegidos. Piscando pouco,
+a lágrima evapora rápido e surgem aqueles sintomas tão conhecidos de quem
+trabalha no digital: **ardência, olhos cansados, vermelhidão, visão embaçada no
+fim do dia e aquela sensação de areia nos olhos**.
 
-1. Abra o `.dmg` e **arraste** o `dry_eye_widget.app` para a pasta **Applications**.
-2. Na **primeira abertura**, como o app ainda não é assinado com Developer ID,
-   o macOS pode bloquear: clique com o **botão direito → Abrir** (ou
-   *Ajustes do Sistema → Privacidade e Segurança → Abrir mesmo assim*).
-3. Pronto — a bolinha azul aparece num canto da tela e o ícone de olho na barra
-   de menu.
+Esse conjunto de incômodos tem nome: **Síndrome da Visão de Computador** (ou
+fadiga visual digital), e caminha lado a lado com o **olho seco**. Não é "frescura"
+nem cansaço passageiro — é um problema real, cada vez mais comum, que vai além do
+desconforto: olhos secos e fatigados **atrapalham a concentração e reduzem a
+produtividade** de quem vive de tela. Quando os olhos não estão bem, o trabalho
+rende menos.
 
-> O `.dmg` é gerado por `scripts/make_dmg.sh` a partir de
-> `flutter build macos --release`.
+A boa notícia é que existe um hábito simples, recomendado por oftalmologistas no
+mundo todo, que ajuda muito:
 
-## Funcionalidades
+## A regra 20-20-20 ⏱️
 
-- **Bolinha flutuante** always-on-top: azul no estado normal, vermelha piscando
-  durante a pausa. Arrastável por toda a tela, com **posição persistida** entre
-  sessões.
-- **Máquina de estados** com uma única fase de pausa:
-  `IDLE → ALERTA → FASE (pausa única de 20s) → CONCLUSÃO → IDLE`.
-- **Overlay de vidro líquido** (blur + transparência) centralizado, com
-  **cronômetro regressivo MM:SS** durante a pausa.
-- Texto da fase de pausa:
-  - **"Olhe para uma distância de 6 metros"**
-  - **"Lembre-se de piscar ao olhar a uma distância de 6 m e mantenha o olhar
-    até o cronômetro zerar"**
-- Tela de **conclusão** ("Parabéns!") antes de retornar ao estado normal.
-- **Som** (alerta, tique-taque, sucesso) e **notificações nativas**, ambos
-  ativáveis/desativáveis.
-- **Anel de progresso** opcional: arco branco horário ao redor da bolinha
-  mostrando o tempo até a próxima pausa.
-- **Iniciar com o sistema** (login item) e botão **"Restaurar padrões"**.
-- **Persistência** via `SharedPreferences` (posição da bolinha, tempo decorrido
-  e todas as preferências serializadas em JSON).
+> **A cada 20 minutos, olhe para algo a cerca de 6 metros de distância (20 pés)
+> por 20 segundos** — e aproveite para piscar algumas vezes, devagar e completo.
 
-## Configurações
+Esses 20 segundos relaxam o músculo que mantém o foco de perto e dão à lágrima a
+chance de renovar a superfície dos olhos. Parece pouco, mas, repetido ao longo do
+dia, faz diferença real no conforto visual.
 
-As preferências ficam num painel de configurações e são agrupadas assim:
+O problema? **No meio do trabalho, a gente esquece.** É exatamente aí que este
+app entra: ele lembra por você, sem atrapalhar.
 
-### Geral / temporização
-- Duração do ciclo (minutos até a próxima pausa).
-- Duração da fase (segundos de pausa).
-- Som ligado/desligado.
-- Notificações ligadas/desligadas.
-- Canto padrão da bolinha (superior esq./dir., inferior esq./dir., centro).
-- **Iniciar com o sistema** (login item via `launch_at_startup`).
-- Botão **"Restaurar padrões"**.
+---
 
-### Aparência
-- Tamanho da bolinha.
-- Cor no estado normal (via paleta).
-- Cor de alerta (via paleta).
-- Opacidade no estado normal (deixa a bolinha mais discreta).
-- Velocidade do piscar.
-- Anel de progresso (arco branco horário ao redor da bolinha).
+## Feito por um médico, para quem trabalha no digital 👨‍⚕️
 
-### Durante a pausa
-- Escurecer o fundo da tela + intensidade do escurecimento.
-- Opacidade do overlay de vidro.
-- Desfoque (blur) do overlay de vidro.
+Este aplicativo foi criado pelo **Dr. Philipe Saraiva Cruz**, oftalmologista, com
+um objetivo simples e sincero: **ajudar seus pacientes — e todos os trabalhadores
+digitais — a conviverem melhor com o olho seco e a fadiga visual**. Ele nasceu da
+prática do consultório, da vontade de levar um cuidado que normalmente fica
+restrito à consulta para dentro da rotina de quem passa o dia diante de uma tela.
 
-### Visibilidade
-- Ocultar ícone do Dock.
-- **Desabilitar item da barra de menu** e **desabilitar widget flutuante** —
-  mutuamente exclusivos (não é possível ocultar os dois ao mesmo tempo, para
-  você nunca perder o controle do app).
+É a regra 20-20-20 transformada em um gesto gentil que aparece na sua tela na hora
+certa.
 
-> O menu da bolinha inclui um item **Orientações**, com material educativo
-> sobre Síndrome da Visão de Computador, olho seco, a regra 20-20-20 e o
-> impacto do desconforto ocular na produtividade.
+---
 
-## Arquitetura
+## 📥 Baixe e use (macOS)
 
-```
-lib/
-├── main.dart                       # Entry point: config da janela + layout dinâmico
-├── models/
-│   ├── app_state.dart              # Estados (IDLE, ALERTA, FASE1, CONCLUSAO) + cantos
-│   └── widget_settings.dart        # Preferências imutáveis, copyWith + JSON
-├── providers/
-│   ├── settings_provider.dart      # Estado das configurações (ChangeNotifier)
-│   └── timer_provider.dart         # Cronômetros + máquina de estados
-├── services/
-│   ├── audio_service.dart          # audioplayers + fallback de som do sistema
-│   ├── notification_service.dart   # local_notifier
-│   ├── startup_service.dart        # launch_at_startup (iniciar com o sistema)
-│   └── storage_service.dart        # SharedPreferences
-├── widgets/
-│   ├── floating_ball.dart          # Bolinha azul/vermelha + piscar + anel de progresso
-│   ├── glass_overlay.dart          # Overlay de vidro líquido
-│   ├── timer_display.dart          # Cronômetro regressivo MM:SS
-│   ├── floating_menu.dart          # Menu flutuante (clique na bolinha)
-│   └── settings_dialog.dart        # Painel de configurações
-└── utils/
-    ├── constants.dart              # Cores, paleta, durações, textos, chaves de storage
-    └── animations.dart             # Curvas e helpers de animação
+**➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
 
-assets/
-└── sounds/                         # alert.wav, tick.wav, success.wav
-```
+1. Abra o `.dmg` e **arraste** o app para a pasta **Aplicativos**.
+2. Na primeira vez, clique com o **botão direito → Abrir** (o app é gratuito e
+   ainda não tem assinatura paga da Apple, então o macOS pede essa confirmação).
+3. Pronto! Uma bolinha azul aparece num canto da tela e um ícone de olho na barra
+   de menu. Pode continuar trabalhando — ele cuida do resto.
 
-> **Janela**: o app usa uma janela frameless e transparente, gerenciada por
-> `window_manager`. No macOS a transparência real é obtida via
-> `flutter_acrylic` (`makeWindowFullyTransparent`). No estado normal a janela
-> tem o tamanho da bolinha e é movida nativamente ao arrastar — assim o resto
-> da tela continua clicável. Durante a pausa ela ocupa a tela toda para exibir o
-> overlay centralizado.
+> Todas as versões ficam em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
 
-## Stack / dependências
+---
 
-- **Flutter 3.16+** (testado com 3.44.1).
-- `window_manager`, `screen_retriever`, `flutter_acrylic` — janela
-  frameless/transparente always-on-top.
-- `audioplayers` — sons; `local_notifier` — notificações nativas.
-- `launch_at_startup` — iniciar com o sistema.
-- `shared_preferences` — persistência; `provider` — gerência de estado.
-- `google_fonts` — tipografia.
+## ✨ Como funciona
 
-## Pré-requisitos
+- 🔵 **Uma bolinha discreta** fica sempre visível, no canto que você preferir.
+  Arraste para onde quiser.
+- ⏰ A cada **20 minutos** (ajustável), ela fica vermelha, pisca suavemente e abre
+  um lembrete delicado: **olhe para longe e pisque por 20 segundos**.
+- 🧘 Um cronômetro guia a pausa. Ao terminar, um "Parabéns!" e a bolinha volta ao
+  normal — ciclo reiniciado.
+- 👁️ Um **ícone de olho na barra de menu** mostra o progresso até a próxima pausa
+  e permite controlar o app a qualquer momento.
+- 📖 Um item **Orientações** traz, em poucas palavras, o porquê de tudo isso.
 
-- **Flutter 3.16+** (testado com 3.44.1).
-- **macOS**: **Xcode completo** (App Store) — não basta o Command Line Tools.
-  Após instalar, registre-o:
-  ```bash
-  sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
-  sudo xcodebuild -runFirstLaunch
-  ```
-- **Windows**: **Visual Studio 2022** com o workload
-  **"Desktop development with C++"**. Builds Windows só podem ser gerados **em
-  uma máquina Windows** — o Flutter não faz cross-compile de macOS para Windows.
+### Você no controle ⚙️
 
-## Como rodar (desenvolvimento)
+Tudo é ajustável para caber na sua rotina: tempo entre as pausas e duração delas,
+tamanho e cor da bolinha, som e notificações, um anel de progresso ao redor da
+bolinha, iniciar junto com o computador, ocultar do Dock e muito mais. Quer
+discrição total? Esconda a bolinha e use só o ícone da barra de menu — ou o
+contrário. Do seu jeito.
+
+---
+
+## 💚 Uma nota de cuidado
+
+Este app é um **lembrete de bons hábitos**, não um tratamento. Ele não diagnostica
+nem cura nada. Se você sente desconforto nos olhos com frequência, **procure um
+oftalmologista** — seus olhos merecem uma avaliação de verdade.
+
+---
+
+## 🛠️ Para desenvolvedores
+
+Projeto **Flutter** (macOS e Windows). Rápido de rodar:
 
 ```bash
 flutter pub get
-flutter run -d macos      # no macOS
-flutter run -d windows    # no Windows
+flutter run -d macos      # ou: -d windows
 ```
 
-## Como compilar (release)
+Compilar e empacotar:
 
 ```bash
-# macOS  → build/macos/Build/Products/Release/dry_eye_widget.app
-flutter build macos --release
-
-# Windows → build/windows/x64/runner/Release/dry_eye_widget.exe
-flutter build windows --release
+flutter build macos --release         # gera o app universal (arm64 + x86_64)
+./scripts/make_dmg.sh                  # empacota em dist/DryEyeWidget.dmg
+flutter build windows --release        # .exe (em uma máquina Windows)
 ```
 
-> O build macOS compila e roda (exige Xcode). O `.exe` de Windows fica pendente
-> até ser gerado numa máquina Windows com o Visual Studio 2022.
+Qualidade: `flutter analyze` (sem avisos) e `flutter test`. A arquitetura usa
+`provider` para estado, `window_manager` + `flutter_acrylic` para a janela
+flutuante transparente, `tray_manager` para a barra de menu, além de
+`audioplayers`, `local_notifier`, `launch_at_startup` e `shared_preferences`.
 
-## Qualidade
+> Windows precisa de **Visual Studio 2022** ("Desktop development with C++") e só
+> pode ser compilado em uma máquina Windows. macOS precisa do **Xcode**.
 
-```bash
-flutter analyze   # estático: sem issues
-flutter test      # 10/10 testes passando (máquina de estados + settings)
-```
+---
 
-## Sons
+## 🆓 Licença
 
-Os arquivos em `assets/sounds/` (`alert.wav`, `tick.wav`, `success.wav`) são
-beeps **sintéticos** gerados localmente. Substitua-os por sons de sua
-preferência mantendo os mesmos nomes. Se um arquivo faltar, o app cai para o
-som de alerta do sistema automaticamente.
+**Uso livre.** Distribuído sob a licença **MIT** — você pode usar, compartilhar,
+estudar e modificar livremente. Que ele ajude o máximo de olhos possível. 💙
 
-## Autor
+## 👨‍⚕️ Autor
 
-**Dr. Philipe Saraiva Cruz** — Oftalmologista · RQE 71.903
-
-## Licença
-
-Uso interno — Saraiva Vision Care.
+Criado com cuidado por **Dr. Philipe Saraiva Cruz** — Oftalmologista · RQE 71.903
