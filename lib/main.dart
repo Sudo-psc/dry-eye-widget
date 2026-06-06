@@ -1,0 +1,452 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_acrylic/flutter_acrylic.dart';
+import 'package:provider/provider.dart';
+import 'package:screen_retriever/screen_retriever.dart';
+import 'package:window_manager/window_manager.dart';
+
+import 'models/app_state.dart';
+import 'models/widget_settings.dart';
+import 'providers/settings_provider.dart';
+import 'providers/timer_provider.dart';
+import 'services/audio_service.dart';
+import 'services/notification_service.dart';
+import 'services/startup_service.dart';
+import 'services/storage_service.dart';
+import 'utils/constants.dart';
+import 'widgets/floating_ball.dart';
+import 'widgets/floating_menu.dart';
+import 'widgets/glass_overlay.dart';
+import 'widgets/settings_dialog.dart';
+
+/// Tamanhos das janelas de menu e configurações (a compacta é dinâmica).
+const Size _menuWindowSize = Size(250, 400);
+const Size _settingsWindowSize = Size(460, 700);
+
+/// Tamanho da janela compacta em função do diâmetro da bolinha.
+Size _compactWindowSize(double ballSize) =>
+    Size(ballSize + 24, ballSize + 24);
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Window.initialize();
+  await windowManager.ensureInitialized();
+
+  final storage = await StorageService.init();
+  final settings = SettingsProvider(storage: storage);
+  final audio = AudioService()..enabled = settings.value.soundEnabled;
+  final notifications = NotificationService()
+    ..enabled = settings.value.notificationsEnabled;
+  await notifications.init();
+
+  final startup = StartupService()..init();
+  // Garante que o estado do sistema bata com a preferência salva.
+  await startup.setEnabled(settings.value.launchAtLogin);
+
+  final initialSize = _compactWindowSize(settings.value.ballSize);
+  final windowOptions = WindowOptions(
+    size: initialSize,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
+    alwaysOnTop: true,
+    windowButtonVisibility: false,
+  );
+
+  await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.setAsFrameless();
+    await windowManager.setBackgroundColor(Colors.transparent);
+    await windowManager.setAlwaysOnTop(true);
+    await windowManager.setResizable(false);
+    // Transparência real do conteúdo: no macOS o `setEffect` sozinho deixa o
+    // fundo opaco — `makeWindowFullyTransparent` adiciona a máscara vazia que
+    // torna o FlutterView de fato transparente (sem blur/sombra).
+    if (Platform.isMacOS) {
+      Window.makeWindowFullyTransparent();
+    } else {
+      await Window.setEffect(effect: WindowEffect.transparent);
+    }
+    await _restoreBallPosition(storage, settings.value, initialSize);
+    await windowManager.show();
+  });
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<StorageService>.value(value: storage),
+        Provider<StartupService>.value(value: startup),
+        ChangeNotifierProvider<SettingsProvider>.value(value: settings),
+        ChangeNotifierProvider<TimerProvider>(
+          create: (_) => TimerProvider(
+            settings: settings,
+            storage: storage,
+            audio: audio,
+            notifications: notifications,
+          )..start(),
+        ),
+      ],
+      child: const DryEyeApp(),
+    ),
+  );
+}
+
+/// Posiciona a janela na última posição salva ou no canto padrão.
+Future<void> _restoreBallPosition(
+  StorageService storage,
+  WidgetSettings settings,
+  Size windowSize,
+) async {
+  final savedX = storage.ballX;
+  final savedY = storage.ballY;
+  if (savedX != null && savedY != null) {
+    await windowManager.setPosition(Offset(savedX, savedY));
+    return;
+  }
+  await windowManager
+      .setPosition(await _cornerOffset(settings.defaultCorner, windowSize));
+}
+
+/// Calcula o canto da tela primária para um dado tamanho de janela.
+Future<Offset> _cornerOffset(BallCorner corner, Size windowSize) async {
+  const margin = 24.0;
+  try {
+    final display = await screenRetriever.getPrimaryDisplay();
+    final screen = display.visibleSize ?? display.size;
+    final maxX = screen.width - windowSize.width - margin;
+    final maxY = screen.height - windowSize.height - margin;
+    switch (corner) {
+      case BallCorner.topLeft:
+        return const Offset(margin, margin);
+      case BallCorner.topRight:
+        return Offset(maxX, margin);
+      case BallCorner.bottomLeft:
+        return Offset(margin, maxY);
+      case BallCorner.bottomRight:
+        return Offset(maxX, maxY);
+      case BallCorner.center:
+        return Offset(maxX / 2, maxY / 2);
+    }
+  } catch (_) {
+    return const Offset(100, 100);
+  }
+}
+
+class DryEyeApp extends StatelessWidget {
+  const DryEyeApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(useMaterial3: true).copyWith(
+        scaffoldBackgroundColor: Colors.transparent,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.idleBall,
+          brightness: Brightness.dark,
+        ),
+      ),
+      home: const HomePage(),
+    );
+  }
+}
+
+enum _WindowLayout { ball, menu, settings, breakOverlay }
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late final TimerProvider _timer;
+  late final SettingsProvider _settings;
+
+  bool _menuOpen = false;
+  bool _settingsOpen = false;
+  bool _wasActive = false;
+
+  Offset _ballPosition = const Offset(100, 100);
+  double _lastBallSize = AppDefaults.ballSize;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = context.read<TimerProvider>();
+    _settings = context.read<SettingsProvider>();
+    _lastBallSize = _settings.value.ballSize;
+    _timer.addListener(_onStateChanged);
+    _settings.addListener(_onSettingsChanged);
+    _cacheCurrentPosition();
+  }
+
+  Future<void> _cacheCurrentPosition() async {
+    try {
+      _ballPosition = await windowManager.getPosition();
+    } catch (_) {/* ignora */}
+  }
+
+  @override
+  void dispose() {
+    _timer.removeListener(_onStateChanged);
+    _settings.removeListener(_onSettingsChanged);
+    super.dispose();
+  }
+
+  void _onStateChanged() {
+    final active = _timer.state.isActive;
+    if (active && !_wasActive) {
+      _enterBreakLayout();
+    } else if (!active && _wasActive) {
+      _exitBreakLayout();
+    }
+    _wasActive = active;
+  }
+
+  /// Reage a mudanças de configuração: se o tamanho da bolinha mudou e
+  /// estamos em modo compacto, redimensiona a janela na hora.
+  void _onSettingsChanged() {
+    final newSize = _settings.value.ballSize;
+    if (newSize != _lastBallSize) {
+      _lastBallSize = newSize;
+      _timer.clampElapsedToCycle();
+      if (!_menuOpen && !_settingsOpen && !_timer.state.isActive) {
+        _applyLayout(_WindowLayout.ball);
+      }
+    }
+  }
+
+  // --- Layout da janela ---------------------------------------------------
+
+  Future<void> _enterBreakLayout() async {
+    if (mounted) {
+      setState(() {
+        _menuOpen = false;
+        _settingsOpen = false;
+      });
+    }
+    await _cacheCurrentPosition();
+    await _applyLayout(_WindowLayout.breakOverlay);
+  }
+
+  Future<void> _exitBreakLayout() async => _applyLayout(_WindowLayout.ball);
+
+  Future<void> _applyLayout(_WindowLayout layout) async {
+    try {
+      switch (layout) {
+        case _WindowLayout.ball:
+          await windowManager
+              .setSize(_compactWindowSize(_settings.value.ballSize));
+          await windowManager.setPosition(_ballPosition);
+          break;
+        case _WindowLayout.menu:
+          await _cacheCurrentPosition();
+          await windowManager.setSize(_menuWindowSize);
+          await windowManager.setPosition(_ballPosition);
+          await _nudgeIntoScreen(_menuWindowSize);
+          break;
+        case _WindowLayout.settings:
+          await windowManager.setSize(_settingsWindowSize);
+          await windowManager.center();
+          break;
+        case _WindowLayout.breakOverlay:
+          final display = await screenRetriever.getPrimaryDisplay();
+          final size = display.visibleSize ?? display.size;
+          final pos = display.visiblePosition ?? Offset.zero;
+          await windowManager.setBounds(pos & size);
+          break;
+      }
+      await windowManager.setAlwaysOnTop(true);
+    } catch (e) {
+      debugPrint('Falha ao aplicar layout $layout: $e');
+    }
+  }
+
+  Future<void> _nudgeIntoScreen(Size windowSize) async {
+    try {
+      final display = await screenRetriever.getPrimaryDisplay();
+      final screen = display.visibleSize ?? display.size;
+      final origin = display.visiblePosition ?? Offset.zero;
+      var x = _ballPosition.dx;
+      var y = _ballPosition.dy;
+      x = x.clamp(origin.dx, origin.dx + screen.width - windowSize.width);
+      y = y.clamp(origin.dy, origin.dy + screen.height - windowSize.height);
+      await windowManager.setPosition(Offset(x, y));
+    } catch (_) {/* ignora */}
+  }
+
+  // --- Interações da bolinha ---------------------------------------------
+
+  void _onBallTap() {
+    if (_timer.state != AppState.idle) return;
+    setState(() => _menuOpen = !_menuOpen);
+    _applyLayout(_menuOpen ? _WindowLayout.menu : _WindowLayout.ball);
+  }
+
+  Future<void> _onBallDragStart() async {
+    if (_timer.state != AppState.idle || _menuOpen) return;
+    await windowManager.startDragging();
+  }
+
+  Future<void> _onBallDragEnd() async {
+    try {
+      final pos = await windowManager.getPosition();
+      _ballPosition = pos;
+      if (mounted) {
+        await context.read<StorageService>().saveBallPosition(pos.dx, pos.dy);
+      }
+    } catch (_) {/* ignora */}
+  }
+
+  void _closeMenu() {
+    if (!_menuOpen) return;
+    setState(() => _menuOpen = false);
+    _applyLayout(_WindowLayout.ball);
+  }
+
+  void _openSettings() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = true;
+    });
+    _applyLayout(_WindowLayout.settings);
+  }
+
+  void _closeSettings() {
+    setState(() => _settingsOpen = false);
+    _applyLayout(_WindowLayout.ball);
+  }
+
+  Future<void> _quit() async => windowManager.close();
+
+  // --- Build --------------------------------------------------------------
+
+  @override
+  Widget build(BuildContext context) {
+    final timer = context.watch<TimerProvider>();
+    final settings = context.watch<SettingsProvider>().value;
+
+    Widget body;
+    if (_settingsOpen) {
+      body = _buildSettings();
+    } else if (timer.state.isActive) {
+      body = _buildBreakOverlay(timer, settings);
+    } else {
+      body = _buildCompact(timer, settings);
+    }
+
+    return Scaffold(backgroundColor: Colors.transparent, body: body);
+  }
+
+  FloatingBall _ball({
+    required bool isActive,
+    required WidgetSettings s,
+    bool interactive = true,
+    double progress = 0.0,
+  }) {
+    return FloatingBall(
+      isActive: isActive,
+      size: s.ballSize,
+      idleColor: s.idleColorValue,
+      alertColor: s.alertColorValue,
+      idleOpacity: s.idleOpacity,
+      blinkDuration: s.blinkDuration,
+      showProgress: s.showProgressRing,
+      progress: progress,
+      onTap: interactive ? _onBallTap : null,
+      onDragStart: interactive ? _onBallDragStart : null,
+      onDragEnd: interactive ? _onBallDragEnd : null,
+    );
+  }
+
+  Widget _buildCompact(TimerProvider timer, WidgetSettings settings) {
+    if (!_menuOpen) {
+      return Center(
+        child: _ball(
+          isActive: timer.state.isActive,
+          s: settings,
+          progress: timer.cycleProgress,
+        ),
+      );
+    }
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: _closeMenu,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ball(isActive: false, s: settings),
+              const SizedBox(height: 8),
+              FloatingMenu(
+                isPaused: timer.isPaused,
+                onStartNow: timer.startBreakNow,
+                onReset: timer.reset,
+                onTogglePause: timer.togglePause,
+                onSettings: _openSettings,
+                onQuit: _quit,
+                onDismiss: _closeMenu,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBreakOverlay(TimerProvider timer, WidgetSettings settings) {
+    return Stack(
+      children: [
+        if (settings.dimBackground)
+          Positioned.fill(
+            child: ColoredBox(
+              color: Colors.black.withValues(alpha: settings.dimOpacity),
+            ),
+          ),
+        Positioned(
+          top: 24,
+          right: 24,
+          child: _ball(isActive: true, s: settings, interactive: false),
+        ),
+        Positioned.fill(
+          child: GlassOverlay(
+            state: timer.state,
+            secondsRemaining: timer.phaseRemaining,
+            fillOpacity: settings.overlayOpacity,
+            blur: settings.overlayBlur,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettings() {
+    final settings = context.read<SettingsProvider>();
+    final startup = context.read<StartupService>();
+    return Center(
+      child: SettingsDialog(
+        initial: settings.value,
+        onSave: (next) async {
+          final loginChanged = next.launchAtLogin != settings.value.launchAtLogin;
+          await settings.update(next);
+          if (loginChanged) await startup.setEnabled(next.launchAtLogin);
+        },
+        onReset: () async {
+          await startup.setEnabled(false);
+          await settings.reset();
+          _closeSettings();
+        },
+        onClose: _closeSettings,
+      ),
+    );
+  }
+}

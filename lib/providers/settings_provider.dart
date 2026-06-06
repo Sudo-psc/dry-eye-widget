@@ -1,0 +1,30 @@
+import 'package:flutter/foundation.dart';
+
+import '../models/widget_settings.dart';
+import '../services/storage_service.dart';
+
+/// Detém as [WidgetSettings] atuais e as persiste a cada alteração.
+///
+/// É a fonte única de verdade para preferências de temporização, som e
+/// aparência. Tanto a UI (cores, tamanho, escurecimento) quanto o
+/// [TimerProvider] (durações, som, notificações) leem deste provider.
+class SettingsProvider extends ChangeNotifier {
+  SettingsProvider({required StorageService storage})
+      : _storage = storage,
+        _settings = storage.loadSettings();
+
+  final StorageService _storage;
+  WidgetSettings _settings;
+
+  WidgetSettings get value => _settings;
+
+  /// Substitui todas as configurações e persiste.
+  Future<void> update(WidgetSettings next) async {
+    _settings = next;
+    notifyListeners();
+    await _storage.saveSettings(next);
+  }
+
+  /// Restaura os valores de fábrica.
+  Future<void> reset() => update(WidgetSettings.defaults());
+}
