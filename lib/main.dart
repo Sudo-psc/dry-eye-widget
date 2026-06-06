@@ -404,6 +404,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _applyLayout(_menuOpen ? _WindowLayout.menu : _WindowLayout.ball);
   }
 
+  /// Botão direito: abre o menu de opções (não alterna — sempre abre).
+  void _onBallSecondaryTap() {
+    if (_timer.state != AppState.idle || _menuOpen) return;
+    setState(() => _menuOpen = true);
+    _applyLayout(_WindowLayout.menu);
+  }
+
   Future<void> _onBallDragStart() async {
     if (_timer.state != AppState.idle || _menuOpen) return;
     await windowManager.startDragging();
@@ -505,6 +512,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       showProgress: s.showProgressRing,
       progress: progress,
       onTap: interactive ? _onBallTap : null,
+      onSecondaryTap: interactive ? _onBallSecondaryTap : null,
       onDragStart: interactive ? _onBallDragStart : null,
       onDragEnd: interactive ? _onBallDragEnd : null,
     );

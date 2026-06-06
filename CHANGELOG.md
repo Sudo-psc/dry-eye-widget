@@ -4,6 +4,13 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.3.1] - 2026-06-06
+
+### Corrigido
+- **Clique com o botão direito na bolinha** não abria o menu de opções —
+  faltava o handler `onSecondaryTap`. Agora o botão direito abre o menu (o
+  esquerdo continua alternando). Coberto por teste de widget.
+
 ## [1.3.0] - 2026-06-06
 
 ### Adicionado
@@ -58,6 +65,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Transparência real da janela no macOS (`flutter_acrylic`).
 - Persistência via `SharedPreferences`.
 
+[1.3.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.1.0

@@ -23,6 +23,7 @@ class FloatingBall extends StatefulWidget {
     this.showProgress = false,
     this.progress = 0.0,
     this.onTap,
+    this.onSecondaryTap,
     this.onDragStart,
     this.onDragEnd,
   });
@@ -36,6 +37,7 @@ class FloatingBall extends StatefulWidget {
   final bool showProgress;
   final double progress;
   final VoidCallback? onTap;
+  final VoidCallback? onSecondaryTap;
   final VoidCallback? onDragStart;
   final VoidCallback? onDragEnd;
 
@@ -151,6 +153,7 @@ class _FloatingBallState extends State<FloatingBall>
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
+        onSecondaryTap: widget.onSecondaryTap,
         onPanStart: (_) => widget.onDragStart?.call(),
         onPanEnd: (_) => widget.onDragEnd?.call(),
         child: visual,
