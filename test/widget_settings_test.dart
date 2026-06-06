@@ -19,6 +19,7 @@ void main() {
         overlayOpacity: 0.3,
         overlayBlur: 12,
         showProgressRing: true,
+        hideDockIcon: true,
       );
 
       final restored = WidgetSettings.fromJson(original.toJson());
@@ -36,6 +37,7 @@ void main() {
       expect(restored.overlayOpacity, 0.3);
       expect(restored.overlayBlur, 12);
       expect(restored.showProgressRing, isTrue);
+      expect(restored.hideDockIcon, isTrue);
     });
 
     test('JSON inválido cai para os padrões', () {

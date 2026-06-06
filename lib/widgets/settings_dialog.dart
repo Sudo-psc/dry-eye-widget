@@ -202,6 +202,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         onChanged: (v) =>
                             _set(_draft.copyWith(launchAtLogin: v)),
                       ),
+                      _switchRow(
+                        label: 'Ocultar ícone do Dock',
+                        value: _draft.hideDockIcon,
+                        onChanged: (v) =>
+                            _set(_draft.copyWith(hideDockIcon: v)),
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'Posição padrão da bolinha',

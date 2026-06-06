@@ -19,13 +19,26 @@ dependencies:
   provider: ^6.1.0
   google_fonts: ^6.1.0
   launch_at_startup: ^0.5.1
+  tray_manager: ^0.5.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
   assets:
     - assets/sounds/
+
+# Ícone do app gerado a partir de icon.png (gere com: dart run flutter_launcher_icons)
+flutter_launcher_icons:
+  image_path: "icon.png"
+  macos:
+    generate: true
+    image_path: "icon.png"
+  windows:
+    generate: true
+    image_path: "icon.png"
+    icon_size: 256

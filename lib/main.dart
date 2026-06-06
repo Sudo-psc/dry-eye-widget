@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_retriever/screen_retriever.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'models/app_state.dart';
@@ -14,6 +15,7 @@ import 'services/audio_service.dart';
 import 'services/notification_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
+import 'services/tray_service.dart';
 import 'utils/constants.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
@@ -45,6 +47,9 @@ Future<void> main() async {
   // Garante que o estado do sistema bata com a preferência salva.
   await startup.setEnabled(settings.value.launchAtLogin);
 
+  final tray = TrayService();
+  await tray.init(widgetEnabled: true);
+
   final initialSize = _compactWindowSize(settings.value.ballSize);
   final windowOptions = WindowOptions(
     size: initialSize,
@@ -60,6 +65,7 @@ Future<void> main() async {
     await windowManager.setBackgroundColor(Colors.transparent);
     await windowManager.setAlwaysOnTop(true);
     await windowManager.setResizable(false);
+    await windowManager.setSkipTaskbar(settings.value.hideDockIcon);
     // Transparência real do conteúdo: no macOS o `setEffect` sozinho deixa o
     // fundo opaco — `makeWindowFullyTransparent` adiciona a máscara vazia que
     // torna o FlutterView de fato transparente (sem blur/sombra).
@@ -77,6 +83,7 @@ Future<void> main() async {
       providers: [
         Provider<StorageService>.value(value: storage),
         Provider<StartupService>.value(value: startup),
+        Provider<TrayService>.value(value: tray),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
         ChangeNotifierProvider<TimerProvider>(
           create: (_) => TimerProvider(
@@ -161,25 +168,34 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TrayListener {
   late final TimerProvider _timer;
   late final SettingsProvider _settings;
+  late final TrayService _tray;
 
   bool _menuOpen = false;
   bool _settingsOpen = false;
   bool _wasActive = false;
 
+  /// Widget habilitado = bolinha visível. Quando desabilitado pelo item da
+  /// barra de menu, a janela é escondida (mas o ciclo e o ícone continuam).
+  bool _widgetEnabled = true;
+
   Offset _ballPosition = const Offset(100, 100);
   double _lastBallSize = AppDefaults.ballSize;
+  bool _lastDockHidden = AppDefaults.hideDockIcon;
 
   @override
   void initState() {
     super.initState();
     _timer = context.read<TimerProvider>();
     _settings = context.read<SettingsProvider>();
+    _tray = context.read<TrayService>();
     _lastBallSize = _settings.value.ballSize;
+    _lastDockHidden = _settings.value.hideDockIcon;
     _timer.addListener(_onStateChanged);
     _settings.addListener(_onSettingsChanged);
+    trayManager.addListener(this);
     _cacheCurrentPosition();
   }
 
@@ -193,10 +209,13 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _timer.removeListener(_onStateChanged);
     _settings.removeListener(_onSettingsChanged);
+    trayManager.removeListener(this);
     super.dispose();
   }
 
   void _onStateChanged() {
+    // Mantém o ícone da barra de menu em sincronia com o progresso do ciclo.
+    _tray.updateProgress(_timer.cycleProgress);
     final active = _timer.state.isActive;
     if (active && !_wasActive) {
       _enterBreakLayout();
@@ -204,6 +223,48 @@ class _HomePageState extends State<HomePage> {
       _exitBreakLayout();
     }
     _wasActive = active;
+  }
+
+  // --- Item da barra de menu (TrayListener) ------------------------------
+
+  @override
+  void onTrayIconMouseDown() => trayManager.popUpContextMenu();
+
+  @override
+  void onTrayIconRightMouseDown() => trayManager.popUpContextMenu();
+
+  @override
+  void onTrayMenuItemClick(MenuItem menuItem) {
+    switch (menuItem.key) {
+      case TrayService.keyToggle:
+        _toggleWidget();
+        break;
+      case TrayService.keyBreak:
+        _timer.startBreakNow();
+        break;
+      case TrayService.keySettings:
+        _openSettingsFromTray();
+        break;
+      case TrayService.keyQuit:
+        _quit();
+        break;
+    }
+  }
+
+  Future<void> _toggleWidget() async {
+    _widgetEnabled = !_widgetEnabled;
+    if (_widgetEnabled) {
+      await windowManager.show();
+      await _applyLayout(_WindowLayout.ball);
+    } else if (!_timer.state.isActive) {
+      await windowManager.hide();
+    }
+    await _tray.updateMenu(widgetEnabled: _widgetEnabled);
+  }
+
+  Future<void> _openSettingsFromTray() async {
+    if (!_widgetEnabled) await windowManager.show();
+    _openSettings();
   }
 
   /// Reage a mudanças de configuração: se o tamanho da bolinha mudou e
@@ -217,6 +278,11 @@ class _HomePageState extends State<HomePage> {
         _applyLayout(_WindowLayout.ball);
       }
     }
+    final hideDock = _settings.value.hideDockIcon;
+    if (hideDock != _lastDockHidden) {
+      _lastDockHidden = hideDock;
+      windowManager.setSkipTaskbar(hideDock);
+    }
   }
 
   // --- Layout da janela ---------------------------------------------------
@@ -228,11 +294,20 @@ class _HomePageState extends State<HomePage> {
         _settingsOpen = false;
       });
     }
+    // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
+    // estar escondida); garantimos que ela volte a ser exibida.
+    if (!_widgetEnabled) await windowManager.show();
     await _cacheCurrentPosition();
     await _applyLayout(_WindowLayout.breakOverlay);
   }
 
-  Future<void> _exitBreakLayout() async => _applyLayout(_WindowLayout.ball);
+  Future<void> _exitBreakLayout() async {
+    if (!_widgetEnabled) {
+      await windowManager.hide();
+    } else {
+      await _applyLayout(_WindowLayout.ball);
+    }
+  }
 
   Future<void> _applyLayout(_WindowLayout layout) async {
     try {
@@ -317,7 +392,11 @@ class _HomePageState extends State<HomePage> {
 
   void _closeSettings() {
     setState(() => _settingsOpen = false);
-    _applyLayout(_WindowLayout.ball);
+    if (!_widgetEnabled && !_timer.state.isActive) {
+      windowManager.hide();
+    } else {
+      _applyLayout(_WindowLayout.ball);
+    }
   }
 
   Future<void> _quit() async => windowManager.close();

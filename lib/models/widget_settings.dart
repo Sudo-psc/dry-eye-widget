@@ -29,6 +29,7 @@ class WidgetSettings {
     required this.overlayOpacity,
     required this.overlayBlur,
     required this.showProgressRing,
+    required this.hideDockIcon,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -77,6 +78,11 @@ class WidgetSettings {
   /// horário conforme o tempo avança até a próxima pausa.
   final bool showProgressRing;
 
+  // --- Integração com o sistema ------------------------------------------
+  /// Oculta o ícone do app no Dock (macOS) / barra de tarefas (Windows),
+  /// deixando o controle pela bolinha e pelo ícone da barra de menu.
+  final bool hideDockIcon;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
         cycleMinutes: AppDefaults.cycleMinutes,
@@ -95,6 +101,7 @@ class WidgetSettings {
         overlayOpacity: AppDefaults.overlayOpacity,
         overlayBlur: AppDefaults.overlayBlur,
         showProgressRing: AppDefaults.showProgressRing,
+        hideDockIcon: AppDefaults.hideDockIcon,
       );
 
   // --- Conveniências ------------------------------------------------------
@@ -120,6 +127,7 @@ class WidgetSettings {
     double? overlayOpacity,
     double? overlayBlur,
     bool? showProgressRing,
+    bool? hideDockIcon,
   }) {
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
@@ -138,6 +146,7 @@ class WidgetSettings {
       overlayOpacity: overlayOpacity ?? this.overlayOpacity,
       overlayBlur: overlayBlur ?? this.overlayBlur,
       showProgressRing: showProgressRing ?? this.showProgressRing,
+      hideDockIcon: hideDockIcon ?? this.hideDockIcon,
     );
   }
 
@@ -158,6 +167,7 @@ class WidgetSettings {
         'overlayOpacity': overlayOpacity,
         'overlayBlur': overlayBlur,
         'showProgressRing': showProgressRing,
+        'hideDockIcon': hideDockIcon,
       };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -188,6 +198,7 @@ class WidgetSettings {
       overlayBlur: (map['overlayBlur'] as num?)?.toDouble() ?? d.overlayBlur,
       showProgressRing:
           map['showProgressRing'] as bool? ?? d.showProgressRing,
+      hideDockIcon: map['hideDockIcon'] as bool? ?? d.hideDockIcon,
     );
   }
 

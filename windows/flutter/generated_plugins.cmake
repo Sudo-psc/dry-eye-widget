@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
   local_notifier
   screen_retriever
+  tray_manager
   window_manager
 )
 
