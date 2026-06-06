@@ -32,6 +32,7 @@ class WidgetSettings {
     required this.hideDockIcon,
     required this.hideMenuBarItem,
     required this.hideFloatingWidget,
+    required this.gentleMode,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -92,6 +93,11 @@ class WidgetSettings {
   /// Oculta a bolinha flutuante. Mutuamente exclusivo com [hideMenuBarItem].
   final bool hideFloatingWidget;
 
+  /// Modo de notificação suave: durante a pausa, em vez do overlay em tela
+  /// cheia, mostra apenas um pequeno cartão no canto superior direito, sem
+  /// bloquear o restante da tela.
+  final bool gentleMode;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
         cycleMinutes: AppDefaults.cycleMinutes,
@@ -113,6 +119,7 @@ class WidgetSettings {
         hideDockIcon: AppDefaults.hideDockIcon,
         hideMenuBarItem: AppDefaults.hideMenuBarItem,
         hideFloatingWidget: AppDefaults.hideFloatingWidget,
+        gentleMode: AppDefaults.gentleMode,
       );
 
   // --- Conveniências ------------------------------------------------------
@@ -141,6 +148,7 @@ class WidgetSettings {
     bool? hideDockIcon,
     bool? hideMenuBarItem,
     bool? hideFloatingWidget,
+    bool? gentleMode,
   }) {
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
@@ -162,6 +170,7 @@ class WidgetSettings {
       hideDockIcon: hideDockIcon ?? this.hideDockIcon,
       hideMenuBarItem: hideMenuBarItem ?? this.hideMenuBarItem,
       hideFloatingWidget: hideFloatingWidget ?? this.hideFloatingWidget,
+      gentleMode: gentleMode ?? this.gentleMode,
     );
   }
 
@@ -185,6 +194,7 @@ class WidgetSettings {
         'hideDockIcon': hideDockIcon,
         'hideMenuBarItem': hideMenuBarItem,
         'hideFloatingWidget': hideFloatingWidget,
+        'gentleMode': gentleMode,
       };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -219,6 +229,7 @@ class WidgetSettings {
       hideMenuBarItem: map['hideMenuBarItem'] as bool? ?? d.hideMenuBarItem,
       hideFloatingWidget:
           map['hideFloatingWidget'] as bool? ?? d.hideFloatingWidget,
+      gentleMode: map['gentleMode'] as bool? ?? d.gentleMode,
     );
   }
 

@@ -65,6 +65,7 @@ class AppDefaults {
   static const bool hideDockIcon = false;
   static const bool hideMenuBarItem = false;
   static const bool hideFloatingWidget = false;
+  static const bool gentleMode = false;
 
   static const double minBallSize = 24.0;
   static const double maxBallSize = 80.0;

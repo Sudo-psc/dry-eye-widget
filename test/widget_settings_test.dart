@@ -22,6 +22,7 @@ void main() {
         hideDockIcon: true,
         hideMenuBarItem: true,
         hideFloatingWidget: false,
+        gentleMode: true,
       );
 
       final restored = WidgetSettings.fromJson(original.toJson());
@@ -42,6 +43,7 @@ void main() {
       expect(restored.hideDockIcon, isTrue);
       expect(restored.hideMenuBarItem, isTrue);
       expect(restored.hideFloatingWidget, isFalse);
+      expect(restored.gentleMode, isTrue);
     });
 
     test('JSON inválido cai para os padrões', () {

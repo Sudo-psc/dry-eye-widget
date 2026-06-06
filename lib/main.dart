@@ -19,6 +19,7 @@ import 'services/tray_service.dart';
 import 'utils/constants.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
+import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
 import 'widgets/settings_dialog.dart';
@@ -162,7 +163,10 @@ class DryEyeApp extends StatelessWidget {
   }
 }
 
-enum _WindowLayout { ball, menu, settings, breakOverlay }
+enum _WindowLayout { ball, menu, settings, breakOverlay, gentleBreak }
+
+/// Tamanho do cartão de pausa no modo suave (canto superior direito).
+const Size _gentleWindowSize = Size(340, 150);
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -324,7 +328,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     // estar escondida); garantimos que ela volte a ser exibida.
     if (!_widgetEnabled) await windowManager.show();
     await _cacheCurrentPosition();
-    await _applyLayout(_WindowLayout.breakOverlay);
+    await _applyLayout(_settings.value.gentleMode
+        ? _WindowLayout.gentleBreak
+        : _WindowLayout.breakOverlay);
   }
 
   Future<void> _exitBreakLayout() async {
@@ -358,6 +364,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
           final size = display.visibleSize ?? display.size;
           final pos = display.visiblePosition ?? Offset.zero;
           await windowManager.setBounds(pos & size);
+          break;
+        case _WindowLayout.gentleBreak:
+          // Cartão pequeno no canto superior direito, sem cobrir a tela.
+          final display = await screenRetriever.getPrimaryDisplay();
+          final screen = display.visibleSize ?? display.size;
+          final origin = display.visiblePosition ?? Offset.zero;
+          await windowManager.setSize(_gentleWindowSize);
+          await windowManager.setPosition(Offset(
+            origin.dx + screen.width - _gentleWindowSize.width - 16,
+            origin.dy + 16,
+          ));
           break;
       }
       await windowManager.setAlwaysOnTop(true);
@@ -459,7 +476,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
     } else if (_guidanceOpen) {
       body = Center(child: GuidanceDialog(onClose: _closeGuidance));
     } else if (timer.state.isActive) {
-      body = _buildBreakOverlay(timer, settings);
+      body = settings.gentleMode
+          ? GentleBreakCard(
+              state: timer.state,
+              secondsRemaining: timer.phaseRemaining,
+            )
+          : _buildBreakOverlay(timer, settings);
     } else {
       body = _buildCompact(timer, settings);
     }

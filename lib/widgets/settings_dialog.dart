@@ -149,6 +149,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
                       _sectionTitle('Durante a pausa'),
                       _switchRow(
+                        label: 'Notificações suaves (não bloquear a tela)',
+                        value: _draft.gentleMode,
+                        onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
+                      ),
+                      const Text(
+                        'Mostra apenas um cartão pequeno no canto superior '
+                        'direito, em vez do aviso em tela cheia.',
+                        style: TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12),
+                      ),
+                      const SizedBox(height: 8),
+                      _switchRow(
                         label: 'Escurecer o fundo',
                         value: _draft.dimBackground,
                         onChanged: (v) =>
