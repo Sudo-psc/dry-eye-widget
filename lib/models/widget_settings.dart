@@ -30,6 +30,8 @@ class WidgetSettings {
     required this.overlayBlur,
     required this.showProgressRing,
     required this.hideDockIcon,
+    required this.hideMenuBarItem,
+    required this.hideFloatingWidget,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -83,6 +85,13 @@ class WidgetSettings {
   /// deixando o controle pela bolinha e pelo ícone da barra de menu.
   final bool hideDockIcon;
 
+  /// Oculta o item da barra de menu (o olho). Mutuamente exclusivo com
+  /// [hideFloatingWidget] — não é permitido ocultar os dois ao mesmo tempo.
+  final bool hideMenuBarItem;
+
+  /// Oculta a bolinha flutuante. Mutuamente exclusivo com [hideMenuBarItem].
+  final bool hideFloatingWidget;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
         cycleMinutes: AppDefaults.cycleMinutes,
@@ -102,6 +111,8 @@ class WidgetSettings {
         overlayBlur: AppDefaults.overlayBlur,
         showProgressRing: AppDefaults.showProgressRing,
         hideDockIcon: AppDefaults.hideDockIcon,
+        hideMenuBarItem: AppDefaults.hideMenuBarItem,
+        hideFloatingWidget: AppDefaults.hideFloatingWidget,
       );
 
   // --- Conveniências ------------------------------------------------------
@@ -128,6 +139,8 @@ class WidgetSettings {
     double? overlayBlur,
     bool? showProgressRing,
     bool? hideDockIcon,
+    bool? hideMenuBarItem,
+    bool? hideFloatingWidget,
   }) {
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
@@ -147,6 +160,8 @@ class WidgetSettings {
       overlayBlur: overlayBlur ?? this.overlayBlur,
       showProgressRing: showProgressRing ?? this.showProgressRing,
       hideDockIcon: hideDockIcon ?? this.hideDockIcon,
+      hideMenuBarItem: hideMenuBarItem ?? this.hideMenuBarItem,
+      hideFloatingWidget: hideFloatingWidget ?? this.hideFloatingWidget,
     );
   }
 
@@ -168,6 +183,8 @@ class WidgetSettings {
         'overlayBlur': overlayBlur,
         'showProgressRing': showProgressRing,
         'hideDockIcon': hideDockIcon,
+        'hideMenuBarItem': hideMenuBarItem,
+        'hideFloatingWidget': hideFloatingWidget,
       };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -199,6 +216,9 @@ class WidgetSettings {
       showProgressRing:
           map['showProgressRing'] as bool? ?? d.showProgressRing,
       hideDockIcon: map['hideDockIcon'] as bool? ?? d.hideDockIcon,
+      hideMenuBarItem: map['hideMenuBarItem'] as bool? ?? d.hideMenuBarItem,
+      hideFloatingWidget:
+          map['hideFloatingWidget'] as bool? ?? d.hideFloatingWidget,
     );
   }
 

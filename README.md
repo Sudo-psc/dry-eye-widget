@@ -14,7 +14,7 @@ um cronômetro regressivo guiando a pausa.
 
 Baixe o instalador `.dmg` mais recente:
 
-**➡️ [Baixar DryEyeWidget-1.0.0.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-1.0.0.dmg)**
+**➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** (universal: Apple Silicon + Intel)
 (ou veja todas as versões em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**)
 
 1. Abra o `.dmg` e **arraste** o `dry_eye_widget.app` para a pasta **Applications**.
@@ -74,6 +74,16 @@ As preferências ficam num painel de configurações e são agrupadas assim:
 - Escurecer o fundo da tela + intensidade do escurecimento.
 - Opacidade do overlay de vidro.
 - Desfoque (blur) do overlay de vidro.
+
+### Visibilidade
+- Ocultar ícone do Dock.
+- **Desabilitar item da barra de menu** e **desabilitar widget flutuante** —
+  mutuamente exclusivos (não é possível ocultar os dois ao mesmo tempo, para
+  você nunca perder o controle do app).
+
+> O menu da bolinha inclui um item **Orientações**, com material educativo
+> sobre Síndrome da Visão de Computador, olho seco, a regra 20-20-20 e o
+> impacto do desconforto ocular na produtividade.
 
 ## Arquitetura
 
@@ -169,6 +179,10 @@ Os arquivos em `assets/sounds/` (`alert.wav`, `tick.wav`, `success.wav`) são
 beeps **sintéticos** gerados localmente. Substitua-os por sons de sua
 preferência mantendo os mesmos nomes. Se um arquivo faltar, o app cai para o
 som de alerta do sistema automaticamente.
+
+## Autor
+
+**Dr. Philipe Saraiva Cruz** — Oftalmologista · RQE 71.903
 
 ## Licença
 

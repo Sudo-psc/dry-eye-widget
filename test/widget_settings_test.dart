@@ -20,6 +20,8 @@ void main() {
         overlayBlur: 12,
         showProgressRing: true,
         hideDockIcon: true,
+        hideMenuBarItem: true,
+        hideFloatingWidget: false,
       );
 
       final restored = WidgetSettings.fromJson(original.toJson());
@@ -38,6 +40,8 @@ void main() {
       expect(restored.overlayBlur, 12);
       expect(restored.showProgressRing, isTrue);
       expect(restored.hideDockIcon, isTrue);
+      expect(restored.hideMenuBarItem, isTrue);
+      expect(restored.hideFloatingWidget, isFalse);
     });
 
     test('JSON inválido cai para os padrões', () {

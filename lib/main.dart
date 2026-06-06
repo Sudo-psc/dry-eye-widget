@@ -20,6 +20,7 @@ import 'utils/constants.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
 import 'widgets/glass_overlay.dart';
+import 'widgets/guidance_dialog.dart';
 import 'widgets/settings_dialog.dart';
 
 /// Tamanhos das janelas de menu e configurações (a compacta é dinâmica).
@@ -48,7 +49,9 @@ Future<void> main() async {
   await startup.setEnabled(settings.value.launchAtLogin);
 
   final tray = TrayService();
-  await tray.init(widgetEnabled: true);
+  if (!settings.value.hideMenuBarItem) {
+    await tray.init(widgetEnabled: !settings.value.hideFloatingWidget);
+  }
 
   final initialSize = _compactWindowSize(settings.value.ballSize);
   final windowOptions = WindowOptions(
@@ -175,15 +178,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   bool _menuOpen = false;
   bool _settingsOpen = false;
+  bool _guidanceOpen = false;
   bool _wasActive = false;
 
-  /// Widget habilitado = bolinha visível. Quando desabilitado pelo item da
-  /// barra de menu, a janela é escondida (mas o ciclo e o ícone continuam).
+  /// Widget habilitado = bolinha visível. Quando desabilitado (pela opção
+  /// nas configurações ou pelo item da barra de menu), a janela é escondida
+  /// — mas o ciclo e o ícone da barra de menu continuam.
   bool _widgetEnabled = true;
 
   Offset _ballPosition = const Offset(100, 100);
   double _lastBallSize = AppDefaults.ballSize;
   bool _lastDockHidden = AppDefaults.hideDockIcon;
+  bool _lastHideMenuBar = AppDefaults.hideMenuBarItem;
+  bool _lastHideFloating = AppDefaults.hideFloatingWidget;
 
   @override
   void initState() {
@@ -193,10 +200,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _tray = context.read<TrayService>();
     _lastBallSize = _settings.value.ballSize;
     _lastDockHidden = _settings.value.hideDockIcon;
+    _lastHideMenuBar = _settings.value.hideMenuBarItem;
+    _lastHideFloating = _settings.value.hideFloatingWidget;
+    _widgetEnabled = !_settings.value.hideFloatingWidget;
     _timer.addListener(_onStateChanged);
     _settings.addListener(_onSettingsChanged);
     trayManager.addListener(this);
     _cacheCurrentPosition();
+    // Aplica o estado inicial de visibilidade da bolinha após o primeiro frame.
+    if (!_widgetEnabled) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => windowManager.hide());
+    }
   }
 
   Future<void> _cacheCurrentPosition() async {
@@ -251,9 +265,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
   }
 
-  Future<void> _toggleWidget() async {
-    _widgetEnabled = !_widgetEnabled;
-    if (_widgetEnabled) {
+  Future<void> _toggleWidget() => _setWidgetEnabled(!_widgetEnabled);
+
+  Future<void> _setWidgetEnabled(bool enabled) async {
+    _widgetEnabled = enabled;
+    if (enabled) {
       await windowManager.show();
       await _applyLayout(_WindowLayout.ball);
     } else if (!_timer.state.isActive) {
@@ -282,6 +298,16 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (hideDock != _lastDockHidden) {
       _lastDockHidden = hideDock;
       windowManager.setSkipTaskbar(hideDock);
+    }
+    final hideMenuBar = _settings.value.hideMenuBarItem;
+    if (hideMenuBar != _lastHideMenuBar) {
+      _lastHideMenuBar = hideMenuBar;
+      _tray.setVisible(!hideMenuBar, widgetEnabled: _widgetEnabled);
+    }
+    final hideFloating = _settings.value.hideFloatingWidget;
+    if (hideFloating != _lastHideFloating) {
+      _lastHideFloating = hideFloating;
+      _setWidgetEnabled(!hideFloating);
     }
   }
 
@@ -392,6 +418,25 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _closeSettings() {
     setState(() => _settingsOpen = false);
+    _restoreAfterPanel();
+  }
+
+  void _openGuidance() {
+    setState(() {
+      _menuOpen = false;
+      _guidanceOpen = true;
+    });
+    _applyLayout(_WindowLayout.settings);
+  }
+
+  void _closeGuidance() {
+    setState(() => _guidanceOpen = false);
+    _restoreAfterPanel();
+  }
+
+  /// Volta ao layout compacto após fechar um painel (configurações/orientações),
+  /// respeitando o estado de widget desabilitado.
+  void _restoreAfterPanel() {
     if (!_widgetEnabled && !_timer.state.isActive) {
       windowManager.hide();
     } else {
@@ -411,6 +456,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     Widget body;
     if (_settingsOpen) {
       body = _buildSettings();
+    } else if (_guidanceOpen) {
+      body = Center(child: GuidanceDialog(onClose: _closeGuidance));
     } else if (timer.state.isActive) {
       body = _buildBreakOverlay(timer, settings);
     } else {
@@ -471,6 +518,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onStartNow: timer.startBreakNow,
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
+                onGuidance: _openGuidance,
                 onSettings: _openSettings,
                 onQuit: _quit,
                 onDismiss: _closeMenu,

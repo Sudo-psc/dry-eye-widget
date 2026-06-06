@@ -1,2 +1,6 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "ephemeral/Flutter-Generated.xcconfig"
+
+// Build universal (Apple Silicon + Intel) no release.
+ARCHS=arm64 x86_64
+ONLY_ACTIVE_ARCH=NO

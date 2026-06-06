@@ -8,9 +8,10 @@
 # Saída: dist/DryEyeWidget-<versão>.dmg
 set -euo pipefail
 
-VERSION="${1:-1.0.0}"
+VERSION="${1:-1.1.0}"
 APP="build/macos/Build/Products/Release/dry_eye_widget.app"
-OUT="dist/DryEyeWidget-${VERSION}.dmg"
+# Nome fixo do asset: mantém o link de download estável entre versões.
+OUT="dist/DryEyeWidget.dmg"
 
 if [ ! -d "$APP" ]; then
   echo "App não encontrado em $APP. Rode antes: flutter build macos --release" >&2

@@ -103,8 +103,21 @@ class TrayService {
     }
   }
 
+  /// Mostra ou oculta o item da barra de menu em tempo de execução.
+  Future<void> setVisible(bool visible, {required bool widgetEnabled}) async {
+    if (!(Platform.isMacOS || Platform.isWindows)) return;
+    if (visible) {
+      if (_ready) return;
+      _lastStep = -1;
+      _lastIconPath = null;
+      await init(widgetEnabled: widgetEnabled);
+    } else {
+      await dispose();
+      _ready = false;
+    }
+  }
+
   Future<void> dispose() async {
-    if (!_ready) return;
     try {
       await trayManager.destroy();
     } catch (_) {/* ignora */}

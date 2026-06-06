@@ -208,6 +208,32 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         onChanged: (v) =>
                             _set(_draft.copyWith(hideDockIcon: v)),
                       ),
+
+                      _sectionTitle('Visibilidade'),
+                      _switchRow(
+                        label: 'Desabilitar item da barra de menu',
+                        value: _draft.hideMenuBarItem,
+                        onChanged: (v) => _set(_draft.copyWith(
+                          hideMenuBarItem: v,
+                          // Exclusivo: não é possível ocultar os dois.
+                          hideFloatingWidget:
+                              v ? false : _draft.hideFloatingWidget,
+                        )),
+                      ),
+                      _switchRow(
+                        label: 'Desabilitar widget flutuante',
+                        value: _draft.hideFloatingWidget,
+                        onChanged: (v) => _set(_draft.copyWith(
+                          hideFloatingWidget: v,
+                          hideMenuBarItem: v ? false : _draft.hideMenuBarItem,
+                        )),
+                      ),
+                      const Text(
+                        'Não é possível ocultar o widget e a barra de menu ao '
+                        'mesmo tempo.',
+                        style: TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12),
+                      ),
                       const SizedBox(height: 8),
                       const Text(
                         'Posição padrão da bolinha',

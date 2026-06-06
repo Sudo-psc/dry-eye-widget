@@ -20,6 +20,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onStartNow,
     required this.onReset,
     required this.onTogglePause,
+    required this.onGuidance,
     required this.onSettings,
     required this.onQuit,
     required this.onDismiss,
@@ -29,6 +30,7 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onStartNow;
   final VoidCallback onReset;
   final VoidCallback onTogglePause;
+  final VoidCallback onGuidance;
   final VoidCallback onSettings;
   final VoidCallback onQuit;
   final VoidCallback onDismiss;
@@ -43,6 +45,7 @@ class FloatingMenu extends StatelessWidget {
         isPaused ? 'Retomar cronômetro' : 'Pausar cronômetro',
         onTogglePause,
       ),
+      _MenuItem(Icons.menu_book_outlined, 'Orientações', onGuidance),
       _MenuItem(Icons.settings_outlined, 'Configurações', onSettings),
       _MenuItem(Icons.close, 'Sair', onQuit),
     ];

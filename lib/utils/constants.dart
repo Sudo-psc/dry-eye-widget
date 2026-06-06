@@ -63,6 +63,8 @@ class AppDefaults {
   static const double overlayBlur = 20.0;
   static const bool showProgressRing = false;
   static const bool hideDockIcon = false;
+  static const bool hideMenuBarItem = false;
+  static const bool hideFloatingWidget = false;
 
   static const double minBallSize = 24.0;
   static const double maxBallSize = 80.0;
