@@ -4,6 +4,20 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.3.0] - 2026-06-06
+
+### Adicionado
+- Seção **"O que dizem os estudos"** na janela de Orientações, com dados
+  estatísticos e **referências científicas** (prevalência de olho seco em
+  usuários de tela, impacto na produtividade e na velocidade de leitura).
+- Referências em formato RIS (`docs/referencias.ris`) e citações no README.
+
+### Corrigido
+- Estatísticas conferidas na literatura via PubMed: prevalência ~49,5%
+  (meta-análise, não 60%); impacto na produtividade descrito como ~30% de
+  redução de desempenho (presenteísmo), não "15 min/dia"; leitura até 14% mais
+  lenta (confirmado).
+
 ## [1.2.0] - 2026-06-06
 
 ### Adicionado
@@ -44,6 +58,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Transparência real da janela no macOS (`flutter_acrylic`).
 - Persistência via `SharedPreferences`.
 
+[1.3.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.0.0
