@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.5.0] - 2026-06-07
+
+### Adicionado
+- **Internacionalização (PT-BR / English)**: todo o app traduzido para inglês
+  (menu, configurações, orientações, notificações, pausas e barra de menu).
+- **Seletor de idioma** nas Configurações, com bandeiras do Brasil e dos EUA
+  (desenhadas no app, sem dependências externas). A troca atualiza o painel na
+  hora e persiste.
+- **README em inglês** (`README.en.md`) com seletor de idioma 🇧🇷/🇺🇸 no topo de
+  ambos os READMEs.
+
 ## [1.4.1] - 2026-06-07
 
 ### Melhorado
@@ -82,6 +93,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Transparência real da janela no macOS (`flutter_acrylic`).
 - Persistência via `SharedPreferences`.
 
+[1.5.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.5.0
 [1.4.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.1

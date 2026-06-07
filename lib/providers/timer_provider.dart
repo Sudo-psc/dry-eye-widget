@@ -102,7 +102,10 @@ class TimerProvider extends ChangeNotifier {
     _cycleElapsed = 0;
     _storage.setElapsedSeconds(0);
     if (_soundOn) _audio.playAlert();
-    if (_notifyOn) _notifications.notifyBreakStart();
+    if (_notifyOn) {
+      final s = _settings.strings;
+      _notifications.notifyBreakStart(s.notifyBreakTitle, s.notifyBreakBody);
+    }
     notifyListeners();
 
     Timer(const Duration(milliseconds: 1500), () {
@@ -134,7 +137,10 @@ class TimerProvider extends ChangeNotifier {
   void _enterConclusao() {
     _state = AppState.conclusao;
     if (_soundOn) _audio.playSuccess();
-    if (_notifyOn) _notifications.notifyBreakDone();
+    if (_notifyOn) {
+      final s = _settings.strings;
+      _notifications.notifyBreakDone(s.notifyDoneTitle, s.notifyDoneBody);
+    }
     notifyListeners();
 
     Timer(AppDurations.completion, () {

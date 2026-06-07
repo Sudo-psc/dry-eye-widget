@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:tray_manager/tray_manager.dart';
 
+import '../l10n/app_strings.dart';
 import '../utils/eye_icon.dart';
 
 /// Gerencia o ícone na barra de menu (macOS) / bandeja do sistema (Windows).
@@ -33,8 +34,14 @@ class TrayService {
   Color get _color => Platform.isMacOS ? Colors.black : Colors.white;
   bool get _isTemplate => Platform.isMacOS;
 
-  Future<void> init({required bool widgetEnabled}) async {
+  AppStrings _strings = ptStrings;
+
+  Future<void> init({
+    required bool widgetEnabled,
+    required AppStrings strings,
+  }) async {
     if (!(Platform.isMacOS || Platform.isWindows)) return;
+    _strings = strings;
     // O ícone é o que importa para o serviço estar "pronto". Marcamos como
     // pronto assim que ele é exibido — tooltip e menu são best-effort e não
     // podem bloquear as futuras atualizações de progresso.
@@ -44,7 +51,7 @@ class TrayService {
     } catch (e) {
       debugPrint('TrayService: setToolTip falhou ($e).');
     }
-    await updateMenu(widgetEnabled: widgetEnabled);
+    await updateMenu(widgetEnabled: widgetEnabled, strings: strings);
   }
 
   /// Atualiza a barra de progresso do ícone (com throttle por passo).
@@ -83,19 +90,23 @@ class TrayService {
 
   /// (Re)constrói o menu de contexto com o rótulo correto de habilitar/
   /// desabilitar o widget.
-  Future<void> updateMenu({required bool widgetEnabled}) async {
+  Future<void> updateMenu({
+    required bool widgetEnabled,
+    required AppStrings strings,
+  }) async {
     if (!(Platform.isMacOS || Platform.isWindows)) return;
+    _strings = strings;
     try {
       await trayManager.setContextMenu(
         Menu(items: [
           MenuItem(
             key: keyToggle,
-            label: widgetEnabled ? 'Desabilitar widget' : 'Habilitar widget',
+            label: widgetEnabled ? strings.trayDisable : strings.trayEnable,
           ),
-          MenuItem(key: keyBreak, label: 'Iniciar pausa agora'),
+          MenuItem(key: keyBreak, label: strings.menuStartBreak),
           MenuItem.separator(),
-          MenuItem(key: keySettings, label: 'Configurações'),
-          MenuItem(key: keyQuit, label: 'Sair'),
+          MenuItem(key: keySettings, label: strings.menuSettings),
+          MenuItem(key: keyQuit, label: strings.menuQuit),
         ]),
       );
     } catch (e) {
@@ -104,13 +115,17 @@ class TrayService {
   }
 
   /// Mostra ou oculta o item da barra de menu em tempo de execução.
-  Future<void> setVisible(bool visible, {required bool widgetEnabled}) async {
+  Future<void> setVisible(
+    bool visible, {
+    required bool widgetEnabled,
+    AppStrings? strings,
+  }) async {
     if (!(Platform.isMacOS || Platform.isWindows)) return;
     if (visible) {
       if (_ready) return;
       _lastStep = -1;
       _lastIconPath = null;
-      await init(widgetEnabled: widgetEnabled);
+      await init(widgetEnabled: widgetEnabled, strings: strings ?? _strings);
     } else {
       await dispose();
       _ready = false;

@@ -7,6 +7,7 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'l10n/app_strings.dart';
 import 'models/app_state.dart';
 import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
@@ -51,7 +52,10 @@ Future<void> main() async {
 
   final tray = TrayService();
   if (!settings.value.hideMenuBarItem) {
-    await tray.init(widgetEnabled: !settings.value.hideFloatingWidget);
+    await tray.init(
+      widgetEnabled: !settings.value.hideFloatingWidget,
+      strings: settings.strings,
+    );
   }
 
   final initialSize = _compactWindowSize(settings.value.ballSize);
@@ -195,6 +199,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _lastDockHidden = AppDefaults.hideDockIcon;
   bool _lastHideMenuBar = AppDefaults.hideMenuBarItem;
   bool _lastHideFloating = AppDefaults.hideFloatingWidget;
+  String _lastLanguage = AppDefaults.languageCode;
 
   @override
   void initState() {
@@ -206,6 +211,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _lastDockHidden = _settings.value.hideDockIcon;
     _lastHideMenuBar = _settings.value.hideMenuBarItem;
     _lastHideFloating = _settings.value.hideFloatingWidget;
+    _lastLanguage = _settings.value.languageCode;
     _widgetEnabled = !_settings.value.hideFloatingWidget;
     _timer.addListener(_onStateChanged);
     _settings.addListener(_onSettingsChanged);
@@ -279,7 +285,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     } else if (!_timer.state.isActive) {
       await windowManager.hide();
     }
-    await _tray.updateMenu(widgetEnabled: _widgetEnabled);
+    await _tray.updateMenu(
+        widgetEnabled: _widgetEnabled, strings: _settings.strings);
   }
 
   Future<void> _openSettingsFromTray() async {
@@ -306,12 +313,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final hideMenuBar = _settings.value.hideMenuBarItem;
     if (hideMenuBar != _lastHideMenuBar) {
       _lastHideMenuBar = hideMenuBar;
-      _tray.setVisible(!hideMenuBar, widgetEnabled: _widgetEnabled);
+      _tray.setVisible(!hideMenuBar,
+          widgetEnabled: _widgetEnabled, strings: _settings.strings);
     }
     final hideFloating = _settings.value.hideFloatingWidget;
     if (hideFloating != _lastHideFloating) {
       _lastHideFloating = hideFloating;
       _setWidgetEnabled(!hideFloating);
+    }
+    final lang = _settings.value.languageCode;
+    if (lang != _lastLanguage) {
+      _lastLanguage = lang;
+      _tray.updateMenu(
+          widgetEnabled: _widgetEnabled, strings: _settings.strings);
     }
   }
 
@@ -475,22 +489,26 @@ class _HomePageState extends State<HomePage> with TrayListener {
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerProvider>();
-    final settings = context.watch<SettingsProvider>().value;
+    final provider = context.watch<SettingsProvider>();
+    final settings = provider.value;
+    final strings = provider.strings;
 
     Widget body;
     if (_settingsOpen) {
       body = _buildSettings();
     } else if (_guidanceOpen) {
-      body = Center(child: GuidanceDialog(onClose: _closeGuidance));
+      body = Center(
+          child: GuidanceDialog(strings: strings, onClose: _closeGuidance));
     } else if (timer.state.isActive) {
       body = settings.gentleMode
           ? GentleBreakCard(
               state: timer.state,
+              strings: strings,
               secondsRemaining: timer.phaseRemaining,
             )
-          : _buildBreakOverlay(timer, settings);
+          : _buildBreakOverlay(timer, settings, strings);
     } else {
-      body = _buildCompact(timer, settings);
+      body = _buildCompact(timer, settings, strings);
     }
 
     return Scaffold(backgroundColor: Colors.transparent, body: body);
@@ -518,7 +536,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     );
   }
 
-  Widget _buildCompact(TimerProvider timer, WidgetSettings settings) {
+  Widget _buildCompact(
+      TimerProvider timer, WidgetSettings settings, AppStrings strings) {
     if (!_menuOpen) {
       return Center(
         child: _ball(
@@ -544,6 +563,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
               _ball(isActive: false, s: settings),
               const SizedBox(height: 8),
               FloatingMenu(
+                strings: strings,
                 isPaused: timer.isPaused,
                 onStartNow: timer.startBreakNow,
                 onReset: timer.reset,
@@ -560,7 +580,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     );
   }
 
-  Widget _buildBreakOverlay(TimerProvider timer, WidgetSettings settings) {
+  Widget _buildBreakOverlay(
+      TimerProvider timer, WidgetSettings settings, AppStrings strings) {
     return Stack(
       children: [
         if (settings.dimBackground)
@@ -577,6 +598,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         Positioned.fill(
           child: GlassOverlay(
             state: timer.state,
+            strings: strings,
             secondsRemaining: timer.phaseRemaining,
             fillOpacity: settings.overlayOpacity,
             blur: settings.overlayBlur,

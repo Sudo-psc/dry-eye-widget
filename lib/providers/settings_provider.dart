@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/widget_settings.dart';
 import '../services/storage_service.dart';
 
@@ -17,6 +18,9 @@ class SettingsProvider extends ChangeNotifier {
   WidgetSettings _settings;
 
   WidgetSettings get value => _settings;
+
+  /// Textos do idioma ativo.
+  AppStrings get strings => AppStrings.of(_settings.languageCode);
 
   /// Substitui todas as configurações e persiste.
   Future<void> update(WidgetSettings next) async {

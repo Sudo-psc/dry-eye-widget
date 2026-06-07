@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
 
@@ -15,6 +16,7 @@ class _MenuItem {
 class FloatingMenu extends StatelessWidget {
   const FloatingMenu({
     super.key,
+    required this.strings,
     required this.isPaused,
     required this.onStartNow,
     required this.onReset,
@@ -25,6 +27,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onDismiss,
   });
 
+  final AppStrings strings;
   final bool isPaused;
   final VoidCallback onStartNow;
   final VoidCallback onReset;
@@ -36,17 +39,18 @@ class FloatingMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = strings;
     final items = <_MenuItem>[
-      _MenuItem(Icons.play_circle_outline, 'Iniciar pausa agora', onStartNow),
-      _MenuItem(Icons.refresh, 'Resetar cronômetro', onReset),
+      _MenuItem(Icons.play_circle_outline, s.menuStartBreak, onStartNow),
+      _MenuItem(Icons.refresh, s.menuReset, onReset),
       _MenuItem(
         isPaused ? Icons.play_arrow : Icons.pause,
-        isPaused ? 'Retomar cronômetro' : 'Pausar cronômetro',
+        isPaused ? s.menuResume : s.menuPause,
         onTogglePause,
       ),
-      _MenuItem(Icons.menu_book_outlined, 'Orientações', onGuidance),
-      _MenuItem(Icons.settings_outlined, 'Configurações', onSettings),
-      _MenuItem(Icons.close, 'Sair', onQuit),
+      _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
+      _MenuItem(Icons.settings_outlined, s.menuSettings, onSettings),
+      _MenuItem(Icons.close, s.menuQuit, onQuit),
     ];
 
     return LiquidGlass(

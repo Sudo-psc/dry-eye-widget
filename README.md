@@ -6,6 +6,8 @@
 
 <p align="center"><em>Seus olhos também merecem uma pausa.</em></p>
 
+<p align="center"><b>🇧🇷 Português</b> · <a href="README.en.md">🇺🇸 English</a></p>
+
 <p align="center">
   <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Baixar-macOS%20.dmg-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Baixar para macOS"></a>
   <img src="https://img.shields.io/badge/Plataforma-macOS%20%7C%20Windows-555?style=flat-square" alt="Plataformas">

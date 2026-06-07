@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
@@ -13,12 +14,14 @@ class GlassOverlay extends StatelessWidget {
   const GlassOverlay({
     super.key,
     required this.state,
+    required this.strings,
     required this.secondsRemaining,
     this.fillOpacity = 0.15,
     this.blur = 20.0,
   });
 
   final AppState state;
+  final AppStrings strings;
   final int secondsRemaining;
 
   /// Opacidade do preenchimento branco do vidro.
@@ -69,7 +72,7 @@ class GlassOverlay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            state.title,
+            strings.stateTitle(state),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 20,
@@ -80,7 +83,7 @@ class GlassOverlay extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            state.subtitle,
+            strings.stateSubtitle(state),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 16,

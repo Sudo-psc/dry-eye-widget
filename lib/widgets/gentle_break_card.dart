@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
@@ -12,10 +13,12 @@ class GentleBreakCard extends StatelessWidget {
   const GentleBreakCard({
     super.key,
     required this.state,
+    required this.strings,
     required this.secondsRemaining,
   });
 
   final AppState state;
+  final AppStrings strings;
   final int secondsRemaining;
 
   String get _timeText {
@@ -47,7 +50,7 @@ class GentleBreakCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      state.title,
+                      strings.stateTitle(state),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

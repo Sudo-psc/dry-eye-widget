@@ -66,6 +66,7 @@ class AppDefaults {
   static const bool hideMenuBarItem = false;
   static const bool hideFloatingWidget = false;
   static const bool gentleMode = false;
+  static const String languageCode = 'pt';
 
   static const double minBallSize = 24.0;
   static const double maxBallSize = 80.0;

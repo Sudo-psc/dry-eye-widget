@@ -1,13 +1,15 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../models/widget_settings.dart';
 import '../utils/constants.dart';
+import 'flag_icons.dart';
+import 'liquid_glass.dart';
 
 /// Painel de configurações. Edita uma cópia local de [WidgetSettings] e
-/// devolve o resultado via [onSave].
+/// devolve o resultado via [onSave]. Os textos são exibidos no idioma do
+/// rascunho — então trocar a bandeira atualiza o painel na hora.
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({
     super.key,
@@ -39,269 +41,252 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          width: 400,
-          constraints: const BoxConstraints(maxHeight: 620),
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xF2323238), Color(0xF21E1E22)],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-                color: Colors.white.withValues(alpha: 0.18), width: 1),
-            boxShadow: const [
-              BoxShadow(
-                color: AppColors.glassShadow,
-                blurRadius: 26,
-                offset: Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Configurações',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textPrimary),
-                    onPressed: widget.onClose,
-                  ),
-                ],
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _sectionTitle('Temporização'),
-                      _slider(
-                        label: 'Ciclo de trabalho',
-                        value: _draft.cycleMinutes.toDouble(),
-                        min: 1,
-                        max: 60,
-                        suffix: '${_draft.cycleMinutes} min',
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(cycleMinutes: v.round())),
-                      ),
-                      _slider(
-                        label: 'Duração de cada fase',
-                        value: _draft.phaseSeconds.toDouble(),
-                        min: 5,
-                        max: 120,
-                        suffix: '${_draft.phaseSeconds} s',
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(phaseSeconds: v.round())),
-                      ),
+    final s = AppStrings.of(_draft.languageCode);
 
-                      _sectionTitle('Aparência'),
-                      _slider(
-                        label: 'Tamanho da bolinha',
-                        value: _draft.ballSize,
-                        min: AppDefaults.minBallSize,
-                        max: AppDefaults.maxBallSize,
-                        suffix: '${_draft.ballSize.round()} px',
-                        onChanged: (v) => _set(_draft.copyWith(ballSize: v)),
-                      ),
-                      _colorRow(
-                        label: 'Cor (normal)',
-                        selected: _draft.idleColor,
-                        onPick: (c) =>
-                            _set(_draft.copyWith(idleColor: c)),
-                      ),
-                      _colorRow(
-                        label: 'Cor (alerta)',
-                        selected: _draft.alertColor,
-                        onPick: (c) =>
-                            _set(_draft.copyWith(alertColor: c)),
-                      ),
-                      _slider(
-                        label: 'Opacidade (normal)',
-                        value: _draft.idleOpacity,
-                        min: 0.3,
-                        max: 1.0,
-                        suffix: '${(_draft.idleOpacity * 100).round()}%',
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(idleOpacity: v)),
-                      ),
-                      _slider(
-                        label: 'Velocidade do piscar',
-                        value: _draft.blinkMs.toDouble(),
-                        min: 200,
-                        max: 1500,
-                        suffix: '${_draft.blinkMs} ms',
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(blinkMs: v.round())),
-                      ),
-                      _switchRow(
-                        label: 'Anel de progresso',
-                        value: _draft.showProgressRing,
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(showProgressRing: v)),
-                      ),
-
-                      _sectionTitle('Durante a pausa'),
-                      _switchRow(
-                        label: 'Notificações suaves (não bloquear a tela)',
-                        value: _draft.gentleMode,
-                        onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
-                      ),
-                      const Text(
-                        'Mostra apenas um cartão pequeno no canto superior '
-                        'direito, em vez do aviso em tela cheia.',
-                        style: TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12),
-                      ),
-                      const SizedBox(height: 8),
-                      _switchRow(
-                        label: 'Escurecer o fundo',
-                        value: _draft.dimBackground,
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(dimBackground: v)),
-                      ),
-                      if (_draft.dimBackground)
-                        _slider(
-                          label: 'Intensidade do escurecimento',
-                          value: _draft.dimOpacity,
-                          min: 0.0,
-                          max: 0.6,
-                          suffix: '${(_draft.dimOpacity * 100).round()}%',
-                          onChanged: (v) =>
-                              _set(_draft.copyWith(dimOpacity: v)),
-                        ),
-                      _slider(
-                        label: 'Opacidade do overlay',
-                        value: _draft.overlayOpacity,
-                        min: 0.05,
-                        max: 0.4,
-                        suffix: '${(_draft.overlayOpacity * 100).round()}%',
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(overlayOpacity: v)),
-                      ),
-                      _slider(
-                        label: 'Desfoque do overlay',
-                        value: _draft.overlayBlur,
-                        min: 0,
-                        max: 40,
-                        suffix: '${_draft.overlayBlur.round()} px',
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(overlayBlur: v)),
-                      ),
-
-                      _sectionTitle('Geral'),
-                      _switchRow(
-                        label: 'Ativar som',
-                        value: _draft.soundEnabled,
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(soundEnabled: v)),
-                      ),
-                      _switchRow(
-                        label: 'Ativar notificações',
-                        value: _draft.notificationsEnabled,
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(notificationsEnabled: v)),
-                      ),
-                      _switchRow(
-                        label: 'Iniciar com o sistema',
-                        value: _draft.launchAtLogin,
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(launchAtLogin: v)),
-                      ),
-                      _switchRow(
-                        label: 'Ocultar ícone do Dock',
-                        value: _draft.hideDockIcon,
-                        onChanged: (v) =>
-                            _set(_draft.copyWith(hideDockIcon: v)),
-                      ),
-
-                      _sectionTitle('Visibilidade'),
-                      _switchRow(
-                        label: 'Desabilitar item da barra de menu',
-                        value: _draft.hideMenuBarItem,
-                        onChanged: (v) => _set(_draft.copyWith(
-                          hideMenuBarItem: v,
-                          // Exclusivo: não é possível ocultar os dois.
-                          hideFloatingWidget:
-                              v ? false : _draft.hideFloatingWidget,
-                        )),
-                      ),
-                      _switchRow(
-                        label: 'Desabilitar widget flutuante',
-                        value: _draft.hideFloatingWidget,
-                        onChanged: (v) => _set(_draft.copyWith(
-                          hideFloatingWidget: v,
-                          hideMenuBarItem: v ? false : _draft.hideMenuBarItem,
-                        )),
-                      ),
-                      const Text(
-                        'Não é possível ocultar o widget e a barra de menu ao '
-                        'mesmo tempo.',
-                        style: TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Posição padrão da bolinha',
-                        style: TextStyle(
-                            color: AppColors.textSecondary, fontSize: 13),
-                      ),
-                      const SizedBox(height: 4),
-                      DropdownButton<BallCorner>(
-                        value: _draft.defaultCorner,
-                        isExpanded: true,
-                        dropdownColor: const Color(0xFF2A2A2A),
-                        style: const TextStyle(color: AppColors.textPrimary),
-                        underline:
-                            Container(height: 1, color: AppColors.glassBorder),
-                        items: [
-                          for (final corner in BallCorner.values)
-                            DropdownMenuItem(
-                                value: corner, child: Text(corner.label)),
-                        ],
-                        onChanged: (v) => _set(
-                            _draft.copyWith(defaultCorner: v ?? _draft.defaultCorner)),
-                      ),
-                    ],
+    return LiquidGlass(
+      width: 400,
+      constraints: const BoxConstraints(maxHeight: 640),
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  s.settingsTitle,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: AppColors.textPrimary),
+                  onPressed: widget.onClose,
+                ),
+              ],
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle(s.secLanguage),
+                    Row(
+                      children: [
+                        _langButton(
+                          label: 'Português',
+                          flag: const FlagIcon.brazil(),
+                          selected: _draft.languageCode == 'pt',
+                          onTap: () =>
+                              _set(_draft.copyWith(languageCode: 'pt')),
+                        ),
+                        const SizedBox(width: 10),
+                        _langButton(
+                          label: 'English',
+                          flag: const FlagIcon.usa(),
+                          selected: _draft.languageCode == 'en',
+                          onTap: () =>
+                              _set(_draft.copyWith(languageCode: 'en')),
+                        ),
+                      ],
+                    ),
+
+                    _sectionTitle(s.secTiming),
+                    _slider(
+                      label: s.workCycle,
+                      value: _draft.cycleMinutes.toDouble(),
+                      min: 1,
+                      max: 60,
+                      suffix: '${_draft.cycleMinutes} ${s.unitMin}',
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(cycleMinutes: v.round())),
+                    ),
+                    _slider(
+                      label: s.breakDuration,
+                      value: _draft.phaseSeconds.toDouble(),
+                      min: 5,
+                      max: 120,
+                      suffix: '${_draft.phaseSeconds} ${s.unitSec}',
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(phaseSeconds: v.round())),
+                    ),
+
+                    _sectionTitle(s.secAppearance),
+                    _slider(
+                      label: s.ballSize,
+                      value: _draft.ballSize,
+                      min: AppDefaults.minBallSize,
+                      max: AppDefaults.maxBallSize,
+                      suffix: '${_draft.ballSize.round()} px',
+                      onChanged: (v) => _set(_draft.copyWith(ballSize: v)),
+                    ),
+                    _colorRow(
+                      label: s.colorNormal,
+                      selected: _draft.idleColor,
+                      onPick: (c) => _set(_draft.copyWith(idleColor: c)),
+                    ),
+                    _colorRow(
+                      label: s.colorAlert,
+                      selected: _draft.alertColor,
+                      onPick: (c) => _set(_draft.copyWith(alertColor: c)),
+                    ),
+                    _slider(
+                      label: s.opacityNormal,
+                      value: _draft.idleOpacity,
+                      min: 0.3,
+                      max: 1.0,
+                      suffix: '${(_draft.idleOpacity * 100).round()}%',
+                      onChanged: (v) => _set(_draft.copyWith(idleOpacity: v)),
+                    ),
+                    _slider(
+                      label: s.blinkSpeed,
+                      value: _draft.blinkMs.toDouble(),
+                      min: 200,
+                      max: 1500,
+                      suffix: '${_draft.blinkMs} ms',
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(blinkMs: v.round())),
+                    ),
+                    _switchRow(
+                      label: s.progressRing,
+                      value: _draft.showProgressRing,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(showProgressRing: v)),
+                    ),
+
+                    _sectionTitle(s.secDuringBreak),
+                    _switchRow(
+                      label: s.gentleMode,
+                      value: _draft.gentleMode,
+                      onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
+                    ),
+                    _hint(s.gentleHint),
+                    const SizedBox(height: 8),
+                    _switchRow(
+                      label: s.dimBackground,
+                      value: _draft.dimBackground,
+                      onChanged: (v) => _set(_draft.copyWith(dimBackground: v)),
+                    ),
+                    if (_draft.dimBackground)
+                      _slider(
+                        label: s.dimIntensity,
+                        value: _draft.dimOpacity,
+                        min: 0.0,
+                        max: 0.6,
+                        suffix: '${(_draft.dimOpacity * 100).round()}%',
+                        onChanged: (v) => _set(_draft.copyWith(dimOpacity: v)),
+                      ),
+                    _slider(
+                      label: s.overlayOpacity,
+                      value: _draft.overlayOpacity,
+                      min: 0.05,
+                      max: 0.4,
+                      suffix: '${(_draft.overlayOpacity * 100).round()}%',
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(overlayOpacity: v)),
+                    ),
+                    _slider(
+                      label: s.overlayBlur,
+                      value: _draft.overlayBlur,
+                      min: 0,
+                      max: 40,
+                      suffix: '${_draft.overlayBlur.round()} px',
+                      onChanged: (v) => _set(_draft.copyWith(overlayBlur: v)),
+                    ),
+
+                    _sectionTitle(s.secGeneral),
+                    _switchRow(
+                      label: s.enableSound,
+                      value: _draft.soundEnabled,
+                      onChanged: (v) => _set(_draft.copyWith(soundEnabled: v)),
+                    ),
+                    _switchRow(
+                      label: s.enableNotifications,
+                      value: _draft.notificationsEnabled,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(notificationsEnabled: v)),
+                    ),
+                    _switchRow(
+                      label: s.launchAtLogin,
+                      value: _draft.launchAtLogin,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(launchAtLogin: v)),
+                    ),
+                    _switchRow(
+                      label: s.hideDock,
+                      value: _draft.hideDockIcon,
+                      onChanged: (v) => _set(_draft.copyWith(hideDockIcon: v)),
+                    ),
+
+                    _sectionTitle(s.secVisibility),
+                    _switchRow(
+                      label: s.disableMenuBar,
+                      value: _draft.hideMenuBarItem,
+                      onChanged: (v) => _set(_draft.copyWith(
+                        hideMenuBarItem: v,
+                        hideFloatingWidget:
+                            v ? false : _draft.hideFloatingWidget,
+                      )),
+                    ),
+                    _switchRow(
+                      label: s.disableFloating,
+                      value: _draft.hideFloatingWidget,
+                      onChanged: (v) => _set(_draft.copyWith(
+                        hideFloatingWidget: v,
+                        hideMenuBarItem: v ? false : _draft.hideMenuBarItem,
+                      )),
+                    ),
+                    _hint(s.exclusivityHint),
+                    const SizedBox(height: 8),
+                    Text(
+                      s.defaultPosition,
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 13),
+                    ),
+                    const SizedBox(height: 4),
+                    DropdownButton<BallCorner>(
+                      value: _draft.defaultCorner,
+                      isExpanded: true,
+                      dropdownColor: const Color(0xFF2A2A2A),
+                      style: const TextStyle(color: AppColors.textPrimary),
+                      underline:
+                          Container(height: 1, color: AppColors.glassBorder),
+                      items: [
+                        for (final corner in BallCorner.values)
+                          DropdownMenuItem(
+                            value: corner,
+                            child: Text(s.cornerLabel(corner)),
+                          ),
+                      ],
+                      onChanged: (v) => _set(_draft.copyWith(
+                          defaultCorner: v ?? _draft.defaultCorner)),
+                    ),
+                  ],
+                ),
               ),
-              const Divider(color: AppColors.glassBorder),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: widget.onReset,
-                    child: const Text('Restaurar padrões'),
-                  ),
-                  FilledButton(
-                    onPressed: () {
-                      widget.onSave(_draft);
-                      widget.onClose();
-                    },
-                    child: const Text('Salvar'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+            const Divider(color: AppColors.glassBorder),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: widget.onReset,
+                  child: Text(s.restoreDefaults),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    widget.onSave(_draft);
+                    widget.onClose();
+                  },
+                  child: Text(s.save),
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
     );
   }
 
@@ -320,6 +305,51 @@ class _SettingsDialogState extends State<SettingsDialog> {
         ),
       );
 
+  Widget _hint(String text) => Text(
+        text,
+        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+      );
+
+  Widget _langButton({
+    required String label,
+    required Widget flag,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.idleBall.withValues(alpha: 0.18)
+                : Colors.white.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: selected ? AppColors.idleBall : AppColors.glassBorder,
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              flag,
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _slider({
     required String label,
     required double value,
@@ -334,9 +364,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label,
-                style: const TextStyle(
-                    color: AppColors.textPrimary, fontSize: 14)),
+            Expanded(
+              child: Text(label,
+                  style: const TextStyle(
+                      color: AppColors.textPrimary, fontSize: 14)),
+            ),
             Text(suffix,
                 style: const TextStyle(
                     color: AppColors.textSecondary, fontSize: 13)),
@@ -360,9 +392,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style:
-                const TextStyle(color: AppColors.textPrimary, fontSize: 14)),
+        Expanded(
+          child: Text(label,
+              style: const TextStyle(
+                  color: AppColors.textPrimary, fontSize: 14)),
+        ),
         Switch(value: value, onChanged: onChanged),
       ],
     );

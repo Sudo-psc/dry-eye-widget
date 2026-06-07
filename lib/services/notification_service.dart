@@ -33,10 +33,9 @@ class NotificationService {
   }
 
   /// Notificação de início da pausa.
-  Future<void> notifyBreakStart() =>
-      show('Hora da pausa 👀', 'Descanse os olhos por alguns segundos.');
+  Future<void> notifyBreakStart(String title, String body) =>
+      show(title, body);
 
   /// Notificação ao concluir o ciclo de pausas.
-  Future<void> notifyBreakDone() =>
-      show('Pausa concluída ✅', 'Lágrimas renovadas! Voltando ao trabalho.');
+  Future<void> notifyBreakDone(String title, String body) => show(title, body);
 }

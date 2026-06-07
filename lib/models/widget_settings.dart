@@ -33,6 +33,7 @@ class WidgetSettings {
     required this.hideMenuBarItem,
     required this.hideFloatingWidget,
     required this.gentleMode,
+    required this.languageCode,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -98,6 +99,9 @@ class WidgetSettings {
   /// bloquear o restante da tela.
   final bool gentleMode;
 
+  /// Idioma da interface: 'pt' ou 'en'.
+  final String languageCode;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
         cycleMinutes: AppDefaults.cycleMinutes,
@@ -120,6 +124,7 @@ class WidgetSettings {
         hideMenuBarItem: AppDefaults.hideMenuBarItem,
         hideFloatingWidget: AppDefaults.hideFloatingWidget,
         gentleMode: AppDefaults.gentleMode,
+        languageCode: AppDefaults.languageCode,
       );
 
   // --- Conveniências ------------------------------------------------------
@@ -149,6 +154,7 @@ class WidgetSettings {
     bool? hideMenuBarItem,
     bool? hideFloatingWidget,
     bool? gentleMode,
+    String? languageCode,
   }) {
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
@@ -171,6 +177,7 @@ class WidgetSettings {
       hideMenuBarItem: hideMenuBarItem ?? this.hideMenuBarItem,
       hideFloatingWidget: hideFloatingWidget ?? this.hideFloatingWidget,
       gentleMode: gentleMode ?? this.gentleMode,
+      languageCode: languageCode ?? this.languageCode,
     );
   }
 
@@ -195,6 +202,7 @@ class WidgetSettings {
         'hideMenuBarItem': hideMenuBarItem,
         'hideFloatingWidget': hideFloatingWidget,
         'gentleMode': gentleMode,
+        'languageCode': languageCode,
       };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -230,6 +238,7 @@ class WidgetSettings {
       hideFloatingWidget:
           map['hideFloatingWidget'] as bool? ?? d.hideFloatingWidget,
       gentleMode: map['gentleMode'] as bool? ?? d.gentleMode,
+      languageCode: map['languageCode'] as String? ?? d.languageCode,
     );
   }
 
