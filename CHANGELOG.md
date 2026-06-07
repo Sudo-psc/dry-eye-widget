@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.4.1] - 2026-06-07
+
+### Melhorado
+- Ícone da barra de menu: o **olho ficou mais alto e aberto** (e a íris um pouco
+  maior), deixando o desenho mais legível.
+
 ## [1.4.0] - 2026-06-07
 
 ### Adicionado
@@ -76,6 +82,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Transparência real da janela no macOS (`flutter_acrylic`).
 - Persistência via `SharedPreferences`.
 
+[1.4.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.0

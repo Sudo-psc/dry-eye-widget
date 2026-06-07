@@ -29,7 +29,7 @@ class EyeIcon {
     final stroke = s * 0.07;
     final eyeCenterY = s * 0.42;
     final eyeHalfWidth = s * 0.42;
-    final eyeHalfHeight = s * 0.24;
+    final eyeHalfHeight = s * 0.32; // olho mais alto/aberto
 
     final line = Paint()
       ..color = color
@@ -48,7 +48,7 @@ class EyeIcon {
     canvas.drawPath(eye, line);
 
     // Íris (círculo) + pupila preenchida.
-    final irisR = s * 0.14;
+    final irisR = s * 0.15;
     canvas.drawCircle(Offset(s / 2, eyeCenterY), irisR, line);
     canvas.drawCircle(
       Offset(s / 2, eyeCenterY),
