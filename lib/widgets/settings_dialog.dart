@@ -197,6 +197,36 @@ class _SettingsDialogState extends State<SettingsDialog> {
                       onChanged: (v) => _set(_draft.copyWith(overlayBlur: v)),
                     ),
 
+                    _sectionTitle(s.secEyeDrops),
+                    _switchRow(
+                      label: s.eyeDropsEnable,
+                      value: _draft.eyeDropsEnabled,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(eyeDropsEnabled: v)),
+                    ),
+                    if (_draft.eyeDropsEnabled) ...[
+                      const SizedBox(height: 6),
+                      _hint(s.eyeDropsInterval),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          _choiceButton(
+                            label: s.eyeDropsEvery4h,
+                            selected: _draft.eyeDropsIntervalHours == 4,
+                            onTap: () => _set(
+                                _draft.copyWith(eyeDropsIntervalHours: 4)),
+                          ),
+                          const SizedBox(width: 10),
+                          _choiceButton(
+                            label: s.eyeDropsEvery6h,
+                            selected: _draft.eyeDropsIntervalHours == 6,
+                            onTap: () => _set(
+                                _draft.copyWith(eyeDropsIntervalHours: 6)),
+                          ),
+                        ],
+                      ),
+                    ],
+
                     _sectionTitle(s.secGeneral),
                     _switchRow(
                       label: s.enableSound,
@@ -344,6 +374,40 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _choiceButton({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.idleBall.withValues(alpha: 0.18)
+                : Colors.white.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: selected ? AppColors.idleBall : AppColors.glassBorder,
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 14,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            ),
           ),
         ),
       ),

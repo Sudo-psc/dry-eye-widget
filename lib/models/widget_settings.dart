@@ -34,6 +34,8 @@ class WidgetSettings {
     required this.hideFloatingWidget,
     required this.gentleMode,
     required this.languageCode,
+    required this.eyeDropsEnabled,
+    required this.eyeDropsIntervalHours,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -102,6 +104,12 @@ class WidgetSettings {
   /// Idioma da interface: 'pt' ou 'en'.
   final String languageCode;
 
+  /// Lembrete de colírio ligado/desligado.
+  final bool eyeDropsEnabled;
+
+  /// Intervalo do lembrete de colírio em horas (4 ou 6).
+  final int eyeDropsIntervalHours;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
         cycleMinutes: AppDefaults.cycleMinutes,
@@ -125,6 +133,8 @@ class WidgetSettings {
         hideFloatingWidget: AppDefaults.hideFloatingWidget,
         gentleMode: AppDefaults.gentleMode,
         languageCode: AppDefaults.languageCode,
+        eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
+        eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
       );
 
   // --- Conveniências ------------------------------------------------------
@@ -155,6 +165,8 @@ class WidgetSettings {
     bool? hideFloatingWidget,
     bool? gentleMode,
     String? languageCode,
+    bool? eyeDropsEnabled,
+    int? eyeDropsIntervalHours,
   }) {
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
@@ -178,6 +190,9 @@ class WidgetSettings {
       hideFloatingWidget: hideFloatingWidget ?? this.hideFloatingWidget,
       gentleMode: gentleMode ?? this.gentleMode,
       languageCode: languageCode ?? this.languageCode,
+      eyeDropsEnabled: eyeDropsEnabled ?? this.eyeDropsEnabled,
+      eyeDropsIntervalHours:
+          eyeDropsIntervalHours ?? this.eyeDropsIntervalHours,
     );
   }
 
@@ -203,6 +218,8 @@ class WidgetSettings {
         'hideFloatingWidget': hideFloatingWidget,
         'gentleMode': gentleMode,
         'languageCode': languageCode,
+        'eyeDropsEnabled': eyeDropsEnabled,
+        'eyeDropsIntervalHours': eyeDropsIntervalHours,
       };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -239,6 +256,10 @@ class WidgetSettings {
           map['hideFloatingWidget'] as bool? ?? d.hideFloatingWidget,
       gentleMode: map['gentleMode'] as bool? ?? d.gentleMode,
       languageCode: map['languageCode'] as String? ?? d.languageCode,
+      eyeDropsEnabled: map['eyeDropsEnabled'] as bool? ?? d.eyeDropsEnabled,
+      eyeDropsIntervalHours:
+          (map['eyeDropsIntervalHours'] as num?)?.toInt() ??
+              d.eyeDropsIntervalHours,
     );
   }
 

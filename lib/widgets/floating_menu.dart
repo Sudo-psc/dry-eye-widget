@@ -22,6 +22,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onReset,
     required this.onTogglePause,
     required this.onGuidance,
+    required this.onCheckUpdates,
     required this.onSettings,
     required this.onQuit,
     required this.onDismiss,
@@ -33,6 +34,7 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onReset;
   final VoidCallback onTogglePause;
   final VoidCallback onGuidance;
+  final VoidCallback onCheckUpdates;
   final VoidCallback onSettings;
   final VoidCallback onQuit;
   final VoidCallback onDismiss;
@@ -49,6 +51,7 @@ class FloatingMenu extends StatelessWidget {
         onTogglePause,
       ),
       _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
+      _MenuItem(Icons.system_update_alt, s.menuCheckUpdates, onCheckUpdates),
       _MenuItem(Icons.settings_outlined, s.menuSettings, onSettings),
       _MenuItem(Icons.close, s.menuQuit, onQuit),
     ];

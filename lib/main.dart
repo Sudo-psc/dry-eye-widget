@@ -17,13 +17,16 @@ import 'services/notification_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
+import 'services/update_service.dart';
 import 'utils/constants.dart';
+import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
 import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
 import 'widgets/settings_dialog.dart';
+import 'widgets/update_dialog.dart';
 
 /// Tamanhos das janelas de menu e configurações (a compacta é dinâmica).
 const Size _menuWindowSize = Size(250, 400);
@@ -187,7 +190,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _menuOpen = false;
   bool _settingsOpen = false;
   bool _guidanceOpen = false;
+  bool _updateOpen = false;
   bool _wasActive = false;
+  bool _wasDrops = false;
+
+  final UpdateService _updater = UpdateService();
+  UpdateResult? _updateResult;
 
   /// Widget habilitado = bolinha visível. Quando desabilitado (pela opção
   /// nas configurações ou pelo item da barra de menu), a janela é escondida
@@ -247,6 +255,20 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _exitBreakLayout();
     }
     _wasActive = active;
+
+    // Aviso de colírio: expande a janela para o cartão centralizado.
+    final drops = _timer.eyeDropsAlert;
+    if (drops && !_wasDrops) {
+      if (!_menuOpen && !_settingsOpen && !_guidanceOpen && !_updateOpen) {
+        () async {
+          if (!_widgetEnabled) await windowManager.show();
+          await _applyLayout(_WindowLayout.settings);
+        }();
+      }
+    } else if (!drops && _wasDrops) {
+      _restoreAfterPanel();
+    }
+    _wasDrops = drops;
   }
 
   // --- Item da barra de menu (TrayListener) ------------------------------
@@ -472,9 +494,33 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
-  /// Volta ao layout compacto após fechar um painel (configurações/orientações),
-  /// respeitando o estado de widget desabilitado.
+  // --- Verificação de atualização ----------------------------------------
+
+  Future<void> _openCheckUpdates() async {
+    setState(() {
+      _menuOpen = false;
+      _updateOpen = true;
+      _updateResult = null;
+    });
+    await _applyLayout(_WindowLayout.settings);
+    final result = await _updater.check();
+    if (mounted && _updateOpen) {
+      setState(() => _updateResult = result);
+    }
+  }
+
+  void _closeUpdate() {
+    setState(() => _updateOpen = false);
+    _restoreAfterPanel();
+  }
+
+  /// Volta ao layout compacto após fechar um painel, respeitando o estado de
+  /// widget desabilitado e um eventual aviso de colírio ainda ativo.
   void _restoreAfterPanel() {
+    if (_timer.eyeDropsAlert) {
+      _applyLayout(_WindowLayout.settings);
+      return;
+    }
     if (!_widgetEnabled && !_timer.state.isActive) {
       windowManager.hide();
     } else {
@@ -494,11 +540,23 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final strings = provider.strings;
 
     Widget body;
-    if (_settingsOpen) {
+    if (_updateOpen) {
+      body = UpdateDialog(
+        strings: strings,
+        result: _updateResult,
+        onClose: _closeUpdate,
+        onDownload: _updater.openReleasesPage,
+      );
+    } else if (_settingsOpen) {
       body = _buildSettings();
     } else if (_guidanceOpen) {
       body = Center(
           child: GuidanceDialog(strings: strings, onClose: _closeGuidance));
+    } else if (timer.eyeDropsAlert) {
+      body = EyeDropsReminder(
+        strings: strings,
+        onDone: _timer.dismissEyeDrops,
+      );
     } else if (timer.state.isActive) {
       body = settings.gentleMode
           ? GentleBreakCard(
@@ -569,6 +627,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
                 onGuidance: _openGuidance,
+                onCheckUpdates: _openCheckUpdates,
                 onSettings: _openSettings,
                 onQuit: _quit,
                 onDismiss: _closeMenu,

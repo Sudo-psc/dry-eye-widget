@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../utils/constants.dart';
+import 'blinking_eye.dart';
 import 'liquid_glass.dart';
 import 'timer_display.dart';
 
@@ -71,6 +72,10 @@ class GlassOverlay extends StatelessWidget {
         key: ValueKey(state),
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (state.showsCountdown) ...[
+            const BlinkingEye(size: 96),
+            const SizedBox(height: 16),
+          ],
           Text(
             strings.stateTitle(state),
             textAlign: TextAlign.center,

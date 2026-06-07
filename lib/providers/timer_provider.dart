@@ -26,6 +26,7 @@ class TimerProvider extends ChangeNotifier {
         _audio = audio,
         _notifications = notifications {
     _cycleElapsed = storage.elapsedSeconds.clamp(0, cycleSeconds);
+    _eyeDropsElapsed = storage.eyeDropsElapsed;
   }
 
   final SettingsProvider _settings;
@@ -49,6 +50,12 @@ class TimerProvider extends ChangeNotifier {
   bool _paused = false;
   bool get isPaused => _paused;
 
+  // Timer oculto do lembrete de colírio.
+  int _eyeDropsElapsed = 0;
+  bool _eyeDropsPending = false;
+  bool _eyeDropsAlert = false;
+  bool get eyeDropsAlert => _eyeDropsAlert;
+
   // --- Configurações derivadas (lidas do SettingsProvider) ----------------
 
   int get cycleSeconds => _settings.value.cycleSeconds;
@@ -68,6 +75,7 @@ class TimerProvider extends ChangeNotifier {
   }
 
   void _onTick() {
+    _tickEyeDrops();
     switch (_state) {
       case AppState.idle:
         _tickIdle();
@@ -182,6 +190,41 @@ class TimerProvider extends ChangeNotifier {
   void clampElapsedToCycle() {
     if (_cycleElapsed > cycleSeconds) {
       _cycleElapsed = cycleSeconds;
+      notifyListeners();
+    }
+  }
+
+  // --- Lembrete de colírio (timer oculto) --------------------------------
+
+  void _tickEyeDrops() {
+    final s = _settings.value;
+    if (!s.eyeDropsEnabled) return;
+    _eyeDropsElapsed++;
+    if (_eyeDropsElapsed % 60 == 0) {
+      _storage.setEyeDropsElapsed(_eyeDropsElapsed);
+    }
+    final interval = s.eyeDropsIntervalHours * 3600;
+    if (_eyeDropsElapsed >= interval) {
+      _eyeDropsElapsed = 0;
+      _storage.setEyeDropsElapsed(0);
+      _eyeDropsPending = true;
+      if (_notifyOn) {
+        final str = _settings.strings;
+        _notifications.show(str.eyeDropsNotifyTitle, str.eyeDropsNotifyBody);
+      }
+    }
+    // Exibe o aviso na tela apenas quando ocioso (não atrapalha uma pausa).
+    if (_eyeDropsPending && _state == AppState.idle && !_eyeDropsAlert) {
+      _eyeDropsPending = false;
+      _eyeDropsAlert = true;
+      notifyListeners();
+    }
+  }
+
+  /// Fecha o aviso de colírio (após o usuário confirmar).
+  void dismissEyeDrops() {
+    if (_eyeDropsAlert) {
+      _eyeDropsAlert = false;
       notifyListeners();
     }
   }

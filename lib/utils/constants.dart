@@ -67,6 +67,8 @@ class AppDefaults {
   static const bool hideFloatingWidget = false;
   static const bool gentleMode = false;
   static const String languageCode = 'pt';
+  static const bool eyeDropsEnabled = false;
+  static const int eyeDropsIntervalHours = 4;
 
   static const double minBallSize = 24.0;
   static const double maxBallSize = 80.0;
@@ -124,7 +126,24 @@ class StorageKeys {
   static const String ballX = 'ball_x';
   static const String ballY = 'ball_y';
   static const String elapsedSeconds = 'elapsed_seconds';
+  static const String eyeDropsElapsed = 'eye_drops_elapsed';
 
   /// JSON serializado de [WidgetSettings] com todas as preferências.
   static const String widgetSettings = 'widget_settings_json';
+}
+
+/// Informações do app usadas na verificação de atualização.
+class AppInfo {
+  AppInfo._();
+
+  /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
+  static const String version = '1.6.0';
+
+  static const String repoOwner = 'Sudo-psc';
+  static const String repoName = 'dry-eye-widget';
+
+  static String get latestReleaseApi =>
+      'https://api.github.com/repos/$repoOwner/$repoName/releases/latest';
+  static String get releasesPage =>
+      'https://github.com/$repoOwner/$repoName/releases/latest';
 }

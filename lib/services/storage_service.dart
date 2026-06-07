@@ -34,6 +34,11 @@ class StorageService {
   Future<void> setElapsedSeconds(int value) =>
       _prefs.setInt(StorageKeys.elapsedSeconds, value);
 
+  int get eyeDropsElapsed => _prefs.getInt(StorageKeys.eyeDropsElapsed) ?? 0;
+
+  Future<void> setEyeDropsElapsed(int value) =>
+      _prefs.setInt(StorageKeys.eyeDropsElapsed, value);
+
   // --- Configurações do widget -------------------------------------------
 
   WidgetSettings loadSettings() {

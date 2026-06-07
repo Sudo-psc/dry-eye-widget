@@ -11,6 +11,7 @@ class AppStrings {
     required this.menuPause,
     required this.menuResume,
     required this.menuGuidance,
+    required this.menuCheckUpdates,
     required this.menuSettings,
     required this.menuQuit,
     required this.trayDisable,
@@ -83,6 +84,24 @@ class AppStrings {
     required this.stat3Text,
     required this.refsTitle,
     required this.disclaimer,
+    // Colírio
+    required this.secEyeDrops,
+    required this.eyeDropsEnable,
+    required this.eyeDropsInterval,
+    required this.eyeDropsEvery4h,
+    required this.eyeDropsEvery6h,
+    required this.eyeDropsTitle,
+    required this.eyeDropsBody,
+    required this.eyeDropsDone,
+    required this.eyeDropsNotifyTitle,
+    required this.eyeDropsNotifyBody,
+    // Atualização
+    required this.updateUpToDate,
+    required this.updateAvailable,
+    required this.updateDownload,
+    required this.updateError,
+    required this.updateChecking,
+    required this.close,
   });
 
   final String languageCode;
@@ -92,6 +111,7 @@ class AppStrings {
   final String menuPause;
   final String menuResume;
   final String menuGuidance;
+  final String menuCheckUpdates;
   final String menuSettings;
   final String menuQuit;
   final String trayDisable;
@@ -165,6 +185,24 @@ class AppStrings {
   final String refsTitle;
   final String disclaimer;
 
+  final String secEyeDrops;
+  final String eyeDropsEnable;
+  final String eyeDropsInterval;
+  final String eyeDropsEvery4h;
+  final String eyeDropsEvery6h;
+  final String eyeDropsTitle;
+  final String eyeDropsBody;
+  final String eyeDropsDone;
+  final String eyeDropsNotifyTitle;
+  final String eyeDropsNotifyBody;
+
+  final String updateUpToDate;
+  final String updateAvailable;
+  final String updateDownload;
+  final String updateError;
+  final String updateChecking;
+  final String close;
+
   // --- Helpers dependentes de enum --------------------------------------
 
   String stateTitle(AppState state) {
@@ -218,6 +256,7 @@ const AppStrings ptStrings = AppStrings(
   menuPause: 'Pausar cronômetro',
   menuResume: 'Retomar cronômetro',
   menuGuidance: 'Orientações',
+  menuCheckUpdates: 'Verificar atualizações',
   menuSettings: 'Configurações',
   menuQuit: 'Sair',
   trayDisable: 'Desabilitar widget',
@@ -304,6 +343,24 @@ const AppStrings ptStrings = AppStrings(
   refsTitle: 'Referências',
   disclaimer: 'Conteúdo educativo — não substitui a avaliação de um '
       'oftalmologista. Sintomas persistentes merecem consulta.',
+  secEyeDrops: 'Colírio',
+  eyeDropsEnable: 'Lembrete de colírio',
+  eyeDropsInterval: 'Lembrar a cada',
+  eyeDropsEvery4h: '4 horas',
+  eyeDropsEvery6h: '6 horas',
+  eyeDropsTitle: 'Hora do colírio',
+  eyeDropsBody: 'Está na hora de pingar o seu colírio. Aplique e siga '
+      'cuidando dos seus olhos.',
+  eyeDropsDone: 'Apliquei',
+  eyeDropsNotifyTitle: 'Hora do colírio 💧',
+  eyeDropsNotifyBody: 'Está na hora de pingar o seu colírio.',
+  updateUpToDate: 'Seu app está atualizado.',
+  updateAvailable: 'Nova versão {v} disponível — baixe e atualize o app.',
+  updateDownload: 'Baixar',
+  updateError: 'Não foi possível verificar atualizações agora. '
+      'Tente novamente mais tarde.',
+  updateChecking: 'Verificando atualizações…',
+  close: 'Fechar',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -313,6 +370,7 @@ const AppStrings enStrings = AppStrings(
   menuPause: 'Pause timer',
   menuResume: 'Resume timer',
   menuGuidance: 'Eye care guide',
+  menuCheckUpdates: 'Check for updates',
   menuSettings: 'Settings',
   menuQuit: 'Quit',
   trayDisable: 'Disable widget',
@@ -398,4 +456,21 @@ const AppStrings enStrings = AppStrings(
   refsTitle: 'References',
   disclaimer: 'Educational content — it does not replace an eye doctor’s '
       'assessment. Persistent symptoms deserve a consultation.',
+  secEyeDrops: 'Eye drops',
+  eyeDropsEnable: 'Eye drops reminder',
+  eyeDropsInterval: 'Remind every',
+  eyeDropsEvery4h: '4 hours',
+  eyeDropsEvery6h: '6 hours',
+  eyeDropsTitle: 'Eye drops time',
+  eyeDropsBody: 'It is time for your eye drops. Apply them and keep caring '
+      'for your eyes.',
+  eyeDropsDone: 'Done',
+  eyeDropsNotifyTitle: 'Eye drops time 💧',
+  eyeDropsNotifyBody: 'It is time for your eye drops.',
+  updateUpToDate: 'Your app is up to date.',
+  updateAvailable: 'New version {v} available — download and update the app.',
+  updateDownload: 'Download',
+  updateError: "Couldn't check for updates right now. Please try again later.",
+  updateChecking: 'Checking for updates…',
+  close: 'Close',
 );

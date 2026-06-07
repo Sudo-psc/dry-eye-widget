@@ -4,6 +4,23 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.6.0] - 2026-06-07
+
+### Adicionado
+- **Animação de olho piscando** durante a pausa de 20s, reforçando o lembrete
+  de piscar enquanto se olha para ~6 metros.
+- **Lembrete de colírio**: opção nas Configurações para ativar/desativar e
+  escolher o intervalo (a cada **4h** ou **6h**). Um timer oculto dispara, ao
+  completar, uma **notificação** e um aviso com **animação de frasco pingando
+  uma gota** e a mensagem "Hora do colírio".
+- **Verificar atualizações** no menu: compara a versão atual com a última
+  release do GitHub e avisa se o app está atualizado ou se há uma nova versão
+  para baixar (com botão que abre a página de download).
+
+### Alterado
+- Entitlements do macOS: adicionada permissão de cliente de rede (necessária
+  para a verificação de atualização no app sandbox).
+
 ## [1.5.0] - 2026-06-07
 
 ### Adicionado
@@ -93,6 +110,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Transparência real da janela no macOS (`flutter_acrylic`).
 - Persistência via `SharedPreferences`.
 
+[1.6.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.6.0
 [1.5.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.5.0
 [1.4.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.0
