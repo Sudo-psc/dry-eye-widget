@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../models/app_state.dart';
 import '../utils/constants.dart';
+import 'liquid_glass.dart';
 import 'timer_display.dart';
 
 /// Overlay central de "vidro líquido" exibido durante alerta e pausas.
@@ -45,30 +44,13 @@ class GlassOverlay extends StatelessWidget {
               maxWidth: AppSizes.overlayMaxWidth,
               minWidth: 240,
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 32,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: fillOpacity),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.glassBorder, width: 1),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: AppColors.glassShadow,
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: _buildContent(),
-                ),
-              ),
+            child: LiquidGlass(
+              dark: false,
+              blur: blur,
+              fillOpacity: fillOpacity,
+              borderRadius: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+              child: _buildContent(),
             ),
           ),
         ),

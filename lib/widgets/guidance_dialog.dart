@@ -23,11 +23,20 @@ class GuidanceDialog extends StatelessWidget {
           constraints: const BoxConstraints(maxHeight: 660),
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
           decoration: BoxDecoration(
-            color: const Color(0xE61E1E1E),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xF2323238), Color(0xF21E1E22)],
+            ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.glassBorder, width: 1),
+            border: Border.all(
+                color: Colors.white.withValues(alpha: 0.18), width: 1),
             boxShadow: const [
-              BoxShadow(color: AppColors.glassShadow, blurRadius: 20),
+              BoxShadow(
+                color: AppColors.glassShadow,
+                blurRadius: 26,
+                offset: Offset(0, 10),
+              ),
             ],
           ),
           child: Column(

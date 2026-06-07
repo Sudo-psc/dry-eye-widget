@@ -1,8 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../utils/constants.dart';
+import 'liquid_glass.dart';
 
 /// Item do menu flutuante.
 class _MenuItem {
@@ -50,35 +49,23 @@ class FloatingMenu extends StatelessWidget {
       _MenuItem(Icons.close, 'Sair', onQuit),
     ];
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          width: 230,
-          decoration: BoxDecoration(
-            color: const Color(0xCC1E1E1E),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.glassBorder, width: 1),
-            boxShadow: const [
-              BoxShadow(color: AppColors.glassShadow, blurRadius: 16),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final item in items)
-                _MenuRow(
-                  icon: item.icon,
-                  label: item.label,
-                  onTap: () {
-                    item.onTap();
-                    onDismiss();
-                  },
-                ),
-            ],
-          ),
-        ),
+    return LiquidGlass(
+      width: 230,
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final item in items)
+            _MenuRow(
+              icon: item.icon,
+              label: item.label,
+              onTap: () {
+                item.onTap();
+                onDismiss();
+              },
+            ),
+        ],
       ),
     );
   }
@@ -107,19 +94,53 @@ class _MenuRowState extends State<_MenuRow> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          color:
-              _hover ? Colors.white.withValues(alpha: 0.08) : Colors.transparent,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          // Pequeno "deslize" para a direita ao passar o mouse.
+          padding: EdgeInsets.only(
+            left: _hover ? 18 : 14,
+            right: 14,
+            top: 11,
+            bottom: 11,
+          ),
+          decoration: BoxDecoration(
+            // Realce em gradiente translúcido no hover.
+            gradient: _hover
+                ? LinearGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.14),
+                      Colors.white.withValues(alpha: 0.04),
+                    ],
+                  )
+                : null,
+            // Barra de destaque à esquerda.
+            border: Border(
+              left: BorderSide(
+                color: _hover ? AppColors.idleBall : Colors.transparent,
+                width: 3,
+              ),
+            ),
+          ),
           child: Row(
             children: [
-              Icon(widget.icon, size: 18, color: AppColors.textPrimary),
+              AnimatedScale(
+                scale: _hover ? 1.12 : 1.0,
+                duration: const Duration(milliseconds: 160),
+                curve: Curves.easeOut,
+                child: Icon(
+                  widget.icon,
+                  size: 18,
+                  color: _hover ? AppColors.idleBall : AppColors.textPrimary,
+                ),
+              ),
               const SizedBox(width: 12),
               Text(
                 widget.label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textPrimary,
+                  fontWeight: _hover ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ],

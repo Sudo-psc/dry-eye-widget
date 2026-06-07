@@ -98,6 +98,11 @@ class _FloatingBallState extends State<FloatingBall>
         widget.isActive ? 1.0 : widget.idleOpacity.clamp(0.1, 1.0);
     final ringVisible = widget.showProgress && !widget.isActive;
 
+    // Tons derivados da cor base para o relevo 3D.
+    final light = Color.lerp(color, Colors.white, 0.55)!;
+    final dark = Color.lerp(color, Colors.black, 0.32)!;
+    final s = widget.size;
+
     Widget circle = AnimatedBuilder(
       animation: _opacity,
       builder: (context, child) {
@@ -107,20 +112,54 @@ class _FloatingBallState extends State<FloatingBall>
         );
       },
       child: Container(
-        width: widget.size,
-        height: widget.size,
+        width: s,
+        height: s,
         decoration: BoxDecoration(
-          color: color,
           shape: BoxShape.circle,
-          boxShadow: widget.isActive
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.6),
-                    blurRadius: 12,
-                    spreadRadius: 2,
+          // Gradiente radial com luz no topo-esquerdo → esfera 3D.
+          gradient: RadialGradient(
+            center: const Alignment(-0.35, -0.4),
+            radius: 0.95,
+            colors: [light, color, dark],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+          boxShadow: [
+            // Sombra de profundidade (sempre, para "flutuar").
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.35),
+              blurRadius: s * 0.22,
+              offset: Offset(0, s * 0.10),
+            ),
+            // Brilho colorido quando em alerta.
+            if (widget.isActive)
+              BoxShadow(
+                color: color.withValues(alpha: 0.6),
+                blurRadius: 14,
+                spreadRadius: 2,
+              ),
+          ],
+        ),
+        // Reflexo especular (brilho de vidro) no topo-esquerdo.
+        child: Stack(
+          children: [
+            Positioned(
+              left: s * 0.16,
+              top: s * 0.12,
+              child: Container(
+                width: s * 0.34,
+                height: s * 0.34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.7),
+                      Colors.white.withValues(alpha: 0.0),
+                    ],
                   ),
-                ]
-              : null,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

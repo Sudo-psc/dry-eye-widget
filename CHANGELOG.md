@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.4.0] - 2026-06-07
+
+### Adicionado
+- **Design liquid glass** em todo o app (menu, configurações, orientações,
+  cartão de pausa e overlay): desfoque, preenchimento em gradiente, brilho
+  superior (reflexo) e borda luminosa, via novo widget `LiquidGlass`.
+- **Efeito de hover no menu**: realce em gradiente, barra lateral colorida,
+  ícone que muda de cor e cresce, e leve deslize ao passar o mouse.
+- **Bolinha 3D com cor gradiente**: gradiente radial com luz no topo, reflexo
+  especular e sombra de profundidade, dando aparência de esfera.
+
 ## [1.3.1] - 2026-06-06
 
 ### Corrigido
@@ -65,6 +76,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Transparência real da janela no macOS (`flutter_acrylic`).
 - Persistência via `SharedPreferences`.
 
+[1.4.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.4.0
 [1.3.1]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.2.0
