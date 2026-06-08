@@ -13,9 +13,13 @@ on:
   pull_request:
     paths:
       - "lib/**"
+      - "test/**"
       - "windows/**"
+      - "analysis_options.yaml"
       - "pubspec.yaml"
+      - "pubspec.lock"
       - ".github/workflows/windows-build.yml"
+      - "win_version/templates/windows-build.yml"
   workflow_dispatch:
 
 permissions:
@@ -33,9 +37,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # Fixe na última estável compatível (>=3.16). Atualize este valor para
-          # a versão usada localmente — confira com `flutter --version`.
-          flutter-version: "3.24.5"
+          # Fixado na versão estável usada/validada localmente (flutter --version).
+          flutter-version: "3.44.1"
           cache: true
 
       - name: Habilitar desktop Windows
@@ -43,6 +46,12 @@ jobs:
 
       - name: Dependências
         run: flutter pub get
+
+      - name: Análise estática
+        run: flutter analyze
+
+      - name: Testes
+        run: flutter test
 
       - name: Gerar ícones
         run: dart run flutter_launcher_icons

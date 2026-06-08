@@ -84,7 +84,7 @@ Se não houver certificado, documente no README que o usuário precisa clicar em
 
 ## Versionamento e Releases
 
-- A versão de exibição vem do `pubspec.yaml` (`version: 1.6.0+9`) e de
+- A versão de exibição vem do `pubspec.yaml` (`version: 1.6.1+10`) e de
   `AppInfo.version` em `lib/utils/constants.dart` (`1.6.0`). **Mantenha as duas em
   sincronia** — a checagem de atualização do app compara com a tag do GitHub.
 - A release no GitHub deve ter tag no formato `vX.Y.Z` (ex.: `v1.6.0`), pois

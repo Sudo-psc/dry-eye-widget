@@ -52,14 +52,67 @@ void main() {
     });
 
     test('campos ausentes usam os padrões (compat. retroativa)', () {
-      final s = WidgetSettings.fromMap(const <String, dynamic>{'cycleMinutes': 15});
+      final s = WidgetSettings.fromMap(const <String, dynamic>{
+        'cycleMinutes': 15,
+      });
       expect(s.cycleMinutes, 15);
       expect(s.ballSize, WidgetSettings.defaults().ballSize);
       expect(s.idleColor, WidgetSettings.defaults().idleColor);
     });
 
+    test(
+      'mantém ao menos um controle visível quando configurações entram em conflito',
+      () {
+        final restored = WidgetSettings.fromMap(const <String, dynamic>{
+          'hideMenuBarItem': true,
+          'hideFloatingWidget': true,
+        });
+        expect(restored.hideMenuBarItem, isFalse);
+        expect(restored.hideFloatingWidget, isTrue);
+
+        final copied = WidgetSettings.defaults().copyWith(
+          hideMenuBarItem: true,
+          hideFloatingWidget: true,
+        );
+        expect(copied.hideMenuBarItem, isFalse);
+        expect(copied.hideFloatingWidget, isTrue);
+      },
+    );
+
+    test('normaliza valores persistidos fora das faixas da tela', () {
+      final restored = WidgetSettings.fromMap(const <String, dynamic>{
+        'cycleMinutes': -3,
+        'phaseSeconds': 999,
+        'ballSize': 500,
+        'idleOpacity': -1.0,
+        'blinkMs': 50,
+        'dimOpacity': 2.0,
+        'overlayOpacity': -0.2,
+        'overlayBlur': 200,
+        'languageCode': 'es',
+        'eyeDropsIntervalHours': 9,
+      });
+
+      expect(restored.cycleMinutes, 1);
+      expect(restored.phaseSeconds, 120);
+      expect(restored.ballSize, 80);
+      expect(restored.idleOpacity, 0.3);
+      expect(restored.blinkMs, 200);
+      expect(restored.dimOpacity, 0.6);
+      expect(restored.overlayOpacity, 0.05);
+      expect(restored.overlayBlur, 40);
+      expect(restored.languageCode, WidgetSettings.defaults().languageCode);
+      expect(
+        restored.eyeDropsIntervalHours,
+        WidgetSettings.defaults().eyeDropsIntervalHours,
+      );
+    });
+
     test('conveniências derivadas', () {
-      final s = WidgetSettings.defaults().copyWith(cycleMinutes: 5, blinkMs: 300);
+      final s = WidgetSettings.defaults().copyWith(
+        cycleMinutes: 5,
+        blinkMs: 300,
+      );
       expect(s.cycleSeconds, 300);
       expect(s.blinkDuration, const Duration(milliseconds: 300));
     });

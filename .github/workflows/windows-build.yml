@@ -12,9 +12,13 @@ on:
   pull_request:
     paths:
       - "lib/**"
+      - "test/**"
       - "windows/**"
+      - "analysis_options.yaml"
       - "pubspec.yaml"
+      - "pubspec.lock"
       - ".github/workflows/windows-build.yml"
+      - "win_version/templates/windows-build.yml"
   workflow_dispatch:
 
 permissions:
@@ -41,6 +45,12 @@ jobs:
 
       - name: Dependências
         run: flutter pub get
+
+      - name: Análise estática
+        run: flutter analyze
+
+      - name: Testes
+        run: flutter test
 
       - name: Gerar ícones
         run: dart run flutter_launcher_icons

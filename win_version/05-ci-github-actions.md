@@ -24,8 +24,9 @@ Copy-Item win_version\templates\windows-build.yml .github\workflows\windows-buil
 - **Gatilhos:** `push` em tags `v*` (release) e `workflow_dispatch` (manual);
   `pull_request` apenas compila (sem publicar).
 - Roda em `windows-latest` (já tem Visual Studio 2022 com C++).
-- Instala o Flutter (versão fixada), `flutter pub get`, gera ícones e
-  `flutter build windows --release`.
+- Instala o Flutter (versão fixada), `flutter pub get`, roda
+  `flutter analyze`, roda `flutter test`, gera ícones e
+  executa `flutter build windows --release`.
 - Gera o **ZIP portátil** sempre.
 - Instala o **Inno Setup** e gera o **instalador** quando o `.iss` existe.
 - Faz **upload dos artefatos** do build (disponíveis em toda execução).

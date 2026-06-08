@@ -11,8 +11,8 @@ import '../services/storage_service.dart';
 /// [TimerProvider] (durações, som, notificações) leem deste provider.
 class SettingsProvider extends ChangeNotifier {
   SettingsProvider({required StorageService storage})
-      : _storage = storage,
-        _settings = storage.loadSettings();
+    : _storage = storage,
+      _settings = storage.loadSettings();
 
   final StorageService _storage;
   WidgetSettings _settings;
@@ -24,9 +24,10 @@ class SettingsProvider extends ChangeNotifier {
 
   /// Substitui todas as configurações e persiste.
   Future<void> update(WidgetSettings next) async {
-    _settings = next;
+    final normalized = next.normalized();
+    _settings = normalized;
     notifyListeners();
-    await _storage.saveSettings(next);
+    await _storage.saveSettings(normalized);
   }
 
   /// Restaura os valores de fábrica.

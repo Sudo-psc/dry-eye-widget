@@ -23,13 +23,19 @@ class TimerProvider extends ChangeNotifier {
     required AudioService audio,
     required NotificationService notifications,
     required IdleService idle,
-  })  : _settings = settings,
-        _storage = storage,
-        _audio = audio,
-        _notifications = notifications,
-        _idle = idle {
-    _cycleElapsed = storage.elapsedSeconds.clamp(0, cycleSeconds);
-    _eyeDropsElapsed = storage.eyeDropsElapsed;
+  }) : this._(settings, storage, audio, notifications, idle);
+
+  TimerProvider._(
+    this._settings,
+    this._storage,
+    this._audio,
+    this._notifications,
+    this._idle,
+  ) {
+    _cycleElapsed = _storage.elapsedSeconds.clamp(0, cycleSeconds);
+    _eyeDropsElapsed = _storage.eyeDropsElapsed;
+    _syncServiceToggles();
+    _settings.addListener(_syncServiceToggles);
   }
 
   final SettingsProvider _settings;
@@ -39,6 +45,9 @@ class TimerProvider extends ChangeNotifier {
   final IdleService _idle;
 
   Timer? _ticker;
+  Timer? _alertTimer;
+  Timer? _completionTimer;
+  bool _disposed = false;
 
   // --- Estado público -----------------------------------------------------
 
@@ -78,6 +87,11 @@ class TimerProvider extends ChangeNotifier {
       cycleSeconds == 0 ? 0 : (_cycleElapsed / cycleSeconds).clamp(0.0, 1.0);
 
   // --- Ciclo de vida ------------------------------------------------------
+
+  void _syncServiceToggles() {
+    _audio.enabled = _soundOn;
+    _notifications.enabled = _notifyOn;
+  }
 
   void start() {
     _ticker?.cancel();
@@ -132,14 +146,18 @@ class TimerProvider extends ChangeNotifier {
     if (_idleBusy) return;
     if (_idlePoll++ % 5 != 0) return;
     _idleBusy = true;
-    _idle.idleSeconds().then((seconds) {
-      final shouldPause = seconds >= AppDefaults.inactivitySeconds;
-      if (shouldPause != _inactivityPaused) {
-        _inactivityPaused = shouldPause;
-        _inactivityAlert = shouldPause;
-        notifyListeners();
-      }
-    }).whenComplete(() => _idleBusy = false);
+    _idle
+        .idleSeconds()
+        .then((seconds) {
+          if (_disposed) return;
+          final shouldPause = seconds >= AppDefaults.inactivitySeconds;
+          if (shouldPause != _inactivityPaused) {
+            _inactivityPaused = shouldPause;
+            _inactivityAlert = shouldPause;
+            notifyListeners();
+          }
+        })
+        .whenComplete(() => _idleBusy = false);
   }
 
   // --- ALERTA -------------------------------------------------------------
@@ -155,7 +173,10 @@ class TimerProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    Timer(const Duration(milliseconds: 1500), () {
+    _alertTimer?.cancel();
+    _alertTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (_disposed) return;
+      _alertTimer = null;
       if (_state == AppState.alerta) _enterPhase1();
     });
   }
@@ -190,7 +211,10 @@ class TimerProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    Timer(AppDurations.completion, () {
+    _completionTimer?.cancel();
+    _completionTimer = Timer(AppDurations.completion, () {
+      if (_disposed) return;
+      _completionTimer = null;
       if (_state == AppState.conclusao) _returnToIdle();
     });
   }
@@ -270,7 +294,11 @@ class TimerProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    _settings.removeListener(_syncServiceToggles);
     _ticker?.cancel();
+    _alertTimer?.cancel();
+    _completionTimer?.cancel();
     super.dispose();
   }
 }
