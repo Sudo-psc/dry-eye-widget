@@ -1,0 +1,92 @@
+# Build e publicação da versão Windows do Dry Eye Widget.
+# Instale copiando para: .github/workflows/windows-build.yml
+#
+# - PR/push manual: compila e sobe os artefatos do build.
+# - Tag vX.Y.Z: compila e anexa instalador + ZIP à GitHub Release.
+
+name: Windows Build
+
+on:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - "lib/**"
+      - "windows/**"
+      - "pubspec.yaml"
+      - ".github/workflows/windows-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Fixe na última estável compatível (>=3.16). Atualize este valor para
+          # a versão usada localmente — confira com `flutter --version`.
+          flutter-version: "3.24.5"
+          cache: true
+
+      - name: Habilitar desktop Windows
+        run: flutter config --enable-windows-desktop
+
+      - name: Dependências
+        run: flutter pub get
+
+      - name: Gerar ícones
+        run: dart run flutter_launcher_icons
+
+      - name: Build Release
+        run: flutter build windows --release
+
+      - name: Gerar ZIP portátil
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Compress-Archive -Path "build\windows\x64\runner\Release\*" `
+            -DestinationPath "dist\DryEyeWidget-windows-x64.zip" -Force
+
+      - name: Instalar Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Gerar instalador
+        shell: pwsh
+        run: |
+          $iss = "win_version\templates\dry-eye-widget.iss"
+          if (Test-Path $iss) {
+            & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" $iss
+          } else {
+            Write-Warning "Script .iss não encontrado em $iss — pulando instalador."
+          }
+
+      - name: Upload de artefatos (toda execução)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-eye-widget-windows
+          path: |
+            dist/DryEyeWidget-windows-x64.zip
+            dist/DryEyeWidget-Setup-x64.exe
+          if-no-files-found: warn
+
+      - name: Anexar à Release (apenas em tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/DryEyeWidget-windows-x64.zip
+            dist/DryEyeWidget-Setup-x64.exe
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
