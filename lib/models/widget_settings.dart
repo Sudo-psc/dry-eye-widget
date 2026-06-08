@@ -36,6 +36,7 @@ class WidgetSettings {
     required this.languageCode,
     required this.eyeDropsEnabled,
     required this.eyeDropsIntervalHours,
+    required this.pauseOnInactivity,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -110,6 +111,9 @@ class WidgetSettings {
   /// Intervalo do lembrete de colírio em horas (4 ou 6).
   final int eyeDropsIntervalHours;
 
+  /// Pausar o timer automaticamente após inatividade do sistema.
+  final bool pauseOnInactivity;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
         cycleMinutes: AppDefaults.cycleMinutes,
@@ -135,6 +139,7 @@ class WidgetSettings {
         languageCode: AppDefaults.languageCode,
         eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
         eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
+        pauseOnInactivity: AppDefaults.pauseOnInactivity,
       );
 
   // --- Conveniências ------------------------------------------------------
@@ -167,6 +172,7 @@ class WidgetSettings {
     String? languageCode,
     bool? eyeDropsEnabled,
     int? eyeDropsIntervalHours,
+    bool? pauseOnInactivity,
   }) {
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
@@ -193,6 +199,7 @@ class WidgetSettings {
       eyeDropsEnabled: eyeDropsEnabled ?? this.eyeDropsEnabled,
       eyeDropsIntervalHours:
           eyeDropsIntervalHours ?? this.eyeDropsIntervalHours,
+      pauseOnInactivity: pauseOnInactivity ?? this.pauseOnInactivity,
     );
   }
 
@@ -220,6 +227,7 @@ class WidgetSettings {
         'languageCode': languageCode,
         'eyeDropsEnabled': eyeDropsEnabled,
         'eyeDropsIntervalHours': eyeDropsIntervalHours,
+        'pauseOnInactivity': pauseOnInactivity,
       };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -260,6 +268,8 @@ class WidgetSettings {
       eyeDropsIntervalHours:
           (map['eyeDropsIntervalHours'] as num?)?.toInt() ??
               d.eyeDropsIntervalHours,
+      pauseOnInactivity:
+          map['pauseOnInactivity'] as bool? ?? d.pauseOnInactivity,
     );
   }
 

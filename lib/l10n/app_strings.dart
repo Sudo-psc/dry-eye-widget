@@ -102,6 +102,11 @@ class AppStrings {
     required this.updateError,
     required this.updateChecking,
     required this.close,
+    // Inatividade
+    required this.pauseOnInactivityLabel,
+    required this.inactivityTitle,
+    required this.inactivityBody,
+    required this.inactivityContinue,
   });
 
   final String languageCode;
@@ -202,6 +207,11 @@ class AppStrings {
   final String updateError;
   final String updateChecking;
   final String close;
+
+  final String pauseOnInactivityLabel;
+  final String inactivityTitle;
+  final String inactivityBody;
+  final String inactivityContinue;
 
   // --- Helpers dependentes de enum --------------------------------------
 
@@ -361,6 +371,12 @@ const AppStrings ptStrings = AppStrings(
       'Tente novamente mais tarde.',
   updateChecking: 'Verificando atualizações…',
   close: 'Fechar',
+  pauseOnInactivityLabel: 'Pausar por inatividade (2 min)',
+  inactivityTitle: 'Inatividade detectada',
+  inactivityBody:
+      'O timer foi pausado automaticamente. Caso deseja continuar, clique em '
+      'continuar.',
+  inactivityContinue: 'Continuar',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -473,4 +489,10 @@ const AppStrings enStrings = AppStrings(
   updateError: "Couldn't check for updates right now. Please try again later.",
   updateChecking: 'Checking for updates…',
   close: 'Close',
+  pauseOnInactivityLabel: 'Pause when inactive (2 min)',
+  inactivityTitle: 'Inactivity detected',
+  inactivityBody:
+      'The timer was paused automatically. If you want to continue, click '
+      'continue.',
+  inactivityContinue: 'Continue',
 );

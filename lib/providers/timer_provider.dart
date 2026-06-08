@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/app_state.dart';
 import '../services/audio_service.dart';
+import '../services/idle_service.dart';
 import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../utils/constants.dart';
@@ -21,10 +22,12 @@ class TimerProvider extends ChangeNotifier {
     required StorageService storage,
     required AudioService audio,
     required NotificationService notifications,
+    required IdleService idle,
   })  : _settings = settings,
         _storage = storage,
         _audio = audio,
-        _notifications = notifications {
+        _notifications = notifications,
+        _idle = idle {
     _cycleElapsed = storage.elapsedSeconds.clamp(0, cycleSeconds);
     _eyeDropsElapsed = storage.eyeDropsElapsed;
   }
@@ -33,6 +36,7 @@ class TimerProvider extends ChangeNotifier {
   final StorageService _storage;
   final AudioService _audio;
   final NotificationService _notifications;
+  final IdleService _idle;
 
   Timer? _ticker;
 
@@ -56,6 +60,13 @@ class TimerProvider extends ChangeNotifier {
   bool _eyeDropsAlert = false;
   bool get eyeDropsAlert => _eyeDropsAlert;
 
+  // Pausa por inatividade.
+  bool _inactivityPaused = false;
+  bool _inactivityAlert = false;
+  bool get inactivityAlert => _inactivityAlert;
+  int _idlePoll = 0;
+  bool _idleBusy = false;
+
   // --- Configurações derivadas (lidas do SettingsProvider) ----------------
 
   int get cycleSeconds => _settings.value.cycleSeconds;
@@ -76,6 +87,7 @@ class TimerProvider extends ChangeNotifier {
 
   void _onTick() {
     _tickEyeDrops();
+    _checkInactivity();
     switch (_state) {
       case AppState.idle:
         _tickIdle();

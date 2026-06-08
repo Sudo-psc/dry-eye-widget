@@ -1,6 +1,12 @@
 #include "flutter_window.h"
 
+#include <windows.h>
+
+#include <memory>
 #include <optional>
+
+#include <flutter/method_channel.h>
+#include <flutter/standard_method_codec.h>
 
 #include "flutter/generated_plugin_registrant.h"
 
@@ -26,6 +32,29 @@ bool FlutterWindow::OnCreate() {
   }
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
+
+  // Canal de tempo ocioso do sistema (segundos desde a última entrada do
+  // usuário em todo o sistema, via GetLastInputInfo).
+  idle_channel_ =
+      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+          flutter_controller_->engine()->messenger(), "dry_eye_widget/idle",
+          &flutter::StandardMethodCodec::GetInstance());
+  idle_channel_->SetMethodCallHandler(
+      [](const flutter::MethodCall<flutter::EncodableValue>& call,
+         std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>
+             result) {
+        if (call.method_name() == "idleSeconds") {
+          LASTINPUTINFO lii;
+          lii.cbSize = sizeof(LASTINPUTINFO);
+          double idle = 0.0;
+          if (GetLastInputInfo(&lii)) {
+            idle = (GetTickCount() - lii.dwTime) / 1000.0;
+          }
+          result->Success(flutter::EncodableValue(idle));
+        } else {
+          result->NotImplemented();
+        }
+      });
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     this->Show();

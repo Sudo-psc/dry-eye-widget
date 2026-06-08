@@ -1,4 +1,5 @@
 import Cocoa
+import CoreGraphics
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
@@ -9,6 +10,26 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: true)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+
+    // Canal de tempo ocioso do sistema (segundos desde a última entrada do
+    // usuário — mouse, cliques, teclas — em todo o sistema).
+    let idleChannel = FlutterMethodChannel(
+      name: "dry_eye_widget/idle",
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
+    idleChannel.setMethodCallHandler { (call, result) in
+      if call.method == "idleSeconds" {
+        let types: [CGEventType] = [
+          .mouseMoved, .leftMouseDown, .rightMouseDown, .keyDown,
+          .scrollWheel, .leftMouseDragged, .rightMouseDragged, .otherMouseDown,
+        ]
+        let idle = types
+          .map { CGEventSource.secondsSinceLastEventType(.hidSystemState, eventType: $0) }
+          .min() ?? 0
+        result(idle)
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
 
     super.awakeFromNib()
   }

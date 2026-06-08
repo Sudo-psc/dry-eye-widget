@@ -69,6 +69,10 @@ class AppDefaults {
   static const String languageCode = 'pt';
   static const bool eyeDropsEnabled = false;
   static const int eyeDropsIntervalHours = 4;
+  static const bool pauseOnInactivity = true;
+
+  /// Segundos de inatividade do sistema antes de pausar o timer.
+  static const int inactivitySeconds = 120;
 
   static const double minBallSize = 24.0;
   static const double maxBallSize = 80.0;
