@@ -104,7 +104,7 @@ class TimerProvider extends ChangeNotifier {
   // --- IDLE ---------------------------------------------------------------
 
   void _tickIdle() {
-    if (_paused) return;
+    if (_paused || _inactivityPaused) return;
     _cycleElapsed++;
     if (_cycleElapsed % 5 == 0) {
       _storage.setElapsedSeconds(_cycleElapsed);
@@ -113,6 +113,33 @@ class TimerProvider extends ChangeNotifier {
       _enterAlerta();
     }
     notifyListeners();
+  }
+
+  // --- Pausa por inatividade do sistema -----------------------------------
+
+  /// Consulta o tempo ocioso do sistema via [IdleService] e pausa/retoma o
+  /// ciclo automaticamente. A leitura é assíncrona e cara, então só é feita a
+  /// cada ~5 s ([_idlePoll]) e nunca de forma sobreposta ([_idleBusy]).
+  void _checkInactivity() {
+    if (!_settings.value.pauseOnInactivity) {
+      if (_inactivityPaused || _inactivityAlert) {
+        _inactivityPaused = false;
+        _inactivityAlert = false;
+        notifyListeners();
+      }
+      return;
+    }
+    if (_idleBusy) return;
+    if (_idlePoll++ % 5 != 0) return;
+    _idleBusy = true;
+    _idle.idleSeconds().then((seconds) {
+      final shouldPause = seconds >= AppDefaults.inactivitySeconds;
+      if (shouldPause != _inactivityPaused) {
+        _inactivityPaused = shouldPause;
+        _inactivityAlert = shouldPause;
+        notifyListeners();
+      }
+    }).whenComplete(() => _idleBusy = false);
   }
 
   // --- ALERTA -------------------------------------------------------------

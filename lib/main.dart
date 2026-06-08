@@ -13,6 +13,7 @@ import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
+import 'services/idle_service.dart';
 import 'services/notification_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
@@ -48,6 +49,8 @@ Future<void> main() async {
   final notifications = NotificationService()
     ..enabled = settings.value.notificationsEnabled;
   await notifications.init();
+
+  final idle = IdleService();
 
   final startup = StartupService()..init();
   // Garante que o estado do sistema bata com a preferência salva.
@@ -102,6 +105,7 @@ Future<void> main() async {
             storage: storage,
             audio: audio,
             notifications: notifications,
+            idle: idle,
           )..start(),
         ),
       ],
