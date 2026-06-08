@@ -4,6 +4,23 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.6.1] - 2026-06-08
+
+### Corrigido
+- **Windows — ícone da bandeja invisível**: o `tray_manager` carrega o ícone
+  com `LoadImage(IMAGE_ICON, LR_LOADFROMFILE)`, que só aceita `.ico`; o app
+  gerava `.png` (HICON nulo → sem ícone). Agora o ícone é gerado em `.ico`
+  (DIB 32bpp) no Windows.
+
+### Alterado
+- **Anel de progresso ao redor da bolinha** passa a vir **ativado por padrão**
+  (mostra o avanço até a próxima pausa); ainda pode ser desligado nas
+  Configurações.
+
+### Notas de build
+- Adicionado workflow `windows-build.yml` (GitHub Actions) que compila e anexa
+  o ZIP portátil e o instalador Windows às releases em tags `v*`.
+
 ## [1.6.0] - 2026-06-07
 
 ### Adicionado
