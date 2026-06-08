@@ -61,7 +61,7 @@ class AppDefaults {
   static const bool launchAtLogin = false;
   static const double overlayOpacity = 0.15;
   static const double overlayBlur = 20.0;
-  static const bool showProgressRing = false;
+  static const bool showProgressRing = true;
   static const bool hideDockIcon = false;
   static const bool hideMenuBarItem = false;
   static const bool hideFloatingWidget = false;
