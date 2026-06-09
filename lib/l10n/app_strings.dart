@@ -11,6 +11,7 @@ class AppStrings {
     required this.menuPause,
     required this.menuResume,
     required this.menuGuidance,
+    required this.menuOsdi,
     required this.menuCheckUpdates,
     required this.menuSettings,
     required this.menuQuit,
@@ -102,6 +103,28 @@ class AppStrings {
     required this.updateError,
     required this.updateChecking,
     required this.close,
+    // OSDI
+    required this.osdiTitle,
+    required this.osdiSubtitle,
+    required this.osdiInstruction,
+    required this.osdiHistoryTitle,
+    required this.osdiNoHistory,
+    required this.osdiSave,
+    required this.osdiReset,
+    required this.osdiScoreLabel,
+    required this.osdiAnsweredLabel,
+    required this.osdiLatestLabel,
+    required this.osdiSeverityNormal,
+    required this.osdiSeverityMild,
+    required this.osdiSeverityModerate,
+    required this.osdiSeveritySevere,
+    required this.osdiTrendBetter,
+    required this.osdiTrendWorse,
+    required this.osdiTrendSame,
+    required this.osdiNotApplicable,
+    required this.osdiAnswerLabels,
+    required this.osdiQuestions,
+    required this.osdiDisclaimer,
     // Inatividade
     required this.pauseOnInactivityLabel,
     required this.inactivityTitle,
@@ -118,6 +141,7 @@ class AppStrings {
   final String menuPause;
   final String menuResume;
   final String menuGuidance;
+  final String menuOsdi;
   final String menuCheckUpdates;
   final String menuSettings;
   final String menuQuit;
@@ -210,6 +234,28 @@ class AppStrings {
   final String updateChecking;
   final String close;
 
+  final String osdiTitle;
+  final String osdiSubtitle;
+  final String osdiInstruction;
+  final String osdiHistoryTitle;
+  final String osdiNoHistory;
+  final String osdiSave;
+  final String osdiReset;
+  final String osdiScoreLabel;
+  final String osdiAnsweredLabel;
+  final String osdiLatestLabel;
+  final String osdiSeverityNormal;
+  final String osdiSeverityMild;
+  final String osdiSeverityModerate;
+  final String osdiSeveritySevere;
+  final String osdiTrendBetter;
+  final String osdiTrendWorse;
+  final String osdiTrendSame;
+  final String osdiNotApplicable;
+  final List<String> osdiAnswerLabels;
+  final List<String> osdiQuestions;
+  final String osdiDisclaimer;
+
   final String pauseOnInactivityLabel;
   final String inactivityTitle;
   final String inactivityBody;
@@ -270,6 +316,7 @@ const AppStrings ptStrings = AppStrings(
   menuPause: 'Pausar cronômetro',
   menuResume: 'Retomar cronômetro',
   menuGuidance: 'Orientações',
+  menuOsdi: 'Questionário OSDI',
   menuCheckUpdates: 'Verificar atualizações',
   menuSettings: 'Configurações',
   menuQuit: 'Sair',
@@ -304,7 +351,8 @@ const AppStrings ptStrings = AppStrings(
   blinkSpeed: 'Velocidade do piscar',
   progressRing: 'Anel de progresso',
   gentleMode: 'Notificações suaves (não bloquear a tela)',
-  gentleHint: 'Mostra apenas um cartão pequeno no canto superior direito, em '
+  gentleHint:
+      'Mostra apenas um cartão pequeno no canto superior direito, em '
       'vez do aviso em tela cheia.',
   dimBackground: 'Escurecer o fundo',
   dimIntensity: 'Intensidade do escurecimento',
@@ -330,32 +378,39 @@ const AppStrings ptStrings = AppStrings(
   unitSec: 's',
   guidanceTitle: 'Orientações — Saúde Ocular Digital',
   cvsTitle: 'Síndrome da Visão de Computador',
-  cvsBody: 'O uso prolongado de telas pode causar a Síndrome da Visão de '
+  cvsBody:
+      'O uso prolongado de telas pode causar a Síndrome da Visão de '
       'Computador (fadiga visual digital): cansaço nos olhos, ardência, visão '
       'embaçada, dor de cabeça e sensação de olhos secos. É frequente em quem '
       'passa muitas horas no computador, tablet ou celular.',
   dryEyeTitle: 'Olho seco',
-  dryEyeBody: 'Diante das telas tendemos a piscar bem menos. Piscar espalha o '
+  dryEyeBody:
+      'Diante das telas tendemos a piscar bem menos. Piscar espalha o '
       'filme lacrimal que lubrifica e protege os olhos; piscando menos, a '
       'lágrima evapora mais rápido e surge o desconforto do olho seco. Não é à '
       'toa que ele é tão comum entre quem trabalha no digital.',
   ruleTitle: 'Regra 20-20-20',
-  ruleBody: 'A cada 20 minutos, olhe para algo a cerca de 6 metros (20 pés) '
+  ruleBody:
+      'A cada 20 minutos, olhe para algo a cerca de 6 metros (20 pés) '
       'por 20 segundos — e pisque algumas vezes, devagar e completo. Esses 20 '
       'segundos relaxam o foco e ajudam a renovar a lágrima. É exatamente o '
       'que este app lembra você de fazer.',
   statsTitle: 'O que dizem os estudos',
   stat1Value: '~50%',
-  stat1Text: 'dos trabalhadores que usam telas têm olho seco — em alguns '
+  stat1Text:
+      'dos trabalhadores que usam telas têm olho seco — em alguns '
       'estudos, perto de 60% [1].',
   stat2Value: '~30%',
-  stat2Text: 'de queda no desempenho no trabalho (presenteísmo) em quem tem '
+  stat2Text:
+      'de queda no desempenho no trabalho (presenteísmo) em quem tem '
       'olho seco sintomático [2].',
   stat3Value: 'até 14%',
-  stat3Text: 'mais lenta fica a leitura prolongada por causa do olho seco '
+  stat3Text:
+      'mais lenta fica a leitura prolongada por causa do olho seco '
       '[3, 4].',
   refsTitle: 'Referências',
-  disclaimer: 'Conteúdo educativo — não substitui a avaliação de um '
+  disclaimer:
+      'Conteúdo educativo — não substitui a avaliação de um '
       'oftalmologista. Sintomas persistentes merecem consulta.',
   secEyeDrops: 'Colírio',
   eyeDropsEnable: 'Lembrete de colírio',
@@ -363,7 +418,8 @@ const AppStrings ptStrings = AppStrings(
   eyeDropsEvery4h: '4 horas',
   eyeDropsEvery6h: '6 horas',
   eyeDropsTitle: 'Hora do colírio',
-  eyeDropsBody: 'Está na hora de pingar o seu colírio. Aplique e siga '
+  eyeDropsBody:
+      'Está na hora de pingar o seu colírio. Aplique e siga '
       'cuidando dos seus olhos.',
   eyeDropsDone: 'Apliquei',
   eyeDropsNotifyTitle: 'Hora do colírio 💧',
@@ -371,10 +427,53 @@ const AppStrings ptStrings = AppStrings(
   updateUpToDate: 'Seu app está atualizado.',
   updateAvailable: 'Nova versão {v} disponível — baixe e atualize o app.',
   updateDownload: 'Baixar',
-  updateError: 'Não foi possível verificar atualizações agora. '
+  updateError:
+      'Não foi possível verificar atualizações agora. '
       'Tente novamente mais tarde.',
   updateChecking: 'Verificando atualizações…',
   close: 'Fechar',
+  osdiTitle: 'Questionário OSDI',
+  osdiSubtitle: 'Acompanhe sintomas de olho seco ao longo do tempo.',
+  osdiInstruction:
+      'Na última semana, com que frequência você percebeu cada situação?',
+  osdiHistoryTitle: 'Histórico e comparação',
+  osdiNoHistory: 'Nenhum resultado salvo ainda.',
+  osdiSave: 'Salvar resultado',
+  osdiReset: 'Limpar respostas',
+  osdiScoreLabel: 'Pontuação OSDI: {score}',
+  osdiAnsweredLabel: '{count}/12 respondidas',
+  osdiLatestLabel: 'Último resultado',
+  osdiSeverityNormal: 'Normal',
+  osdiSeverityMild: 'Leve',
+  osdiSeverityModerate: 'Moderado',
+  osdiSeveritySevere: 'Severo',
+  osdiTrendBetter: 'Melhorou {delta} pontos',
+  osdiTrendWorse: 'Piorou {delta} pontos',
+  osdiTrendSame: 'Estável',
+  osdiNotApplicable: 'Não se aplica',
+  osdiAnswerLabels: [
+    'Nunca',
+    'Raramente',
+    'Às vezes',
+    'Frequentemente',
+    'Sempre',
+  ],
+  osdiQuestions: [
+    'Olhos sensíveis à luz',
+    'Sensação de areia ou corpo estranho nos olhos',
+    'Dor ou desconforto ocular',
+    'Visão embaçada',
+    'Visão ruim ou instável',
+    'Dificuldade para ler',
+    'Dificuldade para dirigir à noite',
+    'Dificuldade para trabalhar no computador ou usar caixa eletrônico',
+    'Dificuldade para assistir TV',
+    'Desconforto em locais com vento',
+    'Desconforto em locais secos ou com baixa umidade',
+    'Desconforto em ambientes com ar-condicionado',
+  ],
+  osdiDisclaimer:
+      'Triagem educativa. O resultado não substitui avaliação oftalmológica.',
   pauseOnInactivityLabel: 'Pausar por inatividade (adaptativo)',
   inactivityTitle: 'Timer pausado',
   inactivityBody:
@@ -391,6 +490,7 @@ const AppStrings enStrings = AppStrings(
   menuPause: 'Pause timer',
   menuResume: 'Resume timer',
   menuGuidance: 'Eye care guide',
+  menuOsdi: 'OSDI questionnaire',
   menuCheckUpdates: 'Check for updates',
   menuSettings: 'Settings',
   menuQuit: 'Quit',
@@ -403,8 +503,7 @@ const AppStrings enStrings = AppStrings(
       'Remember to blink while looking ~6 m (20 ft) away, and hold your gaze '
       'until the timer reaches zero',
   doneTitle: 'Well done!',
-  doneSubtitle:
-      'You refreshed your tears. Back to work with rested eyes',
+  doneSubtitle: 'You refreshed your tears. Back to work with rested eyes',
   notifyBreakTitle: 'Time for a break 👀',
   notifyBreakBody: 'Rest your eyes for a few seconds.',
   notifyDoneTitle: 'Break complete ✅',
@@ -425,7 +524,8 @@ const AppStrings enStrings = AppStrings(
   blinkSpeed: 'Blink speed',
   progressRing: 'Progress ring',
   gentleMode: "Gentle notifications (don't block the screen)",
-  gentleHint: 'Shows just a small card in the top-right corner instead of the '
+  gentleHint:
+      'Shows just a small card in the top-right corner instead of the '
       'full-screen alert.',
   dimBackground: 'Dim the background',
   dimIntensity: 'Dim intensity',
@@ -451,31 +551,37 @@ const AppStrings enStrings = AppStrings(
   unitSec: 's',
   guidanceTitle: 'Guidance — Digital Eye Health',
   cvsTitle: 'Computer Vision Syndrome',
-  cvsBody: 'Prolonged screen use can cause Computer Vision Syndrome (digital '
+  cvsBody:
+      'Prolonged screen use can cause Computer Vision Syndrome (digital '
       'eye strain): tired eyes, burning, blurred vision, headaches and a dry-'
       'eye feeling. It is common in people who spend many hours on a computer, '
       'tablet or phone.',
   dryEyeTitle: 'Dry eye',
-  dryEyeBody: 'In front of screens we tend to blink much less. Blinking '
+  dryEyeBody:
+      'In front of screens we tend to blink much less. Blinking '
       'spreads the tear film that lubricates and protects the eyes; blinking '
       'less, tears evaporate faster and dry-eye discomfort sets in. No wonder '
       'it is so common among digital workers.',
   ruleTitle: 'The 20-20-20 rule',
-  ruleBody: 'Every 20 minutes, look at something about 6 meters (20 feet) away '
+  ruleBody:
+      'Every 20 minutes, look at something about 6 meters (20 feet) away '
       'for 20 seconds — and blink a few times, slowly and fully. Those 20 '
       'seconds relax your focus and help refresh your tears. That is exactly '
       'what this app reminds you to do.',
   statsTitle: 'What studies show',
   stat1Value: '~50%',
-  stat1Text: 'of screen workers have dry eye — in some studies, close to 60% '
+  stat1Text:
+      'of screen workers have dry eye — in some studies, close to 60% '
       '[1].',
   stat2Value: '~30%',
-  stat2Text: 'drop in work performance (presenteeism) among those with '
+  stat2Text:
+      'drop in work performance (presenteeism) among those with '
       'symptomatic dry eye [2].',
   stat3Value: 'up to 14%',
   stat3Text: 'slower prolonged reading because of dry eye [3, 4].',
   refsTitle: 'References',
-  disclaimer: 'Educational content — it does not replace an eye doctor’s '
+  disclaimer:
+      'Educational content — it does not replace an eye doctor’s '
       'assessment. Persistent symptoms deserve a consultation.',
   secEyeDrops: 'Eye drops',
   eyeDropsEnable: 'Eye drops reminder',
@@ -483,7 +589,8 @@ const AppStrings enStrings = AppStrings(
   eyeDropsEvery4h: '4 hours',
   eyeDropsEvery6h: '6 hours',
   eyeDropsTitle: 'Eye drops time',
-  eyeDropsBody: 'It is time for your eye drops. Apply them and keep caring '
+  eyeDropsBody:
+      'It is time for your eye drops. Apply them and keep caring '
       'for your eyes.',
   eyeDropsDone: 'Done',
   eyeDropsNotifyTitle: 'Eye drops time 💧',
@@ -494,10 +601,45 @@ const AppStrings enStrings = AppStrings(
   updateError: "Couldn't check for updates right now. Please try again later.",
   updateChecking: 'Checking for updates…',
   close: 'Close',
+  osdiTitle: 'OSDI questionnaire',
+  osdiSubtitle: 'Track dry-eye symptoms over time.',
+  osdiInstruction:
+      'During the last week, how often did you notice each situation?',
+  osdiHistoryTitle: 'History and comparison',
+  osdiNoHistory: 'No saved result yet.',
+  osdiSave: 'Save result',
+  osdiReset: 'Clear answers',
+  osdiScoreLabel: 'OSDI score: {score}',
+  osdiAnsweredLabel: '{count}/12 answered',
+  osdiLatestLabel: 'Latest result',
+  osdiSeverityNormal: 'Normal',
+  osdiSeverityMild: 'Mild',
+  osdiSeverityModerate: 'Moderate',
+  osdiSeveritySevere: 'Severe',
+  osdiTrendBetter: 'Improved by {delta} points',
+  osdiTrendWorse: 'Worsened by {delta} points',
+  osdiTrendSame: 'Stable',
+  osdiNotApplicable: 'Not applicable',
+  osdiAnswerLabels: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'],
+  osdiQuestions: [
+    'Eyes sensitive to light',
+    'Gritty or foreign-body sensation in the eyes',
+    'Eye pain or discomfort',
+    'Blurred vision',
+    'Poor or unstable vision',
+    'Difficulty reading',
+    'Difficulty driving at night',
+    'Difficulty working on a computer or using an ATM',
+    'Difficulty watching TV',
+    'Discomfort in windy places',
+    'Discomfort in dry or low-humidity places',
+    'Discomfort in air-conditioned environments',
+  ],
+  osdiDisclaimer:
+      'Educational screening. The result does not replace an eye exam.',
   pauseOnInactivityLabel: 'Pause when inactive (adaptive)',
   inactivityTitle: 'Timer paused',
-  inactivityBody:
-      'Inactivity detected. The cycle will resume when you return.',
+  inactivityBody: 'Inactivity detected. The cycle will resume when you return.',
   inactivityContinue: 'Resume',
   secInactivity: 'Inactivity',
   resetLearningLabel: 'Reset inactivity learning',

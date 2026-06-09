@@ -145,6 +145,9 @@ class StorageKeys {
 
   /// Estado agregado, cifrado, do modelo de presença.
   static const String presenceModel = 'presence_model_enc';
+
+  /// JSON serializado com o histórico local de avaliações OSDI.
+  static const String osdiHistory = 'osdi_history_json';
 }
 
 /// Informações do app usadas na verificação de atualização.
@@ -152,7 +155,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.7.0';
+  static const String version = '1.7.1';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';
