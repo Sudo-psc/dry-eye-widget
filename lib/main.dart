@@ -588,6 +588,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     required WidgetSettings s,
     bool interactive = true,
     double progress = 0.0,
+    bool dimmed = false,
   }) {
     return FloatingBall(
       isActive: isActive,
@@ -598,6 +599,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       blinkDuration: s.blinkDuration,
       showProgress: s.showProgressRing,
       progress: progress,
+      dimmed: dimmed,
       onTap: interactive ? _onBallTap : null,
       onSecondaryTap: interactive ? _onBallSecondaryTap : null,
       onDragStart: interactive ? _onBallDragStart : null,
@@ -609,10 +611,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
       TimerProvider timer, WidgetSettings settings, AppStrings strings) {
     if (!_menuOpen) {
       return Center(
-        child: _ball(
-          isActive: timer.state.isActive,
-          s: settings,
-          progress: timer.cycleProgress,
+        child: Tooltip(
+          message:
+              timer.inactivityAlert ? strings.inactivityPausedTooltip : '',
+          child: _ball(
+            isActive: timer.state.isActive,
+            s: settings,
+            progress: timer.cycleProgress,
+            dimmed: timer.inactivityAlert,
+          ),
         ),
       );
     }
