@@ -50,6 +50,8 @@ git push origin v1.6.0
 
 O workflow compila e anexa `DryEyeWidget-Setup-x64.exe` e
 `DryEyeWidget-windows-x64.zip` à release `v1.6.0`.
+Antes de gerar o instalador, o job extrai a versão do `pubspec.yaml`, valida
+`AppInfo.version` e passa `/DMyAppVersion=<versão>` para o Inno Setup.
 
 ## Observações
 
