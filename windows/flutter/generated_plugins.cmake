@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   flutter_acrylic
   local_notifier
-  screen_retriever
+  screen_retriever_windows
   tray_manager
   window_manager
 )

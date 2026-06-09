@@ -106,10 +106,9 @@ class AppStrings {
     required this.pauseOnInactivityLabel,
     required this.inactivityTitle,
     required this.inactivityBody,
-    required this.inactivityPausedTooltip,
+    required this.inactivityContinue,
     required this.secInactivity,
     required this.resetLearningLabel,
-    required this.inactivityContinue,
   });
 
   final String languageCode;
@@ -214,10 +213,9 @@ class AppStrings {
   final String pauseOnInactivityLabel;
   final String inactivityTitle;
   final String inactivityBody;
-  final String inactivityPausedTooltip;
+  final String inactivityContinue;
   final String secInactivity;
   final String resetLearningLabel;
-  final String inactivityContinue;
 
   // --- Helpers dependentes de enum --------------------------------------
 
@@ -378,12 +376,10 @@ const AppStrings ptStrings = AppStrings(
   updateChecking: 'Verificando atualizações…',
   close: 'Fechar',
   pauseOnInactivityLabel: 'Pausar por inatividade (adaptativo)',
-  inactivityTitle: 'Inatividade detectada',
+  inactivityTitle: 'Timer pausado',
   inactivityBody:
-      'O timer foi pausado automaticamente. Caso deseja continuar, clique em '
-      'continuar.',
-  inactivityContinue: 'Continuar',
-  inactivityPausedTooltip: 'Pausado por inatividade',
+      'Inatividade detectada. O ciclo será retomado quando você voltar.',
+  inactivityContinue: 'Retomar',
   secInactivity: 'Inatividade',
   resetLearningLabel: 'Resetar aprendizado de inatividade',
 );
@@ -499,12 +495,10 @@ const AppStrings enStrings = AppStrings(
   updateChecking: 'Checking for updates…',
   close: 'Close',
   pauseOnInactivityLabel: 'Pause when inactive (adaptive)',
-  inactivityTitle: 'Inactivity detected',
+  inactivityTitle: 'Timer paused',
   inactivityBody:
-      'The timer was paused automatically. If you want to continue, click '
-      'continue.',
-  inactivityContinue: 'Continue',
-  inactivityPausedTooltip: 'Paused due to inactivity',
+      'Inactivity detected. The cycle will resume when you return.',
+  inactivityContinue: 'Resume',
   secInactivity: 'Inactivity',
   resetLearningLabel: 'Reset inactivity learning',
 );

@@ -6,7 +6,7 @@
 ; AppInfo.version em lib/utils/constants.dart.
 
 #define MyAppName "Dry Eye Widget"
-#define MyAppVersion "1.6.0"
+#define MyAppVersion "1.6.3"
 #define MyAppPublisher "Saraiva Vision Care"
 #define MyAppURL "https://github.com/Sudo-psc/dry-eye-widget"
 #define MyAppExeName "dry_eye_widget.exe"

@@ -24,13 +24,19 @@ class TimerProvider extends ChangeNotifier {
     required AudioService audio,
     required NotificationService notifications,
     required PresenceController presence,
-  })  : _settings = settings,
-        _storage = storage,
-        _audio = audio,
-        _notifications = notifications,
-        _presence = presence {
-    _cycleElapsed = storage.elapsedSeconds.clamp(0, cycleSeconds);
-    _eyeDropsElapsed = storage.eyeDropsElapsed;
+  }) : this._(settings, storage, audio, notifications, presence);
+
+  TimerProvider._(
+    this._settings,
+    this._storage,
+    this._audio,
+    this._notifications,
+    this._presence,
+  ) {
+    _cycleElapsed = _storage.elapsedSeconds.clamp(0, cycleSeconds);
+    _eyeDropsElapsed = _storage.eyeDropsElapsed;
+    _syncServiceToggles();
+    _settings.addListener(_syncServiceToggles);
   }
 
   final SettingsProvider _settings;
@@ -40,6 +46,9 @@ class TimerProvider extends ChangeNotifier {
   final PresenceController _presence;
 
   Timer? _ticker;
+  Timer? _alertTimer;
+  Timer? _completionTimer;
+  bool _disposed = false;
 
   // --- Estado público -----------------------------------------------------
 
@@ -68,6 +77,10 @@ class TimerProvider extends ChangeNotifier {
   bool _idleBusy = false;
   double _lastIdleSeconds = 0;
 
+  /// Após uma retomada manual (botão do cartão), evita re-pausar
+  /// imediatamente enquanto o usuário ainda estiver ocioso.
+  bool _suppressRepauseUntilActive = false;
+
   // --- Configurações derivadas (lidas do SettingsProvider) ----------------
 
   int get cycleSeconds => _settings.value.cycleSeconds;
@@ -79,6 +92,11 @@ class TimerProvider extends ChangeNotifier {
       cycleSeconds == 0 ? 0 : (_cycleElapsed / cycleSeconds).clamp(0.0, 1.0);
 
   // --- Ciclo de vida ------------------------------------------------------
+
+  void _syncServiceToggles() {
+    _audio.enabled = _soundOn;
+    _notifications.enabled = _notifyOn;
+  }
 
   void start() {
     _ticker?.cancel();
@@ -102,46 +120,6 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
-  // --- Presença / inatividade --------------------------------------------
-
-  /// Consulta o [PresenceController] a cada tick e pausa/retoma o ciclo.
-  /// Reentrância protegida por [_idleBusy] (a leitura nativa é assíncrona).
-  Future<void> _checkPresence() async {
-    if (_idleBusy) return;
-    if (!_settings.value.pauseOnInactivity) {
-      if (_inactivityPaused) _resumeFromInactivity();
-      return;
-    }
-    _idleBusy = true;
-    try {
-      final now = DateTime.now();
-      final idle = await _presence.idleSeconds();
-      final decision = await _presence.evaluate(idleSeconds: idle, now: now);
-
-      if (decision == Presence.absent && !_inactivityPaused) {
-        _inactivityPaused = true;
-        _inactivityAlert = true;
-        notifyListeners();
-      } else if (_inactivityPaused && idle < 2) {
-        // Input retomado: o gap anterior era presença parada -> aprende.
-        _presence.onResume(previousIdleSeconds: _lastIdleSeconds, now: now);
-        _resumeFromInactivity();
-      }
-      _lastIdleSeconds = idle;
-    } finally {
-      _idleBusy = false;
-    }
-  }
-
-  void _resumeFromInactivity() {
-    _inactivityPaused = false;
-    _inactivityAlert = false;
-    notifyListeners();
-  }
-
-  /// Apaga o aprendizado de inatividade (modelo + estado persistido).
-  Future<void> resetInactivityLearning() => _presence.reset();
-
   // --- IDLE ---------------------------------------------------------------
 
   void _tickIdle() {
@@ -153,6 +131,75 @@ class TimerProvider extends ChangeNotifier {
     if (_cycleElapsed >= cycleSeconds) {
       _enterAlerta();
     }
+    notifyListeners();
+  }
+
+  // --- Pausa por inatividade do sistema -----------------------------------
+
+  /// Consulta o [PresenceController] a cada tick e pausa/retoma o ciclo.
+  /// O limiar de entrada é **adaptativo** (aprendido por faixa horária); a
+  /// retomada usa a histerese de [AppDefaults.inactivityResumeSeconds]. A
+  /// leitura nativa é assíncrona e protegida contra sobreposição ([_idleBusy]).
+  void _checkPresence() {
+    if (!_settings.value.pauseOnInactivity) {
+      if (_inactivityPaused || _inactivityAlert) _clearInactivityPause();
+      return;
+    }
+    if (_idleBusy) return;
+    _idleBusy = true;
+    () async {
+      try {
+        final now = DateTime.now();
+        final idle = await _presence.idleSeconds();
+        if (_disposed) return;
+
+        // Atividade real de volta encerra a supressão pós-retomada-manual.
+        if (idle <= AppDefaults.inactivityResumeSeconds) {
+          _suppressRepauseUntilActive = false;
+        }
+
+        final decision = await _presence.evaluate(idleSeconds: idle, now: now);
+        if (_disposed) return;
+
+        if (decision == Presence.absent &&
+            !_inactivityPaused &&
+            !_suppressRepauseUntilActive) {
+          _inactivityPaused = true;
+          _inactivityAlert = true;
+          // Ao entrar em pausa, preserva o progresso acumulado (RF-12).
+          _storage.setElapsedSeconds(_cycleElapsed);
+          notifyListeners();
+        } else if (_inactivityPaused &&
+            idle <= AppDefaults.inactivityResumeSeconds) {
+          // Input retomado: o gap anterior era presença parada -> aprende.
+          _presence.onResume(previousIdleSeconds: _lastIdleSeconds, now: now);
+          _clearInactivityPause();
+        }
+        _lastIdleSeconds = idle;
+      } finally {
+        _idleBusy = false;
+      }
+    }();
+  }
+
+  /// Retomada manual da pausa por inatividade (botão "Retomar" no cartão).
+  ///
+  /// Limpa apenas a pausa automática por inatividade; **não** interfere na
+  /// pausa manual (`_paused`) feita pelo menu. Suprime a re-pausa até haver
+  /// atividade real, para o botão não ser anulado no tick seguinte.
+  void resumeFromInactivity() {
+    if (_inactivityPaused || _inactivityAlert) {
+      _suppressRepauseUntilActive = true;
+      _clearInactivityPause();
+    }
+  }
+
+  /// Apaga o aprendizado de inatividade (modelo + estado persistido cifrado).
+  Future<void> resetInactivityLearning() => _presence.reset();
+
+  void _clearInactivityPause() {
+    _inactivityPaused = false;
+    _inactivityAlert = false;
     notifyListeners();
   }
 
@@ -169,7 +216,10 @@ class TimerProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    Timer(const Duration(milliseconds: 1500), () {
+    _alertTimer?.cancel();
+    _alertTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (_disposed) return;
+      _alertTimer = null;
       if (_state == AppState.alerta) _enterPhase1();
     });
   }
@@ -204,7 +254,10 @@ class TimerProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    Timer(AppDurations.completion, () {
+    _completionTimer?.cancel();
+    _completionTimer = Timer(AppDurations.completion, () {
+      if (_disposed) return;
+      _completionTimer = null;
       if (_state == AppState.conclusao) _returnToIdle();
     });
   }
@@ -284,7 +337,11 @@ class TimerProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    _settings.removeListener(_syncServiceToggles);
     _ticker?.cancel();
+    _alertTimer?.cancel();
+    _completionTimer?.cancel();
     super.dispose();
   }
 }

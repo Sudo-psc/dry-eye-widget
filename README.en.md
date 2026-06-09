@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Download-macOS%20.dmg-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Download for macOS"></a>
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe"><img src="https://img.shields.io/badge/Download-Windows%20.exe-0078D6?style=flat-square&logo=windows&logoColor=white" alt="Download for Windows"></a>
   <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows-555?style=flat-square" alt="Platforms">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter">
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-22c55e?style=flat-square" alt="MIT License"></a>
@@ -81,7 +82,9 @@ just the right time.
 
 ---
 
-## 📥 Download & use (macOS)
+## 📥 Download & use
+
+### 🍎 macOS
 
 **➡️ [Download DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
 
@@ -90,6 +93,18 @@ just the right time.
    with a paid Apple certificate, so macOS asks for this confirmation).
 3. Done! A blue ball appears in a corner of your screen and an eye icon in the
    menu bar. Keep working — it takes care of the rest.
+
+### 🪟 Windows
+
+**➡️ [Download installer (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; or the **[portable version (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (64-bit)
+
+1. Run the installer. Since the app isn't code-signed yet, **Windows SmartScreen**
+   may show "Unknown publisher" — click **More info → Run anyway**.
+2. Open it from the **Start Menu** shortcut. A blue ball appears in a corner and
+   an eye icon in the **system tray**.
+
+> **Portable version:** extract the `.zip` and run `dry_eye_widget.exe` — keep the
+> `.exe` next to the DLLs and the `data\` folder (don't separate the files).
 
 > All versions live in **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
 

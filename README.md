@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Baixar-macOS%20.dmg-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Baixar para macOS"></a>
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe"><img src="https://img.shields.io/badge/Baixar-Windows%20.exe-0078D6?style=flat-square&logo=windows&logoColor=white" alt="Baixar para Windows"></a>
   <img src="https://img.shields.io/badge/Plataforma-macOS%20%7C%20Windows-555?style=flat-square" alt="Plataformas">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter">
   <a href="#-licença"><img src="https://img.shields.io/badge/Licença-MIT-22c55e?style=flat-square" alt="Licença MIT"></a>
@@ -83,7 +84,9 @@ certa.
 
 ---
 
-## 📥 Baixe e use (macOS)
+## 📥 Baixe e use
+
+### 🍎 macOS
 
 **➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
 
@@ -92,6 +95,19 @@ certa.
    ainda não tem assinatura paga da Apple, então o macOS pede essa confirmação).
 3. Pronto! Uma bolinha azul aparece num canto da tela e um ícone de olho na barra
    de menu. Pode continuar trabalhando — ele cuida do resto.
+
+### 🪟 Windows
+
+**➡️ [Baixar instalador (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; ou a **[versão portátil (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (64 bits)
+
+1. Rode o instalador. Como o app ainda não tem assinatura de código, o **Windows
+   SmartScreen** pode mostrar "Editor desconhecido" — clique em **Mais
+   informações → Executar assim mesmo**.
+2. Abra pelo atalho no **Menu Iniciar**. Uma bolinha azul aparece num canto e um
+   ícone de olho na **bandeja do sistema**.
+
+> **Versão portátil:** extraia o `.zip` e rode `dry_eye_widget.exe` — mantenha o
+> `.exe` junto das DLLs e da pasta `data\` (não separe os arquivos).
 
 > Todas as versões ficam em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
 
