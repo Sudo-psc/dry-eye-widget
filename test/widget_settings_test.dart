@@ -70,6 +70,10 @@ void main() {
       expect(s.hoverReactiveBall, WidgetSettings.defaults().hoverReactiveBall);
     });
 
+    test('efeito dinamico fica desligado por padrao', () {
+      expect(WidgetSettings.defaults().dynamicOrbEffect, isFalse);
+    });
+
     test(
       'mantém ao menos um controle visível quando configurações entram em conflito',
       () {

@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.8.7] - 2026-06-09
+
+### Alterado
+- **Efeito dinâmico**: passa a ficar desligado por padrão em novas instalações,
+  preservando o controle nas Configurações para ativação manual.
+
 ## [1.8.6] - 2026-06-09
 
 ### Corrigido
