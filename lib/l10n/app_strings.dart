@@ -338,7 +338,7 @@ const AppStrings ptStrings = AppStrings(
   trayEnable: 'Habilitar widget',
   alertTitle: 'Tire uma pausa de 20 segundos',
   alertSubtitle: 'Vou iniciar um cronômetro',
-  phaseTitle: 'Olhe para uma distância de 6 metros',
+  phaseTitle: 'Olhe a uma distância de 6 metros e pisque',
   phaseSubtitle:
       'Lembre-se de piscar ao olhar a uma distância de 6 m e mantenha o '
       'olhar até o cronômetro zerar',
@@ -526,7 +526,7 @@ const AppStrings enStrings = AppStrings(
   trayEnable: 'Enable widget',
   alertTitle: 'Take a 20-second break',
   alertSubtitle: 'Starting a timer',
-  phaseTitle: 'Look at something 6 meters away',
+  phaseTitle: 'Look 6 meters away and blink',
   phaseSubtitle:
       'Remember to blink while looking ~6 m (20 ft) away, and hold your gaze '
       'until the timer reaches zero',
