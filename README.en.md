@@ -151,4 +151,4 @@ Architecture and Dependencies: The project complies with `flutter analyze` witho
 
 ## 👨‍⚕️ Scientific Authorship
 
-Conceptualized and clinically documented by **Dr. Philipe Saraiva Cruz** — Ophthalmologist · Medical License RQE 71.903
+Conceptualized and clinically documented by **Dr. Philipe Saraiva Cruz** — Ophthalmologist · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903
