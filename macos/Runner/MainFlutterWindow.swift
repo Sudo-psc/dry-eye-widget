@@ -1,9 +1,13 @@
+import AVFoundation
 import Cocoa
 import CoreGraphics
 import FlutterMacOS
 import Security
+import Vision
 
 class MainFlutterWindow: NSWindow {
+  private var faceDetector: FaceDetector?
+
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame
@@ -80,6 +84,24 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    // Canal de detecção de presença por rosto (Vision, on-device). Captura 1
+    // frame, detecta rosto e descarta a imagem; nada é gravado nem enviado.
+    let visionChannel = FlutterMethodChannel(
+      name: "dry_eye_widget/vision",
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
+    visionChannel.setMethodCallHandler { [weak self] (call, result) in
+      if call.method == "hasFace" {
+        let detector = FaceDetector()
+        self?.faceDetector = detector
+        detector.detect { hasFace in
+          result(hasFace)
+          self?.faceDetector = nil
+        }
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     super.awakeFromNib()
   }
 
@@ -96,5 +118,77 @@ class MainFlutterWindow: NSWindow {
     self.hasShadow = false
     self.level = .floating
     self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+  }
+}
+
+/// Detecta presença de rosto capturando um único frame da webcam e rodando o
+/// framework Vision. A sessão é encerrada e a imagem descartada após a
+/// detecção; nada é persistido em disco nem enviado pela rede.
+final class FaceDetector: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
+  private let session = AVCaptureSession()
+  private let queue = DispatchQueue(label: "dry_eye_widget.vision")
+  private var completion: ((Bool) -> Void)?
+  private var finished = false
+
+  func detect(completion: @escaping (Bool) -> Void) {
+    self.completion = completion
+    switch AVCaptureDevice.authorizationStatus(for: .video) {
+    case .authorized:
+      configureAndStart()
+    case .notDetermined:
+      AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+        granted ? self?.configureAndStart() : self?.finish(false)
+      }
+    default:
+      finish(false)
+    }
+  }
+
+  private func configureAndStart() {
+    queue.async {
+      guard let device = AVCaptureDevice.default(for: .video),
+        let input = try? AVCaptureDeviceInput(device: device),
+        self.session.canAddInput(input)
+      else {
+        self.finish(false)
+        return
+      }
+      self.session.addInput(input)
+      let output = AVCaptureVideoDataOutput()
+      output.setSampleBufferDelegate(self, queue: self.queue)
+      guard self.session.canAddOutput(output) else {
+        self.finish(false)
+        return
+      }
+      self.session.addOutput(output)
+      self.session.startRunning()
+      // Segurança: se nenhum frame chegar em 3 s, encerra como "sem rosto".
+      self.queue.asyncAfter(deadline: .now() + 3.0) { self.finish(false) }
+    }
+  }
+
+  func captureOutput(
+    _ output: AVCaptureOutput,
+    didOutput sampleBuffer: CMSampleBuffer,
+    from connection: AVCaptureConnection
+  ) {
+    if finished { return }
+    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+    let request = VNDetectFaceRectanglesRequest()
+    let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
+    try? handler.perform([request])
+    let hasFace = !(request.results?.isEmpty ?? true)
+    finish(hasFace)
+  }
+
+  private func finish(_ value: Bool) {
+    queue.async {
+      if self.finished { return }
+      self.finished = true
+      if self.session.isRunning { self.session.stopRunning() }
+      let callback = self.completion
+      self.completion = nil
+      DispatchQueue.main.async { callback?(value) }
+    }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
@@ -42,6 +44,34 @@ class _SettingsDialogState extends State<SettingsDialog> {
   }
 
   void _set(WidgetSettings next) => setState(() => _draft = next);
+
+  /// Liga/desliga a câmera de presença. Ao ligar, pede consentimento explícito
+  /// antes de o SO solicitar a permissão de câmera na primeira captura.
+  Future<void> _onToggleCamera(bool value, AppStrings s) async {
+    if (!value) {
+      _set(_draft.copyWith(cameraPresence: false));
+      return;
+    }
+    final consented = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF2A2A2A),
+        title: Text(s.cameraConsentTitle),
+        content: Text(s.cameraConsentBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(s.cameraConsentCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(s.cameraConsentAllow),
+          ),
+        ],
+      ),
+    );
+    if (consented == true) _set(_draft.copyWith(cameraPresence: true));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +268,17 @@ class _SettingsDialogState extends State<SettingsDialog> {
                       onChanged: (v) =>
                           _set(_draft.copyWith(pauseOnInactivity: v)),
                     ),
-                    if (_draft.pauseOnInactivity)
+                    if (_draft.pauseOnInactivity) ...[
+                      _switchRow(
+                        label: s.cameraPresenceLabel,
+                        value: _draft.cameraPresence,
+                        onChanged: Platform.isMacOS
+                            ? (v) => _onToggleCamera(v, s)
+                            : null,
+                      ),
+                      _hint(Platform.isMacOS
+                          ? s.cameraPresenceHint
+                          : s.cameraUnavailableHint),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton.icon(
@@ -247,6 +287,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                           label: Text(s.resetLearningLabel),
                         ),
                       ),
+                    ],
 
                     _sectionTitle(s.secGeneral),
                     _switchRow(
@@ -472,7 +513,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Widget _switchRow({
     required String label,
     required bool value,
-    required ValueChanged<bool> onChanged,
+    required ValueChanged<bool>? onChanged,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

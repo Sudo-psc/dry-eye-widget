@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Usada apenas para confirmar sua presença em frente à tela quando o widget detecta inatividade. A câmera tira uma única foto, verifica se há um rosto e descarta a imagem na hora — nada é gravado nem enviado. Opcional e desligada por padrão.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
