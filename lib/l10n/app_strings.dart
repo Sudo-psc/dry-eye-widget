@@ -372,11 +372,10 @@ const AppStrings ptStrings = AppStrings(
   updateChecking: 'Verificando atualizações…',
   close: 'Fechar',
   pauseOnInactivityLabel: 'Pausar por inatividade (2 min)',
-  inactivityTitle: 'Inatividade detectada',
+  inactivityTitle: 'Timer pausado',
   inactivityBody:
-      'O timer foi pausado automaticamente. Caso deseja continuar, clique em '
-      'continuar.',
-  inactivityContinue: 'Continuar',
+      'Inatividade detectada. O ciclo será retomado quando você voltar.',
+  inactivityContinue: 'Retomar',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -490,9 +489,8 @@ const AppStrings enStrings = AppStrings(
   updateChecking: 'Checking for updates…',
   close: 'Close',
   pauseOnInactivityLabel: 'Pause when inactive (2 min)',
-  inactivityTitle: 'Inactivity detected',
+  inactivityTitle: 'Timer paused',
   inactivityBody:
-      'The timer was paused automatically. If you want to continue, click '
-      'continue.',
-  inactivityContinue: 'Continue',
+      'Inactivity detected. The cycle will resume when you return.',
+  inactivityContinue: 'Resume',
 );

@@ -26,6 +26,7 @@ import 'widgets/floating_menu.dart';
 import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
+import 'widgets/inactivity_pause_card.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/update_dialog.dart';
 
@@ -174,10 +175,13 @@ class DryEyeApp extends StatelessWidget {
   }
 }
 
-enum _WindowLayout { ball, menu, settings, breakOverlay, gentleBreak }
+enum _WindowLayout { ball, menu, settings, breakOverlay, gentleBreak, inactivity }
 
 /// Tamanho do cartão de pausa no modo suave (canto superior direito).
 const Size _gentleWindowSize = Size(340, 150);
+
+/// Tamanho do cartão de aviso de pausa por inatividade (canto superior direito).
+const Size _inactivityWindowSize = Size(320, 120);
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -197,6 +201,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _updateOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
+  bool _wasInactive = false;
 
   final UpdateService _updater = UpdateService();
   UpdateResult? _updateResult;
@@ -273,6 +278,26 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _restoreAfterPanel();
     }
     _wasDrops = drops;
+
+    // Aviso de pausa por inatividade: expande para o cartão discreto no canto.
+    // A pausa 20-20-20 e os painéis (colírio/menu/config) têm prioridade visual.
+    final inactive = _timer.inactivityAlert;
+    if (inactive && !_wasInactive) {
+      if (!active &&
+          !drops &&
+          !_menuOpen &&
+          !_settingsOpen &&
+          !_guidanceOpen &&
+          !_updateOpen) {
+        () async {
+          if (!_widgetEnabled) await windowManager.show();
+          await _applyLayout(_WindowLayout.inactivity);
+        }();
+      }
+    } else if (!inactive && _wasInactive) {
+      _restoreAfterPanel();
+    }
+    _wasInactive = inactive;
   }
 
   // --- Item da barra de menu (TrayListener) ------------------------------
@@ -374,11 +399,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Future<void> _exitBreakLayout() async {
-    if (!_widgetEnabled) {
-      await windowManager.hide();
-    } else {
-      await _applyLayout(_WindowLayout.ball);
-    }
+    // Restaura o layout correto após a pausa 20-20-20 — incluindo o aviso de
+    // inatividade, caso o ciclo tenha sido pausado por ociosidade nesse meio.
+    _restoreAfterPanel();
   }
 
   Future<void> _applyLayout(_WindowLayout layout) async {
@@ -413,6 +436,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await windowManager.setSize(_gentleWindowSize);
           await windowManager.setPosition(Offset(
             origin.dx + screen.width - _gentleWindowSize.width - 16,
+            origin.dy + 16,
+          ));
+          break;
+        case _WindowLayout.inactivity:
+          // Aviso compacto no canto superior direito, sem cobrir a tela.
+          final display = await screenRetriever.getPrimaryDisplay();
+          final screen = display.visibleSize ?? display.size;
+          final origin = display.visiblePosition ?? Offset.zero;
+          await windowManager.setSize(_inactivityWindowSize);
+          await windowManager.setPosition(Offset(
+            origin.dx + screen.width - _inactivityWindowSize.width - 16,
             origin.dy + 16,
           ));
           break;
@@ -525,6 +559,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _applyLayout(_WindowLayout.settings);
       return;
     }
+    if (_timer.inactivityAlert && !_timer.state.isActive) {
+      _applyLayout(_WindowLayout.inactivity);
+      return;
+    }
     if (!_widgetEnabled && !_timer.state.isActive) {
       windowManager.hide();
     } else {
@@ -569,6 +607,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
               secondsRemaining: timer.phaseRemaining,
             )
           : _buildBreakOverlay(timer, settings, strings);
+    } else if (timer.inactivityAlert) {
+      body = InactivityPauseCard(
+        strings: strings,
+        onResume: _timer.resumeFromInactivity,
+      );
     } else {
       body = _buildCompact(timer, settings, strings);
     }

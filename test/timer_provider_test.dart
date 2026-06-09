@@ -5,6 +5,8 @@ import 'package:dry_eye_widget/services/audio_service.dart';
 import 'package:dry_eye_widget/services/idle_service.dart';
 import 'package:dry_eye_widget/services/notification_service.dart';
 import 'package:dry_eye_widget/services/storage_service.dart';
+import 'package:dry_eye_widget/utils/constants.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -47,6 +49,140 @@ void main() {
         expect(notifications.enabled, isTrue);
       },
     );
+
+    test(
+      'pausa o ciclo apos inatividade do sistema e retoma com a atividade',
+      () {
+        fakeAsync((async) {
+          final storage = _MemoryStorage(
+            WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+          );
+          final settings = SettingsProvider(storage: storage);
+          final idle = _MutableIdleService(0);
+          final timer = TimerProvider(
+            settings: settings,
+            storage: storage,
+            audio: _FakeAudioService(),
+            notifications: _FakeNotificationService(),
+            idle: idle,
+          );
+          addTearDown(timer.dispose);
+          timer.start();
+
+          // Sistema ativo: o ciclo avança normalmente.
+          async.elapse(const Duration(seconds: 4));
+          expect(timer.cycleElapsed, greaterThan(0));
+          expect(timer.inactivityAlert, isFalse);
+
+          // Inatividade acima do limiar: a deteccao pausa o ciclo.
+          idle.value = (AppDefaults.inactivitySeconds + 10).toDouble();
+          async.elapse(const Duration(seconds: 8));
+          expect(timer.inactivityAlert, isTrue);
+          final pausedAt = timer.cycleElapsed;
+
+          // Enquanto inativo, o ciclo nao avança.
+          async.elapse(const Duration(seconds: 6));
+          expect(timer.cycleElapsed, pausedAt);
+
+          // Atividade retomada: o ciclo volta a avançar.
+          idle.value = 0;
+          async.elapse(const Duration(seconds: 8));
+          expect(timer.inactivityAlert, isFalse);
+          expect(timer.cycleElapsed, greaterThan(pausedAt));
+        });
+      },
+    );
+
+    test('com pauseOnInactivity desligado, a inatividade nao pausa', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: false),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(
+          (AppDefaults.inactivitySeconds + 60).toDouble(),
+        );
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          idle: idle,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        async.elapse(const Duration(seconds: 10));
+        expect(timer.inactivityAlert, isFalse);
+        expect(timer.cycleElapsed, greaterThan(0));
+      });
+    });
+
+    test('histerese: continua pausado entre os limiares, retoma so em <=5', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(0);
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          idle: idle,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        // Acima do limiar de entrada: pausa.
+        idle.value = (AppDefaults.inactivitySeconds + 5).toDouble();
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isTrue);
+
+        // Entre o limiar de retomada e o de entrada: permanece pausado.
+        idle.value = 40;
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isTrue);
+
+        // No limiar de retomada (<=5): retoma.
+        idle.value = AppDefaults.inactivityResumeSeconds.toDouble();
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isFalse);
+      });
+    });
+
+    test('resumeFromInactivity limpa so a pausa por inatividade', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(
+          (AppDefaults.inactivitySeconds + 30).toDouble(),
+        );
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          idle: idle,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        // Pausa manual e pausa por inatividade coexistem.
+        timer.togglePause();
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isTrue);
+        expect(timer.isPaused, isTrue);
+
+        // Retomada manual da inatividade nao mexe na pausa manual.
+        timer.resumeFromInactivity();
+        expect(timer.inactivityAlert, isFalse);
+        expect(timer.isPaused, isTrue);
+      });
+    });
   });
 }
 
@@ -133,4 +269,13 @@ class _FakeNotificationService implements NotificationService {
 class _FakeIdleService implements IdleService {
   @override
   Future<double> idleSeconds() async => 0;
+}
+
+class _MutableIdleService implements IdleService {
+  _MutableIdleService(this.value);
+
+  double value;
+
+  @override
+  Future<double> idleSeconds() async => value;
 }

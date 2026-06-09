@@ -4,6 +4,19 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.6.4] - 2026-06-09
+
+### Adicionado
+- **Módulo de detecção de inatividade** completo: além de pausar o ciclo quando o
+  sistema fica ocioso (≥ 2 min), agora mostra um **aviso compacto** no canto
+  superior direito ("Timer pausado") com botão **Retomar**, retomada automática
+  ao voltar a usar (com histerese para evitar oscilação) e toggle nas
+  Configurações ("Pausar por inatividade").
+
+### Alterado
+- Tamanho padrão da bolinha ajustado para **24 px**.
+- Maior opacidade/contraste do menu de configurações (LiquidGlass).
+
 ## [1.6.3] - 2026-06-08
 
 ### Notas de build
