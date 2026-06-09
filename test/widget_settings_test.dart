@@ -110,6 +110,14 @@ void main() {
       );
     });
 
+    test('permite widget compacto com tamanho minimo de 14 px', () {
+      final restored = WidgetSettings.fromMap(const <String, dynamic>{
+        'ballSize': 1,
+      });
+
+      expect(restored.ballSize, 14);
+    });
+
     test('conveniências derivadas', () {
       final s = WidgetSettings.defaults().copyWith(
         cycleMinutes: 5,

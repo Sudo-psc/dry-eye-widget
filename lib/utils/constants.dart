@@ -82,7 +82,7 @@ class AppDefaults {
   /// evitar oscilação do estado perto do limite.
   static const int inactivityResumeSeconds = 5;
 
-  static const double minBallSize = 24.0;
+  static const double minBallSize = 14.0;
   static const double maxBallSize = 80.0;
 }
 
