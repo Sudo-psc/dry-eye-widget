@@ -17,12 +17,16 @@ class SettingsDialog extends StatefulWidget {
     required this.onSave,
     required this.onClose,
     required this.onReset,
+    required this.onResetLearning,
   });
 
   final WidgetSettings initial;
   final ValueChanged<WidgetSettings> onSave;
   final VoidCallback onClose;
   final VoidCallback onReset;
+
+  /// Apaga o aprendizado adaptativo de inatividade.
+  final VoidCallback onResetLearning;
 
   @override
   State<SettingsDialog> createState() => _SettingsDialogState();
@@ -226,6 +230,23 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         ],
                       ),
                     ],
+
+                    _sectionTitle(s.secInactivity),
+                    _switchRow(
+                      label: s.pauseOnInactivityLabel,
+                      value: _draft.pauseOnInactivity,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(pauseOnInactivity: v)),
+                    ),
+                    if (_draft.pauseOnInactivity)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: widget.onResetLearning,
+                          icon: const Icon(Icons.restart_alt, size: 18),
+                          label: Text(s.resetLearningLabel),
+                        ),
+                      ),
 
                     _sectionTitle(s.secGeneral),
                     _switchRow(

@@ -40,6 +40,16 @@ class AdaptiveThresholdModel {
 
   int _bucketIndex(int hour) => (hour ~/ 6).clamp(0, _bucketCount - 1);
 
+  /// Apaga todo o aprendizado, voltando ao estado de cold start.
+  void reset() {
+    for (var b = 0; b < _bucketCount; b++) {
+      _counts[b] = 0;
+      for (var i = 0; i < _bins[b].length; i++) {
+        _bins[b][i] = 0;
+      }
+    }
+  }
+
   /// Registra um gap (em segundos) durante o qual o usuário estava presente.
   void observePresentGap(int hour, double gapSeconds) {
     if (gapSeconds <= 0 || gapSeconds > maxLearnableGap) return;
@@ -78,31 +88,35 @@ class AdaptiveThresholdModel {
         'bins': _bins,
       };
 
-  factory AdaptiveThresholdModel.fromMap(Map<String, dynamic> map) {
-    final m = AdaptiveThresholdModel(
-      binWidth: (map['binWidth'] as num?)?.toInt() ?? 30,
-      targetPercentile:
-          (map['targetPercentile'] as num?)?.toDouble() ?? 0.85,
-      minThreshold: (map['minThreshold'] as num?)?.toInt() ?? 60,
-      maxThreshold: (map['maxThreshold'] as num?)?.toInt() ?? 600,
-      coldStartThreshold: (map['coldStartThreshold'] as num?)?.toInt() ?? 120,
-      minObservations: (map['minObservations'] as num?)?.toInt() ?? 5,
-      maxLearnableGap: (map['maxLearnableGap'] as num?)?.toInt() ?? 900,
-    );
+  /// Carrega contagens agregadas de um mapa para dentro deste modelo,
+  /// preservando a configuração atual. Estado corrompido -> reset.
+  void loadFrom(Map<String, dynamic> map) {
+    reset();
     try {
       final counts = (map['counts'] as List).cast<num>();
       final bins = (map['bins'] as List)
           .map((row) => (row as List).map((e) => (e as num).toInt()).toList())
           .toList();
       for (var b = 0; b < math.min(counts.length, _bucketCount); b++) {
-        m._counts[b] = counts[b].toInt();
-        for (var i = 0; i < math.min(bins[b].length, m._bins[b].length); i++) {
-          m._bins[b][i] = bins[b][i];
+        _counts[b] = counts[b].toInt();
+        for (var i = 0; i < math.min(bins[b].length, _bins[b].length); i++) {
+          _bins[b][i] = bins[b][i];
         }
       }
     } catch (_) {
-      // Estado corrompido -> recomeça do zero (defaults já aplicados).
+      reset();
     }
-    return m;
+  }
+
+  factory AdaptiveThresholdModel.fromMap(Map<String, dynamic> map) {
+    return AdaptiveThresholdModel(
+      binWidth: (map['binWidth'] as num?)?.toInt() ?? 30,
+      targetPercentile: (map['targetPercentile'] as num?)?.toDouble() ?? 0.85,
+      minThreshold: (map['minThreshold'] as num?)?.toInt() ?? 60,
+      maxThreshold: (map['maxThreshold'] as num?)?.toInt() ?? 600,
+      coldStartThreshold: (map['coldStartThreshold'] as num?)?.toInt() ?? 120,
+      minObservations: (map['minObservations'] as num?)?.toInt() ?? 5,
+      maxLearnableGap: (map['maxLearnableGap'] as num?)?.toInt() ?? 900,
+    )..loadFrom(map);
   }
 }

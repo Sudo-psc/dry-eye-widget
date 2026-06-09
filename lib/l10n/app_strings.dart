@@ -107,6 +107,8 @@ class AppStrings {
     required this.inactivityTitle,
     required this.inactivityBody,
     required this.inactivityPausedTooltip,
+    required this.secInactivity,
+    required this.resetLearningLabel,
     required this.inactivityContinue,
   });
 
@@ -213,6 +215,8 @@ class AppStrings {
   final String inactivityTitle;
   final String inactivityBody;
   final String inactivityPausedTooltip;
+  final String secInactivity;
+  final String resetLearningLabel;
   final String inactivityContinue;
 
   // --- Helpers dependentes de enum --------------------------------------
@@ -380,6 +384,8 @@ const AppStrings ptStrings = AppStrings(
       'continuar.',
   inactivityContinue: 'Continuar',
   inactivityPausedTooltip: 'Pausado por inatividade',
+  secInactivity: 'Inatividade',
+  resetLearningLabel: 'Resetar aprendizado de inatividade',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -499,4 +505,6 @@ const AppStrings enStrings = AppStrings(
       'continue.',
   inactivityContinue: 'Continue',
   inactivityPausedTooltip: 'Paused due to inactivity',
+  secInactivity: 'Inactivity',
+  resetLearningLabel: 'Reset inactivity learning',
 );

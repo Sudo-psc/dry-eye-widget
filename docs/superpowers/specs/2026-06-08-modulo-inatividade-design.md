@@ -144,10 +144,13 @@ um clique nas configurações.
 Requisitos do usuário: processamento local, criptografado, sem histórico, sem
 acesso remoto.
 
-- **`PresenceStore` cifrado:** os ~10 floats do modelo são serializados e
-  cifrados com **AES-GCM**; a chave fica no **Keychain (macOS) / DPAPI
-  (Windows)**, acessada por canal nativo. Nada de eventos brutos, timeline ou
-  imagens é persistido.
+- **`PresenceStore` cifrado:** o estado agregado do modelo é serializado em
+  JSON e cifrado **em repouso pelo próprio SO** — **Keychain (macOS)** /
+  **DPAPI (Windows)** via canal nativo `dry_eye_widget/secure_store`. (Decisão
+  de implementação: usar a cifra nativa do SO em vez de AES-GCM manual em Dart
+  elimina cripto custom e dependências, reduzindo a superfície de erro, com a
+  mesma garantia de confidencialidade em repouso.) Nada de eventos brutos,
+  timeline ou imagens é persistido.
 - **Sem rede:** o módulo não abre sockets nem chama serviços. (Verificável em
   revisão de código — nenhuma dependência de rede é adicionada.)
 - **Consentimento da câmera:** ao ativar o toggle, um diálogo explica

@@ -1,5 +1,6 @@
 import 'presence_sensor.dart';
 import 'adaptive_threshold_model.dart';
+import 'presence_store.dart';
 
 /// Decide presença/ausência combinando o limiar adaptativo (input) com um
 /// sensor de câmera opcional, e alimenta o modelo nos eventos de retomada.
@@ -8,6 +9,8 @@ class PresenceController {
     required this.model,
     required Future<double> Function() idleSource,
     this.cameraSensor,
+    this.store,
+    this.saveEveryN = 5,
     bool Function()? cameraEnabled,
   })  : _idleSource = idleSource,
         cameraEnabled = cameraEnabled ?? (() => false);
@@ -16,6 +19,14 @@ class PresenceController {
   final PresenceSensor? cameraSensor;
   final bool Function() cameraEnabled;
   final Future<double> Function() _idleSource;
+
+  /// Persistência opcional do estado agregado (cifrada). Quando ausente, o
+  /// modelo vive só em memória (reaprende a cada sessão).
+  final PresenceStore? store;
+
+  /// Salva o estado a cada N observações novas, para limitar gravações.
+  final int saveEveryN;
+  int _obsSinceSave = 0;
 
   /// Ociosidade global do SO (segundos). Delega à fonte injetada.
   Future<double> idleSeconds() => _idleSource();
@@ -42,6 +53,7 @@ class PresenceController {
         // Confirmação direta de presença parada: aprende este gap.
         model.observePresentGap(now.hour, idleSeconds);
         _lastObservedGap = idleSeconds.round();
+        _persistSoon();
         return Presence.present;
       }
     }
@@ -53,5 +65,27 @@ class PresenceController {
   void onResume({required double previousIdleSeconds, required DateTime now}) {
     model.observePresentGap(now.hour, previousIdleSeconds);
     _lastObservedGap = previousIdleSeconds.round();
+    _persistSoon();
+  }
+
+  /// Carrega o estado persistido (se houver) para dentro do modelo.
+  Future<void> hydrate() async {
+    final saved = await store?.load();
+    if (saved != null) model.loadFrom(saved);
+  }
+
+  /// Apaga todo o aprendizado, em memória e no armazenamento.
+  Future<void> reset() async {
+    model.reset();
+    _obsSinceSave = 0;
+    await store?.clear();
+  }
+
+  /// Persiste o estado após acumular [saveEveryN] observações (fire-and-forget).
+  void _persistSoon() {
+    if (store == null) return;
+    if (++_obsSinceSave < saveEveryN) return;
+    _obsSinceSave = 0;
+    store!.save(model.toMap());
   }
 }

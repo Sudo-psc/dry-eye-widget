@@ -139,6 +139,9 @@ class TimerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Apaga o aprendizado de inatividade (modelo + estado persistido).
+  Future<void> resetInactivityLearning() => _presence.reset();
+
   // --- IDLE ---------------------------------------------------------------
 
   void _tickIdle() {

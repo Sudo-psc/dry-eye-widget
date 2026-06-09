@@ -17,6 +17,8 @@ import 'services/idle_service.dart';
 import 'services/notification_service.dart';
 import 'services/presence/adaptive_threshold_model.dart';
 import 'services/presence/presence_controller.dart';
+import 'services/presence/secure_presence_store.dart';
+import 'services/secure_storage_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
@@ -56,12 +58,18 @@ Future<void> main() async {
   // Garante que o estado do sistema bata com a preferência salva.
   await startup.setEnabled(settings.value.launchAtLogin);
 
-  // Módulo de inatividade: ociosidade do SO + limiar adaptativo.
+  // Módulo de inatividade: ociosidade do SO + limiar adaptativo, com estado
+  // agregado persistido cifrado em repouso (Keychain/DPAPI).
   final idle = IdleService();
   final presence = PresenceController(
     model: AdaptiveThresholdModel(),
     idleSource: idle.idleSeconds,
+    store: SecurePresenceStore(
+      const ChannelSecureStore(),
+      storageKey: StorageKeys.presenceModel,
+    ),
   );
+  await presence.hydrate();
 
   final tray = TrayService();
   if (!settings.value.hideMenuBarItem) {
@@ -701,6 +709,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await settings.reset();
           _closeSettings();
         },
+        onResetLearning: _timer.resetInactivityLearning,
         onClose: _closeSettings,
       ),
     );
