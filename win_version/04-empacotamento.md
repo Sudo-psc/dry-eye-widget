@@ -34,13 +34,14 @@ compile:
 
 ```powershell
 flutter build windows --release
-"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" win_version\templates\dry-eye-widget.iss
+$version = (Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)\+\d+').Matches[0].Groups[1].Value
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" win_version\templates\dry-eye-widget.iss
 ```
 
 Saída padrão: `dist\DryEyeWidget-Setup-x64.exe`.
 
-> Ajuste `MyAppVersion` no `.iss` para casar com o `pubspec.yaml` antes de
-> compilar uma release oficial.
+> O workflow oficial extrai a versão do `pubspec.yaml`, confere
+> `AppInfo.version` e injeta `MyAppVersion` no Inno Setup automaticamente.
 
 ### Testar o instalador
 

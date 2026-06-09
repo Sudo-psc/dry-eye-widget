@@ -4,6 +4,13 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.8.6] - 2026-06-09
+
+### Corrigido
+- **Instalador Windows**: a versão do Inno Setup agora é injetada pelo workflow
+  a partir do `pubspec.yaml`, com validação contra `AppInfo.version`, evitando
+  instaladores de releases novas com metadados de versão antigos.
+
 ## [1.8.5] - 2026-06-09
 
 ### Adicionado

@@ -79,7 +79,17 @@ jobs:
         run: |
           $iss = "win_version\templates\dry-eye-widget.iss"
           if (Test-Path $iss) {
-            & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" $iss
+            $versionMatch = Select-String -Path "pubspec.yaml" -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)\+\d+'
+            if (-not $versionMatch) {
+              throw "Não foi possível extrair a versão do pubspec.yaml"
+            }
+            $version = $versionMatch.Matches[0].Groups[1].Value
+            $appInfo = Get-Content "lib\utils\constants.dart" -Raw
+            $expected = "static const String version = '$version';"
+            if (-not $appInfo.Contains($expected)) {
+              throw "AppInfo.version não está em sincronia com pubspec.yaml: esperado $version"
+            }
+            & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" $iss
           } else {
             Write-Warning "Script .iss não encontrado em $iss — pulando instalador."
           }
