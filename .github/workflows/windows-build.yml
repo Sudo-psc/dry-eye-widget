@@ -28,8 +28,9 @@ jobs:
   build-windows:
     runs-on: windows-latest
     # `secrets` não pode ser usado diretamente em `if:` — expõe como env de job.
+    # Assinatura via SignPath (OSS): só roda quando o token está configurado.
     env:
-      SIGN_WINDOWS: ${{ secrets.WINDOWS_CERT_BASE64 != '' }}
+      SIGN_SIGNPATH: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
 
     steps:
       - name: Checkout
@@ -61,27 +62,6 @@ jobs:
       - name: Build Release
         run: flutter build windows --release
 
-      # --- Assinatura de código (OPCIONAL) -------------------------------------
-      # Reduz/elimina o alerta "Editor desconhecido" do SmartScreen. Só roda se o
-      # certificado estiver configurado nos Secrets do repositório:
-      #   WINDOWS_CERT_BASE64   -> .pfx codificado em base64
-      #   WINDOWS_CERT_PASSWORD -> senha do .pfx
-      # Sem esses secrets, o passo é pulado e o build segue normalmente (não assinado).
-      # Veja win_version/CODE_SIGNING.md para detalhes e limitações.
-      - name: Assinar executável (se houver certificado)
-        if: ${{ env.SIGN_WINDOWS == 'true' }}
-        shell: pwsh
-        env:
-          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
-          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
-        run: |
-          $pfx = Join-Path $env:RUNNER_TEMP "codesign.pfx"
-          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_CERT_BASE64))
-          & signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-            /f $pfx /p $env:WINDOWS_CERT_PASSWORD `
-            "build\windows\x64\runner\Release\dry_eye_widget.exe"
-          Remove-Item $pfx -Force
-
       - name: Gerar ZIP portátil
         shell: pwsh
         run: |
@@ -103,23 +83,44 @@ jobs:
             Write-Warning "Script .iss não encontrado em $iss — pulando instalador."
           }
 
-      # Assina o instalador final (mesma condição da assinatura do .exe).
-      - name: Assinar instalador (se houver certificado)
-        if: ${{ env.SIGN_WINDOWS == 'true' }}
+      # --- Assinatura via SignPath (OSS) — OPCIONAL ----------------------------
+      # Assina o instalador nos servidores do SignPath (HSM). Só roda quando o
+      # token e os IDs estão configurados (veja win_version/CODE_SIGNING.md):
+      #   Secret: SIGNPATH_API_TOKEN
+      #   Vars:   SIGNPATH_ORGANIZATION_ID, SIGNPATH_PROJECT_SLUG, SIGNPATH_POLICY_SLUG
+      # Sem isso, os passos são pulados e o instalador segue não assinado.
+      - name: Subir instalador (artefato p/ o SignPath)
+        if: ${{ env.SIGN_SIGNPATH == 'true' }}
+        id: upload-unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-installer
+          path: dist/DryEyeWidget-Setup-x64.exe
+          if-no-files-found: error
+
+      - name: Assinar instalador (SignPath)
+        if: ${{ env.SIGN_SIGNPATH == 'true' }}
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG }}
+          github-artifact-id: ${{ steps.upload-unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed
+
+      - name: Aplicar instalador assinado
+        if: ${{ env.SIGN_SIGNPATH == 'true' }}
         shell: pwsh
-        env:
-          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
-          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         run: |
-          $setup = "dist\DryEyeWidget-Setup-x64.exe"
-          if (Test-Path $setup) {
-            $pfx = Join-Path $env:RUNNER_TEMP "codesign.pfx"
-            [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_CERT_BASE64))
-            & signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-              /f $pfx /p $env:WINDOWS_CERT_PASSWORD $setup
-            Remove-Item $pfx -Force
+          $signed = Get-ChildItem -Path signed -Filter *.exe -Recurse |
+            Select-Object -First 1
+          if ($signed) {
+            Copy-Item $signed.FullName "dist\DryEyeWidget-Setup-x64.exe" -Force
+            Write-Host "Instalador assinado aplicado: $($signed.FullName)"
           } else {
-            Write-Warning "Instalador não encontrado em $setup — pulando assinatura."
+            Write-Warning "Instalador assinado não encontrado — mantendo o não assinado."
           }
 
       - name: Upload de artefatos (toda execução)

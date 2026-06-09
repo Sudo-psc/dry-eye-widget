@@ -60,64 +60,69 @@ do que **só** um certificado de assinatura de código resolve.
 
 ---
 
-## Como assinar (quando houver certificado)
+## Como assinar via SignPath (caminho escolhido — grátis para open source)
 
-O workflow `.github/workflows/windows-build.yml` **já tem os passos prontos**,
-desativados até existirem os secrets. Eles assinam **tanto** o `dry_eye_widget.exe`
-**quanto** o instalador final.
+O [SignPath Foundation](https://signpath.org/) assina projetos **open-source**
+de graça, com certificado e HSM gerenciados por eles. A assinatura roda **nos
+servidores do SignPath**: o CI sobe o instalador como artefato, o SignPath assina
+e devolve o arquivo assinado. O `.github/workflows/windows-build.yml` **já tem os
+passos prontos** — eles ativam quando os valores abaixo existirem.
 
-### 1. Obter o certificado
+> **Escopo atual:** o workflow assina o **instalador** (`DryEyeWidget-Setup-x64.exe`),
+> que é o arquivo que o usuário baixa e o que o SmartScreen avalia. Assinar
+> também o `dry_eye_widget.exe` interno é um follow-up opcional (exigiria uma
+> segunda submissão antes de gerar o ZIP/instalador).
 
-- Compre um **Code Signing Certificate** (OV ou, idealmente, **EV**) de uma CA
-  (DigiCert, Sectigo, GlobalSign, SSL.com, etc.).
-- Exporte como `.pfx` (PKCS#12) com a chave privada e uma senha.
-  - Obs.: certificados **EV** modernos exigem token de hardware (HSM/USB) ou
-    serviço de assinatura em nuvem; nesse caso o passo do CI muda para usar o
-    provedor do token em vez de um `.pfx` local. Os passos abaixo cobrem o caso
-    **`.pfx` (OV)**, que é o mais simples de automatizar.
+### 1. Inscrever o projeto no SignPath Foundation
 
-### 2. Cadastrar os secrets no GitHub
+1. Acesse https://signpath.org/ e solicite a inscrição como projeto open-source
+   (o repositório precisa ser público — o `dry-eye-widget` é).
+2. Após a aprovação, você terá uma **organização** em `app.signpath.io`.
 
-Em **Settings → Secrets and variables → Actions → New repository secret**:
+### 2. Configurar a organização no SignPath
 
-```
-WINDOWS_CERT_BASE64    # conteúdo do .pfx em base64
-WINDOWS_CERT_PASSWORD  # senha do .pfx
-```
+No painel (`app.signpath.io`), crie/anote:
 
-Para gerar o base64 a partir do `.pfx`:
+- **Organization ID** — GUID da organização (em *Settings*).
+- **Project** — um projeto (ex.: slug `dry-eye-widget`).
+- **Artifact configuration** — tipo "Authenticode" para `.exe`.
+- **Signing policy** — uma política (ex.: slug `release-signing`).
+- **CI user + API token** — crie um usuário de CI e gere um **API token**.
 
-```powershell
-# Windows (PowerShell)
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("cert.pfx")) | Set-Clipboard
-```
+> Siga o wizard "GitHub Actions" do próprio SignPath: ele conecta o token ao seu
+> repositório e valida a origem do build (trusted build).
 
-```bash
-# macOS/Linux
-base64 -i cert.pfx | pbcopy   # macOS
-base64 -w0 cert.pfx           # Linux
-```
+### 3. Cadastrar o secret + as variables no GitHub
 
-### 3. Pronto
+Em **Settings → Secrets and variables → Actions**:
 
-Com os secrets presentes, os passos `Assinar executável (se houver certificado)`
-e `Assinar instalador (se houver certificado)` passam a rodar automaticamente
-(a condição `if: ${{ secrets.WINDOWS_CERT_BASE64 != '' }}` os ativa). Sem os
-secrets, eles são pulados e o build continua igual (não assinado).
+- **Secret** (aba *Secrets*):
+  ```
+  SIGNPATH_API_TOKEN        # token do usuário de CI do SignPath
+  ```
+- **Variables** (aba *Variables* — não são segredos):
+  ```
+  SIGNPATH_ORGANIZATION_ID  # GUID da organização
+  SIGNPATH_PROJECT_SLUG     # ex.: dry-eye-widget
+  SIGNPATH_POLICY_SLUG      # ex.: release-signing
+  ```
 
-### Assinatura manual (local)
+### 4. Pronto
 
-```powershell
-signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-  /f cert.pfx /p <senha> `
-  build\windows\x64\runner\Release\dry_eye_widget.exe
+Com `SIGNPATH_API_TOKEN` presente, os passos `Subir instalador`,
+`Assinar instalador (SignPath)` e `Aplicar instalador assinado` rodam
+automaticamente em cada tag `v*` (a condição `if: ${{ env.SIGN_SIGNPATH == 'true' }}`
+os ativa). Sem o token, são pulados e o build segue não assinado.
 
-signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-  /f cert.pfx /p <senha> dist\DryEyeWidget-Setup-x64.exe
-```
+> **Reputação:** o certificado do SignPath Foundation é **OV** — remove o "Editor
+> desconhecido" e reduz alertas, mas o SmartScreen ainda constrói reputação ao
+> longo dos downloads. Reputação **imediata** só com um certificado **EV** próprio.
 
-> Sempre use **timestamp** (`/tr`): garante que a assinatura continue válida
-> após o certificado expirar.
+### Alternativas (não escolhidas)
+
+- **Azure Trusted Signing** (~US$ 10/mês) — assinatura em nuvem da Microsoft.
+- **Certum Open Source** (~€30/ano) — certificado OV barato para OSS.
+- **EV próprio** (DigiCert/SSL.com/Sectigo, ~US$ 250+/ano) — reputação imediata.
 
 ---
 
