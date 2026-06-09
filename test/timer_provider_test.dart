@@ -117,6 +117,72 @@ void main() {
         expect(timer.cycleElapsed, greaterThan(0));
       });
     });
+
+    test('histerese: continua pausado entre os limiares, retoma so em <=5', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(0);
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          idle: idle,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        // Acima do limiar de entrada: pausa.
+        idle.value = (AppDefaults.inactivitySeconds + 5).toDouble();
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isTrue);
+
+        // Entre o limiar de retomada e o de entrada: permanece pausado.
+        idle.value = 40;
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isTrue);
+
+        // No limiar de retomada (<=5): retoma.
+        idle.value = AppDefaults.inactivityResumeSeconds.toDouble();
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isFalse);
+      });
+    });
+
+    test('resumeFromInactivity limpa so a pausa por inatividade', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(
+          (AppDefaults.inactivitySeconds + 30).toDouble(),
+        );
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          idle: idle,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        // Pausa manual e pausa por inatividade coexistem.
+        timer.togglePause();
+        async.elapse(const Duration(seconds: 8));
+        expect(timer.inactivityAlert, isTrue);
+        expect(timer.isPaused, isTrue);
+
+        // Retomada manual da inatividade nao mexe na pausa manual.
+        timer.resumeFromInactivity();
+        expect(timer.inactivityAlert, isFalse);
+        expect(timer.isPaused, isTrue);
+      });
+    });
   });
 }
 

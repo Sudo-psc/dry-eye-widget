@@ -74,6 +74,11 @@ class AppDefaults {
   /// Segundos de inatividade do sistema antes de pausar o timer.
   static const int inactivitySeconds = 120;
 
+  /// Limiar (em segundos de inatividade) para retomar o ciclo após uma pausa
+  /// por inatividade. Menor que [inactivitySeconds] para criar histerese e
+  /// evitar oscilação do estado perto do limite.
+  static const int inactivityResumeSeconds = 5;
+
   static const double minBallSize = 24.0;
   static const double maxBallSize = 80.0;
 }
