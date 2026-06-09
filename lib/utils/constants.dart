@@ -71,6 +71,9 @@ class AppDefaults {
   static const int eyeDropsIntervalHours = 4;
   static const bool pauseOnInactivity = true;
 
+  /// Confirmar presença pela câmera (opt-in, desligado por padrão).
+  static const bool cameraPresence = false;
+
   /// Segundos de inatividade do sistema antes de pausar o timer.
   static const int inactivitySeconds = 120;
 
@@ -139,6 +142,9 @@ class StorageKeys {
 
   /// JSON serializado de [WidgetSettings] com todas as preferências.
   static const String widgetSettings = 'widget_settings_json';
+
+  /// Estado agregado, cifrado, do modelo de presença.
+  static const String presenceModel = 'presence_model_enc';
 }
 
 /// Informações do app usadas na verificação de atualização.
@@ -146,7 +152,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.6.4';
+  static const String version = '1.7.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

@@ -15,6 +15,10 @@ import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
+import 'services/presence/adaptive_threshold_model.dart';
+import 'services/presence/presence_controller.dart';
+import 'services/presence/secure_presence_store.dart';
+import 'services/secure_storage_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
@@ -51,7 +55,18 @@ Future<void> main() async {
     ..enabled = settings.value.notificationsEnabled;
   await notifications.init();
 
+  // Módulo de inatividade: ociosidade do SO + limiar adaptativo, com estado
+  // agregado persistido cifrado em repouso (Keychain/DPAPI).
   final idle = IdleService();
+  final presence = PresenceController(
+    model: AdaptiveThresholdModel(),
+    idleSource: idle.idleSeconds,
+    store: SecurePresenceStore(
+      const ChannelSecureStore(),
+      storageKey: StorageKeys.presenceModel,
+    ),
+  );
+  await presence.hydrate();
 
   final startup = StartupService()..init();
   // Garante que o estado do sistema bata com a preferência salva.
@@ -106,7 +121,7 @@ Future<void> main() async {
             storage: storage,
             audio: audio,
             notifications: notifications,
-            idle: idle,
+            presence: presence,
           )..start(),
         ),
       ],
@@ -717,6 +732,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Widget _buildSettings() {
     final settings = context.read<SettingsProvider>();
     final startup = context.read<StartupService>();
+    final timer = context.read<TimerProvider>();
     return Center(
       child: SettingsDialog(
         initial: settings.value,
@@ -730,6 +746,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await settings.reset();
           _closeSettings();
         },
+        onResetLearning: timer.resetInactivityLearning,
         onClose: _closeSettings,
       ),
     );

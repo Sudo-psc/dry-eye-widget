@@ -37,6 +37,7 @@ class WidgetSettings {
     required this.eyeDropsEnabled,
     required this.eyeDropsIntervalHours,
     required this.pauseOnInactivity,
+    required this.cameraPresence,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -114,6 +115,10 @@ class WidgetSettings {
   /// Pausar o timer automaticamente após inatividade do sistema.
   final bool pauseOnInactivity;
 
+  /// Confirmar presença visual pela câmera quando o input fica ocioso
+  /// (opt-in, desligado por padrão; só consulta a câmera no limiar).
+  final bool cameraPresence;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
     cycleMinutes: AppDefaults.cycleMinutes,
@@ -140,6 +145,7 @@ class WidgetSettings {
     eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
     eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
     pauseOnInactivity: AppDefaults.pauseOnInactivity,
+    cameraPresence: AppDefaults.cameraPresence,
   );
 
   // --- Conveniências ------------------------------------------------------
@@ -173,6 +179,7 @@ class WidgetSettings {
     bool? eyeDropsEnabled,
     int? eyeDropsIntervalHours,
     bool? pauseOnInactivity,
+    bool? cameraPresence,
   }) {
     final nextHideMenuBarItem = hideMenuBarItem ?? this.hideMenuBarItem;
     final nextHideFloatingWidget =
@@ -204,6 +211,7 @@ class WidgetSettings {
       eyeDropsIntervalHours:
           eyeDropsIntervalHours ?? this.eyeDropsIntervalHours,
       pauseOnInactivity: pauseOnInactivity ?? this.pauseOnInactivity,
+      cameraPresence: cameraPresence ?? this.cameraPresence,
     ).normalized();
   }
 
@@ -248,6 +256,7 @@ class WidgetSettings {
           ? eyeDropsIntervalHours
           : d.eyeDropsIntervalHours,
       pauseOnInactivity: pauseOnInactivity,
+      cameraPresence: cameraPresence,
     );
   }
 
@@ -289,6 +298,7 @@ class WidgetSettings {
     'eyeDropsEnabled': eyeDropsEnabled,
     'eyeDropsIntervalHours': eyeDropsIntervalHours,
     'pauseOnInactivity': pauseOnInactivity,
+    'cameraPresence': cameraPresence,
   };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -331,6 +341,7 @@ class WidgetSettings {
           d.eyeDropsIntervalHours,
       pauseOnInactivity:
           map['pauseOnInactivity'] as bool? ?? d.pauseOnInactivity,
+      cameraPresence: map['cameraPresence'] as bool? ?? d.cameraPresence,
     ).normalized();
   }
 

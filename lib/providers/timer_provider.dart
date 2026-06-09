@@ -4,8 +4,9 @@ import 'package:flutter/foundation.dart';
 
 import '../models/app_state.dart';
 import '../services/audio_service.dart';
-import '../services/idle_service.dart';
 import '../services/notification_service.dart';
+import '../services/presence/presence_controller.dart';
+import '../services/presence/presence_sensor.dart';
 import '../services/storage_service.dart';
 import '../utils/constants.dart';
 import 'settings_provider.dart';
@@ -22,15 +23,15 @@ class TimerProvider extends ChangeNotifier {
     required StorageService storage,
     required AudioService audio,
     required NotificationService notifications,
-    required IdleService idle,
-  }) : this._(settings, storage, audio, notifications, idle);
+    required PresenceController presence,
+  }) : this._(settings, storage, audio, notifications, presence);
 
   TimerProvider._(
     this._settings,
     this._storage,
     this._audio,
     this._notifications,
-    this._idle,
+    this._presence,
   ) {
     _cycleElapsed = _storage.elapsedSeconds.clamp(0, cycleSeconds);
     _eyeDropsElapsed = _storage.eyeDropsElapsed;
@@ -42,7 +43,7 @@ class TimerProvider extends ChangeNotifier {
   final StorageService _storage;
   final AudioService _audio;
   final NotificationService _notifications;
-  final IdleService _idle;
+  final PresenceController _presence;
 
   Timer? _ticker;
   Timer? _alertTimer;
@@ -73,8 +74,12 @@ class TimerProvider extends ChangeNotifier {
   bool _inactivityPaused = false;
   bool _inactivityAlert = false;
   bool get inactivityAlert => _inactivityAlert;
-  int _idlePoll = 0;
   bool _idleBusy = false;
+  double _lastIdleSeconds = 0;
+
+  /// Após uma retomada manual (botão do cartão), evita re-pausar
+  /// imediatamente enquanto o usuário ainda estiver ocioso.
+  bool _suppressRepauseUntilActive = false;
 
   // --- Configurações derivadas (lidas do SettingsProvider) ----------------
 
@@ -101,7 +106,7 @@ class TimerProvider extends ChangeNotifier {
 
   void _onTick() {
     _tickEyeDrops();
-    _checkInactivity();
+    _checkPresence();
     switch (_state) {
       case AppState.idle:
         _tickIdle();
@@ -131,52 +136,71 @@ class TimerProvider extends ChangeNotifier {
 
   // --- Pausa por inatividade do sistema -----------------------------------
 
-  /// Consulta o tempo ocioso do sistema via [IdleService] e pausa/retoma o
-  /// ciclo automaticamente. A leitura é assíncrona e cara, então só é feita a
-  /// cada ~5 s ([_idlePoll]) e nunca de forma sobreposta ([_idleBusy]).
-  void _checkInactivity() {
+  /// Consulta o [PresenceController] a cada tick e pausa/retoma o ciclo.
+  /// O limiar de entrada é **adaptativo** (aprendido por faixa horária); a
+  /// retomada usa a histerese de [AppDefaults.inactivityResumeSeconds]. A
+  /// leitura nativa é assíncrona e protegida contra sobreposição ([_idleBusy]).
+  void _checkPresence() {
     if (!_settings.value.pauseOnInactivity) {
-      if (_inactivityPaused || _inactivityAlert) {
-        _inactivityPaused = false;
-        _inactivityAlert = false;
-        notifyListeners();
-      }
+      if (_inactivityPaused || _inactivityAlert) _clearInactivityPause();
       return;
     }
     if (_idleBusy) return;
-    if (_idlePoll++ % 5 != 0) return;
     _idleBusy = true;
-    _idle
-        .idleSeconds()
-        .then((seconds) {
-          if (_disposed) return;
-          // Histerese: entra em pausa em >= inactivitySeconds e só sai quando a
-          // inatividade cai para <= inactivityResumeSeconds — evita oscilação
-          // do estado perto do limite.
-          final bool shouldPause = _inactivityPaused
-              ? seconds > AppDefaults.inactivityResumeSeconds
-              : seconds >= AppDefaults.inactivitySeconds;
-          if (shouldPause != _inactivityPaused) {
-            _inactivityPaused = shouldPause;
-            _inactivityAlert = shouldPause;
-            // Ao entrar em pausa, preserva o progresso acumulado (RF-12).
-            if (shouldPause) _storage.setElapsedSeconds(_cycleElapsed);
-            notifyListeners();
-          }
-        })
-        .whenComplete(() => _idleBusy = false);
+    () async {
+      try {
+        final now = DateTime.now();
+        final idle = await _presence.idleSeconds();
+        if (_disposed) return;
+
+        // Atividade real de volta encerra a supressão pós-retomada-manual.
+        if (idle <= AppDefaults.inactivityResumeSeconds) {
+          _suppressRepauseUntilActive = false;
+        }
+
+        final decision = await _presence.evaluate(idleSeconds: idle, now: now);
+        if (_disposed) return;
+
+        if (decision == Presence.absent &&
+            !_inactivityPaused &&
+            !_suppressRepauseUntilActive) {
+          _inactivityPaused = true;
+          _inactivityAlert = true;
+          // Ao entrar em pausa, preserva o progresso acumulado (RF-12).
+          _storage.setElapsedSeconds(_cycleElapsed);
+          notifyListeners();
+        } else if (_inactivityPaused &&
+            idle <= AppDefaults.inactivityResumeSeconds) {
+          // Input retomado: o gap anterior era presença parada -> aprende.
+          _presence.onResume(previousIdleSeconds: _lastIdleSeconds, now: now);
+          _clearInactivityPause();
+        }
+        _lastIdleSeconds = idle;
+      } finally {
+        _idleBusy = false;
+      }
+    }();
   }
 
-  /// Retomada manual da pausa por inatividade (botão "Retomar" no aviso).
+  /// Retomada manual da pausa por inatividade (botão "Retomar" no cartão).
   ///
   /// Limpa apenas a pausa automática por inatividade; **não** interfere na
-  /// pausa manual (`_paused`) feita pelo menu — as duas podem coexistir.
+  /// pausa manual (`_paused`) feita pelo menu. Suprime a re-pausa até haver
+  /// atividade real, para o botão não ser anulado no tick seguinte.
   void resumeFromInactivity() {
     if (_inactivityPaused || _inactivityAlert) {
-      _inactivityPaused = false;
-      _inactivityAlert = false;
-      notifyListeners();
+      _suppressRepauseUntilActive = true;
+      _clearInactivityPause();
     }
+  }
+
+  /// Apaga o aprendizado de inatividade (modelo + estado persistido cifrado).
+  Future<void> resetInactivityLearning() => _presence.reset();
+
+  void _clearInactivityPause() {
+    _inactivityPaused = false;
+    _inactivityAlert = false;
+    notifyListeners();
   }
 
   // --- ALERTA -------------------------------------------------------------
