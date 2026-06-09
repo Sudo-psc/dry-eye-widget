@@ -4,6 +4,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.6.3] - 2026-06-08
+
+### Notas de build
+- Primeira release publicada com **artefatos macOS e Windows juntos**, via CI:
+  `DryEyeWidget.dmg`, `DryEyeWidget-Setup-x64.exe` e `DryEyeWidget-windows-x64.zip`.
+  A partir daqui, os links de download apontam para a release mais recente em
+  ambas as plataformas.
+- Sem alterações funcionais em relação à 1.6.2.
+
 ## [1.6.2] - 2026-06-08
 
 ### Alterado
