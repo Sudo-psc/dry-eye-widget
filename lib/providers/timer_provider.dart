@@ -150,14 +150,33 @@ class TimerProvider extends ChangeNotifier {
         .idleSeconds()
         .then((seconds) {
           if (_disposed) return;
-          final shouldPause = seconds >= AppDefaults.inactivitySeconds;
+          // Histerese: entra em pausa em >= inactivitySeconds e só sai quando a
+          // inatividade cai para <= inactivityResumeSeconds — evita oscilação
+          // do estado perto do limite.
+          final bool shouldPause = _inactivityPaused
+              ? seconds > AppDefaults.inactivityResumeSeconds
+              : seconds >= AppDefaults.inactivitySeconds;
           if (shouldPause != _inactivityPaused) {
             _inactivityPaused = shouldPause;
             _inactivityAlert = shouldPause;
+            // Ao entrar em pausa, preserva o progresso acumulado (RF-12).
+            if (shouldPause) _storage.setElapsedSeconds(_cycleElapsed);
             notifyListeners();
           }
         })
         .whenComplete(() => _idleBusy = false);
+  }
+
+  /// Retomada manual da pausa por inatividade (botão "Retomar" no aviso).
+  ///
+  /// Limpa apenas a pausa automática por inatividade; **não** interfere na
+  /// pausa manual (`_paused`) feita pelo menu — as duas podem coexistir.
+  void resumeFromInactivity() {
+    if (_inactivityPaused || _inactivityAlert) {
+      _inactivityPaused = false;
+      _inactivityAlert = false;
+      notifyListeners();
+    }
   }
 
   // --- ALERTA -------------------------------------------------------------
@@ -289,44 +308,6 @@ class TimerProvider extends ChangeNotifier {
     if (_eyeDropsAlert) {
       _eyeDropsAlert = false;
       notifyListeners();
-    }
-  }
-
-  // --- Inatividade --------------------------------------------------------
-
-  Future<void> _checkInactivity() async {
-    final s = _settings.value;
-    if (!s.pauseOnInactivity) return;
-    if (_state != AppState.idle) return;
-    if (_idleBusy) return;
-
-    _idlePoll++;
-    if (_idlePoll < 5) return;
-    _idlePoll = 0;
-
-    _idleBusy = true;
-    try {
-      final sec = await _idle.idleSeconds();
-      final threshold = AppDefaults.inactivitySeconds;
-
-      if (sec >= threshold) {
-        if (!_inactivityPaused) {
-          _inactivityPaused = true;
-          _paused = true;
-          _inactivityAlert = true;
-          notifyListeners();
-        }
-      } else {
-        if (_inactivityPaused) {
-          _inactivityPaused = false;
-          _inactivityAlert = false;
-          _paused = false;
-          notifyListeners();
-        }
-      }
-    } catch (_) {
-    } finally {
-      _idleBusy = false;
     }
   }
 
