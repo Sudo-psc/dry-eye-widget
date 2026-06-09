@@ -365,6 +365,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keyOsdi:
         _openOsdiFromTray();
         break;
+      case TrayService.keyGithub:
+        _openGithub();
+        break;
       case TrayService.keyQuit:
         _quit();
         break;
@@ -395,6 +398,21 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openOsdiFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openOsdi();
+  }
+
+  Future<void> _openGithub() async {
+    const url = 'https://github.com/Sudo-psc/dry-eye-widget';
+    try {
+      if (Platform.isMacOS) {
+        await Process.run('open', [url]);
+      } else if (Platform.isWindows) {
+        await Process.run('cmd', ['/c', 'start', '', url]);
+      } else {
+        await Process.run('xdg-open', [url]);
+      }
+    } catch (e) {
+      debugPrint('Não foi possível abrir o GitHub: $e');
+    }
   }
 
   /// Reage a mudanças de configuração: se o tamanho da bolinha mudou e
@@ -700,7 +718,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
         strings: strings,
         result: _updateResult,
         onClose: _closeUpdate,
-        onDownload: _updater.openReleasesPage,
+        onDownload: () {
+          _updater.openReleasesPage();
+          _closeUpdate();
+        },
       );
     } else if (_settingsOpen) {
       body = _buildSettings();
@@ -745,6 +766,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       blinkDuration: s.blinkDuration,
       showProgress: s.showProgressRing,
       progress: progress,
+      dynamicOrbEffect: s.dynamicOrbEffect,
+      hoverReactiveBall: s.hoverReactiveBall,
+      orbIntensity: s.orbIntensity,
       onTap: interactive ? _onBallTap : null,
       onSecondaryTap: interactive ? _onBallSecondaryTap : null,
       onDragStart: interactive ? _onBallDragStart : null,
