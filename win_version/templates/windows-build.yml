@@ -28,6 +28,9 @@ permissions:
 jobs:
   build-windows:
     runs-on: windows-latest
+    # `secrets` não pode ser usado diretamente em `if:` — expõe como env de job.
+    env:
+      SIGN_WINDOWS: ${{ secrets.WINDOWS_CERT_BASE64 != '' }}
 
     steps:
       - name: Checkout
@@ -67,7 +70,7 @@ jobs:
       # Sem esses secrets, o passo é pulado e o build segue normalmente (não assinado).
       # Veja win_version/CODE_SIGNING.md para detalhes e limitações.
       - name: Assinar executável (se houver certificado)
-        if: ${{ secrets.WINDOWS_CERT_BASE64 != '' }}
+        if: ${{ env.SIGN_WINDOWS == 'true' }}
         shell: pwsh
         env:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
@@ -103,7 +106,7 @@ jobs:
 
       # Assina o instalador final (mesma condição da assinatura do .exe).
       - name: Assinar instalador (se houver certificado)
-        if: ${{ secrets.WINDOWS_CERT_BASE64 != '' }}
+        if: ${{ env.SIGN_WINDOWS == 'true' }}
         shell: pwsh
         env:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
