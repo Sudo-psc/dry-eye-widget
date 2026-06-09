@@ -91,6 +91,12 @@ class MainFlutterWindow: NSWindow {
       binaryMessenger: flutterViewController.engine.binaryMessenger)
     visionChannel.setMethodCallHandler { [weak self] (call, result) in
       if call.method == "hasFace" {
+        // Uma detecção por vez: se já houver uma em andamento, responde "sem
+        // rosto" em vez de sobrescrever o detector ativo.
+        guard self?.faceDetector == nil else {
+          result(false)
+          return
+        }
         let detector = FaceDetector()
         self?.faceDetector = detector
         detector.detect { hasFace in

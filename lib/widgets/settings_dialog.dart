@@ -70,6 +70,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
         ],
       ),
     );
+    if (!mounted) return;
     if (consented == true) _set(_draft.copyWith(cameraPresence: true));
   }
 
