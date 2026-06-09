@@ -15,6 +15,8 @@ O Dry Eye Widget não possui telemetria de atividade, analytics de uso, monitora
 | Teclas, cliques e cursor | Não grava teclas, cliques, coordenadas, trajetória ou histórico do cursor. |
 | Janelas e aplicativos | Não identifica aplicativos abertos, títulos de janelas ou sites acessados. |
 | Capturas de tela | Não tira screenshots nem analisa a tela. |
+| Câmera (presença) | **Opcional e desligada por padrão.** Quando ativada, tira **uma única foto local**, verifica se há um rosto e **descarta a imagem na hora** — sem gravar nem enviar. |
+| Aprendizado de inatividade | Estado agregado guardado **cifrado** no próprio dispositivo (Keychain/DPAPI), sem histórico de eventos e sem acesso remoto. |
 | Configurações | Salvas localmente para manter preferências do usuário. |
 | Atualizações | A checagem opcional consulta o GitHub Releases e não inclui dados de atividade. |
 
@@ -36,7 +38,7 @@ Isso inclui, sem limitação:
 - coordenadas do mouse;
 - caminho percorrido pelo cursor;
 - capturas de tela;
-- imagens da webcam;
+- imagens da webcam, **exceto** quando o usuário ativa explicitamente a confirmação de presença pela câmera (ver seção 3.1), que processa **um único quadro localmente e o descarta**, sem gravar nem enviar;
 - áudio do microfone;
 - conteúdo de arquivos locais;
 - produtividade, presença, atenção ou classificações comportamentais;
@@ -56,6 +58,19 @@ Essa consulta retorna apenas um valor de tempo, em segundos. O aplicativo usa es
 - permitir retomada manual por um botão minimalista, quando disponível.
 
 Esse mecanismo não informa qual tecla foi pressionada, onde o usuário clicou, qual janela estava aberta, qual site estava sendo acessado ou qual conteúdo estava na tela. O Dry Eye Widget não transforma esse contador local em histórico de atividade e não o envia para servidores externos.
+
+O limiar que separa "pausa" de "ausência" é **aprendido localmente** a partir dos padrões do próprio usuário. Esse aprendizado é guardado apenas como um **estado agregado** (poucos números, sem eventos brutos nem linha do tempo), **cifrado em repouso** pelo sistema (Keychain no macOS, DPAPI no Windows), sem acesso remoto. Há um botão nas configurações para apagar esse aprendizado.
+
+### 3.1 Confirmação opcional de presença pela câmera
+
+A partir da versão 1.8, o Dry Eye Widget oferece um recurso **opcional e desligado por padrão**: confirmar a presença do usuário pela câmera quando o sistema fica ocioso. Quando — e somente quando — o usuário ativa esse recurso e concede a permissão de câmera do sistema:
+
+- no momento em que a inatividade atinge o limiar, o app captura **um único quadro** da câmera;
+- o processamento é **100% local** (no macOS, via o framework Vision do sistema): verifica apenas **se há um rosto enquadrado**;
+- a imagem é **descartada imediatamente** após essa verificação — **não** é gravada em disco, **não** é enviada pela rede e **não** é transformada em histórico;
+- o resultado usado pelo app é apenas um sinal "presente / ausente".
+
+O recurso pede **consentimento explícito** antes de o sistema solicitar a permissão de câmera, pode ser **desligado a qualquer momento** e, quando desligado, a câmera **nunca** é acionada. No Windows, a confirmação por câmera ainda não está disponível.
 
 ## 4. Dados salvos localmente
 

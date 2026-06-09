@@ -1,7 +1,6 @@
 # Política de Assinatura de Código (Code Signing Policy)
 
-> Free code signing provided by [SignPath.io](https://about.signpath.io),
-> certificate by [SignPath Foundation](https://signpath.org)
+> Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
 
 Este documento descreve como as versões do **Dry Eye Widget** são construídas,
 revisadas, aprovadas e assinadas — em conformidade com os
