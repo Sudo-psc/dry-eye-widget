@@ -2,11 +2,13 @@
 ; Compile com:  ISCC.exe win_version\templates\dry-eye-widget.iss
 ; Pré-requisito: ter rodado `flutter build windows --release` antes.
 ;
-; Mantenha MyAppVersion em sincronia com pubspec.yaml (version:) e
-; AppInfo.version em lib/utils/constants.dart.
+; O CI injeta MyAppVersion a partir do pubspec.yaml via /DMyAppVersion=...
+; Fallback abaixo é usado apenas em builds manuais sem /D.
 
 #define MyAppName "Dry Eye Widget"
-#define MyAppVersion "1.7.1"
+#ifndef MyAppVersion
+#define MyAppVersion "1.8.6"
+#endif
 #define MyAppPublisher "Saraiva Vision Care"
 #define MyAppURL "https://github.com/Sudo-psc/dry-eye-widget"
 #define MyAppExeName "dry_eye_widget.exe"
