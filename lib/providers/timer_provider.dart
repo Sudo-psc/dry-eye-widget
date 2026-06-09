@@ -4,8 +4,9 @@ import 'package:flutter/foundation.dart';
 
 import '../models/app_state.dart';
 import '../services/audio_service.dart';
-import '../services/idle_service.dart';
 import '../services/notification_service.dart';
+import '../services/presence/presence_controller.dart';
+import '../services/presence/presence_sensor.dart';
 import '../services/storage_service.dart';
 import '../utils/constants.dart';
 import 'settings_provider.dart';
@@ -22,12 +23,12 @@ class TimerProvider extends ChangeNotifier {
     required StorageService storage,
     required AudioService audio,
     required NotificationService notifications,
-    required IdleService idle,
+    required PresenceController presence,
   })  : _settings = settings,
         _storage = storage,
         _audio = audio,
         _notifications = notifications,
-        _idle = idle {
+        _presence = presence {
     _cycleElapsed = storage.elapsedSeconds.clamp(0, cycleSeconds);
     _eyeDropsElapsed = storage.eyeDropsElapsed;
   }
@@ -36,7 +37,7 @@ class TimerProvider extends ChangeNotifier {
   final StorageService _storage;
   final AudioService _audio;
   final NotificationService _notifications;
-  final IdleService _idle;
+  final PresenceController _presence;
 
   Timer? _ticker;
 
@@ -64,8 +65,8 @@ class TimerProvider extends ChangeNotifier {
   bool _inactivityPaused = false;
   bool _inactivityAlert = false;
   bool get inactivityAlert => _inactivityAlert;
-  int _idlePoll = 0;
   bool _idleBusy = false;
+  double _lastIdleSeconds = 0;
 
   // --- Configurações derivadas (lidas do SettingsProvider) ----------------
 
@@ -87,7 +88,7 @@ class TimerProvider extends ChangeNotifier {
 
   void _onTick() {
     _tickEyeDrops();
-    _checkInactivity();
+    _checkPresence();
     switch (_state) {
       case AppState.idle:
         _tickIdle();
@@ -101,10 +102,47 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
+  // --- Presença / inatividade --------------------------------------------
+
+  /// Consulta o [PresenceController] a cada tick e pausa/retoma o ciclo.
+  /// Reentrância protegida por [_idleBusy] (a leitura nativa é assíncrona).
+  Future<void> _checkPresence() async {
+    if (_idleBusy) return;
+    if (!_settings.value.pauseOnInactivity) {
+      if (_inactivityPaused) _resumeFromInactivity();
+      return;
+    }
+    _idleBusy = true;
+    try {
+      final now = DateTime.now();
+      final idle = await _presence.idleSeconds();
+      final decision = await _presence.evaluate(idleSeconds: idle, now: now);
+
+      if (decision == Presence.absent && !_inactivityPaused) {
+        _inactivityPaused = true;
+        _inactivityAlert = true;
+        notifyListeners();
+      } else if (_inactivityPaused && idle < 2) {
+        // Input retomado: o gap anterior era presença parada -> aprende.
+        _presence.onResume(previousIdleSeconds: _lastIdleSeconds, now: now);
+        _resumeFromInactivity();
+      }
+      _lastIdleSeconds = idle;
+    } finally {
+      _idleBusy = false;
+    }
+  }
+
+  void _resumeFromInactivity() {
+    _inactivityPaused = false;
+    _inactivityAlert = false;
+    notifyListeners();
+  }
+
   // --- IDLE ---------------------------------------------------------------
 
   void _tickIdle() {
-    if (_paused) return;
+    if (_paused || _inactivityPaused) return;
     _cycleElapsed++;
     if (_cycleElapsed % 5 == 0) {
       _storage.setElapsedSeconds(_cycleElapsed);

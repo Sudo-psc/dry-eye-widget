@@ -71,6 +71,9 @@ class AppDefaults {
   static const int eyeDropsIntervalHours = 4;
   static const bool pauseOnInactivity = true;
 
+  /// Confirmar presença pela câmera (opt-in, desligado por padrão).
+  static const bool cameraPresence = false;
+
   /// Segundos de inatividade do sistema antes de pausar o timer.
   static const int inactivitySeconds = 120;
 
@@ -134,6 +137,9 @@ class StorageKeys {
 
   /// JSON serializado de [WidgetSettings] com todas as preferências.
   static const String widgetSettings = 'widget_settings_json';
+
+  /// Estado agregado, cifrado, do modelo de presença.
+  static const String presenceModel = 'presence_model_enc';
 }
 
 /// Informações do app usadas na verificação de atualização.

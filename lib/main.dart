@@ -13,7 +13,10 @@ import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
+import 'services/idle_service.dart';
 import 'services/notification_service.dart';
+import 'services/presence/adaptive_threshold_model.dart';
+import 'services/presence/presence_controller.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
@@ -52,6 +55,13 @@ Future<void> main() async {
   final startup = StartupService()..init();
   // Garante que o estado do sistema bata com a preferência salva.
   await startup.setEnabled(settings.value.launchAtLogin);
+
+  // Módulo de inatividade: ociosidade do SO + limiar adaptativo.
+  final idle = IdleService();
+  final presence = PresenceController(
+    model: AdaptiveThresholdModel(),
+    idleSource: idle.idleSeconds,
+  );
 
   final tray = TrayService();
   if (!settings.value.hideMenuBarItem) {
@@ -102,6 +112,7 @@ Future<void> main() async {
             storage: storage,
             audio: audio,
             notifications: notifications,
+            presence: presence,
           )..start(),
         ),
       ],
