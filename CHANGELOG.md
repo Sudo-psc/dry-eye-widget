@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.8.1] - 2026-06-09
+
+### Corrigido
+- **Instalador Windows**: hardening dos metadados do Inno Setup (publisher,
+  AppId estável, version info), version resource no executável (`Runner.rc`) e
+  `PrivilegesRequired` ajustado — reduz alertas do SmartScreen/Defender e
+  bloqueios de instalação. Adicionado `win_version/CODE_SIGNING.md` documentando
+  o passo (opcional) de assinatura de código por certificado, que é o que
+  elimina por completo o aviso do SmartScreen. (#5)
+
 ## [1.8.0] - 2026-06-09
 
 ### Adicionado
