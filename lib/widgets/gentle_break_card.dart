@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../utils/constants.dart';
+import 'blinking_eye.dart';
 import 'liquid_glass.dart';
 
 /// Cartão compacto de pausa para o "modo suave": aparece no canto superior
@@ -41,8 +42,11 @@ class GentleBreakCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Icon(Icons.visibility_outlined,
-                  color: AppColors.alertBall, size: 26),
+              const BlinkingEye(
+                size: 26,
+                color: AppColors.alertBall,
+                irisColor: AppColors.alertBall,
+              ),
               const SizedBox(width: 12),
               Flexible(
                 child: Column(

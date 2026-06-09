@@ -68,14 +68,17 @@ avisando para **não separar** o `.exe` das DLLs e da pasta `data\`.
 
 ---
 
-## Assinatura de código (opcional, mas reduz alertas do SmartScreen)
+## Assinatura de código (reduz alertas do SmartScreen)
 
 Sem assinatura, o **Windows SmartScreen** mostrará "Editor desconhecido" na
-primeira execução do instalador. Para evitar:
+primeira execução do instalador. O `.iss` e o `Runner.rc` deste repositório já
+embutem **metadados completos** (publisher, version info, copyright), o que
+reduz heurísticas de antivírus — mas **a eliminação do SmartScreen exige um
+certificado de assinatura de código** (pago).
 
-- Obtenha um certificado **Authenticode** (OV ou, idealmente, EV) de uma CA.
-- Assine com `signtool sign /fd SHA256 /tr <timestamp_url> /td SHA256 /f cert.pfx /p <senha> arquivo.exe`.
-- Assine **tanto** o `dry_eye_widget.exe` **quanto** o instalador.
+Detalhes completos, incluindo os passos de `signtool` e o scaffolding já pronto
+(porém desativado) no workflow do GitHub Actions, estão em
+**[`CODE_SIGNING.md`](CODE_SIGNING.md)**.
 
 Se não houver certificado, documente no README que o usuário precisa clicar em
 "Mais informações → Executar assim mesmo" na primeira vez.

@@ -1,0 +1,49 @@
+---
+import { useTranslations } from '../i18n/ui';
+
+interface Props {
+  lang: 'pt' | 'en';
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section id="features" class="py-24 relative">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="glass-panel rounded-2xl overflow-hidden border border-white/20 shadow-xl">
+      <!-- "Window" Header -->
+      <div class="bg-surface/50 border-b border-white/10 px-4 py-3 flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+        <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+        <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+        <div class="ml-4 flex items-center text-sm font-mono opacity-60">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z" clip-rule="evenodd"/>
+          </svg>
+          README.md
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-8 md:p-12 prose dark:prose-invert max-w-none prose-headings:font-semibold prose-a:text-primary">
+        <h2 class="text-3xl mb-6 pb-2 border-b border-white/10">{t('motivation.title')}</h2>
+        
+        <p class="text-lg leading-relaxed mb-6 opacity-90">
+          {t('motivation.content1')}
+        </p>
+        
+        <div class="my-8 p-6 rounded-xl bg-primary/5 border-l-4 border-primary">
+          <p class="m-0 text-lg italic opacity-90">
+            {t('motivation.content2')}
+          </p>
+        </div>
+        
+        <h3 class="text-2xl mt-8 mb-4">{t('carousel.title')}</h3>
+        <p class="opacity-90">
+          Built with an emphasis on low resource consumption and zero distractions, ensuring your workflow remains uninterrupted.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -4,6 +4,29 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.8.1] - 2026-06-09
+
+### Corrigido
+- **Instalador Windows**: hardening dos metadados do Inno Setup (publisher,
+  AppId estável, version info), version resource no executável (`Runner.rc`) e
+  `PrivilegesRequired` ajustado — reduz alertas do SmartScreen/Defender e
+  bloqueios de instalação. Adicionado `win_version/CODE_SIGNING.md` documentando
+  o passo (opcional) de assinatura de código por certificado, que é o que
+  elimina por completo o aviso do SmartScreen. (#5)
+
+## [1.8.0] - 2026-06-09
+
+### Adicionado
+- **Presença pela câmera (opcional, opt-in, desligada por padrão)**: quando o
+  input fica ocioso no limiar de inatividade, um **snapshot pontual** confirma
+  presença via detecção de rosto on-device (macOS/Vision), evitando pausas
+  indevidas enquanto o usuário está lendo a tela. A imagem é processada e
+  descartada na hora — nada é gravado nem enviado.
+- **Consentimento explícito**: ao ativar a câmera nas Configurações, um diálogo
+  explica exatamente o que ela faz antes de o sistema pedir a permissão.
+- Entitlement de câmera (macOS) + `NSCameraUsageDescription`. No Windows o
+  toggle aparece desabilitado (detecção de rosto fica para um follow-up).
+
 ## [1.7.0] - 2026-06-09
 
 ### Adicionado

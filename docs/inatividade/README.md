@@ -4,6 +4,33 @@ Este README descreve o modulo de inatividade do Dry Eye Widget: a parte do app q
 
 Para a especificacao tecnica completa, veja [inactivity-timer-spec.md](../inactivity-timer-spec.md).
 
+## Atualizacao (v1.7.x) — motor adaptativo, camera opcional e cifra
+
+A partir da v1.7.0 o motor de inatividade evoluiu. O **limiar fixo de 120 s**
+descrito abaixo deixou de ser fixo e virou o **valor de cold start**; o resto
+desta secao prevalece sobre os limiares fixos citados mais adiante:
+
+- **Limiar adaptativo (on-device):** o tempo ate pausar e aprendido
+  continuamente a partir dos padroes do usuario, por faixa horaria (estatistica
+  online leve — histograma compacto / percentil P85). Comeca em 120 s (cold
+  start) e se ajusta dentro de `[60 s, 600 s]`. Implementado em
+  `AdaptiveThresholdModel`, orquestrado pelo `PresenceController` (sensores
+  plugaveis via `PresenceSensor`: `InputIdleSensor` e camera opcional).
+- **Presenca pela camera (opcional, opt-in, desligada por padrao):** quando o
+  input fica ocioso no limiar, um **snapshot pontual** confirma presenca via
+  deteccao de rosto on-device (macOS/Vision — `VisionService` +
+  `CameraPresenceSensor`), evitando pausas indevidas enquanto o usuario le a
+  tela. A imagem e processada e **descartada na hora**; nada e gravado nem
+  enviado. Pede consentimento explicito antes da permissao do SO. Disponivel no
+  macOS; no Windows o toggle aparece desabilitado.
+- **Persistencia cifrada do aprendizado:** o estado agregado do modelo (apenas
+  contagens, sem eventos brutos nem timeline) e guardado **cifrado em repouso**
+  pelo SO (Keychain no macOS, DPAPI no Windows) via `SecurePresenceStore`, sem
+  acesso remoto. Ha botao para **resetar o aprendizado** nas Configuracoes.
+
+O cartao de aviso, a histerese de retomada (`inactivityResumeSeconds`) e a
+retomada manual permanecem como descrito a seguir.
+
 ## Objetivo
 
 O timer deve contar apenas tempo ativo de exposicao a tela. Quando o usuario fica longe do teclado e da tela, o app deve congelar o ciclo para evitar alertas falsos. Ao detectar nova atividade, o app retoma automaticamente de onde parou.
