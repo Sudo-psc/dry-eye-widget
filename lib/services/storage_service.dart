@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/osdi_assessment.dart';
 import '../models/widget_settings.dart';
 import '../utils/constants.dart';
 
@@ -49,4 +50,26 @@ class StorageService {
 
   Future<void> saveSettings(WidgetSettings settings) =>
       _prefs.setString(StorageKeys.widgetSettings, settings.toJson());
+
+  // --- Histórico OSDI -----------------------------------------------------
+
+  List<OsdiAssessment> loadOsdiHistory() =>
+      OsdiAssessment.decodeHistory(_prefs.getString(StorageKeys.osdiHistory));
+
+  Future<void> saveOsdiHistory(List<OsdiAssessment> history) async {
+    final sorted = [...history]
+      ..sort((a, b) => a.completedAt.compareTo(b.completedAt));
+    final trimmed = sorted.length <= OsdiAssessment.maxHistoryLength
+        ? sorted
+        : sorted.sublist(sorted.length - OsdiAssessment.maxHistoryLength);
+    await _prefs.setString(
+      StorageKeys.osdiHistory,
+      OsdiAssessment.encodeHistory(trimmed),
+    );
+  }
+
+  Future<void> addOsdiAssessment(OsdiAssessment assessment) async {
+    final history = [...loadOsdiHistory(), assessment];
+    await saveOsdiHistory(history);
+  }
 }

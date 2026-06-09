@@ -22,6 +22,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onReset,
     required this.onTogglePause,
     required this.onGuidance,
+    required this.onOsdi,
     required this.onCheckUpdates,
     required this.onSettings,
     required this.onQuit,
@@ -34,6 +35,7 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onReset;
   final VoidCallback onTogglePause;
   final VoidCallback onGuidance;
+  final VoidCallback onOsdi;
   final VoidCallback onCheckUpdates;
   final VoidCallback onSettings;
   final VoidCallback onQuit;
@@ -51,13 +53,14 @@ class FloatingMenu extends StatelessWidget {
         onTogglePause,
       ),
       _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
+      _MenuItem(Icons.assignment_outlined, s.menuOsdi, onOsdi),
       _MenuItem(Icons.system_update_alt, s.menuCheckUpdates, onCheckUpdates),
       _MenuItem(Icons.settings_outlined, s.menuSettings, onSettings),
       _MenuItem(Icons.close, s.menuQuit, onQuit),
     ];
 
     return LiquidGlass(
-      width: 230,
+      width: 280,
       borderRadius: 16,
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
@@ -79,7 +82,11 @@ class FloatingMenu extends StatelessWidget {
 }
 
 class _MenuRow extends StatefulWidget {
-  const _MenuRow({required this.icon, required this.label, required this.onTap});
+  const _MenuRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;
@@ -142,12 +149,16 @@ class _MenuRowState extends State<_MenuRow> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                widget.label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textPrimary,
-                  fontWeight: _hover ? FontWeight.w600 : FontWeight.w400,
+              Expanded(
+                child: Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                    fontWeight: _hover ? FontWeight.w600 : FontWeight.w400,
+                  ),
                 ),
               ),
             ],

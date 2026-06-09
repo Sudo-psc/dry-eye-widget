@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'l10n/app_strings.dart';
 import 'models/app_state.dart';
+import 'models/osdi_assessment.dart';
 import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
@@ -31,16 +33,17 @@ import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
 import 'widgets/inactivity_pause_card.dart';
+import 'widgets/osdi_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/update_dialog.dart';
 
 /// Tamanhos das janelas de menu e configurações (a compacta é dinâmica).
-const Size _menuWindowSize = Size(250, 400);
+const Size _menuWindowSize = Size(300, 450);
 const Size _settingsWindowSize = Size(460, 700);
+const Size _osdiWindowSize = Size(580, 740);
 
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
-Size _compactWindowSize(double ballSize) =>
-    Size(ballSize + 24, ballSize + 24);
+Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -142,8 +145,9 @@ Future<void> _restoreBallPosition(
     await windowManager.setPosition(Offset(savedX, savedY));
     return;
   }
-  await windowManager
-      .setPosition(await _cornerOffset(settings.defaultCorner, windowSize));
+  await windowManager.setPosition(
+    await _cornerOffset(settings.defaultCorner, windowSize),
+  );
 }
 
 /// Calcula o canto da tela primária para um dado tamanho de janela.
@@ -190,7 +194,15 @@ class DryEyeApp extends StatelessWidget {
   }
 }
 
-enum _WindowLayout { ball, menu, settings, breakOverlay, gentleBreak, inactivity }
+enum _WindowLayout {
+  ball,
+  menu,
+  settings,
+  osdi,
+  breakOverlay,
+  gentleBreak,
+  inactivity,
+}
 
 /// Tamanho do cartão de pausa no modo suave (canto superior direito).
 const Size _gentleWindowSize = Size(340, 150);
@@ -214,12 +226,14 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _settingsOpen = false;
   bool _guidanceOpen = false;
   bool _updateOpen = false;
+  bool _osdiOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
 
   final UpdateService _updater = UpdateService();
   UpdateResult? _updateResult;
+  List<OsdiAssessment> _osdiHistory = const [];
 
   /// Widget habilitado = bolinha visível. Quando desabilitado (pela opção
   /// nas configurações ou pelo item da barra de menu), a janela é escondida
@@ -258,7 +272,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _cacheCurrentPosition() async {
     try {
       _ballPosition = await windowManager.getPosition();
-    } catch (_) {/* ignora */}
+    } catch (_) {
+      /* ignora */
+    }
   }
 
   @override
@@ -283,7 +299,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     // Aviso de colírio: expande a janela para o cartão centralizado.
     final drops = _timer.eyeDropsAlert;
     if (drops && !_wasDrops) {
-      if (!_menuOpen && !_settingsOpen && !_guidanceOpen && !_updateOpen) {
+      if (!_menuOpen &&
+          !_settingsOpen &&
+          !_guidanceOpen &&
+          !_updateOpen &&
+          !_osdiOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.settings);
@@ -303,7 +323,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_menuOpen &&
           !_settingsOpen &&
           !_guidanceOpen &&
-          !_updateOpen) {
+          !_updateOpen &&
+          !_osdiOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.inactivity);
@@ -335,6 +356,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keySettings:
         _openSettingsFromTray();
         break;
+      case TrayService.keyOsdi:
+        _openOsdiFromTray();
+        break;
       case TrayService.keyQuit:
         _quit();
         break;
@@ -352,12 +376,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
       await windowManager.hide();
     }
     await _tray.updateMenu(
-        widgetEnabled: _widgetEnabled, strings: _settings.strings);
+      widgetEnabled: _widgetEnabled,
+      strings: _settings.strings,
+    );
   }
 
   Future<void> _openSettingsFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openSettings();
+  }
+
+  Future<void> _openOsdiFromTray() async {
+    if (!_widgetEnabled) await windowManager.show();
+    _openOsdi();
   }
 
   /// Reage a mudanças de configuração: se o tamanho da bolinha mudou e
@@ -379,8 +410,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final hideMenuBar = _settings.value.hideMenuBarItem;
     if (hideMenuBar != _lastHideMenuBar) {
       _lastHideMenuBar = hideMenuBar;
-      _tray.setVisible(!hideMenuBar,
-          widgetEnabled: _widgetEnabled, strings: _settings.strings);
+      _tray.setVisible(
+        !hideMenuBar,
+        widgetEnabled: _widgetEnabled,
+        strings: _settings.strings,
+      );
     }
     final hideFloating = _settings.value.hideFloatingWidget;
     if (hideFloating != _lastHideFloating) {
@@ -391,7 +425,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (lang != _lastLanguage) {
       _lastLanguage = lang;
       _tray.updateMenu(
-          widgetEnabled: _widgetEnabled, strings: _settings.strings);
+        widgetEnabled: _widgetEnabled,
+        strings: _settings.strings,
+      );
     }
   }
 
@@ -408,9 +444,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     // estar escondida); garantimos que ela volte a ser exibida.
     if (!_widgetEnabled) await windowManager.show();
     await _cacheCurrentPosition();
-    await _applyLayout(_settings.value.gentleMode
-        ? _WindowLayout.gentleBreak
-        : _WindowLayout.breakOverlay);
+    await _applyLayout(
+      _settings.value.gentleMode
+          ? _WindowLayout.gentleBreak
+          : _WindowLayout.breakOverlay,
+    );
   }
 
   Future<void> _exitBreakLayout() async {
@@ -423,8 +461,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     try {
       switch (layout) {
         case _WindowLayout.ball:
-          await windowManager
-              .setSize(_compactWindowSize(_settings.value.ballSize));
+          await windowManager.setSize(
+            _compactWindowSize(_settings.value.ballSize),
+          );
           await windowManager.setPosition(_ballPosition);
           break;
         case _WindowLayout.menu:
@@ -435,6 +474,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           break;
         case _WindowLayout.settings:
           await windowManager.setSize(_settingsWindowSize);
+          await windowManager.center();
+          break;
+        case _WindowLayout.osdi:
+          await windowManager.setSize(_osdiWindowSize);
           await windowManager.center();
           break;
         case _WindowLayout.breakOverlay:
@@ -449,10 +492,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
           final screen = display.visibleSize ?? display.size;
           final origin = display.visiblePosition ?? Offset.zero;
           await windowManager.setSize(_gentleWindowSize);
-          await windowManager.setPosition(Offset(
-            origin.dx + screen.width - _gentleWindowSize.width - 16,
-            origin.dy + 16,
-          ));
+          await windowManager.setPosition(
+            Offset(
+              origin.dx + screen.width - _gentleWindowSize.width - 16,
+              origin.dy + 16,
+            ),
+          );
           break;
         case _WindowLayout.inactivity:
           // Aviso compacto no canto superior direito, sem cobrir a tela.
@@ -460,10 +505,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
           final screen = display.visibleSize ?? display.size;
           final origin = display.visiblePosition ?? Offset.zero;
           await windowManager.setSize(_inactivityWindowSize);
-          await windowManager.setPosition(Offset(
-            origin.dx + screen.width - _inactivityWindowSize.width - 16,
-            origin.dy + 16,
-          ));
+          await windowManager.setPosition(
+            Offset(
+              origin.dx + screen.width - _inactivityWindowSize.width - 16,
+              origin.dy + 16,
+            ),
+          );
           break;
       }
       await windowManager.setAlwaysOnTop(true);
@@ -482,7 +529,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       x = x.clamp(origin.dx, origin.dx + screen.width - windowSize.width);
       y = y.clamp(origin.dy, origin.dy + screen.height - windowSize.height);
       await windowManager.setPosition(Offset(x, y));
-    } catch (_) {/* ignora */}
+    } catch (_) {
+      /* ignora */
+    }
   }
 
   // --- Interações da bolinha ---------------------------------------------
@@ -512,7 +561,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       if (mounted) {
         await context.read<StorageService>().saveBallPosition(pos.dx, pos.dy);
       }
-    } catch (_) {/* ignora */}
+    } catch (_) {
+      /* ignora */
+    }
   }
 
   void _closeMenu() {
@@ -525,6 +576,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _menuOpen = false;
       _settingsOpen = true;
+      _osdiOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -538,6 +590,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _menuOpen = false;
       _guidanceOpen = true;
+      _osdiOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -547,12 +600,42 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
+  void _openOsdi() {
+    final storage = context.read<StorageService>();
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = true;
+      _osdiHistory = storage.loadOsdiHistory();
+    });
+    _applyLayout(_WindowLayout.osdi);
+  }
+
+  void _closeOsdi() {
+    setState(() => _osdiOpen = false);
+    _restoreAfterPanel();
+  }
+
+  void _saveOsdi(OsdiAssessment assessment) {
+    unawaited(_persistOsdiAssessment(assessment));
+  }
+
+  Future<void> _persistOsdiAssessment(OsdiAssessment assessment) async {
+    final storage = context.read<StorageService>();
+    await storage.addOsdiAssessment(assessment);
+    if (!mounted) return;
+    setState(() => _osdiHistory = storage.loadOsdiHistory());
+  }
+
   // --- Verificação de atualização ----------------------------------------
 
   Future<void> _openCheckUpdates() async {
     setState(() {
       _menuOpen = false;
       _updateOpen = true;
+      _osdiOpen = false;
       _updateResult = null;
     });
     await _applyLayout(_WindowLayout.settings);
@@ -597,7 +680,16 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final strings = provider.strings;
 
     Widget body;
-    if (_updateOpen) {
+    if (_osdiOpen) {
+      body = Center(
+        child: OsdiDialog(
+          strings: strings,
+          history: _osdiHistory,
+          onSave: _saveOsdi,
+          onClose: _closeOsdi,
+        ),
+      );
+    } else if (_updateOpen) {
       body = UpdateDialog(
         strings: strings,
         result: _updateResult,
@@ -608,12 +700,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = _buildSettings();
     } else if (_guidanceOpen) {
       body = Center(
-          child: GuidanceDialog(strings: strings, onClose: _closeGuidance));
-    } else if (timer.eyeDropsAlert) {
-      body = EyeDropsReminder(
-        strings: strings,
-        onDone: _timer.dismissEyeDrops,
+        child: GuidanceDialog(strings: strings, onClose: _closeGuidance),
       );
+    } else if (timer.eyeDropsAlert) {
+      body = EyeDropsReminder(strings: strings, onDone: _timer.dismissEyeDrops);
     } else if (timer.state.isActive) {
       body = settings.gentleMode
           ? GentleBreakCard(
@@ -657,7 +747,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Widget _buildCompact(
-      TimerProvider timer, WidgetSettings settings, AppStrings strings) {
+    TimerProvider timer,
+    WidgetSettings settings,
+    AppStrings strings,
+  ) {
     if (!_menuOpen) {
       return Center(
         child: _ball(
@@ -689,6 +782,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
                 onGuidance: _openGuidance,
+                onOsdi: _openOsdi,
                 onCheckUpdates: _openCheckUpdates,
                 onSettings: _openSettings,
                 onQuit: _quit,
@@ -702,7 +796,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Widget _buildBreakOverlay(
-      TimerProvider timer, WidgetSettings settings, AppStrings strings) {
+    TimerProvider timer,
+    WidgetSettings settings,
+    AppStrings strings,
+  ) {
     return Stack(
       children: [
         if (settings.dimBackground)
@@ -737,7 +834,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       child: SettingsDialog(
         initial: settings.value,
         onSave: (next) async {
-          final loginChanged = next.launchAtLogin != settings.value.launchAtLogin;
+          final loginChanged =
+              next.launchAtLogin != settings.value.launchAtLogin;
           await settings.update(next);
           if (loginChanged) await startup.setEnabled(next.launchAtLogin);
         },

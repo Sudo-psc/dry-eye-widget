@@ -18,6 +18,7 @@ class TrayService {
   static const String keyToggle = 'toggle_widget';
   static const String keyBreak = 'start_break';
   static const String keySettings = 'open_settings';
+  static const String keyOsdi = 'open_osdi';
   static const String keyQuit = 'quit';
 
   /// Quantidade de passos do progresso. Mantido próximo da largura útil da
@@ -75,7 +76,9 @@ class TrayService {
       if (previous != null && previous != path) {
         try {
           await File(previous).delete();
-        } catch (_) {/* ignora */}
+        } catch (_) {
+          /* ignora */
+        }
       }
       _lastIconPath = path;
       _lastStep = step;
@@ -98,16 +101,19 @@ class TrayService {
     _strings = strings;
     try {
       await trayManager.setContextMenu(
-        Menu(items: [
-          MenuItem(
-            key: keyToggle,
-            label: widgetEnabled ? strings.trayDisable : strings.trayEnable,
-          ),
-          MenuItem(key: keyBreak, label: strings.menuStartBreak),
-          MenuItem.separator(),
-          MenuItem(key: keySettings, label: strings.menuSettings),
-          MenuItem(key: keyQuit, label: strings.menuQuit),
-        ]),
+        Menu(
+          items: [
+            MenuItem(
+              key: keyToggle,
+              label: widgetEnabled ? strings.trayDisable : strings.trayEnable,
+            ),
+            MenuItem(key: keyBreak, label: strings.menuStartBreak),
+            MenuItem.separator(),
+            MenuItem(key: keyOsdi, label: strings.menuOsdi),
+            MenuItem(key: keySettings, label: strings.menuSettings),
+            MenuItem(key: keyQuit, label: strings.menuQuit),
+          ],
+        ),
       );
     } catch (e) {
       debugPrint('TrayService: updateMenu falhou ($e).');
@@ -135,6 +141,8 @@ class TrayService {
   Future<void> dispose() async {
     try {
       await trayManager.destroy();
-    } catch (_) {/* ignora */}
+    } catch (_) {
+      /* ignora */
+    }
   }
 }

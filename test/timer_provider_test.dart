@@ -1,4 +1,5 @@
 import 'package:dry_eye_widget/models/widget_settings.dart';
+import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/providers/settings_provider.dart';
 import 'package:dry_eye_widget/providers/timer_provider.dart';
 import 'package:dry_eye_widget/services/audio_service.dart';
@@ -237,6 +238,15 @@ class _MemoryStorage implements StorageService {
   Future<void> saveSettings(WidgetSettings settings) async {
     _settings = settings;
   }
+
+  @override
+  List<OsdiAssessment> loadOsdiHistory() => const [];
+
+  @override
+  Future<void> saveOsdiHistory(List<OsdiAssessment> history) async {}
+
+  @override
+  Future<void> addOsdiAssessment(OsdiAssessment assessment) async {}
 
   @override
   Future<void> setElapsedSeconds(int value) async {
