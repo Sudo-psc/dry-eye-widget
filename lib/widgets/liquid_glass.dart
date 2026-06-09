@@ -36,8 +36,8 @@ class LiquidGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(borderRadius);
-    final base = dark ? const Color(0xFF26262C) : Colors.white;
-    final topAlpha = fillOpacity ?? (dark ? 0.80 : 0.22);
+    final base = dark ? Colors.black : Colors.white;
+    final topAlpha = fillOpacity ?? (dark ? 0.95 : 0.22);
     final bottomAlpha = topAlpha * (dark ? 0.94 : 0.55);
 
     return Container(

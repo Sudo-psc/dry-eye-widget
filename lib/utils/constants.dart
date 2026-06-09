@@ -50,7 +50,7 @@ class AppDefaults {
   static const bool soundEnabled = true;
   static const bool notificationsEnabled = true;
 
-  static const double ballSize = 40.0;
+  static const double ballSize = 24.0;
   static const int idleColor = 0xFF4A90E2;
   static const int alertColor = 0xFFFF4444;
   static const double idleOpacity = 1.0;
@@ -146,7 +146,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.6.3';
+  static const String version = '1.6.4';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';
