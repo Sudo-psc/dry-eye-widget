@@ -4,6 +4,63 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.6.4] - 2026-06-09
+
+### Adicionado
+- **Módulo de detecção de inatividade** completo: além de pausar o ciclo quando o
+  sistema fica ocioso (≥ 2 min), agora mostra um **aviso compacto** no canto
+  superior direito ("Timer pausado") com botão **Retomar**, retomada automática
+  ao voltar a usar (com histerese para evitar oscilação) e toggle nas
+  Configurações ("Pausar por inatividade").
+
+### Alterado
+- Tamanho padrão da bolinha ajustado para **24 px**.
+- Maior opacidade/contraste do menu de configurações (LiquidGlass).
+
+## [1.6.3] - 2026-06-08
+
+### Notas de build
+- Primeira release publicada com **artefatos macOS e Windows juntos**, via CI:
+  `DryEyeWidget.dmg`, `DryEyeWidget-Setup-x64.exe` e `DryEyeWidget-windows-x64.zip`.
+  A partir daqui, os links de download apontam para a release mais recente em
+  ambas as plataformas.
+- Sem alterações funcionais em relação à 1.6.2.
+
+## [1.6.2] - 2026-06-08
+
+### Alterado
+- **Atualização de dependências**: `window_manager` ^0.5.1, `screen_retriever`
+  ^0.2.0, `audioplayers` ^6.7.1, `google_fonts` ^8.1.0, `flutter_lints` ^6.0.0;
+  SDK `>=3.12.0`, Flutter `>=3.44.0`.
+- `SettingsProvider.update` normaliza as configurações antes de persistir.
+
+### Corrigido
+- **TimerProvider**: cancela os timers de alerta/conclusão e checa `_disposed`
+  para não notificar após o `dispose` (evita vazamentos/erros ao fechar); o
+  estado de som e notificações passa a acompanhar as configurações em tempo
+  real.
+
+### Qualidade
+- Testes novos/ampliados (`timer_provider_test`, `widget_settings_test`).
+- CI `windows-build` passa a rodar `flutter analyze` e `flutter test`.
+
+## [1.6.1] - 2026-06-08
+
+### Corrigido
+- **Windows — ícone da bandeja invisível**: o `tray_manager` carrega o ícone
+  com `LoadImage(IMAGE_ICON, LR_LOADFROMFILE)`, que só aceita `.ico`; o app
+  gerava `.png` (HICON nulo → sem ícone). Agora o ícone é gerado em `.ico`
+  (DIB 32bpp) no Windows.
+
+### Alterado
+- **Anel de progresso ao redor da bolinha** passa a vir **ativado por padrão**
+  (mostra o avanço até a próxima pausa); ainda pode ser desligado nas
+  Configurações.
+
+### Notas de build
+- Adicionado workflow `windows-build.yml` (GitHub Actions) que compila e anexa
+  o ZIP portátil e o instalador Windows às releases em tags `v*`.
+
 ## [1.6.0] - 2026-06-07
 
 ### Adicionado

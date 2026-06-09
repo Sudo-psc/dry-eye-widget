@@ -40,7 +40,7 @@ Confirme rapidamente (validação completa em `03-notas-plataforma.md`):
 ## Versão / metadados do `.exe`
 
 O `windows/runner/Runner.rc` deriva a versão dos defines `FLUTTER_VERSION_*`,
-que o Flutter preenche a partir do `version:` do `pubspec.yaml` (`1.6.0+9`).
+que o Flutter preenche a partir do `version:` do `pubspec.yaml` (`1.6.1+10`).
 Para personalizar nome de produto / empresa que aparecem em
 **Propriedades → Detalhes** do `.exe`, edite os blocos `StringFileInfo` em
 `windows/runner/Runner.rc` (ex.: `CompanyName`, `ProductName`,

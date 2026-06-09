@@ -1,5 +1,4 @@
 # Build e publicação da versão Windows do Dry Eye Widget.
-# Instale copiando para: .github/workflows/windows-build.yml
 #
 # - PR/push manual: compila e sobe os artefatos do build.
 # - Tag vX.Y.Z: compila e anexa instalador + ZIP à GitHub Release.

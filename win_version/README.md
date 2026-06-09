@@ -27,11 +27,11 @@ Flutter já existente neste repositório.
 | Item | Valor |
 |------|-------|
 | Nome do pacote (pubspec) | `dry_eye_widget` |
-| Versão | `1.6.0+9` |
+| Versão | `1.6.1+10` |
 | BINARY_NAME (CMake) | `dry_eye_widget` |
 | Repositório | `https://github.com/Sudo-psc/dry-eye-widget` |
-| SDK Dart | `>=3.2.0 <4.0.0` |
-| Flutter mínimo | `>=3.16.0` |
+| SDK Dart | `>=3.12.0 <4.0.0` |
+| Flutter mínimo | `>=3.44.0` |
 | Plataformas | macOS (distribuído via `.dmg`) + Windows (a gerar) |
 
 ## Dependências relevantes para Windows

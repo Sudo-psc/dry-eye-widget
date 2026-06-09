@@ -121,32 +121,32 @@ class WidgetSettings {
 
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
-        cycleMinutes: AppDefaults.cycleMinutes,
-        phaseSeconds: AppDefaults.phaseSeconds,
-        soundEnabled: AppDefaults.soundEnabled,
-        notificationsEnabled: AppDefaults.notificationsEnabled,
-        defaultCorner: BallCorner.topRight,
-        ballSize: AppDefaults.ballSize,
-        idleColor: AppDefaults.idleColor,
-        alertColor: AppDefaults.alertColor,
-        idleOpacity: AppDefaults.idleOpacity,
-        blinkMs: AppDefaults.blinkMs,
-        dimBackground: AppDefaults.dimBackground,
-        dimOpacity: AppDefaults.dimOpacity,
-        launchAtLogin: AppDefaults.launchAtLogin,
-        overlayOpacity: AppDefaults.overlayOpacity,
-        overlayBlur: AppDefaults.overlayBlur,
-        showProgressRing: AppDefaults.showProgressRing,
-        hideDockIcon: AppDefaults.hideDockIcon,
-        hideMenuBarItem: AppDefaults.hideMenuBarItem,
-        hideFloatingWidget: AppDefaults.hideFloatingWidget,
-        gentleMode: AppDefaults.gentleMode,
-        languageCode: AppDefaults.languageCode,
-        eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
-        eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
-        pauseOnInactivity: AppDefaults.pauseOnInactivity,
-        cameraPresence: AppDefaults.cameraPresence,
-      );
+    cycleMinutes: AppDefaults.cycleMinutes,
+    phaseSeconds: AppDefaults.phaseSeconds,
+    soundEnabled: AppDefaults.soundEnabled,
+    notificationsEnabled: AppDefaults.notificationsEnabled,
+    defaultCorner: BallCorner.topRight,
+    ballSize: AppDefaults.ballSize,
+    idleColor: AppDefaults.idleColor,
+    alertColor: AppDefaults.alertColor,
+    idleOpacity: AppDefaults.idleOpacity,
+    blinkMs: AppDefaults.blinkMs,
+    dimBackground: AppDefaults.dimBackground,
+    dimOpacity: AppDefaults.dimOpacity,
+    launchAtLogin: AppDefaults.launchAtLogin,
+    overlayOpacity: AppDefaults.overlayOpacity,
+    overlayBlur: AppDefaults.overlayBlur,
+    showProgressRing: AppDefaults.showProgressRing,
+    hideDockIcon: AppDefaults.hideDockIcon,
+    hideMenuBarItem: AppDefaults.hideMenuBarItem,
+    hideFloatingWidget: AppDefaults.hideFloatingWidget,
+    gentleMode: AppDefaults.gentleMode,
+    languageCode: AppDefaults.languageCode,
+    eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
+    eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
+    pauseOnInactivity: AppDefaults.pauseOnInactivity,
+    cameraPresence: AppDefaults.cameraPresence,
+  );
 
   // --- Conveniências ------------------------------------------------------
   int get cycleSeconds => cycleMinutes * 60;
@@ -181,6 +181,10 @@ class WidgetSettings {
     bool? pauseOnInactivity,
     bool? cameraPresence,
   }) {
+    final nextHideMenuBarItem = hideMenuBarItem ?? this.hideMenuBarItem;
+    final nextHideFloatingWidget =
+        hideFloatingWidget ?? this.hideFloatingWidget;
+
     return WidgetSettings(
       cycleMinutes: cycleMinutes ?? this.cycleMinutes,
       phaseSeconds: phaseSeconds ?? this.phaseSeconds,
@@ -199,8 +203,8 @@ class WidgetSettings {
       overlayBlur: overlayBlur ?? this.overlayBlur,
       showProgressRing: showProgressRing ?? this.showProgressRing,
       hideDockIcon: hideDockIcon ?? this.hideDockIcon,
-      hideMenuBarItem: hideMenuBarItem ?? this.hideMenuBarItem,
-      hideFloatingWidget: hideFloatingWidget ?? this.hideFloatingWidget,
+      hideMenuBarItem: nextHideMenuBarItem,
+      hideFloatingWidget: nextHideFloatingWidget,
       gentleMode: gentleMode ?? this.gentleMode,
       languageCode: languageCode ?? this.languageCode,
       eyeDropsEnabled: eyeDropsEnabled ?? this.eyeDropsEnabled,
@@ -208,42 +212,101 @@ class WidgetSettings {
           eyeDropsIntervalHours ?? this.eyeDropsIntervalHours,
       pauseOnInactivity: pauseOnInactivity ?? this.pauseOnInactivity,
       cameraPresence: cameraPresence ?? this.cameraPresence,
+    ).normalized();
+  }
+
+  /// Garante invariantes que podem ser violadas por JSON antigo/corrompido ou
+  /// por construção manual fora da tela de configurações.
+  WidgetSettings normalized() {
+    final d = WidgetSettings.defaults();
+    return WidgetSettings(
+      cycleMinutes: _clampInt(cycleMinutes, 1, 60),
+      phaseSeconds: _clampInt(phaseSeconds, 5, 120),
+      soundEnabled: soundEnabled,
+      notificationsEnabled: notificationsEnabled,
+      defaultCorner: defaultCorner,
+      ballSize: _clampDouble(
+        ballSize,
+        AppDefaults.minBallSize,
+        AppDefaults.maxBallSize,
+        d.ballSize,
+      ),
+      idleColor: idleColor,
+      alertColor: alertColor,
+      idleOpacity: _clampDouble(idleOpacity, 0.3, 1.0, d.idleOpacity),
+      blinkMs: _clampInt(blinkMs, 200, 1500),
+      dimBackground: dimBackground,
+      dimOpacity: _clampDouble(dimOpacity, 0.0, 0.6, d.dimOpacity),
+      launchAtLogin: launchAtLogin,
+      overlayOpacity: _clampDouble(overlayOpacity, 0.05, 0.4, d.overlayOpacity),
+      overlayBlur: _clampDouble(overlayBlur, 0.0, 40.0, d.overlayBlur),
+      showProgressRing: showProgressRing,
+      hideDockIcon: hideDockIcon,
+      hideMenuBarItem: hideMenuBarItem && hideFloatingWidget
+          ? false
+          : hideMenuBarItem,
+      hideFloatingWidget: hideFloatingWidget,
+      gentleMode: gentleMode,
+      languageCode: languageCode == 'en' || languageCode == 'pt'
+          ? languageCode
+          : d.languageCode,
+      eyeDropsEnabled: eyeDropsEnabled,
+      eyeDropsIntervalHours:
+          eyeDropsIntervalHours == 4 || eyeDropsIntervalHours == 6
+          ? eyeDropsIntervalHours
+          : d.eyeDropsIntervalHours,
+      pauseOnInactivity: pauseOnInactivity,
+      cameraPresence: cameraPresence,
     );
   }
 
+  static int _clampInt(int value, int min, int max) =>
+      value.clamp(min, max).toInt();
+
+  static double _clampDouble(
+    double value,
+    double min,
+    double max,
+    double fallback,
+  ) {
+    if (!value.isFinite) return fallback;
+    return value.clamp(min, max).toDouble();
+  }
+
   Map<String, dynamic> toMap() => {
-        'cycleMinutes': cycleMinutes,
-        'phaseSeconds': phaseSeconds,
-        'soundEnabled': soundEnabled,
-        'notificationsEnabled': notificationsEnabled,
-        'defaultCorner': defaultCorner.index,
-        'ballSize': ballSize,
-        'idleColor': idleColor,
-        'alertColor': alertColor,
-        'idleOpacity': idleOpacity,
-        'blinkMs': blinkMs,
-        'dimBackground': dimBackground,
-        'dimOpacity': dimOpacity,
-        'launchAtLogin': launchAtLogin,
-        'overlayOpacity': overlayOpacity,
-        'overlayBlur': overlayBlur,
-        'showProgressRing': showProgressRing,
-        'hideDockIcon': hideDockIcon,
-        'hideMenuBarItem': hideMenuBarItem,
-        'hideFloatingWidget': hideFloatingWidget,
-        'gentleMode': gentleMode,
-        'languageCode': languageCode,
-        'eyeDropsEnabled': eyeDropsEnabled,
-        'eyeDropsIntervalHours': eyeDropsIntervalHours,
-        'pauseOnInactivity': pauseOnInactivity,
-        'cameraPresence': cameraPresence,
-      };
+    'cycleMinutes': cycleMinutes,
+    'phaseSeconds': phaseSeconds,
+    'soundEnabled': soundEnabled,
+    'notificationsEnabled': notificationsEnabled,
+    'defaultCorner': defaultCorner.index,
+    'ballSize': ballSize,
+    'idleColor': idleColor,
+    'alertColor': alertColor,
+    'idleOpacity': idleOpacity,
+    'blinkMs': blinkMs,
+    'dimBackground': dimBackground,
+    'dimOpacity': dimOpacity,
+    'launchAtLogin': launchAtLogin,
+    'overlayOpacity': overlayOpacity,
+    'overlayBlur': overlayBlur,
+    'showProgressRing': showProgressRing,
+    'hideDockIcon': hideDockIcon,
+    'hideMenuBarItem': hideMenuBarItem,
+    'hideFloatingWidget': hideFloatingWidget,
+    'gentleMode': gentleMode,
+    'languageCode': languageCode,
+    'eyeDropsEnabled': eyeDropsEnabled,
+    'eyeDropsIntervalHours': eyeDropsIntervalHours,
+    'pauseOnInactivity': pauseOnInactivity,
+    'cameraPresence': cameraPresence,
+  };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
   /// ausentes ou inválidos (robusto contra versões antigas do JSON).
   factory WidgetSettings.fromMap(Map<String, dynamic> map) {
     final d = WidgetSettings.defaults();
-    int cornerIndex = (map['defaultCorner'] as num?)?.toInt() ?? d.defaultCorner.index;
+    int cornerIndex =
+        (map['defaultCorner'] as num?)?.toInt() ?? d.defaultCorner.index;
     if (cornerIndex < 0 || cornerIndex >= BallCorner.values.length) {
       cornerIndex = d.defaultCorner.index;
     }
@@ -265,8 +328,7 @@ class WidgetSettings {
       overlayOpacity:
           (map['overlayOpacity'] as num?)?.toDouble() ?? d.overlayOpacity,
       overlayBlur: (map['overlayBlur'] as num?)?.toDouble() ?? d.overlayBlur,
-      showProgressRing:
-          map['showProgressRing'] as bool? ?? d.showProgressRing,
+      showProgressRing: map['showProgressRing'] as bool? ?? d.showProgressRing,
       hideDockIcon: map['hideDockIcon'] as bool? ?? d.hideDockIcon,
       hideMenuBarItem: map['hideMenuBarItem'] as bool? ?? d.hideMenuBarItem,
       hideFloatingWidget:
@@ -276,19 +338,18 @@ class WidgetSettings {
       eyeDropsEnabled: map['eyeDropsEnabled'] as bool? ?? d.eyeDropsEnabled,
       eyeDropsIntervalHours:
           (map['eyeDropsIntervalHours'] as num?)?.toInt() ??
-              d.eyeDropsIntervalHours,
+          d.eyeDropsIntervalHours,
       pauseOnInactivity:
           map['pauseOnInactivity'] as bool? ?? d.pauseOnInactivity,
       cameraPresence: map['cameraPresence'] as bool? ?? d.cameraPresence,
-    );
+    ).normalized();
   }
 
   String toJson() => jsonEncode(toMap());
 
   factory WidgetSettings.fromJson(String source) {
     try {
-      return WidgetSettings.fromMap(
-          jsonDecode(source) as Map<String, dynamic>);
+      return WidgetSettings.fromMap(jsonDecode(source) as Map<String, dynamic>);
     } catch (_) {
       return WidgetSettings.defaults();
     }

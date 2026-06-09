@@ -5,7 +5,8 @@ Objetivo: ter uma máquina Windows capaz de compilar Flutter desktop.
 ## Requisitos
 
 - **Windows 10 (1809+) ou Windows 11**, 64 bits.
-- **Flutter SDK** estável (≥ 3.16; recomendado a última estável).
+- **Flutter SDK** estável **3.44.x ou superior**. O CI está fixado em
+  `3.44.1`, que também é a versão validada localmente.
 - **Visual Studio 2022** (não o VS Code) com o workload
   **"Desktop development with C++"** — inclui o MSVC, o Windows 10/11 SDK e o
   CMake. Sem isso, `flutter build windows` falha.

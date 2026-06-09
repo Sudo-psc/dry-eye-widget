@@ -1,0 +1,81 @@
+# Build e publicação da versão macOS do Dry Eye Widget.
+#
+# - PR/push manual: compila e sobe o .dmg como artefato.
+# - Tag vX.Y.Z: compila e anexa o DryEyeWidget.dmg à GitHub Release
+#   (mantém as releases coerentes com a versão Windows).
+
+name: macOS Build
+
+on:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "macos/**"
+      - "scripts/make_dmg.sh"
+      - "analysis_options.yaml"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - ".github/workflows/macos-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Fixado na versão estável usada/validada localmente (flutter --version).
+          flutter-version: "3.44.1"
+          cache: true
+
+      - name: Habilitar desktop macOS
+        run: flutter config --enable-macos-desktop
+
+      - name: Dependências
+        run: flutter pub get
+
+      - name: Análise estática
+        run: flutter analyze
+
+      - name: Testes
+        run: flutter test
+
+      - name: Gerar ícones
+        run: dart run flutter_launcher_icons
+
+      - name: Build Release
+        run: flutter build macos --release
+
+      - name: Gerar .dmg
+        run: |
+          chmod +x scripts/make_dmg.sh
+          ./scripts/make_dmg.sh "${GITHUB_REF_NAME#v}"
+
+      - name: Upload de artefatos (toda execução)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-eye-widget-macos
+          path: dist/DryEyeWidget.dmg
+          if-no-files-found: warn
+
+      - name: Anexar à Release (apenas em tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/DryEyeWidget.dmg
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

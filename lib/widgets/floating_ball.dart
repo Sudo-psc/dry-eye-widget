@@ -22,7 +22,6 @@ class FloatingBall extends StatefulWidget {
     this.blinkDuration = const Duration(milliseconds: AppDefaults.blinkMs),
     this.showProgress = false,
     this.progress = 0.0,
-    this.dimmed = false,
     this.onTap,
     this.onSecondaryTap,
     this.onDragStart,
@@ -37,10 +36,6 @@ class FloatingBall extends StatefulWidget {
   final Duration blinkDuration;
   final bool showProgress;
   final double progress;
-
-  /// Esmaece a bolinha (ex.: quando o ciclo está pausado por inatividade).
-  /// Só tem efeito no estado IDLE.
-  final bool dimmed;
   final VoidCallback? onTap;
   final VoidCallback? onSecondaryTap;
   final VoidCallback? onDragStart;
@@ -99,9 +94,8 @@ class _FloatingBallState extends State<FloatingBall>
   @override
   Widget build(BuildContext context) {
     final color = widget.isActive ? widget.alertColor : widget.idleColor;
-    var baseOpacity =
+    final baseOpacity =
         widget.isActive ? 1.0 : widget.idleOpacity.clamp(0.1, 1.0);
-    if (widget.dimmed && !widget.isActive) baseOpacity *= 0.5;
     final ringVisible = widget.showProgress && !widget.isActive;
 
     // Tons derivados da cor base para o relevo 3D.
