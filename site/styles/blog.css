@@ -1,0 +1,118 @@
+/* ============================================================
+   Dry Eye Widget — Blog
+   Reutiliza os tokens liquid glass de landing.css
+   ============================================================ */
+
+/* ---------- Listagem ---------- */
+.blog-hero { padding: 72px 0 8px; }
+.blog-hero h1 { font-size: clamp(30px, 4vw, 44px); max-width: 18ch; }
+.blog-hero .sub { color: var(--text-2); font-size: 17px; max-width: 58ch; margin-top: 14px; }
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: var(--space-6);
+  margin-top: 44px;
+}
+.post-card {
+  border-radius: var(--radius-2xl);
+  padding: var(--space-7) var(--space-6);
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.post-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.post-card .tag {
+  justify-self: start;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px; border-radius: 999px;
+}
+.post-card h2 { font-size: 21px; line-height: 1.25; }
+.post-card p { font-size: 14.5px; color: var(--text-2); text-wrap: pretty; }
+.post-card .meta { font-size: 12.5px; color: var(--text-3); margin-top: 4px; }
+.post-card .read-more {
+  color: var(--accent); font-weight: 700; font-size: 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+
+/* ---------- Artigo ---------- */
+.article-hero { padding: 64px 0 24px; }
+.article-hero .kicker { margin-bottom: 14px; }
+.article-hero h1 { font-size: clamp(28px, 3.6vw, 42px); max-width: 24ch; }
+.article-meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 20px; font-size: 13.5px; color: var(--text-2);
+}
+.article-meta .author-chip {
+  display: inline-flex; align-items: center; gap: 10px;
+  border-radius: 999px; padding: 6px 14px 6px 6px;
+}
+.article-meta .author-chip img {
+  width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+}
+.article-meta .author-chip strong { color: var(--text); font-size: 13.5px; }
+.article-meta .dot-sep { color: var(--text-3); }
+
+.article-body { max-width: 720px; margin: 0 auto; padding-bottom: 32px; }
+.article-body > * + * { margin-top: 1.15em; }
+.article-body p { font-size: 17px; line-height: 1.72; color: var(--text); text-wrap: pretty; }
+.article-body p.lead { font-size: 19px; color: var(--text-2); line-height: 1.65; }
+.article-body h2 {
+  font-size: 25px; margin-top: 2em; padding-top: 0.4em;
+}
+.article-body h3 { font-size: 19px; margin-top: 1.6em; }
+.article-body ul, .article-body ol { padding-left: 1.4em; display: grid; gap: 8px; }
+.article-body li { font-size: 16.5px; line-height: 1.65; }
+.article-body a { color: var(--accent); font-weight: 600; }
+.article-body a:hover { text-decoration: underline; }
+.article-body sup { font-size: 0.7em; color: var(--accent); font-weight: 700; }
+.article-body strong { font-weight: 700; }
+
+.stat-callout {
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: grid; gap: 6px;
+  border-left: 3px solid var(--accent);
+}
+.stat-callout .big {
+  font-family: var(--font-mono);
+  font-size: 34px; font-weight: 700; color: var(--accent); line-height: 1.1;
+}
+.stat-callout p { font-size: 15px !important; color: var(--text-2) !important; }
+
+.article-body blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 4px 0 4px 20px;
+  color: var(--text-2);
+  font-size: 17px;
+  font-style: italic;
+}
+
+.article-refs { max-width: 720px; margin: 0 auto; padding: 16px 0 48px; }
+.article-refs h2 { font-size: 21px; margin-bottom: 18px; }
+.article-refs .ref-list { display: grid; gap: 12px; }
+
+.article-cta {
+  max-width: 720px; margin: 0 auto 64px;
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  display: grid; gap: 14px; justify-items: start;
+}
+.article-cta h2 { font-size: 23px; }
+.article-cta p { color: var(--text-2); font-size: 15.5px; max-width: 56ch; }
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--text-2); font-weight: 600; font-size: 14px;
+  margin-bottom: 24px;
+}
+.back-link:hover { color: var(--accent); }
+.back-link svg { width: 16px; height: 16px; }
+
+@media (max-width: 640px) {
+  .blog-hero, .article-hero { padding-top: 48px; }
+  .article-body p { font-size: 16px; }
+}

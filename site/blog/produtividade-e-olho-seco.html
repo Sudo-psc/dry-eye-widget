@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtividade e olho seco — Dry Eye Widget</title>
+<meta name="description" content="O olho seco degrada a velocidade de leitura, aumenta erros e fragmenta a atenção. Como a superfície ocular vira gargalo de produtividade, por Dr. Philipe Saraiva Cruz.">
+<script>
+(function(){var t=null;try{t=localStorage.getItem("dew-theme")}catch(e){}
+if(!t)t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+document.documentElement.setAttribute("data-theme",t);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles/landing.css">
+<link rel="stylesheet" href="../styles/blog.css">
+<link rel="icon" href="../assets/icon-256.png">
+<link rel="canonical" href="https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html">
+<link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html">
+<link rel="alternate" hreflang="en" href="https://olhossecos.com.br/app/blog/en/productivity-and-dry-eye.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dry Eye Widget">
+<meta property="og:title" content="Produtividade e olho seco: quando a superfície ocular vira gargalo de desempenho">
+<meta property="og:description" content="Leitura mais lenta, mais erros, pausas involuntárias: como o olho seco degrada o desempenho no trabalho.">
+<meta property="og:url" content="https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html">
+<meta property="og:image" content="https://olhossecos.com.br/app/assets/icon-256.png">
+<meta name="theme-color" content="#0B121D" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EDF3FB" media="(prefers-color-scheme: light)">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "headline": "Produtividade e olho seco: quando a superfície ocular vira gargalo de desempenho",
+  "datePublished": "2026-06-09",
+  "inLanguage": "pt-BR",
+  "url": "https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html",
+  "author": {
+    "@type": "Physician",
+    "name": "Dr. Philipe Saraiva Cruz",
+    "medicalSpecialty": "Ophthalmology",
+    "identifier": "CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903"
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="../">
+      <img src="../assets/icon-256.png" alt="Dry Eye Widget">
+      <span>Dry Eye Widget</span>
+    </a>
+    <nav class="main-nav">
+      <a href="../#sobre">Sobre</a>
+      <a href="../#regra">A regra</a>
+      <a href="../#evidencias">Evidências</a>
+      <a href="../#capturas">Capturas</a>
+      <a href="./">Blog</a>
+    </nav>
+    <div class="header-actions">
+      <a class="lang-link" href="en/productivity-and-dry-eye.html" hreflang="en" style="font-weight:700;font-size:13px;color:var(--text-2);padding:0 8px;">EN</a>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Alternar tema">
+        <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"></path></svg>
+        <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"></path></svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/Sudo-psc/dry-eye-widget" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.15 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<article>
+<section class="article-hero">
+  <div class="wrap">
+    <a class="back-link" href="./">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"></path></svg>
+      Todos os artigos
+    </a>
+    <span class="kicker">Produtividade</span>
+    <h1>Produtividade e olho seco: quando a superfície ocular vira gargalo de desempenho</h1>
+    <div class="article-meta">
+      <span class="author-chip glass">
+        <img src="../assets/doctor.png" alt="Dr. Philipe Saraiva Cruz">
+        <strong>Dr. Philipe Saraiva Cruz</strong>
+      </span>
+      <span class="dot-sep">·</span>
+      <span>Médico Oftalmologista · CRM-MG 69.870 · RQE 71.903</span>
+      <span class="dot-sep">·</span>
+      <span>9 de junho de 2026</span>
+      <span class="dot-sep">·</span>
+      <span>7 min de leitura</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="article-body">
+    <p class="lead">Pensamos em produtividade como uma questão de método, ferramentas e foco. Raramente a associamos a uma camada de lágrima de poucos micrômetros sobre a córnea. No entanto, é exatamente ali — na superfície ocular — que parte do desempenho de quem trabalha com telas se ganha ou se perde, milissegundo a milissegundo, ao longo do dia.</p>
+
+    <p>O olho seco não é apenas desconforto. Ele tem consequências funcionais mensuráveis sobre as duas tarefas centrais do trabalho cognitivo moderno: <strong>ler</strong> e <strong>manter a atenção</strong>. E essas consequências aparecem em estudos clínicos controlados, não apenas em relatos subjetivos.</p>
+
+    <h2>A leitura desacelera — e isso é mensurável</h2>
+    <p>A leitura prolongada é especialmente vulnerável. Quando lemos por períodos extensos, o piscar diminui e o filme lacrimal se desestabiliza progressivamente. A cada piscada incompleta, a córnea fica com pequenas irregularidades ópticas que degradam a nitidez por frações de segundo — justamente quando os olhos precisam de precisão para decodificar texto.</p>
+
+    <p>Estudos que mediram a velocidade de leitura em pacientes com olho seco encontraram reduções relevantes na fluência e na rapidez da leitura sustentada<sup>[1][2]</sup>. Em termos práticos, a pessoa lê mais devagar, relê trechos, perde a linha e precisa de mais tempo para completar a mesma tarefa — sem perceber que a causa está na lágrima, e não na dificuldade do material.</p>
+
+    <div class="stat-callout glass">
+      <span class="big">~14%</span>
+      <p>de redução na velocidade de leitura prolongada foi documentada em associação a alterações da superfície ocular.<sup>[2]</sup></p>
+    </div>
+
+    <h2>A atenção fragmenta-se</h2>
+    <p>Há um segundo efeito, mais sutil. O desconforto ocular crônico funciona como um ruído de fundo constante que compete pela atenção. Cada episódio de ardência ou embaçamento é uma microinterrupção: o cérebro desvia recursos para o incômodo, a pessoa pisca com força, esfrega os olhos, reposiciona-se — e perde o fio do raciocínio.</p>
+
+    <p>Essas microinterrupções são curtas demais para serem registradas como "pausa", mas frequentes o suficiente para corroer o estado de concentração profunda. Em trabalho que exige foco contínuo — programação, redação, análise de dados, revisão de documentos — o custo acumulado é significativo, porque retomar o foco após cada quebra também consome tempo.</p>
+
+    <h2>Mais erros, mais retrabalho</h2>
+    <p>Leitura degradada e atenção fragmentada convergem para um terceiro efeito: a queda de qualidade. Quando a nitidez oscila e a concentração se quebra, aumenta a probabilidade de erros — um número trocado em uma planilha, um detalhe contratual ignorado, um <em>typo</em> que passa na revisão. Cada erro gera retrabalho, e retrabalho é o oposto de produtividade.</p>
+
+    <p>O ponto crítico é que nada disso aparece num crachá de "estou doente". O profissional permanece presente, esforçado, cumprindo a jornada — mas operando abaixo da sua capacidade real. Essa diferença entre estar presente e render plenamente tem nome técnico: <strong>presenteísmo</strong>, e é o componente mais caro e mais invisível do impacto econômico do olho seco.</p>
+
+    <blockquote>O olho seco raramente tira a pessoa do trabalho. Ele apenas faz com que cada hora trabalhada renda menos do que poderia.</blockquote>
+
+    <h2>O caminho de volta: pausas estruturadas</h2>
+    <p>A intervenção mais eficaz contra a perda de desempenho é, paradoxalmente, <strong>parar de olhar para a tela em intervalos regulares</strong>. A regra 20-20-20 — a cada 20 minutos, olhar para 6 metros de distância por 20 segundos — não é apenas uma medida de conforto: é uma forma de preservar a função visual ao longo do dia.</p>
+
+    <p>Ao desviar o olhar, dois processos se restauram. O músculo ciliar relaxa, aliviando o esforço acomodativo da visão de perto. E o piscar completo se restabelece, recompondo o filme lacrimal e devolvendo nitidez à córnea. O efeito líquido é que os 20 minutos seguintes começam com a superfície ocular "renovada", em vez de partir de um estado já degradado.</p>
+
+    <p>Há aqui uma objeção previsível: "parar a cada 20 minutos não atrapalha mais do que ajuda?". A evidência aponta o contrário. Vinte segundos a cada vinte minutos somam pouco mais de oito minutos em uma jornada de oito horas — um investimento mínimo diante da perda de velocidade de leitura, do retrabalho e das microinterrupções que a falta de pausa provoca. Pausar de forma estruturada não compete com a produtividade; é o que a sustenta.</p>
+
+    <h2>Por que um lembrete faz diferença</h2>
+    <p>O obstáculo não é o conhecimento — quase todo mundo já ouviu falar em "descansar a vista". O obstáculo é a execução: no estado de concentração, perdemos completamente a noção do tempo, e a pausa que deveria acontecer simplesmente não acontece. É para fechar essa lacuna que existe o Dry Eye Widget: um sinal discreto que acompanha o ciclo de 20 minutos em silêncio e avisa, com suavidade, quando é hora de olhar para longe — sem bloquear o trabalho e sem coletar nenhum dado.</p>
+
+    <p>Produtividade sustentável não vem de forçar mais horas diante da tela, e sim de proteger a qualidade de cada hora. A superfície ocular é parte invisível dessa equação — e cuidar dela é uma das formas mais baratas de devolver desempenho ao trabalho.</p>
+  </div>
+</div>
+
+<section class="article-refs">
+  <h2>Referências</h2>
+  <div class="ref-list">
+    <div class="ref-item glass">
+      <p><strong>[1] Mathews PM, et al.</strong> Functional impairment of reading in patients with dry eye. <em>Br J Ophthalmol.</em> 2016;101(4):481-6.</p>
+      <a class="doi" href="https://doi.org/10.1136/bjophthalmol-2015-308237" target="_blank" rel="noopener">DOI</a>
+    </div>
+    <div class="ref-item glass">
+      <p><strong>[2] Karakus S, et al.</strong> Impact of Dry Eye on Prolonged Reading. <em>Optom Vis Sci.</em> 2018;95(12):1105-13.</p>
+      <a class="doi" href="https://doi.org/10.1097/OPX.0000000000001303" target="_blank" rel="noopener">DOI</a>
+    </div>
+    <div class="ref-item glass">
+      <p><strong>[3] Nichols KK, et al.</strong> Impact of Dry Eye Disease on Work Productivity, and Patients' Satisfaction With Over-the-Counter Dry Eye Treatments. <em>Invest Ophthalmol Vis Sci.</em> 2016;57(7):2975-82.</p>
+      <a class="doi" href="https://doi.org/10.1167/iovs.16-19419" target="_blank" rel="noopener">DOI</a>
+    </div>
+  </div>
+  <div class="clinical-note glass" style="margin-top: 20px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 7.8v.4"></path></svg>
+    <p>Este conteúdo tem caráter educativo e não substitui avaliação médica individual. Em caso de desconforto ocular persistente, visão turva ou olhos secos crônicos, procure um oftalmologista.</p>
+  </div>
+</section>
+
+<section class="article-cta glass">
+  <span class="kicker">Ferramenta gratuita</span>
+  <h2>Proteja o desempenho de cada hora de trabalho</h2>
+  <p>O Dry Eye Widget aplica a regra 20-20-20 na sua área de trabalho com um lembrete discreto. Gratuito, open source, 100% local — para macOS e Windows.</p>
+  <a class="btn-dl" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"></path></svg>
+    <span>Conhecer e baixar o widget</span>
+  </a>
+</section>
+</article>
+
+<footer class="site-footer">
+  <div class="wrap cols">
+    <div>
+      <div class="footer-brand">
+        <img src="../assets/icon-256.png" alt="">
+        <span>Dry Eye Widget</span>
+      </div>
+      <p style="margin-top: 10px;">Desenvolvido pelo Dr. Philipe Saraiva Cruz · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903</p>
+      <p>Código aberto sob licença MIT</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/Sudo-psc/dry-eye-widget" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/Sudo-psc/dry-eye-widget/releases" target="_blank" rel="noopener">Releases</a>
+      <a href="https://github.com/Sudo-psc/dry-eye-widget/blob/main/docs/legal/termos-de-uso.md" target="_blank" rel="noopener">Termos de Uso</a>
+      <a href="https://github.com/Sudo-psc/dry-eye-widget/blob/main/docs/legal/politica-de-privacidade.md" target="_blank" rel="noopener">Privacidade</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts/landing.js"></script>
+
+</body>
+</html>
