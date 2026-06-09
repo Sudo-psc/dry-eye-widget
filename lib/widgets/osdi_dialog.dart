@@ -28,11 +28,18 @@ class OsdiDialog extends StatefulWidget {
 class _OsdiDialogState extends State<OsdiDialog> {
   late List<int?> _answers;
   OsdiAssessment? _lastSaved;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _answers = List<int?>.filled(OsdiAssessment.questionCount, null);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   OsdiAssessment? get _preview {
@@ -69,6 +76,13 @@ class _OsdiDialogState extends State<OsdiDialog> {
       _lastSaved = assessment;
       _answers = List<int?>.filled(OsdiAssessment.questionCount, null);
     });
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -129,6 +143,7 @@ class _OsdiDialogState extends State<OsdiDialog> {
           const SizedBox(height: 12),
           Expanded(
             child: SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
