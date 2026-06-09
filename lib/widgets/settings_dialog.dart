@@ -240,6 +240,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
                           _set(_draft.copyWith(notificationsEnabled: v)),
                     ),
                     _switchRow(
+                      label: s.pauseOnInactivityLabel,
+                      value: _draft.pauseOnInactivity,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(pauseOnInactivity: v)),
+                    ),
+                    _switchRow(
                       label: s.launchAtLogin,
                       value: _draft.launchAtLogin,
                       onChanged: (v) =>
