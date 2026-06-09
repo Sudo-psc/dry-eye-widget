@@ -9,7 +9,7 @@
 <p align="center"><b>🇧🇷 Português</b> · <a href="README.en.md">🇺🇸 English</a></p>
 
 <p align="center">
-  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/download/v1.6.0/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Baixar-macOS%20.dmg-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Baixar para macOS"></a>
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Baixar-macOS%20.dmg-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Baixar para macOS"></a>
   <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe"><img src="https://img.shields.io/badge/Baixar-Windows%20.exe-0078D6?style=flat-square&logo=windows&logoColor=white" alt="Baixar para Windows"></a>
   <img src="https://img.shields.io/badge/Plataforma-macOS%20%7C%20Windows-555?style=flat-square" alt="Plataformas">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter">
@@ -88,7 +88,7 @@ certa.
 
 ### 🍎 macOS
 
-**➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/download/v1.6.0/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
+**➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
 
 1. Abra o `.dmg` e **arraste** o app para a pasta **Aplicativos**.
 2. Na primeira vez, clique com o **botão direito → Abrir** (o app é gratuito e
