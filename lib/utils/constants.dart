@@ -55,6 +55,9 @@ class AppDefaults {
   static const int alertColor = 0xFFFF4444;
   static const double idleOpacity = 1.0;
   static const int blinkMs = 500;
+  static const bool dynamicOrbEffect = true;
+  static const bool hoverReactiveBall = true;
+  static const double orbIntensity = 0.85;
   static const bool dimBackground = true;
   static const double dimOpacity = 0.2;
 
@@ -155,7 +158,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.8.3';
+  static const String version = '1.8.4';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';
