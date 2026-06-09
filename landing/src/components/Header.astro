@@ -1,0 +1,39 @@
+---
+import { urls } from '../content/siteData';
+
+interface Props {
+  nav: Record<string, string>;
+  langLabel: string;
+  langHref: string;
+  themeLabel: string;
+  blogHref: string;
+  homeHref: string;
+}
+
+const { nav, langLabel, langHref, themeLabel, blogHref, homeHref } = Astro.props;
+---
+<header class="site-header">
+  <a class="brand" href={homeHref} aria-label="Dry Eye Widget">
+    <img src="/assets/icon-128.png" alt="" width="34" height="34" />
+    <span>Dry Eye Widget</span>
+  </a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href={`${homeHref}#science`}>{nav.science}</a>
+    <a href={`${homeHref}#screenshots`}>{nav.screenshots}</a>
+    <a href={`${homeHref}#downloads`}>{nav.downloads}</a>
+    <a href={blogHref}>{nav.blog}</a>
+  </nav>
+  <div class="header-actions">
+    <a class="icon-button" href={urls.github} aria-label={nav.github} title={nav.github}>
+      <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+        <path fill="currentColor" d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.2.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.5-1.3-1.2-1.6-1.2-1.6-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 .1 1.6.8 3.1.6.1-.7.4-1.2.7-1.5-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.2 11.2 0 0 1 6 0C17.8 4.6 18.8 5 18.8 5c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1 .8 2.1v3.1c0 .4.2.7.8.6A12 12 0 0 0 12 .5Z"/>
+      </svg>
+    </a>
+    <a class="pill-link" href={langHref}>{langLabel}</a>
+    <button class="icon-button" type="button" data-theme-toggle aria-label={themeLabel} title={themeLabel}>
+      <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+        <path fill="currentColor" d="M12 18.5a6.5 6.5 0 0 0 0-13 7 7 0 1 1 0 13Zm0 2a9 9 0 0 0 0-18 1 1 0 0 0-.4 1.9 4.5 4.5 0 0 1 0 8.2 1 1 0 0 0 .4 1.9Z"/>
+      </svg>
+    </button>
+  </div>
+</header>
