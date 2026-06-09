@@ -15,6 +15,8 @@ class AppStrings {
     required this.menuCheckUpdates,
     required this.menuSettings,
     required this.menuQuit,
+    required this.menuGitHub,
+    required this.menuAbout,
     required this.trayDisable,
     required this.trayEnable,
     // Estados
@@ -155,6 +157,8 @@ class AppStrings {
   final String menuCheckUpdates;
   final String menuSettings;
   final String menuQuit;
+  final String menuGitHub;
+  final String menuAbout;
   final String trayDisable;
   final String trayEnable;
 
@@ -340,6 +344,8 @@ const AppStrings ptStrings = AppStrings(
   menuCheckUpdates: 'Verificar atualizações',
   menuSettings: 'Configurações',
   menuQuit: 'Sair',
+  menuGitHub: 'GitHub',
+  menuAbout: 'Sobre',
   trayDisable: 'Desabilitar widget',
   trayEnable: 'Habilitar widget',
   alertTitle: 'Tire uma pausa de 20 segundos',
@@ -531,6 +537,8 @@ const AppStrings enStrings = AppStrings(
   menuCheckUpdates: 'Check for updates',
   menuSettings: 'Settings',
   menuQuit: 'Quit',
+  menuGitHub: 'GitHub',
+  menuAbout: 'About',
   trayDisable: 'Disable widget',
   trayEnable: 'Enable widget',
   alertTitle: 'Take a 20-second break',
