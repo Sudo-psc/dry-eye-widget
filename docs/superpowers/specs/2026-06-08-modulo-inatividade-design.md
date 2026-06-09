@@ -107,9 +107,11 @@ Estatística **online leve**, sem dependências externas.
 
 - **Buckets horários:** 4 faixas (00–06, 06–12, 12–18, 18–24). Padrões de pausa
   diferem entre madrugada e horário de trabalho.
-- **Estimador:** algoritmo **P² (P-square)** para o **percentil-alvo P85** das
-  durações de "presença parada" observadas, por bucket. Atualização O(1) por
-  evento, sem armazenar a amostra.
+- **Estimador:** **histograma compacto de contagens** (bins de 30 s até 600 s +
+  overflow) para o **percentil-alvo P85** das durações de "presença parada"
+  observadas, por bucket. Atualização O(1) por evento, sem armazenar a amostra.
+  (Decisão de implementação: substitui o P² originalmente cogitado por ser
+  **determinístico e testável**, com as mesmas garantias de agregação/privacidade.)
 - **Suavização:** EWMA leve sobre o P85 estimado para estabilidade entre sessões.
 - **Limiar efetivo:** `clamp(P85_bucket, 60 s … 600 s)`.
 - **Cold start:** 120 s enquanto o bucket tiver menos de N observações (ex.: N=5).
