@@ -79,6 +79,20 @@ A aplicação foi concebida e desenvolvida pelo **Dr. Philipe Saraiva Cruz**, m�
 
 ---
 
+## 📸 Telas do Aplicativo
+
+<p align="center">
+  <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Alerta Silencioso e Lembrete de Pausa">
+  <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Questionário Clínico OSDI">
+  <br>
+  <img src="landing/public/assets/app-settings.jpg" width="400" alt="Configurações e Customização">
+  <img src="landing/public/assets/app-guidance.jpg" width="400" alt="Orientações e Evidências Científicas">
+  <br>
+  <img src="landing/public/assets/app-menu.jpg" width="400" alt="Menu de Controle do Widget">
+</p>
+
+---
+
 ## ✨ Dinâmica Operacional
 
 - 🔵 **Interface Persistente:** O *widget* opera em modo *overlay* com fundo transparente, garantindo visibilidade contínua de status sem bloquear eventos subjacentes do sistema operacional.
