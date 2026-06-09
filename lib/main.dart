@@ -600,9 +600,70 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _menuOpen = false;
       _settingsOpen = true;
-      _osdiOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
+  }
+
+  void _openAbout() {
+    setState(() => _menuOpen = false);
+    _applyLayout(_WindowLayout.ball);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Row(
+          children: [
+            const Icon(Icons.info_outline, color: AppColors.textPrimary),
+            const SizedBox(width: 8),
+            Text(
+              context.read<SettingsProvider>().strings.menuAbout,
+              style: const TextStyle(color: AppColors.textPrimary),
+            ),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dry Eye Widget',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Versão: ${AppInfo.version}',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Autor: Philipe Saraiva Cruz',
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
+            Text(
+              'CRM-MG 69.870 | CRM-SP 204.923',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            Text(
+              'Instagram: @drphilipesaraiva',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              context.read<SettingsProvider>().strings.close,
+              style: const TextStyle(color: AppColors.idleBall),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _closeSettings() {
@@ -814,6 +875,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onGuidance: _openGuidance,
                 onOsdi: _openOsdi,
                 onCheckUpdates: _openCheckUpdates,
+                onGitHub: _openGithub,
+                onAbout: _openAbout,
                 onSettings: _openSettings,
                 onQuit: _quit,
                 onDismiss: _closeMenu,
