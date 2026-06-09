@@ -12,6 +12,9 @@ void main() {
         alertColor: 0xFFE91E63,
         idleOpacity: 0.7,
         blinkMs: 800,
+        dynamicOrbEffect: true,
+        hoverReactiveBall: false,
+        orbIntensity: 0.42,
         dimBackground: false,
         dimOpacity: 0.45,
         defaultCorner: BallCorner.bottomLeft,
@@ -34,6 +37,9 @@ void main() {
       expect(restored.alertColor, 0xFFE91E63);
       expect(restored.idleOpacity, 0.7);
       expect(restored.blinkMs, 800);
+      expect(restored.dynamicOrbEffect, isTrue);
+      expect(restored.hoverReactiveBall, isFalse);
+      expect(restored.orbIntensity, 0.42);
       expect(restored.dimBackground, isFalse);
       expect(restored.dimOpacity, 0.45);
       expect(restored.defaultCorner, BallCorner.bottomLeft);
@@ -60,6 +66,8 @@ void main() {
       expect(s.cycleMinutes, 15);
       expect(s.ballSize, WidgetSettings.defaults().ballSize);
       expect(s.idleColor, WidgetSettings.defaults().idleColor);
+      expect(s.dynamicOrbEffect, WidgetSettings.defaults().dynamicOrbEffect);
+      expect(s.hoverReactiveBall, WidgetSettings.defaults().hoverReactiveBall);
     });
 
     test(
@@ -88,6 +96,7 @@ void main() {
         'ballSize': 500,
         'idleOpacity': -1.0,
         'blinkMs': 50,
+        'orbIntensity': 9.0,
         'dimOpacity': 2.0,
         'overlayOpacity': -0.2,
         'overlayBlur': 200,
@@ -100,6 +109,7 @@ void main() {
       expect(restored.ballSize, 80);
       expect(restored.idleOpacity, 0.3);
       expect(restored.blinkMs, 200);
+      expect(restored.orbIntensity, 1.0);
       expect(restored.dimOpacity, 0.6);
       expect(restored.overlayOpacity, 0.05);
       expect(restored.overlayBlur, 40);
