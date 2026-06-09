@@ -4,6 +4,24 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.6.2] - 2026-06-08
+
+### Alterado
+- **Atualização de dependências**: `window_manager` ^0.5.1, `screen_retriever`
+  ^0.2.0, `audioplayers` ^6.7.1, `google_fonts` ^8.1.0, `flutter_lints` ^6.0.0;
+  SDK `>=3.12.0`, Flutter `>=3.44.0`.
+- `SettingsProvider.update` normaliza as configurações antes de persistir.
+
+### Corrigido
+- **TimerProvider**: cancela os timers de alerta/conclusão e checa `_disposed`
+  para não notificar após o `dispose` (evita vazamentos/erros ao fechar); o
+  estado de som e notificações passa a acompanhar as configurações em tempo
+  real.
+
+### Qualidade
+- Testes novos/ampliados (`timer_provider_test`, `widget_settings_test`).
+- CI `windows-build` passa a rodar `flutter analyze` e `flutter test`.
+
 ## [1.6.1] - 2026-06-08
 
 ### Corrigido
