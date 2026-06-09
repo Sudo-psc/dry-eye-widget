@@ -78,7 +78,7 @@ class GuidanceDialog extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Dr. Philipe Saraiva Cruz — Oftalmologista · RQE 71.903',
+            'Dr. Philipe Saraiva Cruz — Oftalmologista · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903',
             style: TextStyle(
               color: AppColors.idleBall,
               fontSize: 12,

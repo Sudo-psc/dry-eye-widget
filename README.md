@@ -151,4 +151,4 @@ Arquitetura e Dependências: O projeto não apresenta avisos sob `flutter analyz
 
 ## 👨‍⚕️ Autoria Científica
 
-Concebido e documentado clinicamente pelo **Dr. Philipe Saraiva Cruz** — Médico Oftalmologista · CRM-MG 82.521 · RQE 71.903
+Concebido e documentado clinicamente pelo **Dr. Philipe Saraiva Cruz** — Médico Oftalmologista · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903
