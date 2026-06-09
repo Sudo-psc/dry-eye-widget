@@ -18,9 +18,11 @@ import 'services/audio_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
 import 'services/presence/adaptive_threshold_model.dart';
+import 'services/presence/camera_presence_sensor.dart';
 import 'services/presence/presence_controller.dart';
 import 'services/presence/secure_presence_store.dart';
 import 'services/secure_storage_service.dart';
+import 'services/vision_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
@@ -68,6 +70,10 @@ Future<void> main() async {
       const ChannelSecureStore(),
       storageKey: StorageKeys.presenceModel,
     ),
+    // Câmera opcional: só consultada quando habilitada nas configurações
+    // (disponível apenas no macOS por ora).
+    cameraSensor: CameraPresenceSensor(const VisionService().hasFace),
+    cameraEnabled: () => Platform.isMacOS && settings.value.cameraPresence,
   );
   await presence.hydrate();
 
