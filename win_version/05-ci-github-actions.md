@@ -55,7 +55,9 @@ O workflow compila e anexa `DryEyeWidget-Setup-x64.exe` e
 
 - **Fixe a versão do Flutter** no workflow para builds reprodutíveis (o template
   usa `subosito/flutter-action` com `flutter-version`).
-- Assinatura de código no CI exige guardar o `.pfx` como **secret** e usar
-  `signtool` — fora do escopo padrão; adicione só se houver certificado.
+- Assinatura de código no CI já tem **scaffolding pronto** no workflow (passos
+  `Assinar executável` e `Assinar instalador`), ativados automaticamente quando
+  os secrets `WINDOWS_CERT_BASE64` e `WINDOWS_CERT_PASSWORD` existirem. Sem eles,
+  os passos são pulados. Ver **[`CODE_SIGNING.md`](CODE_SIGNING.md)**.
 - O cache de pub (`~/.pub-cache`) acelera execuções; o template já habilita o
   cache do `flutter-action`.
