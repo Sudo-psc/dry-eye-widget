@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
@@ -21,12 +23,12 @@ class SettingsDialog extends StatefulWidget {
   });
 
   final WidgetSettings initial;
-  final ValueChanged<WidgetSettings> onSave;
+  final FutureOr<void> Function(WidgetSettings settings) onSave;
   final VoidCallback onClose;
   final VoidCallback onReset;
 
   /// Apaga o aprendizado adaptativo de inatividade.
-  final VoidCallback onResetLearning;
+  final FutureOr<void> Function() onResetLearning;
 
   @override
   State<SettingsDialog> createState() => _SettingsDialogState();
@@ -34,6 +36,8 @@ class SettingsDialog extends StatefulWidget {
 
 class _SettingsDialogState extends State<SettingsDialog> {
   late WidgetSettings _draft;
+  bool _saving = false;
+  bool _resettingLearning = false;
 
   @override
   void initState() {
@@ -42,6 +46,27 @@ class _SettingsDialogState extends State<SettingsDialog> {
   }
 
   void _set(WidgetSettings next) => setState(() => _draft = next);
+
+  Future<void> _save() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await Future<void>.sync(() => widget.onSave(_draft));
+      if (mounted) widget.onClose();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _resetLearning() async {
+    if (_resettingLearning) return;
+    setState(() => _resettingLearning = true);
+    try {
+      await Future<void>.sync(widget.onResetLearning);
+    } finally {
+      if (mounted) setState(() => _resettingLearning = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,311 +80,319 @@ class _SettingsDialogState extends State<SettingsDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
                   s.settingsTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textPrimary),
-                  onPressed: widget.onClose,
-                ),
-              ],
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionTitle(s.secLanguage),
-                    Row(
-                      children: [
-                        _langButton(
-                          label: 'Português',
-                          flag: const FlagIcon.brazil(),
-                          selected: _draft.languageCode == 'pt',
-                          onTap: () =>
-                              _set(_draft.copyWith(languageCode: 'pt')),
-                        ),
-                        const SizedBox(width: 10),
-                        _langButton(
-                          label: 'English',
-                          flag: const FlagIcon.usa(),
-                          selected: _draft.languageCode == 'en',
-                          onTap: () =>
-                              _set(_draft.copyWith(languageCode: 'en')),
-                        ),
-                      ],
-                    ),
-
-                    _sectionTitle(s.secTiming),
-                    _slider(
-                      label: s.workCycle,
-                      value: _draft.cycleMinutes.toDouble(),
-                      min: 1,
-                      max: 60,
-                      suffix: '${_draft.cycleMinutes} ${s.unitMin}',
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(cycleMinutes: v.round())),
-                    ),
-                    _slider(
-                      label: s.breakDuration,
-                      value: _draft.phaseSeconds.toDouble(),
-                      min: 5,
-                      max: 120,
-                      suffix: '${_draft.phaseSeconds} ${s.unitSec}',
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(phaseSeconds: v.round())),
-                    ),
-
-                    _sectionTitle(s.secAppearance),
-                    _slider(
-                      label: s.ballSize,
-                      value: _draft.ballSize,
-                      min: AppDefaults.minBallSize,
-                      max: AppDefaults.maxBallSize,
-                      suffix: '${_draft.ballSize.round()} px',
-                      onChanged: (v) => _set(_draft.copyWith(ballSize: v)),
-                    ),
-                    _colorRow(
-                      label: s.colorNormal,
-                      selected: _draft.idleColor,
-                      onPick: (c) => _set(_draft.copyWith(idleColor: c)),
-                    ),
-                    _colorRow(
-                      label: s.colorAlert,
-                      selected: _draft.alertColor,
-                      onPick: (c) => _set(_draft.copyWith(alertColor: c)),
-                    ),
-                    _slider(
-                      label: s.opacityNormal,
-                      value: _draft.idleOpacity,
-                      min: 0.3,
-                      max: 1.0,
-                      suffix: '${(_draft.idleOpacity * 100).round()}%',
-                      onChanged: (v) => _set(_draft.copyWith(idleOpacity: v)),
-                    ),
-                    _slider(
-                      label: s.blinkSpeed,
-                      value: _draft.blinkMs.toDouble(),
-                      min: 200,
-                      max: 1500,
-                      suffix: '${_draft.blinkMs} ms',
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(blinkMs: v.round())),
-                    ),
-                    _switchRow(
-                      label: s.progressRing,
-                      value: _draft.showProgressRing,
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(showProgressRing: v)),
-                    ),
-
-                    _sectionTitle(s.secDuringBreak),
-                    _switchRow(
-                      label: s.gentleMode,
-                      value: _draft.gentleMode,
-                      onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
-                    ),
-                    _hint(s.gentleHint),
-                    const SizedBox(height: 8),
-                    _switchRow(
-                      label: s.dimBackground,
-                      value: _draft.dimBackground,
-                      onChanged: (v) => _set(_draft.copyWith(dimBackground: v)),
-                    ),
-                    if (_draft.dimBackground)
-                      _slider(
-                        label: s.dimIntensity,
-                        value: _draft.dimOpacity,
-                        min: 0.0,
-                        max: 0.6,
-                        suffix: '${(_draft.dimOpacity * 100).round()}%',
-                        onChanged: (v) => _set(_draft.copyWith(dimOpacity: v)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: AppColors.textPrimary),
+                onPressed: widget.onClose,
+              ),
+            ],
+          ),
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle(s.secLanguage),
+                  Row(
+                    children: [
+                      _langButton(
+                        label: 'Português',
+                        flag: const FlagIcon.brazil(),
+                        selected: _draft.languageCode == 'pt',
+                        onTap: () => _set(_draft.copyWith(languageCode: 'pt')),
                       ),
-                    _slider(
-                      label: s.overlayOpacity,
-                      value: _draft.overlayOpacity,
-                      min: 0.05,
-                      max: 0.4,
-                      suffix: '${(_draft.overlayOpacity * 100).round()}%',
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(overlayOpacity: v)),
-                    ),
-                    _slider(
-                      label: s.overlayBlur,
-                      value: _draft.overlayBlur,
-                      min: 0,
-                      max: 40,
-                      suffix: '${_draft.overlayBlur.round()} px',
-                      onChanged: (v) => _set(_draft.copyWith(overlayBlur: v)),
-                    ),
-
-                    _sectionTitle(s.secEyeDrops),
-                    _switchRow(
-                      label: s.eyeDropsEnable,
-                      value: _draft.eyeDropsEnabled,
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(eyeDropsEnabled: v)),
-                    ),
-                    if (_draft.eyeDropsEnabled) ...[
-                      const SizedBox(height: 6),
-                      _hint(s.eyeDropsInterval),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          _choiceButton(
-                            label: s.eyeDropsEvery4h,
-                            selected: _draft.eyeDropsIntervalHours == 4,
-                            onTap: () => _set(
-                                _draft.copyWith(eyeDropsIntervalHours: 4)),
-                          ),
-                          const SizedBox(width: 10),
-                          _choiceButton(
-                            label: s.eyeDropsEvery6h,
-                            selected: _draft.eyeDropsIntervalHours == 6,
-                            onTap: () => _set(
-                                _draft.copyWith(eyeDropsIntervalHours: 6)),
-                          ),
-                        ],
+                      const SizedBox(width: 10),
+                      _langButton(
+                        label: 'English',
+                        flag: const FlagIcon.usa(),
+                        selected: _draft.languageCode == 'en',
+                        onTap: () => _set(_draft.copyWith(languageCode: 'en')),
                       ),
                     ],
+                  ),
 
-                    _sectionTitle(s.secInactivity),
-                    _switchRow(
-                      label: s.pauseOnInactivityLabel,
-                      value: _draft.pauseOnInactivity,
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(pauseOnInactivity: v)),
+                  _sectionTitle(s.secTiming),
+                  _slider(
+                    label: s.workCycle,
+                    value: _draft.cycleMinutes.toDouble(),
+                    min: 1,
+                    max: 60,
+                    suffix: '${_draft.cycleMinutes} ${s.unitMin}',
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(cycleMinutes: v.round())),
+                  ),
+                  _slider(
+                    label: s.breakDuration,
+                    value: _draft.phaseSeconds.toDouble(),
+                    min: 5,
+                    max: 120,
+                    suffix: '${_draft.phaseSeconds} ${s.unitSec}',
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(phaseSeconds: v.round())),
+                  ),
+
+                  _sectionTitle(s.secAppearance),
+                  _slider(
+                    label: s.ballSize,
+                    value: _draft.ballSize,
+                    min: AppDefaults.minBallSize,
+                    max: AppDefaults.maxBallSize,
+                    suffix: '${_draft.ballSize.round()} px',
+                    onChanged: (v) => _set(_draft.copyWith(ballSize: v)),
+                  ),
+                  _colorRow(
+                    label: s.colorNormal,
+                    selected: _draft.idleColor,
+                    onPick: (c) => _set(_draft.copyWith(idleColor: c)),
+                  ),
+                  _colorRow(
+                    label: s.colorAlert,
+                    selected: _draft.alertColor,
+                    onPick: (c) => _set(_draft.copyWith(alertColor: c)),
+                  ),
+                  _slider(
+                    label: s.opacityNormal,
+                    value: _draft.idleOpacity,
+                    min: 0.3,
+                    max: 1.0,
+                    suffix: '${(_draft.idleOpacity * 100).round()}%',
+                    onChanged: (v) => _set(_draft.copyWith(idleOpacity: v)),
+                  ),
+                  _slider(
+                    label: s.blinkSpeed,
+                    value: _draft.blinkMs.toDouble(),
+                    min: 200,
+                    max: 1500,
+                    suffix: '${_draft.blinkMs} ms',
+                    onChanged: (v) => _set(_draft.copyWith(blinkMs: v.round())),
+                  ),
+                  _switchRow(
+                    label: s.progressRing,
+                    value: _draft.showProgressRing,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(showProgressRing: v)),
+                  ),
+
+                  _sectionTitle(s.secDuringBreak),
+                  _switchRow(
+                    label: s.gentleMode,
+                    value: _draft.gentleMode,
+                    onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
+                  ),
+                  _hint(s.gentleHint),
+                  const SizedBox(height: 8),
+                  _switchRow(
+                    label: s.dimBackground,
+                    value: _draft.dimBackground,
+                    onChanged: (v) => _set(_draft.copyWith(dimBackground: v)),
+                  ),
+                  if (_draft.dimBackground)
+                    _slider(
+                      label: s.dimIntensity,
+                      value: _draft.dimOpacity,
+                      min: 0.0,
+                      max: 0.6,
+                      suffix: '${(_draft.dimOpacity * 100).round()}%',
+                      onChanged: (v) => _set(_draft.copyWith(dimOpacity: v)),
                     ),
-                    if (_draft.pauseOnInactivity)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
-                          onPressed: widget.onResetLearning,
-                          icon: const Icon(Icons.restart_alt, size: 18),
-                          label: Text(s.resetLearningLabel),
+                  _slider(
+                    label: s.overlayOpacity,
+                    value: _draft.overlayOpacity,
+                    min: 0.05,
+                    max: 0.4,
+                    suffix: '${(_draft.overlayOpacity * 100).round()}%',
+                    onChanged: (v) => _set(_draft.copyWith(overlayOpacity: v)),
+                  ),
+                  _slider(
+                    label: s.overlayBlur,
+                    value: _draft.overlayBlur,
+                    min: 0,
+                    max: 40,
+                    suffix: '${_draft.overlayBlur.round()} px',
+                    onChanged: (v) => _set(_draft.copyWith(overlayBlur: v)),
+                  ),
+
+                  _sectionTitle(s.secEyeDrops),
+                  _switchRow(
+                    label: s.eyeDropsEnable,
+                    value: _draft.eyeDropsEnabled,
+                    onChanged: (v) => _set(_draft.copyWith(eyeDropsEnabled: v)),
+                  ),
+                  if (_draft.eyeDropsEnabled) ...[
+                    const SizedBox(height: 6),
+                    _hint(s.eyeDropsInterval),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _choiceButton(
+                          label: s.eyeDropsEvery4h,
+                          selected: _draft.eyeDropsIntervalHours == 4,
+                          onTap: () =>
+                              _set(_draft.copyWith(eyeDropsIntervalHours: 4)),
                         ),
-                      ),
-
-                    _sectionTitle(s.secGeneral),
-                    _switchRow(
-                      label: s.enableSound,
-                      value: _draft.soundEnabled,
-                      onChanged: (v) => _set(_draft.copyWith(soundEnabled: v)),
-                    ),
-                    _switchRow(
-                      label: s.enableNotifications,
-                      value: _draft.notificationsEnabled,
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(notificationsEnabled: v)),
-                    ),
-                    _switchRow(
-                      label: s.launchAtLogin,
-                      value: _draft.launchAtLogin,
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(launchAtLogin: v)),
-                    ),
-                    _switchRow(
-                      label: s.hideDock,
-                      value: _draft.hideDockIcon,
-                      onChanged: (v) => _set(_draft.copyWith(hideDockIcon: v)),
-                    ),
-
-                    _sectionTitle(s.secVisibility),
-                    _switchRow(
-                      label: s.disableMenuBar,
-                      value: _draft.hideMenuBarItem,
-                      onChanged: (v) => _set(_draft.copyWith(
-                        hideMenuBarItem: v,
-                        hideFloatingWidget:
-                            v ? false : _draft.hideFloatingWidget,
-                      )),
-                    ),
-                    _switchRow(
-                      label: s.disableFloating,
-                      value: _draft.hideFloatingWidget,
-                      onChanged: (v) => _set(_draft.copyWith(
-                        hideFloatingWidget: v,
-                        hideMenuBarItem: v ? false : _draft.hideMenuBarItem,
-                      )),
-                    ),
-                    _hint(s.exclusivityHint),
-                    const SizedBox(height: 8),
-                    Text(
-                      s.defaultPosition,
-                      style: const TextStyle(
-                          color: AppColors.textSecondary, fontSize: 13),
-                    ),
-                    const SizedBox(height: 4),
-                    DropdownButton<BallCorner>(
-                      value: _draft.defaultCorner,
-                      isExpanded: true,
-                      dropdownColor: const Color(0xFF2A2A2A),
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      underline:
-                          Container(height: 1, color: AppColors.glassBorder),
-                      items: [
-                        for (final corner in BallCorner.values)
-                          DropdownMenuItem(
-                            value: corner,
-                            child: Text(s.cornerLabel(corner)),
-                          ),
+                        const SizedBox(width: 10),
+                        _choiceButton(
+                          label: s.eyeDropsEvery6h,
+                          selected: _draft.eyeDropsIntervalHours == 6,
+                          onTap: () =>
+                              _set(_draft.copyWith(eyeDropsIntervalHours: 6)),
+                        ),
                       ],
-                      onChanged: (v) => _set(_draft.copyWith(
-                          defaultCorner: v ?? _draft.defaultCorner)),
                     ),
                   ],
-                ),
+
+                  _sectionTitle(s.secInactivity),
+                  _switchRow(
+                    label: s.pauseOnInactivityLabel,
+                    value: _draft.pauseOnInactivity,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(pauseOnInactivity: v)),
+                  ),
+                  if (_draft.pauseOnInactivity)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: _resettingLearning ? null : _resetLearning,
+                        icon: const Icon(Icons.restart_alt, size: 18),
+                        label: Text(s.resetLearningLabel),
+                      ),
+                    ),
+
+                  _sectionTitle(s.secGeneral),
+                  _switchRow(
+                    label: s.enableSound,
+                    value: _draft.soundEnabled,
+                    onChanged: (v) => _set(_draft.copyWith(soundEnabled: v)),
+                  ),
+                  _switchRow(
+                    label: s.enableNotifications,
+                    value: _draft.notificationsEnabled,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(notificationsEnabled: v)),
+                  ),
+                  _switchRow(
+                    label: s.launchAtLogin,
+                    value: _draft.launchAtLogin,
+                    onChanged: (v) => _set(_draft.copyWith(launchAtLogin: v)),
+                  ),
+                  _switchRow(
+                    label: s.hideDock,
+                    value: _draft.hideDockIcon,
+                    onChanged: (v) => _set(_draft.copyWith(hideDockIcon: v)),
+                  ),
+
+                  _sectionTitle(s.secVisibility),
+                  _switchRow(
+                    label: s.disableMenuBar,
+                    value: _draft.hideMenuBarItem,
+                    onChanged: (v) => _set(
+                      _draft.copyWith(
+                        hideMenuBarItem: v,
+                        hideFloatingWidget: v
+                            ? false
+                            : _draft.hideFloatingWidget,
+                      ),
+                    ),
+                  ),
+                  _switchRow(
+                    label: s.disableFloating,
+                    value: _draft.hideFloatingWidget,
+                    onChanged: (v) => _set(
+                      _draft.copyWith(
+                        hideFloatingWidget: v,
+                        hideMenuBarItem: v ? false : _draft.hideMenuBarItem,
+                      ),
+                    ),
+                  ),
+                  _hint(s.exclusivityHint),
+                  const SizedBox(height: 8),
+                  Text(
+                    s.defaultPosition,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  DropdownButton<BallCorner>(
+                    value: _draft.defaultCorner,
+                    isExpanded: true,
+                    dropdownColor: const Color(0xFF2A2A2A),
+                    style: const TextStyle(color: AppColors.textPrimary),
+                    underline: Container(
+                      height: 1,
+                      color: AppColors.glassBorder,
+                    ),
+                    items: [
+                      for (final corner in BallCorner.values)
+                        DropdownMenuItem(
+                          value: corner,
+                          child: Text(s.cornerLabel(corner)),
+                        ),
+                    ],
+                    onChanged: (v) => _set(
+                      _draft.copyWith(defaultCorner: v ?? _draft.defaultCorner),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const Divider(color: AppColors.glassBorder),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: widget.onReset,
-                  child: Text(s.restoreDefaults),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    widget.onSave(_draft);
-                    widget.onClose();
-                  },
-                  child: Text(s.save),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+          const Divider(color: AppColors.glassBorder),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              TextButton(
+                onPressed: widget.onReset,
+                child: Text(s.restoreDefaults),
+              ),
+              FilledButton(
+                onPressed: _saving ? null : _save,
+                child: Text(s.save),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   // --- Componentes auxiliares --------------------------------------------
 
   Widget _sectionTitle(String text) => Padding(
-        padding: const EdgeInsets.only(top: 16, bottom: 4),
-        child: Text(
-          text.toUpperCase(),
-          style: const TextStyle(
-            color: AppColors.idleBall,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1,
-          ),
-        ),
-      );
+    padding: const EdgeInsets.only(top: 16, bottom: 4),
+    child: Text(
+      text.toUpperCase(),
+      style: const TextStyle(
+        color: AppColors.idleBall,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1,
+      ),
+    ),
+  );
 
   Widget _hint(String text) => Text(
-        text,
-        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-      );
+    text,
+    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+  );
 
   Widget _langButton({
     required String label,
@@ -386,12 +419,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
             children: [
               flag,
               const SizedBox(width: 10),
-              Text(
-                label,
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 14,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
                 ),
               ),
             ],
@@ -450,13 +487,21 @@ class _SettingsDialogState extends State<SettingsDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text(label,
-                  style: const TextStyle(
-                      color: AppColors.textPrimary, fontSize: 14)),
-            ),
-            Text(suffix,
+              child: Text(
+                label,
                 style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 13)),
+                  color: AppColors.textPrimary,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            Text(
+              suffix,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+              ),
+            ),
           ],
         ),
         Slider(
@@ -478,9 +523,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Text(label,
-              style: const TextStyle(
-                  color: AppColors.textPrimary, fontSize: 14)),
+          child: Text(
+            label,
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+          ),
         ),
         Switch(value: value, onChanged: onChanged),
       ],
@@ -497,9 +543,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: const TextStyle(
-                  color: AppColors.textPrimary, fontSize: 14)),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
