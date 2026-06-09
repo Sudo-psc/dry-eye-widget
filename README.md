@@ -79,6 +79,20 @@ A aplicação foi concebida e desenvolvida pelo **Dr. Philipe Saraiva Cruz**, m�
 
 ---
 
+## 📸 Telas do Aplicativo
+
+<p align="center">
+  <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Alerta Silencioso e Lembrete de Pausa">
+  <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Questionário Clínico OSDI">
+  <br>
+  <img src="landing/public/assets/app-settings.jpg" width="400" alt="Configurações e Customização">
+  <img src="landing/public/assets/app-guidance.jpg" width="400" alt="Orientações e Evidências Científicas">
+  <br>
+  <img src="landing/public/assets/app-menu.jpg" width="400" alt="Menu de Controle do Widget">
+</p>
+
+---
+
 ## ✨ Dinâmica Operacional
 
 - 🔵 **Interface Persistente:** O *widget* opera em modo *overlay* com fundo transparente, garantindo visibilidade contínua de status sem bloquear eventos subjacentes do sistema operacional.
@@ -151,6 +165,17 @@ coletado, vendido ou enviado para fora da máquina pelo aplicativo.
 ## 🆓 Licenciamento
 
 **Código de Distribuição Livre.** Arquitetura open-source governada sob a Licença **MIT** — garantindo prerrogativas irrestritas de uso, replicação, auditoria de código e derivação comercial ou não-comercial. O objetivo fundamental desta ferramenta é universalizar o cuidado ergonômico. 💙
+
+## 🔏 Assinatura de Código
+
+A assinatura de código do instalador Windows é provida pelo **SignPath
+Foundation** (programa gratuito para projetos open-source), reduzindo os alertas
+de "Editor desconhecido" do SmartScreen.
+
+> Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
+
+Papéis da equipe, processo de aprovação de releases e privacidade na
+[Política de Assinatura de Código](docs/legal/code-signing-policy.md).
 
 ## 👨‍⚕️ Autoria Científica
 

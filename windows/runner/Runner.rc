@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.saraivavision" "\0"
-            VALUE "FileDescription", "dry_eye_widget" "\0"
+            VALUE "CompanyName", "Saraiva Vision Care" "\0"
+            VALUE "FileDescription", "Dry Eye Widget" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "dry_eye_widget" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.saraivavision. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Saraiva Vision Care. All rights reserved." "\0"
             VALUE "OriginalFilename", "dry_eye_widget.exe" "\0"
-            VALUE "ProductName", "dry_eye_widget" "\0"
+            VALUE "ProductName", "Dry Eye Widget" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

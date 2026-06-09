@@ -4,6 +4,17 @@
 
 Implementar e documentar o modulo que detecta quando o usuario se afastou do teclado, mouse e tela, pausa automaticamente o timer do Dry Eye Widget e retoma o ciclo quando o usuario volta a interagir com o computador. Durante a pausa por inatividade, o app deve exibir um aviso pequeno, discreto e minimalista, com um botao para retomada manual.
 
+> **Atualizacao v1.7.x:** o limiar de pausa deixou de ser fixo (120 s) e passou
+> a ser **adaptativo** (aprendido por faixa horaria; 120 s vira apenas o cold
+> start, com clamp em `[60 s, 600 s]`), via `PresenceController` +
+> `AdaptiveThresholdModel`. Foram adicionados (a) **presenca opcional pela
+> camera** (snapshot pontual + Vision on-device no macOS; opt-in, off por
+> padrao; `VisionService` + `CameraPresenceSensor`) e (b) **persistencia cifrada**
+> do aprendizado (Keychain/DPAPI via `SecurePresenceStore`, sem historico nem
+> acesso remoto). Onde esta secao cita o limiar fixo `inactivitySeconds`, leia-se
+> "cold start adaptativo". O cartao de aviso, a histerese (`inactivityResumeSeconds`)
+> e a retomada manual permanecem validos.
+
 ## 2. Problema
 
 O timer da regra 20-20-20 deve medir tempo real de exposicao ativa a tela. Se o usuario se afasta do computador, continuar contando esse tempo gera alertas incorretos: o app pode pedir uma pausa quando a pessoa ja estava longe da tela. O modulo de inatividade deve impedir esse falso positivo, sem exigir configuracao complexa e sem bloquear a experiencia.

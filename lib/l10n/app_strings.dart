@@ -132,6 +132,13 @@ class AppStrings {
     required this.inactivityContinue,
     required this.secInactivity,
     required this.resetLearningLabel,
+    required this.cameraPresenceLabel,
+    required this.cameraPresenceHint,
+    required this.cameraUnavailableHint,
+    required this.cameraConsentTitle,
+    required this.cameraConsentBody,
+    required this.cameraConsentAllow,
+    required this.cameraConsentCancel,
   });
 
   final String languageCode;
@@ -262,6 +269,13 @@ class AppStrings {
   final String inactivityContinue;
   final String secInactivity;
   final String resetLearningLabel;
+  final String cameraPresenceLabel;
+  final String cameraPresenceHint;
+  final String cameraUnavailableHint;
+  final String cameraConsentTitle;
+  final String cameraConsentBody;
+  final String cameraConsentAllow;
+  final String cameraConsentCancel;
 
   // --- Helpers dependentes de enum --------------------------------------
 
@@ -324,7 +338,7 @@ const AppStrings ptStrings = AppStrings(
   trayEnable: 'Habilitar widget',
   alertTitle: 'Tire uma pausa de 20 segundos',
   alertSubtitle: 'Vou iniciar um cronômetro',
-  phaseTitle: 'Olhe para uma distância de 6 metros',
+  phaseTitle: 'Olhe a uma distância de 6 metros e pisque',
   phaseSubtitle:
       'Lembre-se de piscar ao olhar a uma distância de 6 m e mantenha o '
       'olhar até o cronômetro zerar',
@@ -481,6 +495,20 @@ const AppStrings ptStrings = AppStrings(
   inactivityContinue: 'Retomar',
   secInactivity: 'Inatividade',
   resetLearningLabel: 'Resetar aprendizado de inatividade',
+  cameraPresenceLabel: 'Confirmar presença pela câmera',
+  cameraPresenceHint:
+      'Quando ocioso, tira uma única foto para checar se há um rosto e a '
+      'descarta na hora. Nada é gravado nem enviado.',
+  cameraUnavailableHint: 'Disponível apenas no macOS por enquanto.',
+  cameraConsentTitle: 'Usar a câmera para confirmar presença?',
+  cameraConsentBody:
+      'Ao detectar inatividade, o app tira uma única foto, verifica se há um '
+      'rosto à frente da tela e descarta a imagem imediatamente. O '
+      'processamento é local; nada é gravado em disco nem enviado pela rede. '
+      'Você pode desligar a qualquer momento. O macOS pedirá a permissão de '
+      'câmera na primeira vez.',
+  cameraConsentAllow: 'Permitir',
+  cameraConsentCancel: 'Agora não',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -498,7 +526,7 @@ const AppStrings enStrings = AppStrings(
   trayEnable: 'Enable widget',
   alertTitle: 'Take a 20-second break',
   alertSubtitle: 'Starting a timer',
-  phaseTitle: 'Look at something 6 meters away',
+  phaseTitle: 'Look 6 meters away and blink',
   phaseSubtitle:
       'Remember to blink while looking ~6 m (20 ft) away, and hold your gaze '
       'until the timer reaches zero',
@@ -643,4 +671,18 @@ const AppStrings enStrings = AppStrings(
   inactivityContinue: 'Resume',
   secInactivity: 'Inactivity',
   resetLearningLabel: 'Reset inactivity learning',
+  cameraPresenceLabel: 'Confirm presence with camera',
+  cameraPresenceHint:
+      'When idle, takes a single photo to check for a face and discards it '
+      'immediately. Nothing is recorded or uploaded.',
+  cameraUnavailableHint: 'Available on macOS only for now.',
+  cameraConsentTitle: 'Use the camera to confirm presence?',
+  cameraConsentBody:
+      'When inactivity is detected, the app takes a single photo, checks '
+      'whether a face is in front of the screen, and discards the image '
+      'immediately. Processing is local; nothing is saved to disk or sent over '
+      'the network. You can turn it off anytime. macOS will ask for camera '
+      'permission the first time.',
+  cameraConsentAllow: 'Allow',
+  cameraConsentCancel: 'Not now',
 );

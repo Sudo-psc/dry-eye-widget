@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+import { author, blogArticles, content, references, urls, type Lang } from '../content/siteData';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = content[lang];
+const homeHref = `/app/${lang}/`;
+const blogHref = `/app/${lang}/blog/`;
+const articles = blogArticles[lang];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Dry Eye Widget',
+  operatingSystem: 'macOS, Windows',
+  applicationCategory: 'HealthApplication',
+  url: t.canonical,
+  downloadUrl: [urls.mac, urls.windows],
+  author: {
+    '@type': 'Person',
+    name: 'Dr. Philipe Saraiva Cruz',
+    jobTitle: lang === 'pt' ? 'Médico Oftalmologista' : 'Ophthalmologist'
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD'
+  }
+};
+---
+<BaseLayout
+  lang={lang}
+  htmlLang={t.htmlLang}
+  title={t.title}
+  description={t.description}
+  canonical={t.canonical}
+  alternate={t.alternate}
+>
+  <Header nav={t.nav} langLabel={t.langLabel} langHref={t.langHref} themeLabel={t.themeLabel} blogHref={blogHref} homeHref={homeHref} />
+  <main>
+    <section class="hero">
+      <img class="hero-bg" src="/assets/hero.jpg" alt="" width="1600" height="800" decoding="async" fetchpriority="high" />
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow">{t.hero.eyebrow}</p>
+        <h1>{t.hero.title}</h1>
+        <p class="hero-subtitle">{t.hero.subtitle}</p>
+        <p class="doctor-line">{t.hero.doctor}</p>
+        <div class="chip-row" aria-label="20-20-20">
+          {t.hero.chips.map((chip: string) => <span>{chip}</span>)}
+        </div>
+        <div class="hero-actions">
+          <a class="button primary" href="#downloads">{t.hero.primary}</a>
+          <a class="button secondary" href={urls.github}>{t.hero.secondary}</a>
+        </div>
+      </div>
+      <a class="hero-next" href="#science" aria-label={t.nav.science}>↓</a>
+    </section>
+
+    <section class="proof-strip" aria-label={lang === 'pt' ? 'Evidências' : 'Evidence'}>
+      {t.proof.map((item: { value: string; label: string }) => (
+        <article>
+          <strong>{item.value}</strong>
+          <span>{item.label}</span>
+        </article>
+      ))}
+    </section>
+
+    <section id="science" class="section split-section">
+      <div>
+        <p class="section-kicker">{lang === 'pt' ? 'README clínico' : 'Clinical README'}</p>
+        <h2>{t.sections.motivationTitle}</h2>
+        <p class="lead">{t.sections.motivationBody}</p>
+      </div>
+      <div class="glass-panel compact">
+        <h3>{t.sections.rationaleTitle}</h3>
+        <ul class="clean-list">
+          {t.sections.rationale.map((item: string) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section app-section">
+      <div class="section-heading">
+        <p class="section-kicker">{lang === 'pt' ? 'Experiência' : 'Experience'}</p>
+        <h2>{t.sections.appTitle}</h2>
+      </div>
+      <div class="feature-grid">
+        {t.sections.appItems.map((item: string, index: number) => (
+          <article class="feature-item">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <p>{item}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section id="downloads" class="section download-section">
+      <div class="section-heading">
+        <p class="section-kicker">Release</p>
+        <h2>{t.sections.downloadsTitle}</h2>
+        <p>{t.sections.downloadsSubtitle}</p>
+      </div>
+      <div class="download-grid">
+        <a class="download-card mac" href={urls.mac}>
+          <span class="platform">macOS</span>
+          <strong>{t.sections.mac}</strong>
+          <small>{t.sections.macMeta}</small>
+        </a>
+        <a class="download-card windows" href={urls.windows}>
+          <span class="platform">Windows</span>
+          <strong>{t.sections.windows}</strong>
+          <small>{t.sections.windowsMeta}</small>
+        </a>
+        <a class="download-card portable" href={urls.windowsZip}>
+          <span class="platform">ZIP</span>
+          <strong>{t.sections.portable}</strong>
+          <small>GitHub Releases</small>
+        </a>
+      </div>
+    </section>
+
+    <section id="screenshots" class="section carousel-section">
+      <div class="section-heading">
+        <p class="section-kicker">{lang === 'pt' ? 'Interface' : 'Interface'}</p>
+        <h2>{t.sections.screenshotsTitle}</h2>
+        <p>{t.sections.screenshotsSubtitle}</p>
+      </div>
+      <div class="carousel" data-carousel>
+        <div class="carousel-actions">
+          <button type="button" data-carousel-action="prev" aria-label="Previous">‹</button>
+          <button type="button" data-carousel-action="next" aria-label="Next">›</button>
+        </div>
+        <div class="carousel-track" data-carousel-track>
+          {t.screenshots.map((shot: { image: string; title: string; text: string }) => (
+            <figure class="screenshot">
+              <img src={shot.image} alt={shot.title} loading="lazy" width="960" height="600" />
+              <figcaption>
+                <strong>{shot.title}</strong>
+                <span>{shot.text}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section authority-section">
+      <div class="authority-copy">
+        <p class="section-kicker">{lang === 'pt' ? 'Autoria médica' : 'Medical authorship'}</p>
+        <h2>{t.sections.authorityTitle}</h2>
+        <p>{t.sections.authorityBody}</p>
+      </div>
+      <aside class="doctor-card">
+        <img class="doctor-photo" src="/assets/dr-philipe.jpg" alt={lang === 'pt' ? 'Foto do Dr. Philipe Saraiva Cruz' : 'Photo of Dr. Philipe Saraiva Cruz'} width="320" height="320" loading="lazy" />
+        <strong>{author[lang]}</strong>
+        <span>{author.credentials}</span>
+      </aside>
+    </section>
+
+    <section class="section blog-preview">
+      <div class="section-heading">
+        <p class="section-kicker">{t.nav.blog}</p>
+        <h2>{t.sections.blogTitle}</h2>
+        <p>{t.sections.blogSubtitle}</p>
+      </div>
+      <div class="article-grid">
+        {articles.map((article) => (
+          <a class="article-card" href={`${blogHref}${article.slug}/`}>
+            <span>{article.date} · {article.readTime}</span>
+            <strong>{article.title}</strong>
+            <p>{article.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section references-section">
+      <div class="section-heading">
+        <p class="section-kicker">{lang === 'pt' ? 'Evidência' : 'Evidence'}</p>
+        <h2>{t.sections.referencesTitle}</h2>
+        <p>{t.sections.referencesIntro}</p>
+      </div>
+      <ol class="references">
+        {references.map((reference) => (
+          <li>
+            <strong>{reference.title}</strong>
+            <span>{reference.journal}</span>
+            <a href={reference.url}>doi:{reference.doi}</a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <p>{t.sections.footer}</p>
+    <div>
+      <a href={urls.github}>GitHub</a>
+      <a href={urls.releases}>Releases</a>
+      <a href={blogHref}>{t.nav.blog}</a>
+    </div>
+  </footer>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+</BaseLayout>

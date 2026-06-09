@@ -18,9 +18,11 @@ import 'services/audio_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
 import 'services/presence/adaptive_threshold_model.dart';
+import 'services/presence/camera_presence_sensor.dart';
 import 'services/presence/presence_controller.dart';
 import 'services/presence/secure_presence_store.dart';
 import 'services/secure_storage_service.dart';
+import 'services/vision_service.dart';
 import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
@@ -68,6 +70,10 @@ Future<void> main() async {
       const ChannelSecureStore(),
       storageKey: StorageKeys.presenceModel,
     ),
+    // Câmera opcional: só consultada quando habilitada nas configurações
+    // (disponível apenas no macOS por ora).
+    cameraSensor: CameraPresenceSensor(const VisionService().hasFace),
+    cameraEnabled: () => Platform.isMacOS && settings.value.cameraPresence,
   );
   await presence.hydrate();
 
@@ -359,6 +365,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keyOsdi:
         _openOsdiFromTray();
         break;
+      case TrayService.keyGithub:
+        _openGithub();
+        break;
       case TrayService.keyQuit:
         _quit();
         break;
@@ -389,6 +398,21 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openOsdiFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openOsdi();
+  }
+
+  Future<void> _openGithub() async {
+    const url = 'https://github.com/Sudo-psc/dry-eye-widget';
+    try {
+      if (Platform.isMacOS) {
+        await Process.run('open', [url]);
+      } else if (Platform.isWindows) {
+        await Process.run('cmd', ['/c', 'start', '', url]);
+      } else {
+        await Process.run('xdg-open', [url]);
+      }
+    } catch (e) {
+      debugPrint('Não foi possível abrir o GitHub: $e');
+    }
   }
 
   /// Reage a mudanças de configuração: se o tamanho da bolinha mudou e
@@ -694,7 +718,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
         strings: strings,
         result: _updateResult,
         onClose: _closeUpdate,
-        onDownload: _updater.openReleasesPage,
+        onDownload: () {
+          _updater.openReleasesPage();
+          _closeUpdate();
+        },
       );
     } else if (_settingsOpen) {
       body = _buildSettings();

@@ -79,6 +79,20 @@ The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**
 
 ---
 
+## 📸 App Screenshots
+
+<p align="center">
+  <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Silent Alert and Break Reminder">
+  <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Clinical OSDI Questionnaire">
+  <br>
+  <img src="landing/public/assets/app-settings.jpg" width="400" alt="Settings and Customization">
+  <img src="landing/public/assets/app-guidance.jpg" width="400" alt="Guidelines and Scientific Evidence">
+  <br>
+  <img src="landing/public/assets/app-menu.jpg" width="400" alt="Widget Control Menu">
+</p>
+
+---
+
 ## ✨ Operational Dynamics
 
 - 🔵 **Persistent Interface:** The *widget* operates in an *overlay* mode with a transparent background, ensuring continuous status visibility without blocking underlying OS events.
@@ -148,6 +162,17 @@ Architecture and Dependencies: The project complies with `flutter analyze` witho
 ## 🆓 Licensing
 
 **Open Distribution Code.** Open-source architecture governed under the **MIT** License — guaranteeing unrestricted prerogatives for use, replication, code auditing, and commercial or non-commercial derivation. The fundamental goal of this tool is to universalize ergonomic care. 💙
+
+## 🔏 Code Signing
+
+Code signing for the Windows installer is provided by the **SignPath
+Foundation** (free program for open-source projects), reducing SmartScreen
+"unknown publisher" warnings.
+
+> Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
+
+Team roles, the release approval process and privacy are described in our
+[Code Signing Policy](docs/legal/code-signing-policy.en.md).
 
 ## 👨‍⚕️ Scientific Authorship
 
