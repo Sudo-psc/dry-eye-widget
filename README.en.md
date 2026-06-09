@@ -4,7 +4,7 @@
 
 <h1 align="center">Dry Eye Widget 👁️💧</h1>
 
-<p align="center"><em>Your eyes deserve a break too.</em></p>
+<p align="center"><em>Prevention of Digital Eye Strain through Ocular Micro-Breaks.</em></p>
 
 <p align="center"><a href="README.md">🇧🇷 Português</a> · <b>🇺🇸 English</b></p>
 
@@ -17,156 +17,111 @@
 </p>
 
 <p align="center">
-A little companion that lives in the corner of your screen and, every so often,
-invites you to breathe, look into the distance and take care of your vision — so
-you can work all day with more comfort and less eye strain.
+A prophylactic intervention tool that implements the 20-20-20 ophthalmological rule, aiming to mitigate Computer Vision Syndrome (CVS) and Dry Eye Disease (DED) associated with prolonged screen exposure.
 </p>
 
 ---
 
-## Why it matters
+## Pathophysiology and Rationale
 
-We spend hours upon hours in front of screens. And something curious happens: when
-we are deeply focused on a computer or phone, we **blink much less** — in some
-cases up to about two-thirds less than usual. Blinking spreads the tears that keep
-the eyes lubricated and protected. Blinking less, tears evaporate quickly and the
-familiar symptoms of digital work appear: **burning, tired eyes, redness, blurry
-vision at the end of the day and that gritty feeling**.
+The continuous and prolonged use of Video Display Terminals (VDTs) induces significant physiological alterations in the ocular surface and the eye's intrinsic musculature. During cognitively demanding tasks on screens, the **spontaneous blink rate is reduced by up to 60%**, while the blink amplitude frequently becomes incomplete. This dysfunction in blink dynamics leads to mechanical instability of the tear film, an increased evaporation rate, and hyperosmolarity, resulting in the desiccation of the ocular surface (Evaporative Dry Eye Disease). Concurrently, uninterrupted near-focusing leads to accommodative spasm of the ciliary muscle and convergence stress, clinically manifesting as asthenopia (visual fatigue) and transient blurred vision.
 
-This set of complaints has a name: **Computer Vision Syndrome** (or digital eye
-strain), and it goes hand in hand with **dry eye**. It is a real, increasingly
-common problem that goes beyond discomfort: dry, fatigued eyes **hurt focus and
-reduce the productivity** of people who live on screens. When your eyes aren't
-well, work suffers.
+The clinical presentation of these symptoms is collectively defined as **Computer Vision Syndrome (CVS)** or **Digital Eye Strain (DES)**. From an occupational standpoint, symptomatic DED and visual fatigue have a substantial impact on work performance, resulting in significant drops in productivity (presenteeism) that can reach approximately 30% [²], alongside a documented decline in prolonged reading speed and fluency of up to 14% [³ ⁴].
 
-### 📊 What studies show
+### 📊 Scientific Evidence
 
 | | |
 |---:|:---|
-| **~50%** | of screen workers have dry eye — in some studies, close to 60% [¹] |
-| **~30%** | drop in work performance (*presenteeism*) among those with symptomatic dry eye [²] |
-| **up to 14%** | slower prolonged reading because of dry eye [³ ⁴] |
+| **~50%** | Global prevalence of Dry Eye Disease (DED) among workers using video display terminals, according to meta-analyses [¹] |
+| **~30%** | Documented reduction in performance and productivity (*presenteeism*) in individuals with symptomatic dry eye [²] |
+| **up to 14%** | Impairment of prolonged reading fluency and speed induced by ocular surface alterations [³ ⁴] |
 
-<sub>Full sources in the [References](#-references) section. The numbers were
-checked against the literature: exact prevalence varies by diagnostic criteria
-(meta-analysis: 49.5%), and the productivity impact is measured as reduced
-performance, not as fixed minutes per day.</sub>
+The first-line prophylactic intervention, advocated by international ophthalmology and ergonomics societies, is the adherence to standardized regular visual breaks:
 
-The good news is that there is a simple habit, recommended by eye doctors
-worldwide, that helps a lot:
+## The 20-20-20 Rule ⏱️
 
-## The 20-20-20 rule ⏱️
+> **For every 20 minutes of screen use, the individual must shift their visual focus to an object situated at least 20 feet (approximately 6 meters) away, for a minimum duration of 20 seconds.**
 
-> **Every 20 minutes, look at something about 6 meters (20 feet) away for 20
-> seconds** — and take the chance to blink a few times, slowly and fully.
+**Mechanism of action:**
+1. **Accommodative Relaxation:** Shifting the gaze to optical infinity (≥ 6 meters) interrupts the sustained contraction of the ciliary muscle and the convergence of extraocular muscles, alleviating biomechanical stress and asthenopia.
+2. **Tear Film Restoration:** The 20-second pause actively encourages the reestablishment of the normal and complete blink rate, promoting the mechanical expression of the Meibomian glands and the subsequent lipid and aqueous redistribution over the cornea.
 
-Those 20 seconds relax the muscle that holds your near focus and give your tears a
-chance to refresh the eye surface. It seems like little, but repeated throughout
-the day it makes a real difference in visual comfort.
-
-The catch? **In the middle of work, we forget.** That is exactly where this app
-comes in: it remembers for you, without getting in the way.
+The primary clinical barrier to this intervention is poor behavioral adherence, largely driven by deep cognitive engagement (digital immersion). The *Dry Eye Widget* addresses this limitation directly, serving as a continuous *biofeedback* mechanism that automates and signals these therapeutic micro-breaks.
 
 ---
 
-## Made by a doctor, for people who work on screens 👨‍⚕️
+## 👨‍⚕️ Specialized Development
 
-This app was created by **Dr. Philipe Saraiva Cruz**, ophthalmologist, with a
-simple and sincere goal: **to help his patients — and all digital workers — cope
-better with dry eye and visual fatigue**. It was born out of clinical practice,
-out of the wish to bring care that usually stays inside the consulting room into
-the daily routine of people who spend their day in front of a screen.
-
-It is the 20-20-20 rule turned into a gentle nudge that appears on your screen at
-just the right time.
+The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**, Ophthalmologist, in response to the growing incidence of DES in daily clinical practice. The software aims to translate evidence-based preventive recommendations from the clinical setting into a seamless digital solution, perfectly aligned with the modern user's workflow.
 
 ---
 
-## 📥 Download & use
+## 📥 Deployment and Execution
 
 ### 🍎 macOS
 
-**➡️ [Download DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
+**➡️ [Download DMG package (DryEyeWidget.dmg)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — Universal binary (Apple Silicon + Intel)
 
-1. Open the `.dmg` and **drag** the app into your **Applications** folder.
-2. On first launch, **right-click → Open** (the app is free and not yet signed
-   with a paid Apple certificate, so macOS asks for this confirmation).
-3. Done! A blue ball appears in a corner of your screen and an eye icon in the
-   menu bar. Keep working — it takes care of the rest.
+1. Mount the `.dmg` file and **move** the application to the **Applications** directory (`/Applications`).
+2. On the initial execution, bypass the Gatekeeper quarantine restrictions by selecting the file and using the **Right-click → Open** function (the application is freely distributed and currently lacks a paid Apple digital certificate).
+3. Upon initialization, a non-intrusive *widget* will be rendered in a persistent window layer (always-on-top), operating autonomously.
 
 ### 🪟 Windows
 
-**➡️ [Download installer (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; or the **[portable version (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (64-bit)
+**➡️ [Download executable installer (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; or the **[portable compressed archive (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (64-bit Architecture)
 
-1. Run the installer. Since the app isn't code-signed yet, **Windows SmartScreen**
-   may show "Unknown publisher" — click **More info → Run anyway**.
-2. Open it from the **Start Menu** shortcut. A blue ball appears in a corner and
-   an eye icon in the **system tray**.
+1. Execute the installer. Should the **Windows SmartScreen** filter intercept execution due to the absence of a code signature, select **More info → Run anyway**.
+2. Initialize the application via the shortcut in the **Start Menu**. The *widget* will dock to the screen and register a background process in the **system tray**.
 
-> **Portable version:** extract the `.zip` and run `dry_eye_widget.exe` — keep the
-> `.exe` next to the DLLs and the `data\` folder (don't separate the files).
+> **Portable version notice:** Extract the `.zip` contents and execute via `dry_eye_widget.exe`. Ensure the structural integrity of the directory is preserved by keeping the `.dll` files and the `data\` subfolder in the same root directory as the executable.
 
-> All versions live in **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
+> All release binaries are archived in **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
 
 ---
 
-## ✨ How it works
+## ✨ Operational Dynamics
 
-- 🔵 **A discreet ball** stays always visible, in the corner you prefer. Drag it
-  anywhere.
-- ⏰ Every **20 minutes** (adjustable), it turns red, blinks gently and shows a
-  delicate reminder: **look into the distance and blink for 20 seconds**.
-- 🧘 A timer guides the break. When it ends, a "Well done!" and the ball goes back
-  to normal — cycle restarted.
-- 👁️ An **eye icon in the menu bar** shows the progress to the next break and lets
-  you control the app anytime.
-- 📖 An **Eye care guide** item explains, in a few words, the why behind it all.
+- 🔵 **Persistent Interface:** The *widget* operates in an *overlay* mode with a transparent background, ensuring continuous status visibility without blocking underlying OS events.
+- ⏰ **Alert Cycles:** Every **20 minutes** (customizable parameter), the visual signaling of the *widget* transitions to an alert state, actively prompting a visual micro-break and the performance of voluntary blinks.
+- 🧘 **Integrated Timer:** A countdown chronometer guides the physiological resting process for 20 seconds. Upon completion, the underlying cycles are automatically rearmed.
+- 👁️ **Tray Control:** An integrated node in the menu bar/system tray provides real-time monitoring of metabolic progress and global overlay control options (pause, reset, etc.).
 
-### You're in control ⚙️
+### Configurable Parameters ⚙️
 
-Everything is adjustable to fit your routine: time between breaks and their length,
-ball size and color, sound and notifications, a progress ring around the ball,
-launch at startup, hide from the Dock and more. Want full discretion? Hide the ball
-and use only the menu bar icon — or the other way around. Your call.
+The *widget* engine offers a flexible configuration architecture: modulation of the cycle timing, adjustment of the *overlay* radius, state color matrix (idle/alert), rendering settings (translucent *liquid glass* mode vs. darkened background), boot initialization coupling, and inactivity control, ensuring optimal adherence to varied workflows.
 
 ---
 
-## 💚 A note of care
+## 💚 Clinical Consideration
 
-This app is a **good-habits reminder**, not a treatment. It does not diagnose or
-cure anything. If you often feel eye discomfort, **see an ophthalmologist** — your
-eyes deserve a real evaluation.
+This application is strictly a **prophylactic support tool**, functioning to modulate occupational habits and does not constitute a medical device intended for diagnostic or curative purposes. In cases of chronic asthenopia, sustained hyperemia, or symptomatic tear film instability, it is imperative to **seek a specialized ophthalmological evaluation**.
 
 ---
 
-## 🛠️ For developers
+## 🛠️ Technical Specifications (Developers)
 
-A **Flutter** project (macOS and Windows). Quick to run:
+The infrastructure is built upon **Flutter** (*desktop-first*), natively supporting macOS and Windows.
 
 ```bash
 flutter pub get
-flutter run -d macos      # or: -d windows
+flutter run -d macos      # or -d windows
 ```
 
-Build and package:
+Build Pipeline:
 
 ```bash
-flutter build macos --release         # builds the universal app (arm64 + x86_64)
-./scripts/make_dmg.sh                  # packages into dist/DryEyeWidget.dmg
-flutter build windows --release        # .exe (on a Windows machine)
+flutter build macos --release         # Compiles universal binary (arm64 + x86_64)
+./scripts/make_dmg.sh                  # Packages the structural dist/DryEyeWidget.dmg
+flutter build windows --release        # Produces x64 standalone binary
 ```
 
-Quality: `flutter analyze` (no warnings) and `flutter test`. The architecture uses
-`provider` for state, `window_manager` + `flutter_acrylic` for the transparent
-floating window, `tray_manager` for the menu bar, plus `audioplayers`,
-`local_notifier`, `launch_at_startup` and `shared_preferences`.
+Architecture and Dependencies: The project complies with `flutter analyze` without warnings. It employs reactive dependency injection via `provider`. Advanced OS window control utilizes `window_manager` interfaced with `flutter_acrylic` (for transparent *liquid glass* effects). Tray communication is handled by `tray_manager`, audio events by `audioplayers`, notification bus by the `local_notifier` package, and inactivity observability via cross-platform native channels.
 
-> Windows needs **Visual Studio 2022** ("Desktop development with C++") and can
-> only be compiled on a Windows machine. macOS needs **Xcode**.
+> **Prerequisites:** Compiling for Windows requires **Visual Studio 2022** with the "Desktop development with C++" workload operating under a Windows OS. Compiling for macOS requires **Xcode** via an Apple host infrastructure.
 
 ---
 
-## 📚 References
+## 📚 Bibliographic References
 
 1. Courtin R, et al. **Prevalence of dry eye disease in visual display terminal
    workers: a systematic review and meta-analysis.** *BMJ Open.* 2016;6(1):e009675.
@@ -182,11 +137,18 @@ floating window, `tray_manager` for the menu bar, plus `audioplayers`,
    2018;95(12):1105-13.
    [doi:10.1097/OPX.0000000000001303](https://doi.org/10.1097/OPX.0000000000001303)
 
-## 🆓 License
+<sub>Reference metadata file in RIS format available at:
+[`docs/referencias.ris`](docs/referencias.ris).</sub>
 
-**Free to use.** Distributed under the **MIT** license — you may use, share, study
-and modify it freely. May it help as many eyes as possible. 💙
+## ⚖️ Legal
 
-## 👨‍⚕️ Author
+- [Terms of Use](docs/TERMS.md)
+- [Privacy Policy](docs/PRIVACY.md)
 
-Crafted with care by **Dr. Philipe Saraiva Cruz** — Ophthalmologist · RQE 71.903
+## 🆓 Licensing
+
+**Open Distribution Code.** Open-source architecture governed under the **MIT** License — guaranteeing unrestricted prerogatives for use, replication, code auditing, and commercial or non-commercial derivation. The fundamental goal of this tool is to universalize ergonomic care. 💙
+
+## 👨‍⚕️ Scientific Authorship
+
+Conceptualized and clinically documented by **Dr. Philipe Saraiva Cruz** — Ophthalmologist · Medical License RQE 71.903

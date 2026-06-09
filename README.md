@@ -4,7 +4,7 @@
 
 <h1 align="center">Dry Eye Widget 👁️💧</h1>
 
-<p align="center"><em>Seus olhos também merecem uma pausa.</em></p>
+<p align="center"><em>Prevenção da Fadiga Visual Digital através de Micro-Pausas Oculares.</em></p>
 
 <p align="center"><b>🇧🇷 Português</b> · <a href="README.en.md">🇺🇸 English</a></p>
 
@@ -17,160 +17,111 @@
 </p>
 
 <p align="center">
-Um pequeno companheiro que vive no canto da sua tela e, de tempos em tempos, te
-convida a respirar, olhar para longe e cuidar da sua visão — para que você
-trabalhe o dia inteiro com mais conforto e menos cansaço nos olhos.
+Uma ferramenta de intervenção profilática que implementa a regra oftalmológica 20-20-20, visando mitigar a Síndrome da Visão de Computador (CVS) e a Doença do Olho Seco (DED) associada ao uso prolongado de telas.
 </p>
 
 ---
 
-## Por que isso importa
+## Fisiopatologia e Justificativa
 
-Passamos horas e horas diante de telas. E acontece algo curioso: quando estamos
-muito concentrados no computador ou no celular, **piscamos bem menos** — em
-alguns casos, até cerca de dois terços menos do que o normal. Piscar é o que
-espalha a lágrima que mantém os olhos lubrificados e protegidos. Piscando pouco,
-a lágrima evapora rápido e surgem aqueles sintomas tão conhecidos de quem
-trabalha no digital: **ardência, olhos cansados, vermelhidão, visão embaçada no
-fim do dia e aquela sensação de areia nos olhos**.
+O uso contínuo e prolongado de Terminais de Vídeo (VDTs) induz alterações fisiológicas significativas na superfície ocular e na musculatura intrínseca do olho. Durante atividades cognitivamente exigentes em telas, a **taxa de pestanejo espontâneo é reduzida em até 60%**, enquanto a amplitude do piscar frequentemente se torna incompleta. Esta disfunção na dinâmica do pestanejo leva a uma instabilidade mecânica do filme lacrimal, aumento da taxa de evaporação e hiperosmolaridade, resultando no ressecamento da superfície ocular (Doença do Olho Seco evaporativa). Simultaneamente, a focalização ininterrupta a curtas distâncias resulta em espasmo acomodativo do músculo ciliar e estresse convergente, manifestando-se clinicamente como astenopia (fadiga visual) e visão turva transitória.
 
-Esse conjunto de incômodos tem nome: **Síndrome da Visão de Computador** (ou
-fadiga visual digital), e caminha lado a lado com o **olho seco**. Não é "frescura"
-nem cansaço passageiro — é um problema real, cada vez mais comum, que vai além do
-desconforto: olhos secos e fatigados **atrapalham a concentração e reduzem a
-produtividade** de quem vive de tela. Quando os olhos não estão bem, o trabalho
-rende menos.
+O conjunto dessas manifestações clínicas é definido como **Síndrome da Visão de Computador (CVS)** ou **Fadiga Visual Digital (DES)**. Do ponto de vista ocupacional, a DED sintomática e a fadiga visual têm um impacto substancial no desempenho laboral, resultando em quedas significativas de produtividade (presenteísmo) que podem atingir cerca de 30% [²], além de induzir um declínio na velocidade e na fluência de leitura prolongada em até 14% [³ ⁴].
 
-### 📊 O que dizem os estudos
+### 📊 Evidências Científicas
 
 | | |
 |---:|:---|
-| **~50%** | dos trabalhadores que usam telas apresentam olho seco — em alguns estudos, perto de 60% [¹] |
-| **~30%** | de queda no desempenho no trabalho (*presenteísmo*) em quem tem olho seco sintomático [²] |
-| **até 14%** | mais lenta fica a leitura prolongada por causa do olho seco [³ ⁴] |
+| **~50%** | Prevalência global de Doença do Olho Seco (DED) entre trabalhadores usuários de terminais de vídeo, segundo meta-análises [¹] |
+| **~30%** | Redução documentada no desempenho e produtividade (*presenteísmo*) em indivíduos com olho seco sintomático [²] |
+| **até 14%** | Comprometimento da fluência e velocidade de leitura prolongada induzido por alterações da superfície ocular [³ ⁴] |
 
-<sub>As fontes completas estão na seção [Referências](#-referências). Os números
-foram conferidos na literatura: a prevalência exata varia conforme o critério
-diagnóstico (meta-análise: 49,5%), e o impacto na produtividade é medido como
-redução de desempenho, não como minutos fixos por dia.</sub>
+A intervenção profilática de primeira linha, preconizada pelas sociedades internacionais de oftalmologia e ergonomia, é a adesão a intervalos visuais regulares e padronizados:
 
-A boa notícia é que existe um hábito simples, recomendado por oftalmologistas no
-mundo todo, que ajuda muito:
+## A Regra 20-20-20 ⏱️
 
-## A regra 20-20-20 ⏱️
+> **A cada 20 minutos de uso de tela, o indivíduo deve desviar o foco visual para um objeto situado a pelo menos 20 pés (aproximadamente 6 metros) de distância, durante um período mínimo de 20 segundos.**
 
-> **A cada 20 minutos, olhe para algo a cerca de 6 metros de distância (20 pés)
-> por 20 segundos** — e aproveite para piscar algumas vezes, devagar e completo.
+**Mecanismo de ação:**
+1. **Relaxamento Acomodativo:** O desvio do olhar para o infinito óptico (≥ 6 metros) interrompe a contração sustentada do músculo ciliar e a convergência dos músculos extraoculares, aliviando o estresse biomecânico e a astenopia.
+2. **Restauração do Filme Lacrimal:** A pausa de 20 segundos encoraja ativamente o restabelecimento da frequência normal e completa de pestanejo, promovendo a ação mecânica de expressão das glândulas de Meibomius e a consequente redistribuição lipídica e aquosa sobre a córnea.
 
-Esses 20 segundos relaxam o músculo que mantém o foco de perto e dão à lágrima a
-chance de renovar a superfície dos olhos. Parece pouco, mas, repetido ao longo do
-dia, faz diferença real no conforto visual.
-
-O problema? **No meio do trabalho, a gente esquece.** É exatamente aí que este
-app entra: ele lembra por você, sem atrapalhar.
+A principal barreira clínica a essa intervenção é a baixa adesão comportamental, motivada pelo engajamento cognitivo profundo (imersão digital). O *Dry Eye Widget* atua diretamente sobre essa limitação, servindo como um mecanismo de *biofeedback* contínuo que automatiza e sinaliza essas micro-pausas terapêuticas.
 
 ---
 
-## Feito por um médico, para quem trabalha no digital 👨‍⚕️
+## 👨‍⚕️ Desenvolvimento Especializado
 
-Este aplicativo foi criado pelo **Dr. Philipe Saraiva Cruz**, oftalmologista, com
-um objetivo simples e sincero: **ajudar seus pacientes — e todos os trabalhadores
-digitais — a conviverem melhor com o olho seco e a fadiga visual**. Ele nasceu da
-prática do consultório, da vontade de levar um cuidado que normalmente fica
-restrito à consulta para dentro da rotina de quem passa o dia diante de uma tela.
-
-É a regra 20-20-20 transformada em um gesto gentil que aparece na sua tela na hora
-certa.
+A aplicação foi concebida e desenvolvida pelo **Dr. Philipe Saraiva Cruz**, médico oftalmologista, em resposta à crescente incidência de DES na prática clínica diária. O software tem como objetivo transpor as recomendações preventivas baseadas em evidências do ambiente clínico para uma solução digital integrada e ininterrupta, perfeitamente alinhada ao fluxo de trabalho (*workflow*) do usuário moderno.
 
 ---
 
-## 📥 Baixe e use
+## 📥 Implantação e Execução
 
 ### 🍎 macOS
 
-**➡️ [Baixar DryEyeWidget.dmg](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — universal (Apple Silicon + Intel)
+**➡️ [Baixar pacote DMG (DryEyeWidget.dmg)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — Binário universal (Apple Silicon + Intel)
 
-1. Abra o `.dmg` e **arraste** o app para a pasta **Aplicativos**.
-2. Na primeira vez, clique com o **botão direito → Abrir** (o app é gratuito e
-   ainda não tem assinatura paga da Apple, então o macOS pede essa confirmação).
-3. Pronto! Uma bolinha azul aparece num canto da tela e um ícone de olho na barra
-   de menu. Pode continuar trabalhando — ele cuida do resto.
+1. Monte o arquivo `.dmg` e **mova** a aplicação para o diretório de **Aplicativos** (`/Applications`).
+2. Na primeira execução, contorne as restrições de quarentena do Gatekeeper selecionando o arquivo e utilizando a função **botão direito → Abrir** (a aplicação é distribuída livremente e não possui certificação digital paga da Apple).
+3. Após a inicialização, um *widget* não intrusivo será renderizado em uma camada de janela persistente (always-on-top), operando de forma autônoma.
 
 ### 🪟 Windows
 
-**➡️ [Baixar instalador (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; ou a **[versão portátil (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (64 bits)
+**➡️ [Baixar instalador executável (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; ou o **[arquivo compactado portátil (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (Arquitetura 64 bits)
 
-1. Rode o instalador. Como o app ainda não tem assinatura de código, o **Windows
-   SmartScreen** pode mostrar "Editor desconhecido" — clique em **Mais
-   informações → Executar assim mesmo**.
-2. Abra pelo atalho no **Menu Iniciar**. Uma bolinha azul aparece num canto e um
-   ícone de olho na **bandeja do sistema**.
+1. Execute o instalador. Caso o filtro **Windows SmartScreen** intercepte a execução devido à ausência de assinatura de código, selecione **Mais informações → Executar assim mesmo**.
+2. Inicialize o aplicativo via atalho no **Menu Iniciar**. O *widget* se acoplará à tela e registrará um processo em segundo plano na **bandeja do sistema** (*system tray*).
 
-> **Versão portátil:** extraia o `.zip` e rode `dry_eye_widget.exe` — mantenha o
-> `.exe` junto das DLLs e da pasta `data\` (não separe os arquivos).
+> **Aviso sobre a versão portátil:** extraia o conteúdo do `.zip` e inicie via `dry_eye_widget.exe`. Certifique-se de preservar a integridade estrutural do diretório, mantendo os arquivos `.dll` e a subpasta `data\` no mesmo diretório do executável raiz.
 
-> Todas as versões ficam em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
+> Todos os binários de *release* encontram-se arquivados em **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
 
 ---
 
-## ✨ Como funciona
+## ✨ Dinâmica Operacional
 
-- 🔵 **Uma bolinha discreta** fica sempre visível, no canto que você preferir.
-  Arraste para onde quiser.
-- ⏰ A cada **20 minutos** (ajustável), ela fica vermelha, pisca suavemente e abre
-  um lembrete delicado: **olhe para longe e pisque por 20 segundos**.
-- 🧘 Um cronômetro guia a pausa. Ao terminar, um "Parabéns!" e a bolinha volta ao
-  normal — ciclo reiniciado.
-- 👁️ Um **ícone de olho na barra de menu** mostra o progresso até a próxima pausa
-  e permite controlar o app a qualquer momento.
-- 📖 Um item **Orientações** traz, em poucas palavras, o porquê de tudo isso.
+- 🔵 **Interface Persistente:** O *widget* opera em modo *overlay* com fundo transparente, garantindo visibilidade contínua de status sem bloquear eventos subjacentes do sistema operacional.
+- ⏰ **Ciclos de Alerta:** A cada **20 minutos** (parâmetro customizável), a sinalização visual do *widget* transita para um estado de alerta e sugere ativamente a micro-pausa visual e a realização de piscadas voluntárias.
+- 🧘 **Temporizador Integrado:** Um cronômetro decrescente orienta o processo fisiológico de repouso por 20 segundos. Concluída a pausa, os ciclos subjacentes são automaticamente rearmados.
+- 👁️ **Controle via Bandeja:** Um nó integrado na barra de menus/bandeja do sistema provê monitoramento em tempo real do progresso metabólico e opções globais de sobreposição de controle (pausar, resetar, etc).
 
-### Você no controle ⚙️
+### Parâmetros Configuráveis ⚙️
 
-Tudo é ajustável para caber na sua rotina: tempo entre as pausas e duração delas,
-tamanho e cor da bolinha, som e notificações, um anel de progresso ao redor da
-bolinha, iniciar junto com o computador, ocultar do Dock e muito mais. Quer
-discrição total? Esconda a bolinha e use só o ícone da barra de menu — ou o
-contrário. Do seu jeito.
+O motor do *widget* oferece uma arquitetura flexível de configuração: modulação do ciclo de tempo, ajuste do raio do *overlay*, matriz de cores de estado (idle/alerta), configurações de renderização (modo *glass* translúcido vs fundo escurecido), inicialização acoplada ao boot do sistema operacional, e controle de inatividade, garantindo aderência ótima a fluxos de trabalho variados.
 
 ---
 
-## 💚 Uma nota de cuidado
+## 💚 Consideração Clínica
 
-Este app é um **lembrete de bons hábitos**, não um tratamento. Ele não diagnostica
-nem cura nada. Se você sente desconforto nos olhos com frequência, **procure um
-oftalmologista** — seus olhos merecem uma avaliação de verdade.
+Esta aplicação é rigorosamente uma **ferramenta de suporte profilático**, atuando na modulação de hábitos laborais e não consistindo em dispositivo médico com fins diagnósticos ou curativos. Em casos de astenopia crônica, hiperemia sustentada ou instabilidade sintomática do filme lacrimal, é imprescindível **buscar avaliação oftalmológica especializada**.
 
 ---
 
-## 🛠️ Para desenvolvedores
+## 🛠️ Especificações Técnicas (Desenvolvedores)
 
-Projeto **Flutter** (macOS e Windows). Rápido de rodar:
+A infraestrutura baseia-se em **Flutter** (*desktop-first*), suportando macOS e Windows nativamente.
 
 ```bash
 flutter pub get
-flutter run -d macos      # ou: -d windows
+flutter run -d macos      # ou -d windows
 ```
 
-Compilar e empacotar:
+Processo de compilação (*Build Pipeline*):
 
 ```bash
-flutter build macos --release         # gera o app universal (arm64 + x86_64)
-./scripts/make_dmg.sh                  # empacota em dist/DryEyeWidget.dmg
-flutter build windows --release        # .exe (em uma máquina Windows)
+flutter build macos --release         # Compila binário universal (arm64 + x86_64)
+./scripts/make_dmg.sh                  # Transcreve o pacote estrutural dist/DryEyeWidget.dmg
+flutter build windows --release        # Produz binário standalone x64
 ```
 
-Qualidade: `flutter analyze` (sem avisos) e `flutter test`. A arquitetura usa
-`provider` para estado, `window_manager` + `flutter_acrylic` para a janela
-flutuante transparente, `tray_manager` para a barra de menu, além de
-`audioplayers`, `local_notifier`, `launch_at_startup` e `shared_preferences`.
+Arquitetura e Dependências: O projeto não apresenta avisos sob `flutter analyze`. Utiliza injeção de dependência reativa via `provider`. O controle avançado da janela do sistema operacional utiliza `window_manager` interligado ao `flutter_acrylic` (para efeitos de transparência *liquid glass*). A comunicação da bandeja é feita por `tray_manager`, eventos sonoros por `audioplayers`, *bus* de notificação pelo pacote `local_notifier` e observabilidade de inatividade por interações via canais nativos multiplataforma.
 
-> Windows precisa de **Visual Studio 2022** ("Desktop development with C++") e só
-> pode ser compilado em uma máquina Windows. macOS precisa do **Xcode**.
+> **Pré-requisitos:** Compilar para Windows exige **Visual Studio 2022** com o pacote "Desktop development with C++" operando sob SO Windows. Compilar para macOS demanda **Xcode** via infraestrutura de host Apple.
 
 ---
 
-## 📚 Referências
+## 📚 Referências Bibliográficas
 
 1. Courtin R, et al. **Prevalence of dry eye disease in visual display terminal
    workers: a systematic review and meta-analysis.** *BMJ Open.* 2016;6(1):e009675.
@@ -186,14 +137,18 @@ flutuante transparente, `tray_manager` para a barra de menu, além de
    2018;95(12):1105-13.
    [doi:10.1097/OPX.0000000000001303](https://doi.org/10.1097/OPX.0000000000001303)
 
-<sub>Referências em formato RIS (importável no Zotero/Mendeley) em
+<sub>Arquivo de metadados de referência no formato RIS disponível em:
 [`docs/referencias.ris`](docs/referencias.ris).</sub>
 
-## 🆓 Licença
+## ⚖️ Aspectos Legais
 
-**Uso livre.** Distribuído sob a licença **MIT** — você pode usar, compartilhar,
-estudar e modificar livremente. Que ele ajude o máximo de olhos possível. 💙
+- [Termos de Uso](docs/TERMOS.md)
+- [Política de Privacidade](docs/PRIVACIDADE.md)
 
-## 👨‍⚕️ Autor
+## 🆓 Licenciamento
 
-Criado com cuidado por **Dr. Philipe Saraiva Cruz** — Oftalmologista · RQE 71.903
+**Código de Distribuição Livre.** Arquitetura open-source governada sob a Licença **MIT** — garantindo prerrogativas irrestritas de uso, replicação, auditoria de código e derivação comercial ou não-comercial. O objetivo fundamental desta ferramenta é universalizar o cuidado ergonômico. 💙
+
+## 👨‍⚕️ Autoria Científica
+
+Concebido e documentado clinicamente pelo **Dr. Philipe Saraiva Cruz** — Médico Oftalmologista · CRM-MG 82.521 · RQE 71.903
