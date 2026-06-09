@@ -7,18 +7,19 @@ import 'presence_store.dart';
 class PresenceController {
   PresenceController({
     required this.model,
-    required Future<double> Function() idleSource,
+    required this.idleSource,
     this.cameraSensor,
     this.store,
     this.saveEveryN = 5,
     bool Function()? cameraEnabled,
-  })  : _idleSource = idleSource,
-        cameraEnabled = cameraEnabled ?? (() => false);
+  }) : cameraEnabled = cameraEnabled ?? (() => false);
 
   final AdaptiveThresholdModel model;
   final PresenceSensor? cameraSensor;
   final bool Function() cameraEnabled;
-  final Future<double> Function() _idleSource;
+
+  /// Fonte de ociosidade global do SO (segundos).
+  final Future<double> Function() idleSource;
 
   /// Persistência opcional do estado agregado (cifrada). Quando ausente, o
   /// modelo vive só em memória (reaprende a cada sessão).
@@ -29,7 +30,7 @@ class PresenceController {
   int _obsSinceSave = 0;
 
   /// Ociosidade global do SO (segundos). Delega à fonte injetada.
-  Future<double> idleSeconds() => _idleSource();
+  Future<double> idleSeconds() => idleSource();
 
   int? _lastObservedGap;
   int? get lastObservedGap => _lastObservedGap;
