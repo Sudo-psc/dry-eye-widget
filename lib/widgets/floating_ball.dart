@@ -154,12 +154,19 @@ class _FloatingBallState extends State<FloatingBall>
               height: s,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                // Gradiente radial com luz no topo-esquerdo → esfera 3D.
                 gradient: RadialGradient(
-                  center: const Alignment(-0.35, -0.4),
-                  radius: 0.95,
-                  colors: [light, color, dark],
-                  stops: const [0.0, 0.5, 1.0],
+                  center: const Alignment(-0.3, -0.3),
+                  radius: 1.0,
+                  colors: [
+                    Color.lerp(color, Colors.white, 0.6)!,
+                    color,
+                    Color.lerp(color, Colors.black, 0.4)!,
+                  ],
+                  stops: const [0.0, 0.6, 1.0],
+                ),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  width: 1.0,
                 ),
                 boxShadow: [
                   // Sombra de profundidade (sempre, para "flutuar").
@@ -441,6 +448,13 @@ class _ProgressRingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
+
+    // Borda escura suave para visibilidade em fundos brancos (Sombra / Contorno)
+    final shadowTrack = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth + 1.5;
+    canvas.drawCircle(center, radius, shadowTrack);
 
     // Trilho de fundo sutil (círculo completo).
     final track = Paint()
