@@ -4,6 +4,26 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.7.0] - 2026-06-09
+
+### Adicionado
+- **Limiar de inatividade adaptativo**: o tempo até pausar deixa de ser fixo
+  (2 min) e passa a ser **aprendido continuamente** a partir dos padrões do
+  usuário, por faixa horária (estatística online leve, on-device).
+- **Presença pela câmera (opcional, opt-in, desligada por padrão)**: quando o
+  input fica ocioso no limiar, um snapshot pontual confirma presença via
+  detecção de rosto on-device (macOS/Vision), evitando pausas indevidas
+  enquanto o usuário está lendo a tela.
+- **Persistência cifrada do aprendizado**: o estado agregado do modelo é
+  guardado cifrado em repouso pelo SO (Keychain no macOS, DPAPI no Windows),
+  sem histórico de eventos nem acesso remoto; botão para **resetar o
+  aprendizado** nas Configurações.
+
+### Alterado
+- O motor de pausa por inatividade passou a ser o `PresenceController`
+  (sensores plugáveis + modelo adaptativo), preservando o cartão de aviso,
+  a histerese de retomada e a retomada manual já existentes.
+
 ## [1.6.4] - 2026-06-09
 
 ### Adicionado
