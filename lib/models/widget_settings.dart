@@ -23,6 +23,9 @@ class WidgetSettings {
     required this.alertColor,
     required this.idleOpacity,
     required this.blinkMs,
+    required this.dynamicOrbEffect,
+    required this.hoverReactiveBall,
+    required this.orbIntensity,
     required this.dimBackground,
     required this.dimOpacity,
     required this.launchAtLogin,
@@ -62,6 +65,16 @@ class WidgetSettings {
 
   /// Intervalo do piscar em milissegundos.
   final int blinkMs;
+
+  /// Renderiza um efeito dinâmico inspirado em assistentes visuais, usando
+  /// apenas tons de azul/ciano/verde/branco.
+  final bool dynamicOrbEffect;
+
+  /// Faz a bolinha reagir ao mouse com brilho, movimento e leve ampliação.
+  final bool hoverReactiveBall;
+
+  /// Intensidade visual do efeito dinâmico (0.0–1.0).
+  final double orbIntensity;
 
   // --- Comportamento da pausa --------------------------------------------
   /// Escurece o fundo da tela durante a pausa para ajudar no foco.
@@ -131,6 +144,9 @@ class WidgetSettings {
     alertColor: AppDefaults.alertColor,
     idleOpacity: AppDefaults.idleOpacity,
     blinkMs: AppDefaults.blinkMs,
+    dynamicOrbEffect: AppDefaults.dynamicOrbEffect,
+    hoverReactiveBall: AppDefaults.hoverReactiveBall,
+    orbIntensity: AppDefaults.orbIntensity,
     dimBackground: AppDefaults.dimBackground,
     dimOpacity: AppDefaults.dimOpacity,
     launchAtLogin: AppDefaults.launchAtLogin,
@@ -165,6 +181,9 @@ class WidgetSettings {
     int? alertColor,
     double? idleOpacity,
     int? blinkMs,
+    bool? dynamicOrbEffect,
+    bool? hoverReactiveBall,
+    double? orbIntensity,
     bool? dimBackground,
     double? dimOpacity,
     bool? launchAtLogin,
@@ -196,6 +215,9 @@ class WidgetSettings {
       alertColor: alertColor ?? this.alertColor,
       idleOpacity: idleOpacity ?? this.idleOpacity,
       blinkMs: blinkMs ?? this.blinkMs,
+      dynamicOrbEffect: dynamicOrbEffect ?? this.dynamicOrbEffect,
+      hoverReactiveBall: hoverReactiveBall ?? this.hoverReactiveBall,
+      orbIntensity: orbIntensity ?? this.orbIntensity,
       dimBackground: dimBackground ?? this.dimBackground,
       dimOpacity: dimOpacity ?? this.dimOpacity,
       launchAtLogin: launchAtLogin ?? this.launchAtLogin,
@@ -235,6 +257,9 @@ class WidgetSettings {
       alertColor: alertColor,
       idleOpacity: _clampDouble(idleOpacity, 0.3, 1.0, d.idleOpacity),
       blinkMs: _clampInt(blinkMs, 200, 1500),
+      dynamicOrbEffect: dynamicOrbEffect,
+      hoverReactiveBall: hoverReactiveBall,
+      orbIntensity: _clampDouble(orbIntensity, 0.0, 1.0, d.orbIntensity),
       dimBackground: dimBackground,
       dimOpacity: _clampDouble(dimOpacity, 0.0, 0.6, d.dimOpacity),
       launchAtLogin: launchAtLogin,
@@ -284,6 +309,9 @@ class WidgetSettings {
     'alertColor': alertColor,
     'idleOpacity': idleOpacity,
     'blinkMs': blinkMs,
+    'dynamicOrbEffect': dynamicOrbEffect,
+    'hoverReactiveBall': hoverReactiveBall,
+    'orbIntensity': orbIntensity,
     'dimBackground': dimBackground,
     'dimOpacity': dimOpacity,
     'launchAtLogin': launchAtLogin,
@@ -322,6 +350,10 @@ class WidgetSettings {
       alertColor: (map['alertColor'] as num?)?.toInt() ?? d.alertColor,
       idleOpacity: (map['idleOpacity'] as num?)?.toDouble() ?? d.idleOpacity,
       blinkMs: (map['blinkMs'] as num?)?.toInt() ?? d.blinkMs,
+      dynamicOrbEffect: map['dynamicOrbEffect'] as bool? ?? d.dynamicOrbEffect,
+      hoverReactiveBall:
+          map['hoverReactiveBall'] as bool? ?? d.hoverReactiveBall,
+      orbIntensity: (map['orbIntensity'] as num?)?.toDouble() ?? d.orbIntensity,
       dimBackground: map['dimBackground'] as bool? ?? d.dimBackground,
       dimOpacity: (map['dimOpacity'] as num?)?.toDouble() ?? d.dimOpacity,
       launchAtLogin: map['launchAtLogin'] as bool? ?? d.launchAtLogin,

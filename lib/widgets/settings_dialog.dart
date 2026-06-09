@@ -216,6 +216,27 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     onChanged: (v) =>
                         _set(_draft.copyWith(showProgressRing: v)),
                   ),
+                  _switchRow(
+                    label: s.dynamicOrbEffect,
+                    value: _draft.dynamicOrbEffect,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(dynamicOrbEffect: v)),
+                  ),
+                  if (_draft.dynamicOrbEffect)
+                    _slider(
+                      label: s.orbIntensity,
+                      value: _draft.orbIntensity,
+                      min: 0.0,
+                      max: 1.0,
+                      suffix: '${(_draft.orbIntensity * 100).round()}%',
+                      onChanged: (v) => _set(_draft.copyWith(orbIntensity: v)),
+                    ),
+                  _switchRow(
+                    label: s.hoverReactiveBall,
+                    value: _draft.hoverReactiveBall,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(hoverReactiveBall: v)),
+                  ),
 
                   _sectionTitle(s.secDuringBreak),
                   _switchRow(

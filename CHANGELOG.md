@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.8.5] - 2026-06-09
+
+### Adicionado
+- **Bolinha dinâmica em estilo assistente visual**: efeito luminoso com fitas
+  internas em tons frios (azul, ciano, verde e branco), sem rosa.
+- **Interação por hover**: ao passar o mouse, a bolinha amplia levemente e
+  intensifica brilho/movimento sem quebrar cliques ou menu.
+- **Controles nas Configurações** para ativar/desativar o efeito dinâmico,
+  ativar/desativar a reação ao mouse e ajustar a intensidade visual.
+
 ## [1.8.1] - 2026-06-09
 
 ### Corrigido

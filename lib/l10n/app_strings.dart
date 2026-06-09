@@ -45,6 +45,9 @@ class AppStrings {
     required this.opacityNormal,
     required this.blinkSpeed,
     required this.progressRing,
+    required this.dynamicOrbEffect,
+    required this.hoverReactiveBall,
+    required this.orbIntensity,
     required this.gentleMode,
     required this.gentleHint,
     required this.dimBackground,
@@ -182,6 +185,9 @@ class AppStrings {
   final String opacityNormal;
   final String blinkSpeed;
   final String progressRing;
+  final String dynamicOrbEffect;
+  final String hoverReactiveBall;
+  final String orbIntensity;
   final String gentleMode;
   final String gentleHint;
   final String dimBackground;
@@ -364,6 +370,9 @@ const AppStrings ptStrings = AppStrings(
   opacityNormal: 'Opacidade (normal)',
   blinkSpeed: 'Velocidade do piscar',
   progressRing: 'Anel de progresso',
+  dynamicOrbEffect: 'Efeito dinâmico na bolinha',
+  hoverReactiveBall: 'Reagir ao passar o mouse',
+  orbIntensity: 'Intensidade do efeito',
   gentleMode: 'Notificações suaves (não bloquear a tela)',
   gentleHint:
       'Mostra apenas um cartão pequeno no canto superior direito, em '
@@ -551,6 +560,9 @@ const AppStrings enStrings = AppStrings(
   opacityNormal: 'Opacity (normal)',
   blinkSpeed: 'Blink speed',
   progressRing: 'Progress ring',
+  dynamicOrbEffect: 'Dynamic ball effect',
+  hoverReactiveBall: 'React on mouse hover',
+  orbIntensity: 'Effect intensity',
   gentleMode: "Gentle notifications (don't block the screen)",
   gentleHint:
       'Shows just a small card in the top-right corner instead of the '
