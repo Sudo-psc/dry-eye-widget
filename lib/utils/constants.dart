@@ -50,7 +50,7 @@ class AppDefaults {
   static const bool soundEnabled = true;
   static const bool notificationsEnabled = true;
 
-  static const double ballSize = 40.0;
+  static const double ballSize = 24.0;
   static const int idleColor = 0xFF4A90E2;
   static const int alertColor = 0xFFFF4444;
   static const double idleOpacity = 1.0;

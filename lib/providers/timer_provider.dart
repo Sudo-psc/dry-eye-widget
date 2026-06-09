@@ -292,6 +292,44 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
+  // --- Inatividade --------------------------------------------------------
+
+  Future<void> _checkInactivity() async {
+    final s = _settings.value;
+    if (!s.pauseOnInactivity) return;
+    if (_state != AppState.idle) return;
+    if (_idleBusy) return;
+
+    _idlePoll++;
+    if (_idlePoll < 5) return;
+    _idlePoll = 0;
+
+    _idleBusy = true;
+    try {
+      final sec = await _idle.idleSeconds();
+      final threshold = AppDefaults.inactivitySeconds;
+
+      if (sec >= threshold) {
+        if (!_inactivityPaused) {
+          _inactivityPaused = true;
+          _paused = true;
+          _inactivityAlert = true;
+          notifyListeners();
+        }
+      } else {
+        if (_inactivityPaused) {
+          _inactivityPaused = false;
+          _inactivityAlert = false;
+          _paused = false;
+          notifyListeners();
+        }
+      }
+    } catch (_) {
+    } finally {
+      _idleBusy = false;
+    }
+  }
+
   @override
   void dispose() {
     _disposed = true;
