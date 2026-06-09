@@ -4,6 +4,8 @@ import 'package:dry_eye_widget/providers/timer_provider.dart';
 import 'package:dry_eye_widget/services/audio_service.dart';
 import 'package:dry_eye_widget/services/idle_service.dart';
 import 'package:dry_eye_widget/services/notification_service.dart';
+import 'package:dry_eye_widget/services/presence/adaptive_threshold_model.dart';
+import 'package:dry_eye_widget/services/presence/presence_controller.dart';
 import 'package:dry_eye_widget/services/storage_service.dart';
 import 'package:dry_eye_widget/utils/constants.dart';
 import 'package:fake_async/fake_async.dart';
@@ -31,7 +33,10 @@ void main() {
           storage: storage,
           audio: audio,
           notifications: notifications,
-          idle: _FakeIdleService(),
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: _FakeIdleService().idleSeconds,
+          ),
         );
         addTearDown(timer.dispose);
 
@@ -64,7 +69,10 @@ void main() {
             storage: storage,
             audio: _FakeAudioService(),
             notifications: _FakeNotificationService(),
-            idle: idle,
+            presence: PresenceController(
+              model: AdaptiveThresholdModel(),
+              idleSource: idle.idleSeconds,
+            ),
           );
           addTearDown(timer.dispose);
           timer.start();
@@ -107,7 +115,10 @@ void main() {
           storage: storage,
           audio: _FakeAudioService(),
           notifications: _FakeNotificationService(),
-          idle: idle,
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: idle.idleSeconds,
+          ),
         );
         addTearDown(timer.dispose);
         timer.start();
@@ -130,7 +141,10 @@ void main() {
           storage: storage,
           audio: _FakeAudioService(),
           notifications: _FakeNotificationService(),
-          idle: idle,
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: idle.idleSeconds,
+          ),
         );
         addTearDown(timer.dispose);
         timer.start();
@@ -166,7 +180,10 @@ void main() {
           storage: storage,
           audio: _FakeAudioService(),
           notifications: _FakeNotificationService(),
-          idle: idle,
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: idle.idleSeconds,
+          ),
         );
         addTearDown(timer.dispose);
         timer.start();

@@ -23,6 +23,7 @@ void main() {
         hideMenuBarItem: true,
         hideFloatingWidget: false,
         gentleMode: true,
+        cameraPresence: true,
       );
 
       final restored = WidgetSettings.fromJson(original.toJson());
@@ -44,6 +45,7 @@ void main() {
       expect(restored.hideMenuBarItem, isTrue);
       expect(restored.hideFloatingWidget, isFalse);
       expect(restored.gentleMode, isTrue);
+      expect(restored.cameraPresence, isTrue);
     });
 
     test('JSON inválido cai para os padrões', () {

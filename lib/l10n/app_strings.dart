@@ -107,6 +107,8 @@ class AppStrings {
     required this.inactivityTitle,
     required this.inactivityBody,
     required this.inactivityContinue,
+    required this.secInactivity,
+    required this.resetLearningLabel,
   });
 
   final String languageCode;
@@ -212,6 +214,8 @@ class AppStrings {
   final String inactivityTitle;
   final String inactivityBody;
   final String inactivityContinue;
+  final String secInactivity;
+  final String resetLearningLabel;
 
   // --- Helpers dependentes de enum --------------------------------------
 
@@ -371,11 +375,13 @@ const AppStrings ptStrings = AppStrings(
       'Tente novamente mais tarde.',
   updateChecking: 'Verificando atualizações…',
   close: 'Fechar',
-  pauseOnInactivityLabel: 'Pausar por inatividade (2 min)',
+  pauseOnInactivityLabel: 'Pausar por inatividade (adaptativo)',
   inactivityTitle: 'Timer pausado',
   inactivityBody:
       'Inatividade detectada. O ciclo será retomado quando você voltar.',
   inactivityContinue: 'Retomar',
+  secInactivity: 'Inatividade',
+  resetLearningLabel: 'Resetar aprendizado de inatividade',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -488,9 +494,11 @@ const AppStrings enStrings = AppStrings(
   updateError: "Couldn't check for updates right now. Please try again later.",
   updateChecking: 'Checking for updates…',
   close: 'Close',
-  pauseOnInactivityLabel: 'Pause when inactive (2 min)',
+  pauseOnInactivityLabel: 'Pause when inactive (adaptive)',
   inactivityTitle: 'Timer paused',
   inactivityBody:
       'Inactivity detected. The cycle will resume when you return.',
   inactivityContinue: 'Resume',
+  secInactivity: 'Inactivity',
+  resetLearningLabel: 'Reset inactivity learning',
 );
