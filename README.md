@@ -142,8 +142,11 @@ Arquitetura e Dependências: O projeto não apresenta avisos sob `flutter analyz
 
 ## ⚖️ Aspectos Legais
 
-- [Termos de Uso](docs/TERMOS.md)
-- [Política de Privacidade](docs/PRIVACIDADE.md)
+O Dry Eye Widget funciona localmente: nenhum dado de atividade do usuário é
+coletado, vendido ou enviado para fora da máquina pelo aplicativo.
+
+- [Termos de Uso](docs/legal/termos-de-uso.md)
+- [Política de Privacidade](docs/legal/politica-de-privacidade.md)
 
 ## 🆓 Licenciamento
 
