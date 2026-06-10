@@ -21,10 +21,10 @@ Uma ferramenta de intervenção profilática que implementa a regra oftalmológi
 </p>
 
 <p align="center">
-  <img src="docs/media/app-demo.gif" alt="Dry Eye Widget em ação: a bolinha conta o ciclo, dispara a pausa 20-20-20 com piscar guiado e retoma" width="760">
+  <img src="docs/media/landing-demo.gif" alt="Demonstração do Dry Eye Widget em vídeo: telas e fluxo do app" width="820">
 </p>
 
-<p align="center"><sub>🎬 Simulação do app — o ciclo de trabalho, o lembrete <b>20·20·20</b> com piscar guiado e a retomada · <a href="docs/media/app-demo.mp4">versão em vídeo (MP4)</a></sub></p>
+<p align="center"><sub>🎥 Demonstração em vídeo do app · <a href="docs/media/landing-demo.mp4">versão em vídeo (MP4, com áudio)</a></sub></p>
 
 ---
 
@@ -96,12 +96,6 @@ A aplicação foi concebida e desenvolvida pelo **Dr. Philipe Saraiva Cruz**, m�
 </p>
 
 <p align="center"><sub>🎞️ Telas reais em carrossel — o tema claro/escuro acompanha o seu GitHub · vídeo: <a href="docs/media/carousel-dark.mp4">escuro</a> · <a href="docs/media/carousel-light.mp4">claro</a></sub></p>
-
-<p align="center">
-  <img src="docs/media/landing-demo.gif" alt="Demonstração do Dry Eye Widget em vídeo: telas e fluxo do app" width="820">
-</p>
-
-<p align="center"><sub>🎥 Demonstração em vídeo do app · <a href="docs/media/landing-demo.mp4">versão em vídeo (MP4, com áudio)</a></sub></p>
 
 ---
 
