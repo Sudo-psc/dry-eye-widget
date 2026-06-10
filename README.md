@@ -156,6 +156,10 @@ Arquitetura e Dependências: O projeto não apresenta avisos sob `flutter analyz
 4. Karakus S, et al. **Impact of Dry Eye on Prolonged Reading.** *Optom Vis Sci.*
    2018;95(12):1105-13.
    [doi:10.1097/OPX.0000000000001303](https://doi.org/10.1097/OPX.0000000000001303)
+5. Talens-Estarelles C, et al. **The effects of breaks on digital eye strain, dry eye and binocular vision: Testing the 20-20-20 rule.** *Cont Lens Anterior Eye.* 2023;46(2):101744.
+   [doi:10.1016/j.clae.2022.101744](https://doi.org/10.1016/j.clae.2022.101744)
+6. Alabdulkader B. **Effect of digital device use during COVID-19 on digital eye strain.** *Clin Exp Optom.* 2021;104(6):698-704.
+   [doi:10.1080/08164622.2021.1878843](https://doi.org/10.1080/08164622.2021.1878843)
 
 <sub>Arquivo de metadados de referência no formato RIS disponível em:
 [`docs/referencias.ris`](docs/referencias.ris).</sub>
