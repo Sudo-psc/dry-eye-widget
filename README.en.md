@@ -89,9 +89,9 @@ The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/media/carousel-dark.webp">
-    <source media="(prefers-color-scheme: light)" srcset="docs/media/carousel-light.webp">
-    <img src="docs/media/carousel-dark.webp" alt="Carousel of real Dry Eye Widget screens" width="820">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/media/carousel-dark.gif">
+    <source media="(prefers-color-scheme: light)" srcset="docs/media/carousel-light.gif">
+    <img src="docs/media/carousel-dark.gif" alt="Carousel of real Dry Eye Widget screens" width="820">
   </picture>
 </p>
 
