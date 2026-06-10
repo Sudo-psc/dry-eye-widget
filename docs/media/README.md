@@ -4,6 +4,12 @@
   20-20-20 com piscar guiado → retomada), usada no topo do README.
 - `app-demo.html` — fonte da simulação: render determinístico via
   `window.renderAt(segundos)`.
+- `carousel-dark.webp` / `carousel-light.webp` — carrossel animado das **telas
+  reais** (WebP animado), nas variantes escura e clara; embutidos via `<picture>`
+  com `prefers-color-scheme` (acompanha o tema do GitHub do leitor).
+- `carousel-dark.mp4` / `carousel-light.mp4` — mesma animação em vídeo (links).
+- `carousel.html` — fonte do carrossel: `window.setTheme('dark'|'light')` +
+  `window.renderAt(segundos)` sobre as telas reais de `site/assets/shots/`.
 
 ## Regenerar
 

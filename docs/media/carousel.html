@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ width:960px; height:560px; overflow:hidden;
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  #stage{ position:relative; width:960px; height:560px; }
+  /* Temas */
+  body[data-theme="dark"] #stage{
+    background:radial-gradient(1100px 700px at 70% -10%, #1b2a4a 0%, #0e1730 48%, #070d1d 100%); }
+  body[data-theme="light"] #stage{
+    background:radial-gradient(1100px 700px at 70% -10%, #ffffff 0%, #eef3fb 48%, #dfe8f5 100%); }
+  body[data-theme="dark"]  { --tx:#e9eefc; --tx2:#a9bbe0; --acc:#7fb2ff; --sh:rgba(0,0,0,.55); --dotoff:rgba(255,255,255,.22); }
+  body[data-theme="light"] { --tx:#1b2740; --tx2:#56688c; --acc:#2f6fe0; --sh:rgba(30,55,110,.22); --dotoff:rgba(20,40,80,.18); }
+
+  .left{ position:absolute; left:56px; top:0; height:560px; width:330px;
+    display:flex; flex-direction:column; justify-content:center; }
+  .brand{ display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+  .brand img{ width:46px; height:46px; border-radius:12px; }
+  .brand b{ color:var(--tx); font-size:20px; letter-spacing:.2px; }
+  .kicker{ color:var(--acc); font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase; }
+  .cap{ color:var(--tx); font-size:30px; font-weight:800; line-height:1.18; margin:10px 0 10px; min-height:74px; }
+  .sub{ color:var(--tx2); font-size:15px; line-height:1.5; min-height:44px; }
+  .dots{ display:flex; gap:9px; margin-top:30px; }
+  .dots i{ width:9px; height:9px; border-radius:50%; background:var(--dotoff); transition:none; }
+
+  .right{ position:absolute; right:40px; top:0; width:560px; height:560px;
+    display:flex; align-items:center; justify-content:center; }
+  .shotwrap{ position:relative; width:520px; height:500px; }
+  .shot{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; }
+  .shot img{ max-width:100%; max-height:100%; object-fit:contain; border-radius:14px;
+    filter:drop-shadow(0 30px 55px var(--sh)); }
+</style>
+</head>
+<body data-theme="dark">
+<div id="stage">
+  <div class="left">
+    <div class="brand"><img src="shots/icon.png" alt=""><b>Dry Eye Widget</b></div>
+    <div class="kicker" id="kicker">Telas do app</div>
+    <div class="cap" id="cap">—</div>
+    <div class="sub" id="sub">—</div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="right">
+    <div class="shotwrap" id="shotwrap"></div>
+  </div>
+</div>
+
+<script>
+const SHOTS = [
+  { img:"shots/ball-menu.png", cap:"Bolinha flutuante + menu rápido", sub:"Sempre no topo, discreta — clique para iniciar a pausa, ajustar ou ver orientações." },
+  { img:"shots/break-card.png", cap:"Pausa 20·20·20, sem interromper", sub:"Aviso gentil no canto: olhe para longe, pisque e descanse — com retomada automática." },
+  { img:"shots/settings.png", cap:"Configurações sob medida", sub:"Tempos, som, notificações, aparência, idioma e inatividade adaptativa." },
+  { img:"shots/guidance.png", cap:"Orientações clínicas", sub:"Por que descansar os olhos, com base em evidência oftalmológica." },
+  { img:"shots/osdi.png", cap:"Questionário OSDI com histórico", sub:"Pontue sintomas de olho seco e acompanhe a evolução ao longo do tempo." },
+];
+const SEG = 2.4, CF = 0.55;          // s por tela / crossfade
+const N = SHOTS.length;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*clamp(t,0,1);
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+
+// Monta camadas de imagem e dots
+const wrap = document.getElementById('shotwrap');
+const layers = SHOTS.map(s=>{ const d=document.createElement('div'); d.className='shot';
+  const im=document.createElement('img'); im.src=s.img; d.appendChild(im); wrap.appendChild(d); return d; });
+const dotsEl = document.getElementById('dots');
+const dots = SHOTS.map(()=>{ const i=document.createElement('i'); dotsEl.appendChild(i); return i; });
+
+function renderAt(t){
+  const p = clamp(t/SEG, 0, N-1e-4);
+  const base = Math.floor(p);
+  const frac = p - base;                  // 0..1 dentro do segmento
+  const cfRatio = CF/SEG;
+  let aIn = 1, out = -1, aOut = 0;
+  if(frac < cfRatio && base > 0){ aIn = ease(frac/cfRatio); out = base-1; aOut = 1-aIn; }
+  layers.forEach((l,i)=>{
+    let op = 0, sc = 1;
+    if(i===base){ op = aIn; sc = 1 + 0.06*frac; }
+    else if(i===out){ op = aOut; sc = 1.06 + 0.02*frac; }
+    l.style.opacity = op.toFixed(3);
+    l.firstChild.style.transform = `scale(${sc.toFixed(4)})`;
+  });
+  // Texto: troca no meio do crossfade, com leve fade
+  const cur = SHOTS[base];
+  document.getElementById('cap').textContent = cur.cap;
+  document.getElementById('sub').textContent = cur.sub;
+  const textFade = (frac < cfRatio && base>0) ? ease(frac/cfRatio) : 1;
+  document.getElementById('cap').style.opacity = textFade;
+  document.getElementById('sub').style.opacity = textFade;
+  dots.forEach((d,i)=>{ d.style.background = (i===base) ? getComputedStyle(document.body).getPropertyValue('--acc') : getComputedStyle(document.body).getPropertyValue('--dotoff'); });
+}
+window.setTheme = th => { document.body.dataset.theme = th; };
+window.renderAt = renderAt;
+window.TOTAL = N*SEG;
+renderAt(0);
+</script>
+</body>
+</html>
