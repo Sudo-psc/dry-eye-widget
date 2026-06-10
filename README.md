@@ -98,14 +98,10 @@ A aplicação foi concebida e desenvolvida pelo **Dr. Philipe Saraiva Cruz**, m�
 <p align="center"><sub>🎞️ Telas reais em carrossel — o tema claro/escuro acompanha o seu GitHub · vídeo: <a href="docs/media/carousel-dark.mp4">escuro</a> · <a href="docs/media/carousel-light.mp4">claro</a></sub></p>
 
 <p align="center">
-  <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Alerta Silencioso e Lembrete de Pausa">
-  <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Questionário Clínico OSDI">
-  <br>
-  <img src="landing/public/assets/app-settings.jpg" width="400" alt="Configurações e Customização">
-  <img src="landing/public/assets/app-guidance.jpg" width="400" alt="Orientações e Evidências Científicas">
-  <br>
-  <img src="landing/public/assets/app-menu.jpg" width="400" alt="Menu de Controle do Widget">
+  <img src="docs/media/landing-demo.gif" alt="Demonstração do Dry Eye Widget em vídeo: telas e fluxo do app" width="820">
 </p>
+
+<p align="center"><sub>🎥 Demonstração em vídeo do app · <a href="docs/media/landing-demo.mp4">versão em vídeo (MP4, com áudio)</a></sub></p>
 
 ---
 
