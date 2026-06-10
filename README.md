@@ -20,6 +20,12 @@
 Uma ferramenta de intervenção profilática que implementa a regra oftalmológica 20-20-20, visando mitigar a Síndrome da Visão de Computador (CVS) e a Doença do Olho Seco (DED) associada ao uso prolongado de telas.
 </p>
 
+<p align="center">
+  <img src="docs/media/app-demo.gif" alt="Dry Eye Widget em ação: a bolinha conta o ciclo, dispara a pausa 20-20-20 com piscar guiado e retoma" width="760">
+</p>
+
+<p align="center"><sub>🎬 Simulação do app — o ciclo de trabalho, o lembrete <b>20·20·20</b> com piscar guiado e a retomada · <a href="docs/media/app-demo.mp4">versão em vídeo (MP4)</a></sub></p>
+
 ---
 
 ## Fisiopatologia e Justificativa
