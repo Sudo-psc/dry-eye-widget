@@ -20,6 +20,12 @@
 A prophylactic intervention tool that implements the 20-20-20 ophthalmological rule, aiming to mitigate Computer Vision Syndrome (CVS) and Dry Eye Disease (DED) associated with prolonged screen exposure.
 </p>
 
+<p align="center">
+  <img src="docs/media/app-demo.gif" alt="Dry Eye Widget in action: the ball tracks the cycle, triggers the 20-20-20 break with guided blinking and resumes" width="760">
+</p>
+
+<p align="center"><sub>🎬 App simulation — the work cycle, the <b>20·20·20</b> reminder with guided blinking, and the resume · <a href="docs/media/app-demo.mp4">video version (MP4)</a></sub></p>
+
 ---
 
 ## Pathophysiology and Rationale
