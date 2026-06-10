@@ -130,9 +130,6 @@ class _FloatingBallState extends State<FloatingBall>
         : widget.idleOpacity.clamp(0.1, 1.0);
     final ringVisible = widget.showProgress && !widget.isActive;
 
-    // Tons derivados da cor base para o relevo 3D.
-    final light = Color.lerp(color, Colors.white, 0.55)!;
-    final dark = Color.lerp(color, Colors.black, 0.32)!;
     final s = widget.size;
     final orbIntensity = widget.orbIntensity.clamp(0.0, 1.0);
     final hoverBoost = widget.hoverReactiveBall && _hovered ? 1.0 : 0.0;

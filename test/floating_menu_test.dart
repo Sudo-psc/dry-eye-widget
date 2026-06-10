@@ -22,6 +22,8 @@ void main() {
               onGuidance: () {},
               onOsdi: () => osdiOpened++,
               onCheckUpdates: () {},
+              onGitHub: () {},
+              onAbout: () {},
               onSettings: () {},
               onQuit: () {},
               onDismiss: () {},
