@@ -4,6 +4,24 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.8.10] - 2026-06-10
+
+### Corrigido
+- **Build**: corrige erros de compilação introduzidos na 1.8.9 — constante
+  `AppColors.surface` ausente (fundo do diálogo Sobre), teste do menu flutuante
+  sem os callbacks `onGitHub`/`onAbout` e variáveis não usadas na bolinha.
+
+## [1.8.9] - 2026-06-09
+
+### Adicionado
+- **Menu flutuante**: link para o repositório no GitHub e diálogo "Sobre".
+
+## [1.8.8] - 2026-06-09
+
+### Alterado
+- **Visual**: design minimalista 3D moderno e anel de progresso na borda da
+  bolinha.
+
 ## [1.8.7] - 2026-06-09
 
 ### Alterado

@@ -20,6 +20,9 @@ class AppColors {
 
   static const Color textPrimary = Colors.white;
   static const Color textSecondary = Color(0xCCFFFFFF);
+
+  /// Fundo escuro de diálogos (Sobre, configurações).
+  static const Color surface = Color(0xFF2A2A2A);
 }
 
 /// Paleta de cores sugeridas no seletor de cor das configurações.
@@ -158,7 +161,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.8.9';
+  static const String version = '1.8.10';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';
