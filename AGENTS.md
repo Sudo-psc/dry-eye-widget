@@ -18,3 +18,4 @@ Default posture:
 Current web landing lives in `landing/`.
 
 - **Commits:** Do NOT add `Co-authored-by: Claude` or any other AI co-authorship to commit messages.
+- **Communication:** Always respond to the user using plain text without markdown formatting (no bold, no italics, no lists, no code blocks, etc.).
