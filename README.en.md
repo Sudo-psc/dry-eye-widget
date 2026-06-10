@@ -88,6 +88,16 @@ The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**
 ## 📸 App Screenshots
 
 <p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/media/carousel-dark.webp">
+    <source media="(prefers-color-scheme: light)" srcset="docs/media/carousel-light.webp">
+    <img src="docs/media/carousel-dark.webp" alt="Carousel of real Dry Eye Widget screens" width="820">
+  </picture>
+</p>
+
+<p align="center"><sub>🎞️ Real screens carousel — light/dark follows your GitHub theme · video: <a href="docs/media/carousel-dark.mp4">dark</a> · <a href="docs/media/carousel-light.mp4">light</a></sub></p>
+
+<p align="center">
   <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Silent Alert and Break Reminder">
   <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Clinical OSDI Questionnaire">
   <br>

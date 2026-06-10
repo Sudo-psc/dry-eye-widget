@@ -88,6 +88,16 @@ A aplicação foi concebida e desenvolvida pelo **Dr. Philipe Saraiva Cruz**, m�
 ## 📸 Telas do Aplicativo
 
 <p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/media/carousel-dark.webp">
+    <source media="(prefers-color-scheme: light)" srcset="docs/media/carousel-light.webp">
+    <img src="docs/media/carousel-dark.webp" alt="Carrossel das telas reais do Dry Eye Widget" width="820">
+  </picture>
+</p>
+
+<p align="center"><sub>🎞️ Telas reais em carrossel — o tema claro/escuro acompanha o seu GitHub · vídeo: <a href="docs/media/carousel-dark.mp4">escuro</a> · <a href="docs/media/carousel-light.mp4">claro</a></sub></p>
+
+<p align="center">
   <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Alerta Silencioso e Lembrete de Pausa">
   <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Questionário Clínico OSDI">
   <br>
