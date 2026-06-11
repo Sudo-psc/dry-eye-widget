@@ -1,0 +1,44 @@
+DADOS PARA PREENCHIMENTO DO FORMULARIO e-Software (INPI)
+Registro Eletronico de Programa de Computador (e-RPC)
+========================================================
+
+1. IDENTIFICACAO DO PROGRAMA
+   Titulo do programa : dry_eye_widget (Widget flutuante de olho seco - regra 20-20-20)
+   Versao             : 1.8.10+26
+   Linguagem          : Dart / Flutter
+   Commit de origem   : 917955ea6da90aa9c941e5d9153f3fad9a324116
+   Data de geracao    : 2026-06-10
+
+2. ALGORITMO DE RESUMO DIGITAL HASH
+   Algoritmo          : SHA-512 (Secure Hash Algorithm, 512 bits)
+   (algoritmo publico recomendado pelo proprio Manual do e-Software do INPI)
+
+3. RESUMO DIGITAL HASH A INFORMAR NO FORMULARIO
+   Objeto resumido    : inpi/codigo-fonte-consolidado.txt
+                        (codigo-fonte Dart de lib/ + manifesto pubspec.yaml; 42 arquivos)
+
+   SHA-512:
+   4B14762E65567BE23D82EAC604F6042E67B197EFCB473DE2B455928D2EAC3233
+   6BDCF6159574D898A89FB01C1A226E4F2937644225136B5E72C45A8AB824447E
+
+   (valor unico, sem espacos:)
+   4B14762E65567BE23D82EAC604F6042E67B197EFCB473DE2B455928D2EAC32336BDCF6159574D898A89FB01C1A226E4F2937644225136B5E72C45A8AB824447E
+
+4. ARQUIVOS DESTA PASTA
+   gerar-hash-inpi.ps1            Script que reconstroi o documento e recalcula o hash.
+   codigo-fonte-consolidado.txt   Documento consolidado (este e o objeto resumido).
+   manifesto-hash.txt             Hash SHA-512 individual de cada um dos 42 arquivos.
+   DADOS-PARA-eSOFTWARE.txt       Este arquivo.
+
+5. COMO CONFERIR / REPRODUZIR O HASH (Windows / PowerShell)
+   Get-FileHash -Algorithm SHA512 inpi\codigo-fonte-consolidado.txt | Select Hash
+
+   Para reconstruir o documento e o hash a partir do codigo-fonte:
+   pwsh -File inpi\gerar-hash-inpi.ps1
+
+OBSERVACOES
+- O documento consolidado NAO contem data/hora interna; por isso o hash e
+  reproduzivel byte a byte por qualquer perito que parta do mesmo codigo-fonte.
+- O titular do direito e responsavel pela guarda do objeto resumido (codigo-fonte).
+  Recomenda-se arquivar inpi/codigo-fonte-consolidado.txt junto ao comprovante do
+  registro, pois o INPI guarda apenas o resumo hash, nao o codigo.
