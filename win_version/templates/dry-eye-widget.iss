@@ -7,7 +7,7 @@
 
 #define MyAppName "Dry Eye Widget"
 #ifndef MyAppVersion
-#define MyAppVersion "1.9.1"
+#define MyAppVersion "1.9.2"
 #endif
 #define MyAppPublisher "Saraiva Vision Care"
 #define MyAppURL "https://github.com/Sudo-psc/dry-eye-widget"
