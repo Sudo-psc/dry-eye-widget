@@ -5,7 +5,7 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = dry_eye_widget
+PRODUCT_NAME = Dry Eye Widget
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.saraivavision.dryEyeWidget

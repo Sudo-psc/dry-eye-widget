@@ -58,6 +58,13 @@ std::string ArgString(const flutter::EncodableMap* args, const char* key) {
   return "";
 }
 
+// Timer que reafirma HWND_TOPMOST: apps em tela cheia (borderless) retomam o
+// topo do z-order e escondem o widget; reposicionar periodicamente dentro da
+// banda topmost mantém a janela visível. Tela cheia exclusiva (DirectX
+// fullscreen real) não pode ser sobreposta por nenhuma janela.
+constexpr UINT_PTR kTopMostTimerId = 0xD0E0;
+constexpr UINT kTopMostIntervalMs = 2000;
+
 }  // namespace
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
@@ -174,10 +181,13 @@ bool FlutterWindow::OnCreate() {
   // window is shown. It is a no-op if the first frame hasn't completed yet.
   flutter_controller_->ForceRedraw();
 
+  SetTimer(GetHandle(), kTopMostTimerId, kTopMostIntervalMs, nullptr);
+
   return true;
 }
 
 void FlutterWindow::OnDestroy() {
+  KillTimer(GetHandle(), kTopMostTimerId);
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }
@@ -202,6 +212,16 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
   switch (message) {
     case WM_FONTCHANGE:
       flutter_controller_->engine()->ReloadSystemFonts();
+      break;
+    case WM_TIMER:
+      if (wparam == kTopMostTimerId) {
+        // SWP_NOACTIVATE evita roubar o foco do app em primeiro plano.
+        if (IsWindowVisible(hwnd)) {
+          SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                       SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        }
+        return 0;
+      }
       break;
   }
 

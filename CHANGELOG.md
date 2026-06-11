@@ -4,6 +4,22 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.9.1] - 2026-06-11
+
+### Adicionado
+- **Tela cheia**: o widget agora permanece visível sobre apps em tela cheia.
+  No macOS, a janela entra nos Spaces de tela cheia de outros apps
+  (`canJoinAllSpaces` + `fullScreenAuxiliary`, reafirmados a cada mudança de
+  layout). No Windows, o runner reafirma `HWND_TOPMOST` periodicamente sem
+  roubar o foco (`SWP_NOACTIVATE`), cobrindo apps borderless em tela cheia;
+  tela cheia exclusiva (DirectX) segue fora do alcance de qualquer janela.
+
+## [1.9.0] - 2026-06-11
+
+### Alterado
+- **Nome do app**: o aplicativo gerado passa a se chamar "Dry Eye Widget"
+  (antes `dry_eye_widget`) no bundle macOS e no título da janela.
+
 ## [1.8.10] - 2026-06-10
 
 ### Corrigido

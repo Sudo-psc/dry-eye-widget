@@ -103,6 +103,16 @@ Future<void> main() async {
     await windowManager.setAsFrameless();
     await windowManager.setBackgroundColor(Colors.transparent);
     await windowManager.setAlwaysOnTop(true);
+    // Mantém o widget visível mesmo sobre apps em tela cheia: no macOS a
+    // janela precisa de canJoinAllSpaces + fullScreenAuxiliary para entrar
+    // nos Spaces de tela cheia de outros apps (nível .floating sozinho não
+    // basta). No Windows o método não é suportado.
+    if (Platform.isMacOS) {
+      await windowManager.setVisibleOnAllWorkspaces(
+        true,
+        visibleOnFullScreen: true,
+      );
+    }
     await windowManager.setResizable(false);
     await windowManager.setSkipTaskbar(settings.value.hideDockIcon);
     // Transparência real do conteúdo: no macOS o `setEffect` sozinho deixa o
@@ -538,6 +548,14 @@ class _HomePageState extends State<HomePage> with TrayListener {
           break;
       }
       await windowManager.setAlwaysOnTop(true);
+      // Reafirma a presença em Spaces de tela cheia após mudanças de layout
+      // (redimensionar/reposicionar pode reordenar a janela).
+      if (Platform.isMacOS) {
+        await windowManager.setVisibleOnAllWorkspaces(
+          true,
+          visibleOnFullScreen: true,
+        );
+      }
     } catch (e) {
       debugPrint('Falha ao aplicar layout $layout: $e');
     }
