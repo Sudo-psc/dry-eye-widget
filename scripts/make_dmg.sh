@@ -9,7 +9,7 @@
 set -euo pipefail
 
 VERSION="${1:-1.1.0}"
-APP="build/macos/Build/Products/Release/dry_eye_widget.app"
+APP="build/macos/Build/Products/Release/Dry Eye Widget.app"
 # Nome fixo do asset: mantém o link de download estável entre versões.
 OUT="dist/DryEyeWidget.dmg"
 
