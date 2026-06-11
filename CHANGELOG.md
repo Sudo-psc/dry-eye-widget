@@ -4,6 +4,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.9.2] - 2026-06-11
+
+### Corrigido
+- **Menu flutuante**: o item "Sair" deixava de aparecer porque a janela do menu
+  tinha altura fixa (450 px) e o conteúdo (cabeçalho + 10 itens) era cortado pela
+  borda inferior. A janela passa a ser dimensionada dinamicamente em função do
+  tamanho da bolinha, garantindo que todos os itens fiquem visíveis no Windows e
+  no macOS.
+
 ## [1.9.1] - 2026-06-11
 
 ### Adicionado

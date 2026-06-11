@@ -39,13 +39,22 @@ import 'widgets/osdi_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/update_dialog.dart';
 
-/// Tamanhos das janelas de menu e configurações (a compacta é dinâmica).
-const Size _menuWindowSize = Size(300, 450);
+/// Tamanhos das janelas de configurações (a compacta e a do menu são dinâmicas).
 const Size _settingsWindowSize = Size(460, 700);
 const Size _osdiWindowSize = Size(580, 740);
 
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
+
+/// Altura do painel de menu (cabeçalho + 10 itens + paddings do vidro), com
+/// folga para variações de fonte entre plataformas.
+const double _menuPanelHeight = 460;
+
+/// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
+/// A altura acompanha a bolinha + o painel completo para que o último item
+/// ("Sair") nunca seja cortado pela borda da janela (Windows e macOS).
+Size _menuWindowSize(double ballSize) =>
+    Size(300, ballSize + 24 + _menuPanelHeight + 8);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -502,9 +511,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           break;
         case _WindowLayout.menu:
           await _cacheCurrentPosition();
-          await windowManager.setSize(_menuWindowSize);
+          final menuSize = _menuWindowSize(_settings.value.ballSize);
+          await windowManager.setSize(menuSize);
           await windowManager.setPosition(_ballPosition);
-          await _nudgeIntoScreen(_menuWindowSize);
+          await _nudgeIntoScreen(menuSize);
           break;
         case _WindowLayout.settings:
           await windowManager.setSize(_settingsWindowSize);

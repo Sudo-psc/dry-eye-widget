@@ -40,4 +40,43 @@ void main() {
 
     expect(osdiOpened, 1);
   });
+
+  testWidgets('painel do menu cabe na janela e mostra o item "Sair"', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: FloatingMenu(
+              strings: ptStrings,
+              isPaused: false,
+              onStartNow: () {},
+              onReset: () {},
+              onTogglePause: () {},
+              onGuidance: () {},
+              onOsdi: () {},
+              onCheckUpdates: () {},
+              onGitHub: () {},
+              onAbout: () {},
+              onSettings: () {},
+              onQuit: () {},
+              onDismiss: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // O último item precisa ser renderizado por inteiro.
+    expect(find.text(ptStrings.menuQuit), findsOneWidget);
+
+    // A altura intrínseca do painel (cabeçalho + 10 itens) deve caber na
+    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 460).
+    // Se um novo item estourar esse limite, o último item ("Sair") voltaria a
+    // ser cortado pela borda da janela — este teste é o guarda dessa regressão.
+    final height = tester.getSize(find.byType(FloatingMenu)).height;
+    expect(height, lessThanOrEqualTo(460));
+  });
 }
