@@ -98,13 +98,13 @@ The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**
 <p align="center"><sub>🎞️ Real screens carousel — light/dark follows your GitHub theme · video: <a href="docs/media/carousel-dark.mp4">dark</a> · <a href="docs/media/carousel-light.mp4">light</a></sub></p>
 
 <p align="center">
-  <img src="landing/public/assets/app-break-timer.jpg" width="400" alt="Silent Alert and Break Reminder">
-  <img src="landing/public/assets/app-osdi.jpg" width="400" alt="Clinical OSDI Questionnaire">
+  <img src="docs/media/app-break-timer.jpg" width="400" alt="Silent Alert and Break Reminder">
+  <img src="docs/media/app-osdi.jpg" width="400" alt="Clinical OSDI Questionnaire">
   <br>
-  <img src="landing/public/assets/app-settings.jpg" width="400" alt="Settings and Customization">
-  <img src="landing/public/assets/app-guidance.jpg" width="400" alt="Guidelines and Scientific Evidence">
+  <img src="docs/media/app-settings.jpg" width="400" alt="Settings and Customization">
+  <img src="docs/media/app-guidance.jpg" width="400" alt="Guidelines and Scientific Evidence">
   <br>
-  <img src="landing/public/assets/app-menu.jpg" width="400" alt="Widget Control Menu">
+  <img src="docs/media/app-menu.jpg" width="400" alt="Widget Control Menu">
 </p>
 
 ---
