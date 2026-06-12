@@ -22,6 +22,9 @@
   --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-5: 20px; --space-6: 24px; --space-7: 28px; --space-8: 32px;
 
+  /* Vão vertical entre seções (padding-bottom de cada seção; os tops são zerados) */
+  --section-gap: 56px;
+
   /* Radius — mirrors widget DS */
   --radius-sm: 8px; --radius-md: 10px; --radius-lg: 16px;
   --radius-xl: 18px; --radius-2xl: 22px; --radius-overlay: 24px;
@@ -104,8 +107,8 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   text-transform: uppercase; color: var(--accent);
 }
 .kicker::before { content: ""; width: 22px; height: 2px; background: var(--accent); border-radius: 2px; }
-.section { padding: 88px 0; }
-.section-head { max-width: 640px; margin-bottom: 44px; display: grid; gap: 14px; }
+.section { padding: var(--section-gap) 0; scroll-margin-top: calc(var(--header-h) + 24px); }
+.section-head { max-width: 640px; margin-bottom: 32px; display: grid; gap: 14px; }
 .section-head h2 { font-size: clamp(28px, 3.4vw, 38px); }
 .section-head p { color: var(--text-2); font-size: 17px; text-wrap: pretty; }
 
@@ -165,7 +168,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
 [data-theme="dark"] .theme-icon-dark { display: block; }
 
 /* ---------- Hero ---------- */
-.hero { padding: calc(var(--header-h) + 72px) 0 96px; }
+.hero { padding: calc(var(--header-h) + 56px) 0 var(--section-gap); }
 .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 56px; align-items: center; }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
@@ -342,7 +345,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
 .clinical-note svg { width: 20px; height: 20px; color: var(--accent); flex: none; margin-top: 2px; }
 
 /* ---------- Footer ---------- */
-.site-footer { border-top: 1px solid var(--line); padding: 44px 0 56px; margin-top: 40px; }
+.site-footer { border-top: 1px solid var(--line); padding: 32px 0 40px; margin-top: 0; }
 .site-footer .cols { display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; }
 .footer-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
 .footer-brand img { width: 26px; height: 26px; border-radius: 7px; }
@@ -367,5 +370,5 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   .doctor-card { grid-template-columns: 1fr; justify-items: start; }
   .ref-item { grid-template-columns: 28px 1fr; }
   .ref-item a.doi { grid-column: 2; justify-self: start; }
-  .section { padding: 64px 0; }
+  :root { --section-gap: 44px; }
 }
