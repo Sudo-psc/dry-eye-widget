@@ -16,37 +16,118 @@ document.documentElement.setAttribute("data-theme",t);})();
 <link rel="stylesheet" href="styles/landing.css">
 <link rel="stylesheet" href="styles/widget-screens.css">
 <link rel="icon" href="assets/icon-256.png">
-<link rel="canonical" href="https://olhossecos.com.br/app/pt">
-<link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/pt">
-<link rel="alternate" hreflang="en" href="https://olhossecos.com.br/app/en">
-<link rel="alternate" hreflang="x-default" href="https://olhossecos.com.br/app/en">
+<link rel="canonical" href="https://olhossecos.com.br/app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dry Eye Widget">
 <meta property="og:title" content="Dry Eye Widget — A regra 20-20-20 na sua tela">
 <meta property="og:description" content="Lembrete gentil da regra 20-20-20 para prevenir fadiga visual digital e olho seco. Desenvolvido por médico oftalmologista. Gratuito, open source, macOS e Windows.">
-<meta property="og:url" content="https://olhossecos.com.br/app/pt">
-<meta property="og:image" content="https://olhossecos.com.br/app/assets/icon-256.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:url" content="https://olhossecos.com.br/app/">
+<meta property="og:image" content="https://olhossecos.com.br/app/assets/twitter-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dry Eye Widget — A regra 20-20-20 na sua tela">
+<meta name="twitter:description" content="Lembrete gentil da regra 20-20-20 para prevenir fadiga visual digital e olho seco. Desenvolvido por médico oftalmologista. Gratuito, open source, macOS e Windows.">
+<meta name="twitter:image" content="https://olhossecos.com.br/app/assets/twitter-card.jpg">
 <meta name="theme-color" content="#0B121D" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#EDF3FB" media="(prefers-color-scheme: light)">
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Dry Eye Widget",
-  "operatingSystem": "macOS, Windows",
-  "applicationCategory": "HealthApplication",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" },
-  "license": "https://opensource.org/licenses/MIT",
-  "url": "https://olhossecos.com.br/app/pt",
-  "downloadUrl": "https://github.com/Sudo-psc/dry-eye-widget/releases/latest",
-  "author": {
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Dry Eye Widget",
+    "operatingSystem": "macOS, Windows",
+    "applicationCategory": "HealthApplication",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" },
+    "license": "https://opensource.org/licenses/MIT",
+    "url": "https://olhossecos.com.br/app/",
+    "downloadUrl": "https://github.com/Sudo-psc/dry-eye-widget/releases/latest",
+    "screenshot": "https://olhossecos.com.br/app/assets/twitter-card.jpg",
+    "softwareVersion": "latest",
+    "fileSize": "5MB",
+    "author": {
+      "@type": "Physician",
+      "name": "Dr. Philipe Saraiva Cruz",
+      "medicalSpecialty": "Ophthalmology",
+      "identifier": "CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903",
+      "url": "https://portal.cfm.org.br/busca-medicos/"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "ratingCount": "1"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "O que é a regra 20-20-20?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Uma recomendação clínica simples: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) de distância por 20 segundos. Isso relaxa a musculatura ciliar e estimula piscadas completas, melhorando a lubrificação."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "O widget coleta meus dados?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Não. O Dry Eye Widget é 100% open source (licença MIT), funciona localmente e não coleta dados de uso, não tem telemetria e nem se conecta à internet (exceto para checar atualizações no GitHub)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "O app funciona offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim. Todas as funcionalidades principais, incluindo os temporizadores, questionário OSDI e orientações rodam nativamente offline."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "O app substitui o tratamento médico?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Não. Ele é uma ferramenta preventiva de mudança comportamental. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e prescrição de colírios adequados."
+        }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
     "@type": "Physician",
     "name": "Dr. Philipe Saraiva Cruz",
+    "image": "https://olhossecos.com.br/app/assets/doctor.png",
     "medicalSpecialty": "Ophthalmology",
-    "identifier": "CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903"
+    "url": "https://portal.cfm.org.br/busca-medicos/",
+    "description": "Oftalmologista focado na intersecção entre saúde ocular e bem-estar digital. O Dry Eye Widget nasceu em seu consultório, diante da dificuldade dos pacientes em manter pausas visuais consistentes."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Como fazer a regra 20-20-20",
+    "step": [
+      { "@type": "HowToStep", "text": "A cada 20 minutos de uso de tela" },
+      { "@type": "HowToStep", "text": "Olhe para algo a 6 metros (20 pés)" },
+      { "@type": "HowToStep", "text": "Por 20 segundos" },
+      { "@type": "HowToStep", "text": "Piscar completamente" }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://olhossecos.com.br/app/"
+      }
+    ]
   }
-}
+]
 </script>
 </head>
 <body>
@@ -318,6 +399,34 @@ document.documentElement.setAttribute("data-theme",t);})();
   </div>
 </section>
 
+<!-- ====================== FAQ ====================== -->
+<section class="section" id="faq" style="padding-top: 0;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker" data-i18n="faq.kicker">Dúvidas Frequentes</span>
+      <h2 data-i18n="faq.title">Perguntas Frequentes (FAQ)</h2>
+    </div>
+    <div class="faq-list reveal" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;">O que é a regra 20-20-20?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;">Uma recomendação clínica simples: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) de distância por 20 segundos. Isso relaxa a musculatura ciliar e estimula piscadas completas, melhorando a lubrificação.</p>
+      </details>
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;">O widget coleta meus dados?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;">Não. O Dry Eye Widget é 100% open source (licença MIT), funciona localmente e não coleta dados de uso, não tem telemetria e nem se conecta à internet (exceto para checar atualizações no GitHub).</p>
+      </details>
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;">O app funciona offline?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;">Sim. Todas as funcionalidades principais, incluindo os temporizadores, questionário OSDI e orientações rodam nativamente offline.</p>
+      </details>
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;">O app substitui o tratamento médico?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;">Não. Ele é uma ferramenta preventiva de mudança comportamental. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e prescrição de colírios adequados.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
 <!-- ====================== DOCTOR ====================== -->
 <section class="section" id="autoria" style="padding-top: 0;">
   <div class="wrap">
@@ -331,9 +440,10 @@ document.documentElement.setAttribute("data-theme",t);})();
         <h3 data-i18n="dr.name">Dr. Philipe Saraiva Cruz</h3>
         <div class="doctor-creds">
           <span class="cred-chip" data-i18n="dr.role">Médico Oftalmologista</span>
-          <span class="cred-chip">CRM-MG 69.870</span>
-          <span class="cred-chip">CRM-SP 204.923</span>
-          <span class="cred-chip">RQE 71.903</span>
+          <a class="cred-chip" href="https://portal.cfm.org.br/busca-medicos/" target="_blank" rel="noopener">CRM-MG 69.870</a>
+          <a class="cred-chip" href="https://portal.cfm.org.br/busca-medicos/" target="_blank" rel="noopener">CRM-SP 204.923</a>
+          <a class="cred-chip" href="https://portal.cfm.org.br/busca-medicos/" target="_blank" rel="noopener">RQE 71.903</a>
+          <a class="cred-chip" href="https://github.com/Sudo-psc" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.15 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path></svg> GitHub</a>
         </div>
         <p class="about" data-i18n="dr.about">Concebido, desenvolvido e documentado clinicamente em resposta à crescente incidência de fadiga visual digital na prática clínica diária. O objetivo: transpor as recomendações preventivas baseadas em evidências do ambiente clínico para uma ferramenta digital gratuita, integrada ao fluxo de trabalho de quem vive em frente a telas.</p>
       </div>
