@@ -244,12 +244,41 @@
       b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
     });
     try { localStorage.setItem("dew-lang", lang); } catch (e) {}
+    try {
+      document.cookie = "dew-lang=" + lang + "; path=/; max-age=31536000; SameSite=Lax";
+    } catch (e) {}
+  }
+
+  function readCookieLang() {
+    try {
+      const m = document.cookie.match(/(?:^|;\s*)dew-lang=(pt|en)(?:;|$)/);
+      return m ? m[1] : null;
+    } catch (e) { return null; }
+  }
+
+  function detectLang() {
+    // Preferência explícita: cookie (setado pelo nginx em /app/pt|/app/en
+    // ou por visita anterior) > localStorage.
+    const fromCookie = readCookieLang();
+    if (fromCookie) return fromCookie;
+    try {
+      const stored = localStorage.getItem("dew-lang");
+      if (stored === "pt" || stored === "en") return stored;
+    } catch (e) {}
+    // Primeira visita: idioma conforme a localização/idioma do navegador.
+    const langs = (navigator.languages && navigator.languages.length)
+      ? navigator.languages
+      : [navigator.language || "pt-BR"];
+    for (const l of langs) {
+      const low = String(l).toLowerCase();
+      if (low.startsWith("pt")) return "pt";
+      if (low.startsWith("en")) return "en";
+    }
+    return "en";
   }
 
   window.dewSetLang = apply;
   window.dewInitLang = function () {
-    let lang = "pt";
-    try { lang = localStorage.getItem("dew-lang") || "pt"; } catch (e) {}
-    apply(lang);
+    apply(detectLang());
   };
 })();

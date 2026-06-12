@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://olhossecos.com.br/sitemap.xml
-
