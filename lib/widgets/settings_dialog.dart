@@ -21,6 +21,7 @@ class SettingsDialog extends StatefulWidget {
     required this.onClose,
     required this.onReset,
     required this.onResetLearning,
+    required this.onOpenScreenTime,
   });
 
   final WidgetSettings initial;
@@ -30,6 +31,9 @@ class SettingsDialog extends StatefulWidget {
 
   /// Apaga o aprendizado adaptativo de inatividade.
   final FutureOr<void> Function() onResetLearning;
+
+  /// Abre a janela de visualização do tempo de tela.
+  final VoidCallback onOpenScreenTime;
 
   @override
   State<SettingsDialog> createState() => _SettingsDialogState();
@@ -245,6 +249,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
                   ),
                   _hint(s.gentleHint),
+                  if (_draft.gentleMode) ...[
+                    const SizedBox(height: 8),
+                    _switchRow(
+                      label: s.lockScreenOnBreak,
+                      value: _draft.lockScreenOnBreak,
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(lockScreenOnBreak: v)),
+                    ),
+                    _hint(s.lockScreenHint),
+                  ],
                   const SizedBox(height: 8),
                   _switchRow(
                     label: s.dimBackground,
@@ -335,6 +349,24 @@ class _SettingsDialogState extends State<SettingsDialog> {
                       ),
                     ),
                   ],
+
+                  _sectionTitle(s.secScreenTime),
+                  _switchRow(
+                    label: s.screenTimeEnable,
+                    value: _draft.screenTimeTracking,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(screenTimeTracking: v)),
+                  ),
+                  _hint(s.screenTimeHint),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: widget.onOpenScreenTime,
+                      icon: const Icon(Icons.bar_chart_outlined, size: 18),
+                      label: Text(s.screenTimeView),
+                    ),
+                  ),
 
                   _sectionTitle(s.secGeneral),
                   _switchRow(

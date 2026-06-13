@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/osdi_assessment.dart';
+import '../models/screen_time_data.dart';
 import '../models/widget_settings.dart';
 import '../utils/constants.dart';
 
@@ -72,4 +73,12 @@ class StorageService {
     final history = [...loadOsdiHistory(), assessment];
     await saveOsdiHistory(history);
   }
+
+  // --- Tempo de tela ------------------------------------------------------
+
+  ScreenTimeData loadScreenTime() =>
+      ScreenTimeData.fromJson(_prefs.getString(StorageKeys.screenTime));
+
+  Future<void> saveScreenTime(ScreenTimeData data) =>
+      _prefs.setString(StorageKeys.screenTime, data.toJson());
 }

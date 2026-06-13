@@ -26,6 +26,8 @@ void main() {
         hideMenuBarItem: true,
         hideFloatingWidget: false,
         gentleMode: true,
+        lockScreenOnBreak: true,
+        screenTimeTracking: false,
         cameraPresence: true,
       );
 
@@ -51,7 +53,27 @@ void main() {
       expect(restored.hideMenuBarItem, isTrue);
       expect(restored.hideFloatingWidget, isFalse);
       expect(restored.gentleMode, isTrue);
+      expect(restored.lockScreenOnBreak, isTrue);
+      expect(restored.screenTimeTracking, isFalse);
       expect(restored.cameraPresence, isTrue);
+    });
+
+    test('usesFullScreenBreak respeita o modo suave e o bloqueio', () {
+      final base = WidgetSettings.defaults();
+      // Sem modo suave: sempre tela cheia.
+      expect(base.copyWith(gentleMode: false).usesFullScreenBreak, isTrue);
+      // Modo suave sem bloqueio: cartão discreto.
+      expect(
+        base.copyWith(gentleMode: true, lockScreenOnBreak: false)
+            .usesFullScreenBreak,
+        isFalse,
+      );
+      // Modo suave com bloqueio: tela cheia tem precedência.
+      expect(
+        base.copyWith(gentleMode: true, lockScreenOnBreak: true)
+            .usesFullScreenBreak,
+        isTrue,
+      );
     });
 
     test('JSON inválido cai para os padrões', () {

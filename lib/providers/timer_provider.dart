@@ -7,6 +7,7 @@ import '../services/audio_service.dart';
 import '../services/notification_service.dart';
 import '../services/presence/presence_controller.dart';
 import '../services/presence/presence_sensor.dart';
+import '../services/screen_time_service.dart';
 import '../services/storage_service.dart';
 import '../utils/constants.dart';
 import 'settings_provider.dart';
@@ -24,7 +25,8 @@ class TimerProvider extends ChangeNotifier {
     required AudioService audio,
     required NotificationService notifications,
     required PresenceController presence,
-  }) : this._(settings, storage, audio, notifications, presence);
+    ScreenTimeService? screenTime,
+  }) : this._(settings, storage, audio, notifications, presence, screenTime);
 
   TimerProvider._(
     this._settings,
@@ -32,6 +34,7 @@ class TimerProvider extends ChangeNotifier {
     this._audio,
     this._notifications,
     this._presence,
+    this._screenTime,
   ) {
     _cycleElapsed = _storage.elapsedSeconds.clamp(0, cycleSeconds);
     _eyeDropsElapsed = _storage.eyeDropsElapsed;
@@ -44,6 +47,9 @@ class TimerProvider extends ChangeNotifier {
   final AudioService _audio;
   final NotificationService _notifications;
   final PresenceController _presence;
+
+  /// Coleta de tempo de tela (opcional; ausente nos testes de temporização).
+  final ScreenTimeService? _screenTime;
 
   Timer? _ticker;
   Timer? _alertTimer;
@@ -107,6 +113,7 @@ class TimerProvider extends ChangeNotifier {
   void _onTick() {
     _tickEyeDrops();
     _checkPresence();
+    _maybeTrackScreenTime();
     switch (_state) {
       case AppState.idle:
         _tickIdle();
@@ -141,9 +148,13 @@ class TimerProvider extends ChangeNotifier {
   /// retomada usa a histerese de [AppDefaults.inactivityResumeSeconds]. A
   /// leitura nativa é assíncrona e protegida contra sobreposição ([_idleBusy]).
   void _checkPresence() {
-    if (!_settings.value.pauseOnInactivity) {
+    final pauseOn = _settings.value.pauseOnInactivity;
+    // A coleta de tempo de tela também precisa do tempo ocioso para descartar
+    // inatividade — então consultamos o idle mesmo com a pausa desligada.
+    final trackScreen = _screenTime != null && _settings.value.screenTimeTracking;
+    if (!pauseOn) {
       if (_inactivityPaused || _inactivityAlert) _clearInactivityPause();
-      return;
+      if (!trackScreen) return;
     }
     if (_idleBusy) return;
     _idleBusy = true;
@@ -152,6 +163,13 @@ class TimerProvider extends ChangeNotifier {
         final now = DateTime.now();
         final idle = await _presence.idleSeconds();
         if (_disposed) return;
+        // Preserva o idle anterior para o aprendizado de retomada.
+        final previousIdle = _lastIdleSeconds;
+        _lastIdleSeconds = idle;
+
+        // Sem pausa por inatividade: só mantemos o idle atualizado para a
+        // coleta de tempo de tela.
+        if (!pauseOn) return;
 
         // Atividade real de volta encerra a supressão pós-retomada-manual.
         if (idle <= AppDefaults.inactivityResumeSeconds) {
@@ -172,14 +190,26 @@ class TimerProvider extends ChangeNotifier {
         } else if (_inactivityPaused &&
             idle <= AppDefaults.inactivityResumeSeconds) {
           // Input retomado: o gap anterior era presença parada -> aprende.
-          _presence.onResume(previousIdleSeconds: _lastIdleSeconds, now: now);
+          _presence.onResume(previousIdleSeconds: previousIdle, now: now);
           _clearInactivityPause();
         }
-        _lastIdleSeconds = idle;
       } finally {
         _idleBusy = false;
       }
     }();
+  }
+
+  // --- Coleta de tempo de tela -------------------------------------------
+
+  /// Registra um segundo de uso ativo de tela, descartando inatividade.
+  void _maybeTrackScreenTime() {
+    final st = _screenTime;
+    if (st == null || !_settings.value.screenTimeTracking) return;
+    // Não contabiliza durante pausa manual nem pausa por inatividade.
+    if (_paused || _inactivityPaused) return;
+    // Nem quando o sistema está ocioso além do limiar de inatividade.
+    if (_lastIdleSeconds > AppDefaults.inactivitySeconds) return;
+    st.tick();
   }
 
   /// Retomada manual da pausa por inatividade (botão "Retomar" no cartão).
@@ -342,6 +372,8 @@ class TimerProvider extends ChangeNotifier {
     _ticker?.cancel();
     _alertTimer?.cancel();
     _completionTimer?.cancel();
+    // Garante a gravação do tempo de tela ainda em memória.
+    unawaited(_screenTime?.flush());
     super.dispose();
   }
 }

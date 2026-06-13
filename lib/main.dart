@@ -17,6 +17,7 @@ import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
+import 'services/screen_time_service.dart';
 import 'services/presence/adaptive_threshold_model.dart';
 import 'services/presence/camera_presence_sensor.dart';
 import 'services/presence/presence_controller.dart';
@@ -36,6 +37,7 @@ import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
 import 'widgets/inactivity_pause_card.dart';
 import 'widgets/osdi_dialog.dart';
+import 'widgets/screen_time_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/update_dialog.dart';
 
@@ -46,9 +48,9 @@ const Size _osdiWindowSize = Size(580, 740);
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
-/// Altura do painel de menu (cabeçalho + 10 itens + paddings do vidro), com
+/// Altura do painel de menu (cabeçalho + 11 itens + paddings do vidro), com
 /// folga para variações de fonte entre plataformas.
-const double _menuPanelHeight = 460;
+const double _menuPanelHeight = 504;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -64,6 +66,7 @@ Future<void> main() async {
 
   final storage = await StorageService.init();
   final settings = SettingsProvider(storage: storage);
+  final screenTime = ScreenTimeService(storage: storage);
   final audio = AudioService()..enabled = settings.value.soundEnabled;
   final notifications = NotificationService()
     ..enabled = settings.value.notificationsEnabled;
@@ -143,6 +146,7 @@ Future<void> main() async {
         Provider<StartupService>.value(value: startup),
         Provider<TrayService>.value(value: tray),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
+        ChangeNotifierProvider<ScreenTimeService>.value(value: screenTime),
         ChangeNotifierProvider<TimerProvider>(
           create: (_) => TimerProvider(
             settings: settings,
@@ -150,6 +154,7 @@ Future<void> main() async {
             audio: audio,
             notifications: notifications,
             presence: presence,
+            screenTime: screenTime,
           )..start(),
         ),
       ],
@@ -252,6 +257,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _guidanceOpen = false;
   bool _updateOpen = false;
   bool _osdiOpen = false;
+  bool _screenTimeOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
@@ -328,7 +334,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_settingsOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
-          !_osdiOpen) {
+          !_osdiOpen &&
+          !_screenTimeOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.settings);
@@ -349,7 +356,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_settingsOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
-          !_osdiOpen) {
+          !_osdiOpen &&
+          !_screenTimeOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.inactivity);
@@ -488,9 +496,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (!_widgetEnabled) await windowManager.show();
     await _cacheCurrentPosition();
     await _applyLayout(
-      _settings.value.gentleMode
-          ? _WindowLayout.gentleBreak
-          : _WindowLayout.breakOverlay,
+      _settings.value.usesFullScreenBreak
+          ? _WindowLayout.breakOverlay
+          : _WindowLayout.gentleBreak,
     );
   }
 
@@ -731,6 +739,27 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
+  void _openScreenTime() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = true;
+    });
+    _applyLayout(_WindowLayout.osdi);
+  }
+
+  void _closeScreenTime() {
+    setState(() => _screenTimeOpen = false);
+    _restoreAfterPanel();
+  }
+
+  Future<void> _clearScreenTime() async {
+    await context.read<ScreenTimeService>().clear();
+  }
+
   void _saveOsdi(OsdiAssessment assessment) {
     unawaited(_persistOsdiAssessment(assessment));
   }
@@ -802,6 +831,18 @@ class _HomePageState extends State<HomePage> with TrayListener {
           onClose: _closeOsdi,
         ),
       );
+    } else if (_screenTimeOpen) {
+      body = Center(
+        child: Consumer<ScreenTimeService>(
+          builder: (_, screenTime, __) => ScreenTimeDialog(
+            strings: strings,
+            data: screenTime.data,
+            trackingEnabled: settings.screenTimeTracking,
+            onClose: _closeScreenTime,
+            onClear: _clearScreenTime,
+          ),
+        ),
+      );
     } else if (_updateOpen) {
       body = UpdateDialog(
         strings: strings,
@@ -821,13 +862,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
     } else if (timer.eyeDropsAlert) {
       body = EyeDropsReminder(strings: strings, onDone: _timer.dismissEyeDrops);
     } else if (timer.state.isActive) {
-      body = settings.gentleMode
-          ? GentleBreakCard(
+      body = settings.usesFullScreenBreak
+          ? _buildBreakOverlay(timer, settings, strings)
+          : GentleBreakCard(
               state: timer.state,
               strings: strings,
               secondsRemaining: timer.phaseRemaining,
-            )
-          : _buildBreakOverlay(timer, settings, strings);
+            );
     } else if (timer.inactivityAlert) {
       body = InactivityPauseCard(
         strings: strings,
@@ -902,6 +943,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onTogglePause: timer.togglePause,
                 onGuidance: _openGuidance,
                 onOsdi: _openOsdi,
+                onScreenTime: _openScreenTime,
                 onCheckUpdates: _openCheckUpdates,
                 onGitHub: _openGithub,
                 onAbout: _openAbout,
@@ -966,6 +1008,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           _closeSettings();
         },
         onResetLearning: timer.resetInactivityLearning,
+        onOpenScreenTime: () {
+          setState(() => _settingsOpen = false);
+          _openScreenTime();
+        },
         onClose: _closeSettings,
       ),
     );

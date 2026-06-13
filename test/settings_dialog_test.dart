@@ -26,6 +26,7 @@ void main() {
               onClose: onClose ?? () {},
               onReset: onReset ?? () {},
               onResetLearning: onResetLearning ?? () {},
+              onOpenScreenTime: () {},
             ),
           ),
         ),

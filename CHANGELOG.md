@@ -4,6 +4,25 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.10.0] - 2026-06-13
+
+### Adicionado
+- **Tempo de tela**: nova coleta local do tempo de uso ativo de tela por dia,
+  descartando a inatividade do sistema (reaproveita o sinal de ociosidade e as
+  pausas por inatividade). Os dados ficam apenas no computador do usuário.
+- **Janela de visualização de tempo de tela**: destaque do total de hoje e
+  gráfico de barras com os períodos semanal, mensal e anual, além de total e
+  média diária do período. Acessível pelo menu flutuante e pelas configurações;
+  permite limpar o histórico. Implementada sem dependências de gráficos.
+- **Bloquear a tela na pausa**: nova opção que força o aviso em tela cheia
+  durante a pausa mesmo com as notificações suaves ligadas, para reforçar o
+  descanso (precedência sobre o modo suave).
+
+### Alterado
+- **Configurações**: nova seção "Tempo de tela" (ativar coleta + atalho para a
+  janela) e sub-opção de bloqueio de tela dentro de "Durante a pausa". A opção
+  "Ativar notificações" do sistema permanece em "Geral".
+
 ## [1.9.2] - 2026-06-11
 
 ### Corrigido

@@ -36,6 +36,8 @@ class WidgetSettings {
     required this.hideMenuBarItem,
     required this.hideFloatingWidget,
     required this.gentleMode,
+    required this.lockScreenOnBreak,
+    required this.screenTimeTracking,
     required this.languageCode,
     required this.eyeDropsEnabled,
     required this.eyeDropsIntervalHours,
@@ -116,8 +118,21 @@ class WidgetSettings {
   /// bloquear o restante da tela.
   final bool gentleMode;
 
+  /// Mostra o overlay em tela cheia durante a pausa mesmo com [gentleMode]
+  /// ligado — "bloqueia a tela" para forçar o descanso. Quando ligado, tem
+  /// precedência sobre o modo suave.
+  final bool lockScreenOnBreak;
+
+  /// Coleta localmente o tempo de uso diário de tela (sem contabilizar
+  /// inatividade). Alimenta a janela de visualização de tempo de tela.
+  final bool screenTimeTracking;
+
   /// Idioma da interface: 'pt' ou 'en'.
   final String languageCode;
+
+  /// Usa o overlay em tela cheia (bloqueio) na pausa. O modo suave só vale
+  /// quando ativo e [lockScreenOnBreak] desligado.
+  bool get usesFullScreenBreak => !gentleMode || lockScreenOnBreak;
 
   /// Lembrete de colírio ligado/desligado.
   final bool eyeDropsEnabled;
@@ -157,6 +172,8 @@ class WidgetSettings {
     hideMenuBarItem: AppDefaults.hideMenuBarItem,
     hideFloatingWidget: AppDefaults.hideFloatingWidget,
     gentleMode: AppDefaults.gentleMode,
+    lockScreenOnBreak: AppDefaults.lockScreenOnBreak,
+    screenTimeTracking: AppDefaults.screenTimeTracking,
     languageCode: AppDefaults.languageCode,
     eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
     eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
@@ -194,6 +211,8 @@ class WidgetSettings {
     bool? hideMenuBarItem,
     bool? hideFloatingWidget,
     bool? gentleMode,
+    bool? lockScreenOnBreak,
+    bool? screenTimeTracking,
     String? languageCode,
     bool? eyeDropsEnabled,
     int? eyeDropsIntervalHours,
@@ -228,6 +247,8 @@ class WidgetSettings {
       hideMenuBarItem: nextHideMenuBarItem,
       hideFloatingWidget: nextHideFloatingWidget,
       gentleMode: gentleMode ?? this.gentleMode,
+      lockScreenOnBreak: lockScreenOnBreak ?? this.lockScreenOnBreak,
+      screenTimeTracking: screenTimeTracking ?? this.screenTimeTracking,
       languageCode: languageCode ?? this.languageCode,
       eyeDropsEnabled: eyeDropsEnabled ?? this.eyeDropsEnabled,
       eyeDropsIntervalHours:
@@ -272,6 +293,8 @@ class WidgetSettings {
           : hideMenuBarItem,
       hideFloatingWidget: hideFloatingWidget,
       gentleMode: gentleMode,
+      lockScreenOnBreak: lockScreenOnBreak,
+      screenTimeTracking: screenTimeTracking,
       languageCode: languageCode == 'en' || languageCode == 'pt'
           ? languageCode
           : d.languageCode,
@@ -322,6 +345,8 @@ class WidgetSettings {
     'hideMenuBarItem': hideMenuBarItem,
     'hideFloatingWidget': hideFloatingWidget,
     'gentleMode': gentleMode,
+    'lockScreenOnBreak': lockScreenOnBreak,
+    'screenTimeTracking': screenTimeTracking,
     'languageCode': languageCode,
     'eyeDropsEnabled': eyeDropsEnabled,
     'eyeDropsIntervalHours': eyeDropsIntervalHours,
@@ -366,6 +391,10 @@ class WidgetSettings {
       hideFloatingWidget:
           map['hideFloatingWidget'] as bool? ?? d.hideFloatingWidget,
       gentleMode: map['gentleMode'] as bool? ?? d.gentleMode,
+      lockScreenOnBreak:
+          map['lockScreenOnBreak'] as bool? ?? d.lockScreenOnBreak,
+      screenTimeTracking:
+          map['screenTimeTracking'] as bool? ?? d.screenTimeTracking,
       languageCode: map['languageCode'] as String? ?? d.languageCode,
       eyeDropsEnabled: map['eyeDropsEnabled'] as bool? ?? d.eyeDropsEnabled,
       eyeDropsIntervalHours:
