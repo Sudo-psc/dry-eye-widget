@@ -72,6 +72,15 @@ class AppDefaults {
   static const bool hideMenuBarItem = false;
   static const bool hideFloatingWidget = false;
   static const bool gentleMode = false;
+
+  /// Bloqueia a tela (overlay em tela cheia) durante a pausa mesmo quando o
+  /// modo de notificação suave está ligado. Desligado por padrão.
+  static const bool lockScreenOnBreak = false;
+
+  /// Coleta o tempo de uso diário de tela (apenas local, sem envio). Ligado
+  /// por padrão — alimenta a janela de visualização de tempo de tela.
+  static const bool screenTimeTracking = true;
+
   static const String languageCode = 'pt';
   static const bool eyeDropsEnabled = false;
   static const int eyeDropsIntervalHours = 4;
@@ -154,6 +163,9 @@ class StorageKeys {
 
   /// JSON serializado com o histórico local de avaliações OSDI.
   static const String osdiHistory = 'osdi_history_json';
+
+  /// JSON serializado com o tempo de uso de tela por dia ({'AAAA-MM-DD': seg}).
+  static const String screenTime = 'screen_time_json';
 }
 
 /// Informações do app usadas na verificação de atualização.
@@ -161,7 +173,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.9.2';
+  static const String version = '1.10.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

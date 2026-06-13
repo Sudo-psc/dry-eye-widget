@@ -1,10 +1,12 @@
 import 'package:dry_eye_widget/models/widget_settings.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
+import 'package:dry_eye_widget/models/screen_time_data.dart';
 import 'package:dry_eye_widget/providers/settings_provider.dart';
 import 'package:dry_eye_widget/providers/timer_provider.dart';
 import 'package:dry_eye_widget/services/audio_service.dart';
 import 'package:dry_eye_widget/services/idle_service.dart';
 import 'package:dry_eye_widget/services/notification_service.dart';
+import 'package:dry_eye_widget/services/screen_time_service.dart';
 import 'package:dry_eye_widget/services/presence/adaptive_threshold_model.dart';
 import 'package:dry_eye_widget/services/presence/presence_controller.dart';
 import 'package:dry_eye_widget/services/storage_service.dart';
@@ -167,6 +169,73 @@ void main() {
       });
     });
 
+    test(
+      'coleta tempo de tela quando ativo e descarta a inatividade',
+      () {
+        fakeAsync((async) {
+          final storage = _MemoryStorage(
+            WidgetSettings.defaults().copyWith(
+              pauseOnInactivity: true,
+              screenTimeTracking: true,
+            ),
+          );
+          final settings = SettingsProvider(storage: storage);
+          final screenTime = ScreenTimeService(storage: storage);
+          final idle = _MutableIdleService(0);
+          final timer = TimerProvider(
+            settings: settings,
+            storage: storage,
+            audio: _FakeAudioService(),
+            notifications: _FakeNotificationService(),
+            presence: PresenceController(
+              model: AdaptiveThresholdModel(),
+              idleSource: idle.idleSeconds,
+            ),
+            screenTime: screenTime,
+          );
+          addTearDown(timer.dispose);
+          timer.start();
+
+          // Ativo: o tempo de tela acumula.
+          async.elapse(const Duration(seconds: 5));
+          final active = screenTime.data.secondsForDay(DateTime.now());
+          expect(active, greaterThan(0));
+
+          // Inativo acima do limiar: a coleta praticamente para.
+          idle.value = (AppDefaults.inactivitySeconds + 10).toDouble();
+          async.elapse(const Duration(seconds: 10));
+          final afterIdle = screenTime.data.secondsForDay(DateTime.now());
+          expect(afterIdle, lessThan(active + 10));
+        });
+      },
+    );
+
+    test('com a coleta desligada, o tempo de tela nao acumula', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(screenTimeTracking: false),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final screenTime = ScreenTimeService(storage: storage);
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: _FakeIdleService().idleSeconds,
+          ),
+          screenTime: screenTime,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        async.elapse(const Duration(seconds: 10));
+        expect(screenTime.data.secondsForDay(DateTime.now()), 0);
+      });
+    });
+
     test('resumeFromInactivity limpa so a pausa por inatividade', () {
       fakeAsync((async) {
         final storage = _MemoryStorage(
@@ -247,6 +316,16 @@ class _MemoryStorage implements StorageService {
 
   @override
   Future<void> addOsdiAssessment(OsdiAssessment assessment) async {}
+
+  ScreenTimeData _screenTime = ScreenTimeData.empty();
+
+  @override
+  ScreenTimeData loadScreenTime() => _screenTime;
+
+  @override
+  Future<void> saveScreenTime(ScreenTimeData data) async {
+    _screenTime = data;
+  }
 
   @override
   Future<void> setElapsedSeconds(int value) async {

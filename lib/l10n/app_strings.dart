@@ -12,6 +12,7 @@ class AppStrings {
     required this.menuResume,
     required this.menuGuidance,
     required this.menuOsdi,
+    required this.menuScreenTime,
     required this.menuCheckUpdates,
     required this.menuSettings,
     required this.menuQuit,
@@ -52,6 +53,8 @@ class AppStrings {
     required this.orbIntensity,
     required this.gentleMode,
     required this.gentleHint,
+    required this.lockScreenOnBreak,
+    required this.lockScreenHint,
     required this.dimBackground,
     required this.dimIntensity,
     required this.overlayOpacity,
@@ -144,6 +147,26 @@ class AppStrings {
     required this.cameraConsentBody,
     required this.cameraConsentAllow,
     required this.cameraConsentCancel,
+    // Tempo de tela
+    required this.secScreenTime,
+    required this.screenTimeEnable,
+    required this.screenTimeHint,
+    required this.screenTimeView,
+    required this.screenTimeTitle,
+    required this.screenTimeSubtitle,
+    required this.screenTimeToday,
+    required this.screenTimeWeek,
+    required this.screenTimeMonth,
+    required this.screenTimeYear,
+    required this.screenTimeTotal,
+    required this.screenTimeDailyAverage,
+    required this.screenTimeNoData,
+    required this.screenTimeClear,
+    required this.screenTimeDisabledHint,
+    required this.screenTimeDisclaimer,
+    required this.unitHour,
+    required this.weekdayShort,
+    required this.monthShort,
   });
 
   final String languageCode;
@@ -154,6 +177,7 @@ class AppStrings {
   final String menuResume;
   final String menuGuidance;
   final String menuOsdi;
+  final String menuScreenTime;
   final String menuCheckUpdates;
   final String menuSettings;
   final String menuQuit;
@@ -194,6 +218,8 @@ class AppStrings {
   final String orbIntensity;
   final String gentleMode;
   final String gentleHint;
+  final String lockScreenOnBreak;
+  final String lockScreenHint;
   final String dimBackground;
   final String dimIntensity;
   final String overlayOpacity;
@@ -287,6 +313,30 @@ class AppStrings {
   final String cameraConsentAllow;
   final String cameraConsentCancel;
 
+  final String secScreenTime;
+  final String screenTimeEnable;
+  final String screenTimeHint;
+  final String screenTimeView;
+  final String screenTimeTitle;
+  final String screenTimeSubtitle;
+  final String screenTimeToday;
+  final String screenTimeWeek;
+  final String screenTimeMonth;
+  final String screenTimeYear;
+  final String screenTimeTotal;
+  final String screenTimeDailyAverage;
+  final String screenTimeNoData;
+  final String screenTimeClear;
+  final String screenTimeDisabledHint;
+  final String screenTimeDisclaimer;
+  final String unitHour;
+
+  /// Rótulos curtos dos dias da semana (segunda a domingo).
+  final List<String> weekdayShort;
+
+  /// Rótulos curtos dos meses (janeiro a dezembro).
+  final List<String> monthShort;
+
   // --- Helpers dependentes de enum --------------------------------------
 
   String stateTitle(AppState state) {
@@ -341,6 +391,7 @@ const AppStrings ptStrings = AppStrings(
   menuResume: 'Retomar cronômetro',
   menuGuidance: 'Orientações',
   menuOsdi: 'Questionário OSDI',
+  menuScreenTime: 'Tempo de tela',
   menuCheckUpdates: 'Verificar atualizações',
   menuSettings: 'Configurações',
   menuQuit: 'Sair',
@@ -383,6 +434,10 @@ const AppStrings ptStrings = AppStrings(
   gentleHint:
       'Mostra apenas um cartão pequeno no canto superior direito, em '
       'vez do aviso em tela cheia.',
+  lockScreenOnBreak: 'Bloquear a tela na pausa',
+  lockScreenHint:
+      'Mostra o aviso em tela cheia durante a pausa mesmo com as '
+      'notificações suaves ligadas, para forçar o descanso.',
   dimBackground: 'Escurecer o fundo',
   dimIntensity: 'Intensidade do escurecimento',
   overlayOpacity: 'Opacidade do overlay',
@@ -524,6 +579,44 @@ const AppStrings ptStrings = AppStrings(
       'câmera na primeira vez.',
   cameraConsentAllow: 'Permitir',
   cameraConsentCancel: 'Agora não',
+  secScreenTime: 'Tempo de tela',
+  screenTimeEnable: 'Coletar tempo de tela',
+  screenTimeHint:
+      'Mede o tempo de uso ativo de tela por dia, descartando a '
+      'inatividade. Os dados ficam só no seu computador.',
+  screenTimeView: 'Ver tempo de tela',
+  screenTimeTitle: 'Tempo de tela',
+  screenTimeSubtitle: 'Seu uso ativo de tela ao longo do tempo.',
+  screenTimeToday: 'Hoje',
+  screenTimeWeek: 'Semana',
+  screenTimeMonth: 'Mês',
+  screenTimeYear: 'Ano',
+  screenTimeTotal: 'Total',
+  screenTimeDailyAverage: 'Média diária',
+  screenTimeNoData: 'Sem dados de uso ainda.',
+  screenTimeClear: 'Limpar histórico',
+  screenTimeDisabledHint:
+      'A coleta de tempo de tela está desativada. Ative nas configurações '
+      'para acompanhar seu uso.',
+  screenTimeDisclaimer:
+      'Estimativa local baseada no tempo ativo do app; não substitui '
+      'medições do sistema operacional.',
+  unitHour: 'h',
+  weekdayShort: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+  monthShort: [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez',
+  ],
 );
 
 const AppStrings enStrings = AppStrings(
@@ -534,6 +627,7 @@ const AppStrings enStrings = AppStrings(
   menuResume: 'Resume timer',
   menuGuidance: 'Eye care guide',
   menuOsdi: 'OSDI questionnaire',
+  menuScreenTime: 'Screen time',
   menuCheckUpdates: 'Check for updates',
   menuSettings: 'Settings',
   menuQuit: 'Quit',
@@ -575,6 +669,10 @@ const AppStrings enStrings = AppStrings(
   gentleHint:
       'Shows just a small card in the top-right corner instead of the '
       'full-screen alert.',
+  lockScreenOnBreak: 'Lock the screen on break',
+  lockScreenHint:
+      'Shows the full-screen alert during the break even with gentle '
+      'notifications on, to enforce the rest.',
   dimBackground: 'Dim the background',
   dimIntensity: 'Dim intensity',
   overlayOpacity: 'Overlay opacity',
@@ -705,4 +803,42 @@ const AppStrings enStrings = AppStrings(
       'permission the first time.',
   cameraConsentAllow: 'Allow',
   cameraConsentCancel: 'Not now',
+  secScreenTime: 'Screen time',
+  screenTimeEnable: 'Collect screen time',
+  screenTimeHint:
+      'Measures your active screen time per day, discarding inactivity. '
+      'The data stays on your computer only.',
+  screenTimeView: 'View screen time',
+  screenTimeTitle: 'Screen time',
+  screenTimeSubtitle: 'Your active screen use over time.',
+  screenTimeToday: 'Today',
+  screenTimeWeek: 'Week',
+  screenTimeMonth: 'Month',
+  screenTimeYear: 'Year',
+  screenTimeTotal: 'Total',
+  screenTimeDailyAverage: 'Daily average',
+  screenTimeNoData: 'No usage data yet.',
+  screenTimeClear: 'Clear history',
+  screenTimeDisabledHint:
+      'Screen-time collection is off. Enable it in settings to track your '
+      'usage.',
+  screenTimeDisclaimer:
+      'Local estimate based on the app\'s active time; it does not replace '
+      'operating-system measurements.',
+  unitHour: 'h',
+  weekdayShort: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  monthShort: [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ],
 );
