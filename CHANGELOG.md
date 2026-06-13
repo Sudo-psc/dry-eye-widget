@@ -4,6 +4,19 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.10.2] - 2026-06-13
+
+### Corrigido
+- **Botão "Sobre"**: ao clicar em "Sobre" no menu da bolinha, nada aparecia. A
+  janela era encolhida para o tamanho da bolinha antes de abrir o diálogo, que
+  então não tinha espaço para renderizar. O "Sobre" passa a ser um painel
+  interno (mesmo padrão de "Orientações"/OSDI), exibido numa janela ampla.
+
+### Alterado
+- **Janela "Sobre"**: agora traz uma breve descrição do app, a versão atual e a
+  autoria — Dr. Philipe Saraiva Cruz, médico oftalmologista (RQE 71.903 ·
+  CRM-MG 69.870 · CRM-SP 204.923).
+
 ## [1.10.1] - 2026-06-13
 
 ### Corrigido

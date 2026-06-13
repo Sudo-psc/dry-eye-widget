@@ -18,6 +18,9 @@ class AppStrings {
     required this.menuQuit,
     required this.menuGitHub,
     required this.menuAbout,
+    required this.aboutDescription,
+    required this.aboutAuthorLabel,
+    required this.aboutAuthorRole,
     required this.trayDisable,
     required this.trayEnable,
     // Estados
@@ -183,6 +186,9 @@ class AppStrings {
   final String menuQuit;
   final String menuGitHub;
   final String menuAbout;
+  final String aboutDescription;
+  final String aboutAuthorLabel;
+  final String aboutAuthorRole;
   final String trayDisable;
   final String trayEnable;
 
@@ -397,6 +403,13 @@ const AppStrings ptStrings = AppStrings(
   menuQuit: 'Sair',
   menuGitHub: 'GitHub',
   menuAbout: 'Sobre',
+  aboutDescription:
+      'Lembretes da regra 20-20-20 para descanso visual durante o uso '
+      'prolongado de telas, ajudando a aliviar a fadiga ocular digital. '
+      'Funciona localmente, sem coletar dados de atividade nem enviar '
+      'informações para fora do computador.',
+  aboutAuthorLabel: 'AUTOR',
+  aboutAuthorRole: 'Médico oftalmologista',
   trayDisable: 'Desabilitar widget',
   trayEnable: 'Habilitar widget',
   alertTitle: 'Tire uma pausa de 20 segundos',
@@ -633,6 +646,12 @@ const AppStrings enStrings = AppStrings(
   menuQuit: 'Quit',
   menuGitHub: 'GitHub',
   menuAbout: 'About',
+  aboutDescription:
+      'A 20-20-20 rule reminder for visual rest during prolonged screen '
+      'use, helping to ease digital eye strain. It runs locally, without '
+      'collecting activity data or sending information off your computer.',
+  aboutAuthorLabel: 'AUTHOR',
+  aboutAuthorRole: 'Ophthalmologist (MD)',
   trayDisable: 'Disable widget',
   trayEnable: 'Enable widget',
   alertTitle: 'Take a 20-second break',
