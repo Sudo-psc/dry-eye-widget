@@ -172,7 +172,7 @@ Architecture and Dependencies: The project complies with `flutter analyze` witho
 
 ## ⚖️ Legal
 
-- [Terms of Use](docs/TERMS.md)
+- [Terms of Use](docs/legal/termos-de-uso.md) (Portuguese)
 - [Privacy Policy](docs/PRIVACY.md)
 
 ## 🆓 Licensing
