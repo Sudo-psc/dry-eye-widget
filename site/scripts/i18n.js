@@ -4,6 +4,7 @@
   const STR = {
     pt: {
       "nav.about": "Sobre",
+      "nav.video": "Vídeo",
       "nav.rule": "A regra",
       "nav.evidence": "Evidências",
       "nav.shots": "Capturas",
@@ -24,6 +25,9 @@
       "demo.title": "Hora de descansar os olhos",
       "demo.body": "Olhe para algo a 6 metros de distância",
       "demo.chip": "Próxima pausa em",
+      "video.kicker": "Veja em ação",
+      "video.title": "O widget em 10 segundos",
+      "video.sub": "Uma demonstração rápida: a bolinha acompanha o ciclo em silêncio, avisa com suavidade na hora da pausa e volta ao trabalho com você.",
       "about.kicker": "Por que existe",
       "about.title": "Olhamos para telas o dia inteiro. Piscamos 60% menos quando o fazemos.",
       "about.body": "Durante o trabalho concentrado em telas, a frequência do piscar despenca e o filme lacrimal evapora — resultando em ardência, visão turva e cansaço ao fim do dia. O Dry Eye Widget nasceu no consultório: uma resposta prática à queixa mais comum da era digital, transformada em software livre para qualquer pessoa usar.",
@@ -116,6 +120,7 @@
     },
     en: {
       "nav.about": "About",
+      "nav.video": "Video",
       "nav.rule": "The rule",
       "nav.evidence": "Evidence",
       "nav.shots": "Screenshots",
@@ -136,6 +141,9 @@
       "demo.title": "Time to rest your eyes",
       "demo.body": "Look at something 20 feet away",
       "demo.chip": "Next break in",
+      "video.kicker": "See it in action",
+      "video.title": "The widget in 10 seconds",
+      "video.sub": "A quick demo: the floating ball silently tracks your cycle, gently signals break time, and gets back to work with you.",
       "about.kicker": "Why it exists",
       "about.title": "We stare at screens all day. We blink 60% less while doing it.",
       "about.body": "During focused screen work, blink rate plummets and the tear film evaporates — leading to burning, blurry vision and end-of-day fatigue. Dry Eye Widget was born in the clinic: a practical answer to the most common complaint of the digital era, released as free software for anyone to use.",
