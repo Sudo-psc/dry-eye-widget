@@ -154,6 +154,7 @@ document.documentElement.setAttribute("data-theme",t);})();
       <a href="#video" data-i18n="nav.video">Vídeo</a>
       <a href="#regra" data-i18n="nav.rule">A regra</a>
       <a href="#evidencias" data-i18n="nav.evidence">Evidências</a>
+      <a href="#custo" data-i18n="nav.cost">Impacto</a>
       <a href="#capturas" data-i18n="nav.shots">Capturas</a>
       <a href="blog/" data-i18n="nav.blog">Blog</a>
     </nav>
@@ -250,6 +251,9 @@ document.documentElement.setAttribute("data-theme",t);})();
     </div>
     <figure class="video-frame glass reveal">
       <video
+        id="demo-video"
+        data-src="assets/video-landingpage.mp4"
+        data-src-mobile="assets/video-landingpage-mobile.mp4"
         poster="assets/video-poster.jpg"
         preload="metadata"
         controls
@@ -326,6 +330,73 @@ document.documentElement.setAttribute("data-theme",t);})();
       </div>
     </div>
     <p class="evidence-note reveal" data-i18n="ev.note">Referências completas com DOI ao final da página. Arquivo de metadados RIS disponível no repositório.</p>
+  </div>
+</section>
+
+<!-- ====================== HIDDEN COST (INFOGRAPHIC) ====================== -->
+<section class="section cost-section" id="custo" style="padding-top: 0;">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker" data-i18n="cost.kicker">O custo oculto das telas</span>
+      <h2 data-i18n="cost.title">Visão e produtividade no trabalho</h2>
+      <p data-i18n="cost.sub">A doença do olho seco não dói só nos olhos — ela aparece na folha de produtividade. Veja os números que justificam a pausa.</p>
+    </div>
+
+    <!-- Cards de destaque -->
+    <div class="cost-highlights">
+      <div class="cost-card glass reveal">
+        <div class="cost-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </div>
+        <div class="cost-fig">61,4<span>%</span></div>
+        <p data-i18n="cost.c1">de prevalência de olho seco entre trabalhadores que usam telas — a maioria com algum nível da doença.</p>
+      </div>
+      <div class="cost-card glass reveal warn">
+        <div class="cost-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2M9.5 2.5h5"></path></svg>
+        </div>
+        <div class="cost-fig">4,36<span data-i18n="cost.c2.u">h/semana</span></div>
+        <p data-i18n="cost.c2">perdidas em produtividade nos casos graves — mais de meio dia de trabalho a cada semana.</p>
+      </div>
+      <div class="cost-card glass reveal">
+        <div class="cost-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 16l3.5-4 3 2.5L20 8"></path></svg>
+        </div>
+        <div class="cost-fig">20,4<span>%</span></div>
+        <p data-i18n="cost.c3">de queda de produtividade (presenteísmo) no estágio grave da doença do olho seco.</p>
+      </div>
+    </div>
+
+    <!-- Gráfico de barras: gravidade × perda -->
+    <div class="cost-bars glass reveal">
+      <h3 data-i18n="cost.bars.title">Gravidade da doença × perda de produtividade</h3>
+      <div class="bar-row">
+        <span class="bar-label" data-i18n="cost.sev.mild">Leve</span>
+        <div class="bar-track"><div class="bar-fill mild" style="--w: 13%"></div></div>
+        <span class="bar-val"><strong>0,58 h</strong> · 13,66%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label" data-i18n="cost.sev.mod">Moderada</span>
+        <div class="bar-track"><div class="bar-fill mod" style="--w: 39%"></div></div>
+        <span class="bar-val"><strong>1,69 h</strong> · 15,93%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label" data-i18n="cost.sev.sev">Grave</span>
+        <div class="bar-track"><div class="bar-fill sev" style="--w: 100%"></div></div>
+        <span class="bar-val"><strong>4,36 h</strong> · 20,40%</span>
+      </div>
+      <p class="bar-foot" data-i18n="cost.bars.foot">Horas perdidas por semana e queda percentual de produtividade, por gravidade da doença do olho seco (DED).</p>
+    </div>
+
+    <!-- Infográfico completo -->
+    <figure class="cost-info reveal">
+      <picture>
+        <source srcset="assets/custo-oculto-telas.webp" type="image/webp">
+        <img src="assets/custo-oculto-telas.jpg" width="1600" height="893" loading="lazy" decoding="async"
+             alt="Infográfico: O custo oculto das telas — prevalência de olho seco, horas de produtividade perdidas, dinâmica do piscar e a regra 20-20-20.">
+      </picture>
+      <figcaption data-i18n="cost.caption">Panorama completo: impacto na saúde ocular e na produtividade, causas e estratégias de proteção.</figcaption>
+    </figure>
   </div>
 </section>
 

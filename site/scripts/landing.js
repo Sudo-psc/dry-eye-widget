@@ -14,8 +14,33 @@
   }
   initTheme();
 
+  /* ---------- Responsive demo video ----------
+     Em telas pequenas ou conexões com economia de dados, troca o vídeo de
+     demonstração pela versão comprimida (~460 KB vs ~2,4 MB). Idempotente:
+     roda imediatamente (antes do download do vídeo cheio) e de novo no
+     DOMContentLoaded, quando o viewport já está estável. */
+  function pickDemoVideo() {
+    var v = document.getElementById("demo-video");
+    if (!v) return;
+    var conn = navigator.connection || {};
+    var lite = window.matchMedia("(max-width: 640px)").matches ||
+      conn.saveData === true ||
+      /(^|-)2g$/.test(conn.effectiveType || "");
+    if (!lite) return;
+    var want = v.getAttribute("data-src-mobile");
+    var srcEl = v.querySelector("source");
+    if (srcEl && want && srcEl.getAttribute("src") !== want) {
+      srcEl.setAttribute("src", want);
+      v.load();
+    }
+  }
+  pickDemoVideo();
+  // Cobre rotação de tela / mudança de breakpoint após o carregamento.
+  try { window.matchMedia("(max-width: 640px)").addEventListener("change", pickDemoVideo); } catch (e) {}
+
   document.addEventListener("DOMContentLoaded", function () {
     window.dewInitLang();
+    pickDemoVideo();
 
     const themeBtn = document.getElementById("theme-toggle");
     if (themeBtn) themeBtn.addEventListener("click", function () {
