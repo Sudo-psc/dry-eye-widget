@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.10.1] - 2026-06-13
+
+### Corrigido
+- **Build Windows**: corrige a falha de compilação no novo `windows-latest`
+  (VS 2026 / MSVC 14.51), que passou a tratar `<experimental/coroutine>` como
+  erro fatal (STL1011) ao compilar o plugin `audioplayers_windows`. O define
+  `_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS` agora é aplicado a
+  todos os alvos via `windows/CMakeLists.txt`, restaurando a geração do
+  instalador `.exe` na release.
+
 ## [1.10.0] - 2026-06-13
 
 ### Adicionado
