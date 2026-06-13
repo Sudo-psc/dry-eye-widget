@@ -61,6 +61,11 @@ jobs:
 
       - name: Build Release
         run: flutter build windows --release
+        env:
+          # VS 2026/MSVC 14.51 (novo windows-latest) trata <experimental/coroutine>
+          # como erro (STL1011). audioplayers_windows ainda usa o header antigo;
+          # silencia a depreciação em todos os alvos via variável CL do cl.exe.
+          CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
 
       - name: Gerar ZIP portátil
         shell: pwsh
