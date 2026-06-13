@@ -59,6 +59,16 @@ document.documentElement.setAttribute("data-theme",t);})();
   },
   {
     "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "Dry Eye Widget — demonstração em funcionamento",
+    "description": "Demonstração do Dry Eye Widget: a bolinha flutuante acompanha o ciclo da regra 20-20-20, avisa com suavidade na hora da pausa e some quando não é necessária.",
+    "thumbnailUrl": "https://olhossecos.com.br/app/assets/video-poster.jpg",
+    "contentUrl": "https://olhossecos.com.br/app/assets/video-landingpage.mp4",
+    "uploadDate": "2026-06-13",
+    "duration": "PT10S"
+  },
+  {
+    "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
       {
@@ -141,6 +151,7 @@ document.documentElement.setAttribute("data-theme",t);})();
     </a>
     <nav class="main-nav">
       <a href="#sobre" data-i18n="nav.about">Sobre</a>
+      <a href="#video" data-i18n="nav.video">Vídeo</a>
       <a href="#regra" data-i18n="nav.rule">A regra</a>
       <a href="#evidencias" data-i18n="nav.evidence">Evidências</a>
       <a href="#capturas" data-i18n="nav.shots">Capturas</a>
@@ -226,6 +237,30 @@ document.documentElement.setAttribute("data-theme",t);})();
         <span class="mono" id="chip-timer">19:42</span>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ====================== VIDEO DEMO ====================== -->
+<section class="section video-section" id="video">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker" data-i18n="video.kicker">Veja em ação</span>
+      <h2 data-i18n="video.title">O widget em 10 segundos</h2>
+      <p data-i18n="video.sub">Uma demonstração rápida: a bolinha acompanha o ciclo em silêncio, avisa com suavidade na hora da pausa e volta ao trabalho com você.</p>
+    </div>
+    <figure class="video-frame glass reveal">
+      <video
+        poster="assets/video-poster.jpg"
+        preload="metadata"
+        controls
+        muted
+        loop
+        autoplay
+        playsinline
+        aria-label="Demonstração do Dry Eye Widget em funcionamento">
+        <source src="assets/video-landingpage.mp4" type="video/mp4">
+      </video>
+    </figure>
   </div>
 </section>
 

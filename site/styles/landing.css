@@ -358,6 +358,42 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
 /* ---------- Reveal on scroll: estados aplicados via JS (fail-safe) ---------- */
 .reveal { opacity: 1; }
 
+/* ---------- Video demo ---------- */
+.video-section .section-head {
+  max-width: 680px;
+  margin-inline: auto;
+  margin-bottom: 28px;
+  justify-items: center;
+  text-align: center;
+}
+.video-frame {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: var(--radius-2xl);
+  position: relative;
+  overflow: hidden;
+}
+.video-frame::after {
+  /* brilho sutil na borda superior, no espírito liquid glass */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% -10%, var(--accent-soft), transparent 60%);
+}
+.video-frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  background: #05080d;
+  position: relative;
+  z-index: 1;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 980px) {
   .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
@@ -370,5 +406,6 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   .doctor-card { grid-template-columns: 1fr; justify-items: start; }
   .ref-item { grid-template-columns: 28px 1fr; }
   .ref-item a.doi { grid-column: 2; justify-self: start; }
+  .video-frame { padding: 6px; }
   :root { --section-gap: 44px; }
 }
