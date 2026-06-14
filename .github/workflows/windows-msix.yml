@@ -1,0 +1,64 @@
+# Gera o pacote MSIX (para a Microsoft Store) do Dry Eye Widget.
+#
+# A Store assina o MSIX automaticamente (política 10.2.9) — não usa certificado.
+# O .msix sai como artefato do run; baixe e envie no Partner Center.
+#
+# Pré-requisito: os valores de identidade em `msix_config` (pubspec.yaml) devem
+# ser os do Partner Center → Gerenciamento de produtos → Identidade do produto.
+
+name: Windows MSIX (Store)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*-msix"
+
+permissions:
+  contents: read
+
+jobs:
+  build-msix:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.44.1"
+          cache: true
+
+      - name: Habilitar desktop Windows
+        run: flutter config --enable-windows-desktop
+
+      - name: Dependências
+        run: flutter pub get
+
+      - name: Build Release
+        run: flutter build windows --release
+        env:
+          # Mesma mitigação do build .exe (STL1011 no MSVC 14.51).
+          CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
+
+      - name: Gerar MSIX para a Store
+        run: dart run msix:create --store
+
+      - name: Localizar o .msix
+        id: find
+        shell: pwsh
+        run: |
+          $msix = Get-ChildItem -Recurse -Filter *.msix |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msix) { throw "Nenhum .msix gerado." }
+          Write-Host "MSIX: $($msix.FullName)"
+          "path=$($msix.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Subir artefato (.msix)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-eye-widget-msix
+          path: ${{ steps.find.outputs.path }}
+          if-no-files-found: error
