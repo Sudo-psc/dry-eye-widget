@@ -27,6 +27,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   fake_async: ^1.3.3
+  msix: ^3.16.8
 
 flutter:
   uses-material-design: true
@@ -43,3 +44,21 @@ flutter_launcher_icons:
     generate: true
     image_path: "icon.png"
     icon_size: 256
+
+# Empacotamento MSIX para a Microsoft Store.
+# A própria Store assina o pacote (política 10.2.9) — não é preciso certificado.
+# Gere com: dart run msix:create --store
+#
+# IMPORTANTE: os três valores de identidade abaixo precisam ser IDÊNTICOS aos do
+# Partner Center → seu app → Gerenciamento de produtos → Identidade do produto
+# (Package/Identity/Name, Package/Identity/Publisher, PublisherDisplayName).
+msix_config:
+  display_name: Dry Eye Widget
+  publisher_display_name: DR. Philipe Saraiva Cruz
+  identity_name: DR.PhilipeSaraivaCruz.DryEyeWidget
+  publisher: CN=71D5E9B9-21A8-4078-84B2-62C827D80D0E
+  msix_version: 1.10.2.0
+  logo_path: icon.png
+  languages: pt-br, en-us
+  capabilities: internetClient
+  store: true
