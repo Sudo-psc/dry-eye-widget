@@ -197,9 +197,9 @@ document.documentElement.setAttribute("data-theme",t);})();
         <a href="https://github.com/Sudo-psc/dry-eye-widget/releases" target="_blank" rel="noopener" data-i18n="hero.meta.releases">todas as versões</a>
       </p>
       <p class="dl-note" style="margin-top:10px;font-size:.82rem;opacity:.72;line-height:1.5;max-width:56ch">
-        <span data-i18n="hero.note.mac">No macOS, se aparecer que o app "está danificado", ele não está corrompido — falta apenas a assinatura paga da Apple. Arraste o app para Aplicativos e rode no Terminal:</span>
+        <span data-i18n="hero.note.mac">No macOS, se aparecer que o arquivo "está danificado", ele não está corrompido — falta apenas a assinatura paga da Apple. Abra o Terminal, rode o comando abaixo e então abra o .dmg normalmente:</span>
         <br>
-        <code style="display:inline-block;margin-top:4px;padding:2px 7px;border-radius:5px;background:rgba(127,127,127,.18);font-size:.82em;user-select:all">xattr -dr com.apple.quarantine "/Applications/Dry Eye Widget.app"</code>
+        <code style="display:inline-block;margin-top:4px;padding:2px 7px;border-radius:5px;background:rgba(127,127,127,.18);font-size:.82em;user-select:all">xattr -cr ~/Downloads/DryEyeWidget*.dmg</code>
       </p>
       <div class="trust-row">
         <span class="trust-item">
