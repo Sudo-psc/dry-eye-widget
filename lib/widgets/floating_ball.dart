@@ -25,6 +25,8 @@ class FloatingBall extends StatefulWidget {
     this.dynamicOrbEffect = AppDefaults.dynamicOrbEffect,
     this.hoverReactiveBall = AppDefaults.hoverReactiveBall,
     this.orbIntensity = AppDefaults.orbIntensity,
+    this.blinkReminderVisible = false,
+    this.blinkReminderText = '',
     this.onTap,
     this.onSecondaryTap,
     this.onDragStart,
@@ -42,6 +44,8 @@ class FloatingBall extends StatefulWidget {
   final bool dynamicOrbEffect;
   final bool hoverReactiveBall;
   final double orbIntensity;
+  final bool blinkReminderVisible;
+  final String blinkReminderText;
   final VoidCallback? onTap;
   final VoidCallback? onSecondaryTap;
   final VoidCallback? onDragStart;
@@ -59,6 +63,7 @@ class _FloatingBallState extends State<FloatingBall>
     with TickerProviderStateMixin {
   late final AnimationController _blink;
   late final AnimationController _orb;
+  late final AnimationController _reminder;
   late final Animation<double> _opacity;
   bool _hovered = false;
 
@@ -74,8 +79,13 @@ class _FloatingBallState extends State<FloatingBall>
       vsync: this,
       duration: const Duration(milliseconds: 3200),
     );
+    _reminder = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
     _syncAnimation();
     _syncOrbAnimation();
+    _syncReminderAnimation();
   }
 
   @override
@@ -92,6 +102,10 @@ class _FloatingBallState extends State<FloatingBall>
         oldWidget.orbIntensity != widget.orbIntensity ||
         oldWidget.isActive != widget.isActive) {
       _syncOrbAnimation();
+    }
+    if (oldWidget.blinkReminderVisible != widget.blinkReminderVisible ||
+        oldWidget.isActive != widget.isActive) {
+      _syncReminderAnimation();
     }
   }
 
@@ -115,16 +129,30 @@ class _FloatingBallState extends State<FloatingBall>
     }
   }
 
+  void _syncReminderAnimation() {
+    if (widget.blinkReminderVisible && !widget.isActive) {
+      _reminder.repeat(reverse: true);
+    } else {
+      _reminder.stop();
+      _reminder.value = 0;
+    }
+  }
+
   @override
   void dispose() {
     _blink.dispose();
     _orb.dispose();
+    _reminder.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final color = widget.isActive ? widget.alertColor : widget.idleColor;
+    final reminderVisible =
+        widget.blinkReminderVisible &&
+        !widget.isActive &&
+        widget.blinkReminderText.trim().isNotEmpty;
     final baseOpacity = widget.isActive
         ? 1.0
         : widget.idleOpacity.clamp(0.1, 1.0);
@@ -138,12 +166,16 @@ class _FloatingBallState extends State<FloatingBall>
         : 0.0;
 
     Widget circle = AnimatedBuilder(
-      animation: Listenable.merge([_opacity, _orb]),
+      animation: Listenable.merge([_opacity, _orb, _reminder]),
       builder: (context, _) {
+        final reminderPulse = reminderVisible
+            ? math.sin(_reminder.value * math.pi)
+            : 0.0;
         final hoverScale = widget.hoverReactiveBall && _hovered ? 1.08 : 1.0;
+        final reminderScale = 1.0 + reminderPulse * 0.05;
         final opacity = widget.isActive ? _opacity.value : baseOpacity;
         return Transform.scale(
-          scale: hoverScale,
+          scale: hoverScale * reminderScale,
           child: Opacity(
             opacity: opacity,
             child: Container(
@@ -185,6 +217,14 @@ class _FloatingBallState extends State<FloatingBall>
                       color: const Color(0xFF79F2D0).withValues(alpha: 0.42),
                       blurRadius: s * 0.46,
                       spreadRadius: 2.0,
+                    ),
+                  if (reminderVisible)
+                    BoxShadow(
+                      color: const Color(
+                        0xFF88F7FF,
+                      ).withValues(alpha: 0.22 + reminderPulse * 0.22),
+                      blurRadius: s * (0.44 + reminderPulse * 0.18),
+                      spreadRadius: 1.5 + reminderPulse * 1.5,
                     ),
                   // Brilho colorido quando em alerta.
                   if (widget.isActive)
@@ -257,6 +297,18 @@ class _FloatingBallState extends State<FloatingBall>
         ),
       );
     }
+    if (reminderVisible) {
+      final pillWidth = math.max(widget.size + 156, 176.0).toDouble();
+      final pillHeight = math.max(widget.size + 24, 52.0).toDouble();
+      visual = _BlinkReminderPill(
+        width: pillWidth,
+        height: pillHeight,
+        color: color,
+        text: widget.blinkReminderText,
+        progressRingVisible: ringVisible,
+        child: visual,
+      );
+    }
 
     return MouseRegion(
       cursor: SystemMouseCursors.grab,
@@ -273,6 +325,77 @@ class _FloatingBallState extends State<FloatingBall>
         onPanStart: (_) => widget.onDragStart?.call(),
         onPanEnd: (_) => widget.onDragEnd?.call(),
         child: visual,
+      ),
+    );
+  }
+}
+
+class _BlinkReminderPill extends StatelessWidget {
+  const _BlinkReminderPill({
+    required this.width,
+    required this.height,
+    required this.color,
+    required this.text,
+    required this.progressRingVisible,
+    required this.child,
+  });
+
+  final double width;
+  final double height;
+  final Color color;
+  final String text;
+  final bool progressRingVisible;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFF07121F).withValues(alpha: 0.58),
+            borderRadius: BorderRadius.circular(height / 2),
+            border: Border.all(color: color.withValues(alpha: 0.32), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.24),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: color.withValues(alpha: 0.22),
+                blurRadius: 18,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(progressRingVisible ? 3 : 8, 5, 14, 5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                child,
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    text,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

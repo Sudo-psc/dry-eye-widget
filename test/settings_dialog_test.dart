@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dry_eye_widget/l10n/app_strings.dart';
+import 'package:dry_eye_widget/models/app_state.dart';
 import 'package:dry_eye_widget/models/widget_settings.dart';
 import 'package:dry_eye_widget/widgets/settings_dialog.dart';
 import 'package:flutter/material.dart';
@@ -107,5 +108,42 @@ void main() {
     await tester.pump();
 
     expect(resetCalls, 2);
+  });
+
+  testWidgets('permite ativar aviso sonoro de piscada e escolher toque', (
+    tester,
+  ) async {
+    WidgetSettings? saved;
+
+    await tester.pumpWidget(
+      host(initial: WidgetSettings.defaults(), onSave: (s) => saved = s),
+    );
+
+    final soundRow = find.ancestor(
+      of: find.text(ptStrings.blinkReminderSound),
+      matching: find.byType(Row),
+    );
+    final soundSwitch = find.descendant(
+      of: soundRow,
+      matching: find.byType(Switch),
+    );
+    await tester.tap(soundSwitch);
+    await tester.pump();
+
+    expect(find.text(ptStrings.blinkReminderToneSoftPulse), findsOneWidget);
+    expect(find.text(ptStrings.blinkReminderToneWarmBell), findsOneWidget);
+
+    await tester.ensureVisible(find.text(ptStrings.blinkReminderToneWarmBell));
+    await tester.pump();
+    await tester.tap(find.text(ptStrings.blinkReminderToneWarmBell));
+    await tester.pump();
+
+    await tester.ensureVisible(find.text(ptStrings.save));
+    await tester.tap(find.text(ptStrings.save));
+    await tester.pump();
+
+    expect(saved, isNotNull);
+    expect(saved!.blinkReminderSoundEnabled, isTrue);
+    expect(saved!.blinkReminderSound, BlinkReminderSound.warmBell);
   });
 }

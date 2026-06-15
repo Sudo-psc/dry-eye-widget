@@ -52,6 +52,11 @@ class AppDefaults {
   static const int phaseSeconds = 20;
   static const bool soundEnabled = true;
   static const bool notificationsEnabled = true;
+  static const bool visualBlinkRemindersEnabled = true;
+  static const bool blinkReminderSoundEnabled = false;
+  static const double blinkReminderVolume = 0.3;
+  static const int blinkReminderIntervalMs = 7500;
+  static const int blinkReminderVisibleMs = 1800;
 
   static const double ballSize = 24.0;
   static const int idleColor = 0xFF4A90E2;
@@ -173,7 +178,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.10.2';
+  static const String version = '1.11.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

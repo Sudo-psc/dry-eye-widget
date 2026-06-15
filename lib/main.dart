@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
@@ -29,7 +30,6 @@ import 'services/storage_service.dart';
 import 'services/tray_service.dart';
 import 'services/update_service.dart';
 import 'utils/constants.dart';
-import 'widgets/about_panel.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
@@ -144,6 +144,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider<StorageService>.value(value: storage),
+        Provider<AudioService>.value(value: audio),
         Provider<StartupService>.value(value: startup),
         Provider<TrayService>.value(value: tray),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
@@ -227,6 +228,7 @@ class DryEyeApp extends StatelessWidget {
 
 enum _WindowLayout {
   ball,
+  blinkReminder,
   menu,
   settings,
   osdi,
@@ -241,6 +243,12 @@ const Size _gentleWindowSize = Size(340, 150);
 /// Tamanho do cartão de aviso de pausa por inatividade (canto superior direito).
 const Size _inactivityWindowSize = Size(320, 120);
 
+/// Tamanho da micronotificação de piscada em função do diâmetro da bolinha.
+Size _blinkReminderWindowSize(double ballSize) => Size(
+  math.max(ballSize + 156, 176.0).toDouble(),
+  math.max(ballSize + 24, 52.0).toDouble(),
+);
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -251,6 +259,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TrayListener {
   late final TimerProvider _timer;
   late final SettingsProvider _settings;
+  late final AudioService _audio;
   late final TrayService _tray;
 
   bool _menuOpen = false;
@@ -259,10 +268,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _updateOpen = false;
   bool _osdiOpen = false;
   bool _screenTimeOpen = false;
-  bool _aboutOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
+  bool _blinkReminderVisible = false;
+  Timer? _blinkReminderTicker;
+  Timer? _blinkReminderHideTimer;
 
   final UpdateService _updater = UpdateService();
   UpdateResult? _updateResult;
@@ -285,6 +296,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     super.initState();
     _timer = context.read<TimerProvider>();
     _settings = context.read<SettingsProvider>();
+    _audio = context.read<AudioService>();
     _tray = context.read<TrayService>();
     _lastBallSize = _settings.value.ballSize;
     _lastDockHidden = _settings.value.hideDockIcon;
@@ -295,6 +307,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _timer.addListener(_onStateChanged);
     _settings.addListener(_onSettingsChanged);
     trayManager.addListener(this);
+    _startBlinkReminderLoop();
     _cacheCurrentPosition();
     // Aplica o estado inicial de visibilidade da bolinha após o primeiro frame.
     if (!_widgetEnabled) {
@@ -315,8 +328,90 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _timer.removeListener(_onStateChanged);
     _settings.removeListener(_onSettingsChanged);
     trayManager.removeListener(this);
+    _blinkReminderTicker?.cancel();
+    _blinkReminderHideTimer?.cancel();
     super.dispose();
   }
+
+  void _startBlinkReminderLoop() {
+    _blinkReminderTicker?.cancel();
+    _blinkReminderTicker = Timer.periodic(
+      const Duration(milliseconds: AppDefaults.blinkReminderIntervalMs),
+      (_) {
+        if (_canTriggerBlinkReminder) {
+          unawaited(_triggerBlinkReminder());
+        } else if (_blinkReminderVisible) {
+          _hideBlinkReminder(restoreLayout: true);
+        }
+      },
+    );
+  }
+
+  bool get _canTriggerBlinkReminder =>
+      mounted &&
+      _isBlinkReminderContextFree &&
+      (_canShowVisualBlinkReminder ||
+          (_settings.value.soundEnabled &&
+              _settings.value.blinkReminderSoundEnabled));
+
+  bool get _isBlinkReminderContextFree =>
+      !_menuOpen &&
+      !_settingsOpen &&
+      !_guidanceOpen &&
+      !_updateOpen &&
+      !_osdiOpen &&
+      !_screenTimeOpen &&
+      !_timer.eyeDropsAlert &&
+      !_timer.inactivityAlert &&
+      !_timer.isPaused &&
+      _timer.state == AppState.idle;
+
+  bool get _canShowVisualBlinkReminder =>
+      _settings.value.visualBlinkRemindersEnabled && _widgetEnabled;
+
+  Future<void> _triggerBlinkReminder() async {
+    if (!_canTriggerBlinkReminder) return;
+    final settings = _settings.value;
+    if (settings.soundEnabled && settings.blinkReminderSoundEnabled) {
+      unawaited(
+        _audio.playBlinkReminder(
+          sound: settings.blinkReminderSound,
+          volume: settings.blinkReminderVolume,
+        ),
+      );
+    }
+
+    if (_blinkReminderVisible || !_canShowVisualBlinkReminder) return;
+    setState(() => _blinkReminderVisible = true);
+    await _applyLayout(_WindowLayout.blinkReminder);
+    _blinkReminderHideTimer?.cancel();
+    _blinkReminderHideTimer = Timer(
+      const Duration(milliseconds: AppDefaults.blinkReminderVisibleMs),
+      () => _hideBlinkReminder(restoreLayout: true),
+    );
+  }
+
+  void _hideBlinkReminder({required bool restoreLayout}) {
+    _blinkReminderHideTimer?.cancel();
+    _blinkReminderHideTimer = null;
+    if (!_blinkReminderVisible) return;
+    if (mounted) setState(() => _blinkReminderVisible = false);
+    if (restoreLayout && _isCompactLayoutFree) {
+      unawaited(_applyLayout(_WindowLayout.ball));
+    }
+  }
+
+  bool get _isCompactLayoutFree =>
+      _widgetEnabled &&
+      !_menuOpen &&
+      !_settingsOpen &&
+      !_guidanceOpen &&
+      !_updateOpen &&
+      !_osdiOpen &&
+      !_screenTimeOpen &&
+      !_timer.eyeDropsAlert &&
+      !_timer.inactivityAlert &&
+      _timer.state == AppState.idle;
 
   void _onStateChanged() {
     // Mantém o ícone da barra de menu em sincronia com o progresso do ciclo.
@@ -482,6 +577,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
         strings: _settings.strings,
       );
     }
+    if (!_settings.value.visualBlinkRemindersEnabled && _blinkReminderVisible) {
+      _hideBlinkReminder(restoreLayout: true);
+    }
   }
 
   // --- Layout da janela ---------------------------------------------------
@@ -511,6 +609,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Future<void> _applyLayout(_WindowLayout layout) async {
+    if (layout != _WindowLayout.blinkReminder && _blinkReminderVisible) {
+      _blinkReminderHideTimer?.cancel();
+      _blinkReminderHideTimer = null;
+      if (mounted) setState(() => _blinkReminderVisible = false);
+    }
     try {
       switch (layout) {
         case _WindowLayout.ball:
@@ -518,6 +621,14 @@ class _HomePageState extends State<HomePage> with TrayListener {
             _compactWindowSize(_settings.value.ballSize),
           );
           await windowManager.setPosition(_ballPosition);
+          break;
+        case _WindowLayout.blinkReminder:
+          final reminderSize = _blinkReminderWindowSize(
+            _settings.value.ballSize,
+          );
+          await windowManager.setSize(reminderSize);
+          await windowManager.setPosition(_ballPosition);
+          await _nudgeIntoScreen(reminderSize);
           break;
         case _WindowLayout.menu:
           await _cacheCurrentPosition();
@@ -643,23 +754,65 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   void _openAbout() {
-    setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _guidanceOpen = false;
-      _osdiOpen = false;
-      _screenTimeOpen = false;
-      _updateOpen = false;
-      _aboutOpen = true;
-    });
-    // Painel interno num layout amplo: uma janela do tamanho da bolinha não
-    // tem espaço para renderizar o conteúdo (causa do botão "não funcionar").
-    _applyLayout(_WindowLayout.settings);
-  }
-
-  void _closeAbout() {
-    setState(() => _aboutOpen = false);
-    _restoreAfterPanel();
+    setState(() => _menuOpen = false);
+    _applyLayout(_WindowLayout.ball);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Row(
+          children: [
+            const Icon(Icons.info_outline, color: AppColors.textPrimary),
+            const SizedBox(width: 8),
+            Text(
+              context.read<SettingsProvider>().strings.menuAbout,
+              style: const TextStyle(color: AppColors.textPrimary),
+            ),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Dry Eye Widget',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Versão: ${AppInfo.version}',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Autor: Philipe Saraiva Cruz',
+              style: TextStyle(color: AppColors.textPrimary),
+            ),
+            Text(
+              'CRM-MG 69.870 | CRM-SP 204.923',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            Text(
+              'Instagram: @drphilipesaraiva',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              context.read<SettingsProvider>().strings.close,
+              style: const TextStyle(color: AppColors.idleBall),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _closeSettings() {
@@ -819,10 +972,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = Center(
         child: GuidanceDialog(strings: strings, onClose: _closeGuidance),
       );
-    } else if (_aboutOpen) {
-      body = Center(
-        child: AboutPanel(strings: strings, onClose: _closeAbout),
-      );
     } else if (timer.eyeDropsAlert) {
       body = EyeDropsReminder(strings: strings, onDone: _timer.dismissEyeDrops);
     } else if (timer.state.isActive) {
@@ -850,6 +999,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     required WidgetSettings s,
     bool interactive = true,
     double progress = 0.0,
+    bool blinkReminderVisible = false,
+    String blinkReminderText = '',
   }) {
     return FloatingBall(
       isActive: isActive,
@@ -863,6 +1014,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       dynamicOrbEffect: s.dynamicOrbEffect,
       hoverReactiveBall: s.hoverReactiveBall,
       orbIntensity: s.orbIntensity,
+      blinkReminderVisible: blinkReminderVisible,
+      blinkReminderText: blinkReminderText,
       onTap: interactive ? _onBallTap : null,
       onSecondaryTap: interactive ? _onBallSecondaryTap : null,
       onDragStart: interactive ? _onBallDragStart : null,
@@ -881,6 +1034,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           isActive: timer.state.isActive,
           s: settings,
           progress: timer.cycleProgress,
+          blinkReminderVisible: _blinkReminderVisible,
+          blinkReminderText: strings.blinkReminderText,
         ),
       );
     }
