@@ -178,10 +178,16 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.11.1';
+  static const String version = '1.11.2';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';
+
+  /// Comando que remove a quarentena do .dmg baixado, contornando o falso
+  /// "app danificado" do Gatekeeper (build sem notarização). Mostrado no
+  /// diálogo de atualização do macOS.
+  static const String macUnblockCommand =
+      'xattr -cr ~/Downloads/DryEyeWidget*.dmg';
 
   static String get latestReleaseApi =>
       'https://api.github.com/repos/$repoOwner/$repoName/releases/latest';

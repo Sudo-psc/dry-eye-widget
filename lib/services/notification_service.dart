@@ -22,8 +22,8 @@ class NotificationService {
     }
   }
 
-  Future<void> show(String title, String body) async {
-    if (!enabled || !_ready) return;
+  Future<void> show(String title, String body, {bool force = false}) async {
+    if ((!enabled && !force) || !_ready) return;
     try {
       final notification = LocalNotification(title: title, body: body);
       await notification.show();
@@ -31,6 +31,11 @@ class NotificationService {
       debugPrint('NotificationService: falha ao exibir notificação ($e).');
     }
   }
+
+  /// Exibe a notificação ignorando o flag [enabled]. Usado para garantir o
+  /// aviso quando o overlay não pode aparecer (ex.: app em tela cheia).
+  Future<void> showForced(String title, String body) =>
+      show(title, body, force: true);
 
   /// Notificação de início da pausa.
   Future<void> notifyBreakStart(String title, String body) =>

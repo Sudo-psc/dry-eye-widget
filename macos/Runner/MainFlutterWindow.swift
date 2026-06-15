@@ -108,7 +108,54 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    // Canal de detecção de tela cheia: indica se o app em primeiro plano (que
+    // não seja este widget) ocupa uma tela inteira. Lê apenas metadados de
+    // janela (CGWindowList) — não captura conteúdo, então não exige permissão
+    // de gravação de tela.
+    let displayChannel = FlutterMethodChannel(
+      name: "dry_eye_widget/display",
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
+    displayChannel.setMethodCallHandler { (call, result) in
+      if call.method == "frontmostFullscreen" {
+        result(MainFlutterWindow.frontmostAppIsFullscreen())
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     super.awakeFromNib()
+  }
+
+  /// Heurística de tela cheia: o app frontmost tem uma janela de nível normal
+  /// (layer 0) que cobre uma tela inteira — incluindo a faixa da barra de
+  /// menus, o que a distingue de uma janela apenas maximizada. Usa só metadados
+  /// de janela; não acessa o conteúdo de nenhuma janela.
+  static func frontmostAppIsFullscreen() -> Bool {
+    guard let frontApp = NSWorkspace.shared.frontmostApplication else { return false }
+    let pid = frontApp.processIdentifier
+    // Ignora o próprio widget.
+    if pid == ProcessInfo.processInfo.processIdentifier { return false }
+    guard let infoList = CGWindowListCopyWindowInfo(
+      [.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+      as? [[String: Any]] else { return false }
+    let screenSizes = NSScreen.screens.map { $0.frame.size }
+    for info in infoList {
+      // Os números do CGWindowList chegam como NSNumber; `as? Int` faz o bridge
+      // de forma confiável (`as? pid_t`/Int32 retornaria nil).
+      guard let ownerPID = info[kCGWindowOwnerPID as String] as? Int,
+        ownerPID == Int(pid),
+        let layer = info[kCGWindowLayer as String] as? Int,
+        layer == 0,
+        let boundsDict = info[kCGWindowBounds as String] as? [String: Any],
+        let bounds = CGRect(dictionaryRepresentation: boundsDict as CFDictionary)
+      else { continue }
+      for size in screenSizes {
+        if bounds.width >= size.width - 1 && bounds.height >= size.height - 1 {
+          return true
+        }
+      }
+    }
+    return false
   }
 
   // Janela transparente, sem fundo, sempre no topo e em todos os Spaces.

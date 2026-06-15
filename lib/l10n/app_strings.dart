@@ -123,6 +123,10 @@ class AppStrings {
     required this.updateDownload,
     required this.updateError,
     required this.updateChecking,
+    required this.updateMacInstallTitle,
+    required this.updateMacInstallSteps,
+    required this.updateCopyCommand,
+    required this.updateCommandCopied,
     required this.close,
     // OSDI
     required this.osdiTitle,
@@ -301,6 +305,10 @@ class AppStrings {
   final String updateDownload;
   final String updateError;
   final String updateChecking;
+  final String updateMacInstallTitle;
+  final String updateMacInstallSteps;
+  final String updateCopyCommand;
+  final String updateCommandCopied;
   final String close;
 
   final String osdiTitle;
@@ -575,6 +583,13 @@ const AppStrings ptStrings = AppStrings(
       'Não foi possível verificar atualizações agora. '
       'Tente novamente mais tarde.',
   updateChecking: 'Verificando atualizações…',
+  updateMacInstallTitle: 'Instalar a atualização no macOS',
+  updateMacInstallSteps:
+      'Baixe o .dmg, rode o comando abaixo no Terminal para liberá-lo e então '
+      'abra o arquivo e arraste o app para Aplicativos, substituindo a versão '
+      'atual.',
+  updateCopyCommand: 'Copiar comando',
+  updateCommandCopied: 'Comando copiado',
   close: 'Fechar',
   osdiTitle: 'Questionário OSDI',
   osdiSubtitle: 'Acompanhe sintomas de olho seco ao longo do tempo.',
@@ -826,6 +841,13 @@ const AppStrings enStrings = AppStrings(
   updateDownload: 'Download',
   updateError: "Couldn't check for updates right now. Please try again later.",
   updateChecking: 'Checking for updates…',
+  updateMacInstallTitle: 'Install the update on macOS',
+  updateMacInstallSteps:
+      'Download the .dmg, run the command below in Terminal to unblock it, then '
+      'open the file and drag the app to Applications, replacing the current '
+      'version.',
+  updateCopyCommand: 'Copy command',
+  updateCommandCopied: 'Command copied',
   close: 'Close',
   osdiTitle: 'OSDI questionnaire',
   osdiSubtitle: 'Track dry-eye symptoms over time.',
