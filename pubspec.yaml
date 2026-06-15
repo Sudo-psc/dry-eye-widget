@@ -57,7 +57,7 @@ msix_config:
   publisher_display_name: DR. Philipe Saraiva Cruz
   identity_name: DR.PhilipeSaraivaCruz.DryEyeWidget
   publisher: CN=71D5E9B9-21A8-4078-84B2-62C827D80D0E
-  msix_version: 1.10.2.0
+  msix_version: 1.11.0.0
   logo_path: icon.png
   languages: pt-br, en-us
   capabilities: internetClient
