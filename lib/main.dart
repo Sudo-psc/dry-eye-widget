@@ -351,8 +351,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       mounted &&
       _isBlinkReminderContextFree &&
       (_canShowVisualBlinkReminder ||
-          (_settings.value.soundEnabled &&
-              _settings.value.blinkReminderSoundEnabled));
+          _settings.value.blinkReminderSoundEnabled);
 
   bool get _isBlinkReminderContextFree =>
       !_menuOpen &&
@@ -372,7 +371,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _triggerBlinkReminder() async {
     if (!_canTriggerBlinkReminder) return;
     final settings = _settings.value;
-    if (settings.soundEnabled && settings.blinkReminderSoundEnabled) {
+    // O aviso sonoro de piscada tem habilitação própria, independente do
+    // controle de som dos avisos 20-20-20 ([soundEnabled]).
+    if (settings.blinkReminderSoundEnabled) {
       unawaited(
         _audio.playBlinkReminder(
           sound: settings.blinkReminderSound,

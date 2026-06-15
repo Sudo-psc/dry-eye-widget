@@ -25,14 +25,17 @@ class AudioService {
   /// lembrete de piscada mudo.
   final AudioPlayer _blinkPlayer = AudioPlayer();
 
+  /// Habilita os sons do ciclo 20-20-20 (alerta, tique-taque, sucesso). Não
+  /// afeta o lembrete de piscada, que tem habilitação própria.
   bool enabled = true;
 
   Future<void> _playOn(
     AudioPlayer player,
     String asset, {
     double volume = 1.0,
+    bool gated = true,
   }) async {
-    if (!enabled) return;
+    if (gated && !enabled) return;
     try {
       final safeVolume = volume.clamp(0.0, 1.0).toDouble();
       await player.stop();
@@ -58,10 +61,14 @@ class AudioService {
 
   /// Tom suave do lembrete de piscada (player dedicado, com o volume aplicado
   /// explicitamente para garantir áudio no macOS).
+  ///
+  /// Tem habilitação própria (`blinkReminderSoundEnabled`), por isso **não**
+  /// respeita o [enabled] geral — que silencia apenas os avisos do ciclo
+  /// 20-20-20.
   Future<void> playBlinkReminder({
     required BlinkReminderSound sound,
     required double volume,
-  }) => _playOn(_blinkPlayer, sound.assetName, volume: volume);
+  }) => _playOn(_blinkPlayer, sound.assetName, volume: volume, gated: false);
 
   void dispose() {
     _player.dispose();
