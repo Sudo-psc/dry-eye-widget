@@ -30,7 +30,7 @@ Esta semana tivemos muito trabalho concentrado em:
 4. Persistência de tela em Fullscreen (98bd126)
 5. Adição de Landing Page, Site Estático e novos assets de documentação (d5e34eb, edaa9e9, 7cdd3ae, c532e6d)
 6. Novos visuais: design 3D, orb dynamics, progress ring (cfbd66e, 0379d70)
-7. Conformidade com SignPath para Windows CI Code Signing (cc07c53, 3c8b26d)
+7. Conformidade com SignPath para Windows CI Code Signing (3c8b26d)
 
 ### Falhas e Pontos de Atenção Encontrados
 - **Falhas de CI/Build**: Vimos problemas em versões específicas do MSVC (14.51) que precisaram de hotfixes rápidos. O uso de `if:` com `secrets` no CI quebrou pipelines, o que nos lembra de sempre testar changes em branches antes de push na main.
