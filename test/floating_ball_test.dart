@@ -68,4 +68,32 @@ void main() {
     expect(taps, 1);
     await gesture.removePointer();
   });
+
+  testWidgets('micronotificacao de piscada mostra texto e preserva clique', (
+    tester,
+  ) async {
+    var taps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              blinkReminderVisible: true,
+              blinkReminderText: 'Pisque',
+              onTap: () => taps++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Pisque'), findsOneWidget);
+
+    await tester.tap(find.byType(FloatingBall));
+    await tester.pump();
+
+    expect(taps, 1);
+  });
 }

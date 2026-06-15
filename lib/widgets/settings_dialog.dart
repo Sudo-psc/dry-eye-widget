@@ -178,6 +178,96 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     onChanged: (v) =>
                         _set(_draft.copyWith(phaseSeconds: v.round())),
                   ),
+                  _switchRow(
+                    label: s.visualBlinkReminders,
+                    value: _draft.visualBlinkRemindersEnabled,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(visualBlinkRemindersEnabled: v)),
+                  ),
+                  _hint(s.visualBlinkRemindersHint),
+                  _switchRow(
+                    label: s.blinkReminderSound,
+                    value: _draft.blinkReminderSoundEnabled,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(blinkReminderSoundEnabled: v)),
+                  ),
+                  _hint(s.blinkReminderSoundHint),
+                  if (_draft.blinkReminderSoundEnabled) ...[
+                    const SizedBox(height: 8),
+                    _slider(
+                      label: s.blinkReminderVolume,
+                      value: _draft.blinkReminderVolume,
+                      min: 0.0,
+                      max: 1.0,
+                      suffix: '${(_draft.blinkReminderVolume * 100).round()}%',
+                      onChanged: (v) =>
+                          _set(_draft.copyWith(blinkReminderVolume: v)),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _choiceButton(
+                          label: s.blinkReminderSoundLabel(
+                            BlinkReminderSound.softPulse,
+                          ),
+                          selected:
+                              _draft.blinkReminderSound ==
+                              BlinkReminderSound.softPulse,
+                          onTap: () => _set(
+                            _draft.copyWith(
+                              blinkReminderSound: BlinkReminderSound.softPulse,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        _choiceButton(
+                          label: s.blinkReminderSoundLabel(
+                            BlinkReminderSound.clearDrop,
+                          ),
+                          selected:
+                              _draft.blinkReminderSound ==
+                              BlinkReminderSound.clearDrop,
+                          onTap: () => _set(
+                            _draft.copyWith(
+                              blinkReminderSound: BlinkReminderSound.clearDrop,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _choiceButton(
+                          label: s.blinkReminderSoundLabel(
+                            BlinkReminderSound.warmBell,
+                          ),
+                          selected:
+                              _draft.blinkReminderSound ==
+                              BlinkReminderSound.warmBell,
+                          onTap: () => _set(
+                            _draft.copyWith(
+                              blinkReminderSound: BlinkReminderSound.warmBell,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        _choiceButton(
+                          label: s.blinkReminderSoundLabel(
+                            BlinkReminderSound.lightTick,
+                          ),
+                          selected:
+                              _draft.blinkReminderSound ==
+                              BlinkReminderSound.lightTick,
+                          onTap: () => _set(
+                            _draft.copyWith(
+                              blinkReminderSound: BlinkReminderSound.lightTick,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
 
                   _sectionTitle(s.secAppearance),
                   _slider(

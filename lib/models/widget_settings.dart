@@ -17,6 +17,10 @@ class WidgetSettings {
     required this.phaseSeconds,
     required this.soundEnabled,
     required this.notificationsEnabled,
+    required this.visualBlinkRemindersEnabled,
+    required this.blinkReminderSoundEnabled,
+    required this.blinkReminderSound,
+    required this.blinkReminderVolume,
     required this.defaultCorner,
     required this.ballSize,
     required this.idleColor,
@@ -50,6 +54,10 @@ class WidgetSettings {
   final int phaseSeconds;
   final bool soundEnabled;
   final bool notificationsEnabled;
+  final bool visualBlinkRemindersEnabled;
+  final bool blinkReminderSoundEnabled;
+  final BlinkReminderSound blinkReminderSound;
+  final double blinkReminderVolume;
   final BallCorner defaultCorner;
 
   // --- Aparência ----------------------------------------------------------
@@ -153,6 +161,10 @@ class WidgetSettings {
     phaseSeconds: AppDefaults.phaseSeconds,
     soundEnabled: AppDefaults.soundEnabled,
     notificationsEnabled: AppDefaults.notificationsEnabled,
+    visualBlinkRemindersEnabled: AppDefaults.visualBlinkRemindersEnabled,
+    blinkReminderSoundEnabled: AppDefaults.blinkReminderSoundEnabled,
+    blinkReminderSound: BlinkReminderSound.softPulse,
+    blinkReminderVolume: AppDefaults.blinkReminderVolume,
     defaultCorner: BallCorner.topRight,
     ballSize: AppDefaults.ballSize,
     idleColor: AppDefaults.idleColor,
@@ -192,6 +204,10 @@ class WidgetSettings {
     int? phaseSeconds,
     bool? soundEnabled,
     bool? notificationsEnabled,
+    bool? visualBlinkRemindersEnabled,
+    bool? blinkReminderSoundEnabled,
+    BlinkReminderSound? blinkReminderSound,
+    double? blinkReminderVolume,
     BallCorner? defaultCorner,
     double? ballSize,
     int? idleColor,
@@ -228,6 +244,12 @@ class WidgetSettings {
       phaseSeconds: phaseSeconds ?? this.phaseSeconds,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      visualBlinkRemindersEnabled:
+          visualBlinkRemindersEnabled ?? this.visualBlinkRemindersEnabled,
+      blinkReminderSoundEnabled:
+          blinkReminderSoundEnabled ?? this.blinkReminderSoundEnabled,
+      blinkReminderSound: blinkReminderSound ?? this.blinkReminderSound,
+      blinkReminderVolume: blinkReminderVolume ?? this.blinkReminderVolume,
       defaultCorner: defaultCorner ?? this.defaultCorner,
       ballSize: ballSize ?? this.ballSize,
       idleColor: idleColor ?? this.idleColor,
@@ -267,6 +289,15 @@ class WidgetSettings {
       phaseSeconds: _clampInt(phaseSeconds, 5, 120),
       soundEnabled: soundEnabled,
       notificationsEnabled: notificationsEnabled,
+      visualBlinkRemindersEnabled: visualBlinkRemindersEnabled,
+      blinkReminderSoundEnabled: blinkReminderSoundEnabled,
+      blinkReminderSound: blinkReminderSound,
+      blinkReminderVolume: _clampDouble(
+        blinkReminderVolume,
+        0.0,
+        1.0,
+        d.blinkReminderVolume,
+      ),
       defaultCorner: defaultCorner,
       ballSize: _clampDouble(
         ballSize,
@@ -326,6 +357,10 @@ class WidgetSettings {
     'phaseSeconds': phaseSeconds,
     'soundEnabled': soundEnabled,
     'notificationsEnabled': notificationsEnabled,
+    'visualBlinkRemindersEnabled': visualBlinkRemindersEnabled,
+    'blinkReminderSoundEnabled': blinkReminderSoundEnabled,
+    'blinkReminderSound': blinkReminderSound.index,
+    'blinkReminderVolume': blinkReminderVolume,
     'defaultCorner': defaultCorner.index,
     'ballSize': ballSize,
     'idleColor': idleColor,
@@ -363,12 +398,29 @@ class WidgetSettings {
     if (cornerIndex < 0 || cornerIndex >= BallCorner.values.length) {
       cornerIndex = d.defaultCorner.index;
     }
+    var blinkSoundIndex =
+        (map['blinkReminderSound'] as num?)?.toInt() ??
+        d.blinkReminderSound.index;
+    if (blinkSoundIndex < 0 ||
+        blinkSoundIndex >= BlinkReminderSound.values.length) {
+      blinkSoundIndex = d.blinkReminderSound.index;
+    }
     return WidgetSettings(
       cycleMinutes: (map['cycleMinutes'] as num?)?.toInt() ?? d.cycleMinutes,
       phaseSeconds: (map['phaseSeconds'] as num?)?.toInt() ?? d.phaseSeconds,
       soundEnabled: map['soundEnabled'] as bool? ?? d.soundEnabled,
       notificationsEnabled:
           map['notificationsEnabled'] as bool? ?? d.notificationsEnabled,
+      visualBlinkRemindersEnabled:
+          map['visualBlinkRemindersEnabled'] as bool? ??
+          d.visualBlinkRemindersEnabled,
+      blinkReminderSoundEnabled:
+          map['blinkReminderSoundEnabled'] as bool? ??
+          d.blinkReminderSoundEnabled,
+      blinkReminderSound: BlinkReminderSound.values[blinkSoundIndex],
+      blinkReminderVolume:
+          (map['blinkReminderVolume'] as num?)?.toDouble() ??
+          d.blinkReminderVolume,
       defaultCorner: BallCorner.values[cornerIndex],
       ballSize: (map['ballSize'] as num?)?.toDouble() ?? d.ballSize,
       idleColor: (map['idleColor'] as num?)?.toInt() ?? d.idleColor,

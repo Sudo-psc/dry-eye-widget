@@ -64,6 +64,16 @@ class AppStrings {
     required this.overlayBlur,
     required this.enableSound,
     required this.enableNotifications,
+    required this.visualBlinkReminders,
+    required this.visualBlinkRemindersHint,
+    required this.blinkReminderText,
+    required this.blinkReminderSound,
+    required this.blinkReminderSoundHint,
+    required this.blinkReminderVolume,
+    required this.blinkReminderToneSoftPulse,
+    required this.blinkReminderToneClearDrop,
+    required this.blinkReminderToneWarmBell,
+    required this.blinkReminderToneLightTick,
     required this.launchAtLogin,
     required this.hideDock,
     required this.disableMenuBar,
@@ -232,6 +242,16 @@ class AppStrings {
   final String overlayBlur;
   final String enableSound;
   final String enableNotifications;
+  final String visualBlinkReminders;
+  final String visualBlinkRemindersHint;
+  final String blinkReminderText;
+  final String blinkReminderSound;
+  final String blinkReminderSoundHint;
+  final String blinkReminderVolume;
+  final String blinkReminderToneSoftPulse;
+  final String blinkReminderToneClearDrop;
+  final String blinkReminderToneWarmBell;
+  final String blinkReminderToneLightTick;
   final String launchAtLogin;
   final String hideDock;
   final String disableMenuBar;
@@ -386,6 +406,19 @@ class AppStrings {
     }
   }
 
+  String blinkReminderSoundLabel(BlinkReminderSound sound) {
+    switch (sound) {
+      case BlinkReminderSound.softPulse:
+        return blinkReminderToneSoftPulse;
+      case BlinkReminderSound.clearDrop:
+        return blinkReminderToneClearDrop;
+      case BlinkReminderSound.warmBell:
+        return blinkReminderToneWarmBell;
+      case BlinkReminderSound.lightTick:
+        return blinkReminderToneLightTick;
+    }
+  }
+
   static AppStrings of(String code) => code == 'en' ? enStrings : ptStrings;
 }
 
@@ -457,6 +490,20 @@ const AppStrings ptStrings = AppStrings(
   overlayBlur: 'Desfoque do overlay',
   enableSound: 'Ativar som',
   enableNotifications: 'Ativar notificações',
+  visualBlinkReminders: 'Lembretes visuais de piscada',
+  visualBlinkRemindersHint:
+      'Mostra um aviso delicado no widget a cada 7,5 s, sem notificação '
+      'do sistema.',
+  blinkReminderText: 'Pisque',
+  blinkReminderSound: 'Aviso sonoro de piscada',
+  blinkReminderSoundHint:
+      'Toca um som curto e suave junto do lembrete de piscada. Respeita o '
+      'controle geral de som.',
+  blinkReminderVolume: 'Volume do aviso sonoro',
+  blinkReminderToneSoftPulse: 'Pulso suave',
+  blinkReminderToneClearDrop: 'Gota clara',
+  blinkReminderToneWarmBell: 'Sino quente',
+  blinkReminderToneLightTick: 'Toque leve',
   launchAtLogin: 'Iniciar com o sistema',
   hideDock: 'Ocultar ícone do Dock',
   disableMenuBar: 'Desabilitar item da barra de menu',
@@ -698,6 +745,20 @@ const AppStrings enStrings = AppStrings(
   overlayBlur: 'Overlay blur',
   enableSound: 'Enable sound',
   enableNotifications: 'Enable notifications',
+  visualBlinkReminders: 'Visual blink reminders',
+  visualBlinkRemindersHint:
+      'Shows a delicate cue in the widget every 7.5 s, without a system '
+      'notification.',
+  blinkReminderText: 'Blink',
+  blinkReminderSound: 'Blink sound reminder',
+  blinkReminderSoundHint:
+      'Plays a short, gentle sound with the blink reminder. It follows the '
+      'main sound setting.',
+  blinkReminderVolume: 'Sound reminder volume',
+  blinkReminderToneSoftPulse: 'Soft pulse',
+  blinkReminderToneClearDrop: 'Clear drop',
+  blinkReminderToneWarmBell: 'Warm bell',
+  blinkReminderToneLightTick: 'Light tap',
   launchAtLogin: 'Launch at startup',
   hideDock: 'Hide Dock icon',
   disableMenuBar: 'Disable menu bar item',

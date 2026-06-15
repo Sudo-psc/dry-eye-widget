@@ -1,3 +1,4 @@
+import 'package:dry_eye_widget/models/app_state.dart';
 import 'package:dry_eye_widget/models/widget_settings.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
@@ -353,6 +354,12 @@ class _FakeAudioService implements AudioService {
 
   @override
   Future<void> playTick() async {}
+
+  @override
+  Future<void> playBlinkReminder({
+    required BlinkReminderSound sound,
+    required double volume,
+  }) async {}
 }
 
 class _FakeNotificationService implements NotificationService {

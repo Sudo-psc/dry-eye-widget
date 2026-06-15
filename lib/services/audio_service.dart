@@ -2,6 +2,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../models/app_state.dart';
+
 /// Reprodução dos sons curtos do app.
 ///
 /// Tenta tocar os assets em `assets/sounds/`. Se o arquivo não existir ou
@@ -17,14 +19,17 @@ class AudioService {
 
   bool enabled = true;
 
-  Future<void> _play(String asset) async {
+  Future<void> _play(String asset, {double volume = 1.0}) async {
     if (!enabled) return;
     try {
+      final safeVolume = volume.clamp(0.0, 1.0).toDouble();
       await _player.stop();
-      await _player.play(AssetSource('sounds/$asset'));
+      await _player.play(AssetSource('sounds/$asset'), volume: safeVolume);
     } catch (e) {
       // Fallback: som de sistema. Não interrompe o fluxo do app.
-      debugPrint('AudioService: falha ao tocar "$asset" ($e). Usando fallback.');
+      debugPrint(
+        'AudioService: falha ao tocar "$asset" ($e). Usando fallback.',
+      );
       try {
         await SystemSound.play(SystemSoundType.alert);
       } catch (_) {
@@ -41,6 +46,12 @@ class AudioService {
 
   /// Som curto de conclusão de fase / sucesso final.
   Future<void> playSuccess() => _play('success.wav');
+
+  /// Tom suave do lembrete de piscada.
+  Future<void> playBlinkReminder({
+    required BlinkReminderSound sound,
+    required double volume,
+  }) => _play(sound.assetName, volume: volume);
 
   void dispose() {
     _player.dispose();

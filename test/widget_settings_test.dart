@@ -7,6 +7,10 @@ void main() {
     test('roundtrip JSON preserva todos os campos', () {
       final original = WidgetSettings.defaults().copyWith(
         cycleMinutes: 30,
+        visualBlinkRemindersEnabled: false,
+        blinkReminderSoundEnabled: true,
+        blinkReminderSound: BlinkReminderSound.warmBell,
+        blinkReminderVolume: 0.64,
         ballSize: 64,
         idleColor: 0xFF50C878,
         alertColor: 0xFFE91E63,
@@ -34,6 +38,10 @@ void main() {
       final restored = WidgetSettings.fromJson(original.toJson());
 
       expect(restored.cycleMinutes, 30);
+      expect(restored.visualBlinkRemindersEnabled, isFalse);
+      expect(restored.blinkReminderSoundEnabled, isTrue);
+      expect(restored.blinkReminderSound, BlinkReminderSound.warmBell);
+      expect(restored.blinkReminderVolume, 0.64);
       expect(restored.ballSize, 64);
       expect(restored.idleColor, 0xFF50C878);
       expect(restored.alertColor, 0xFFE91E63);
@@ -64,13 +72,15 @@ void main() {
       expect(base.copyWith(gentleMode: false).usesFullScreenBreak, isTrue);
       // Modo suave sem bloqueio: cartão discreto.
       expect(
-        base.copyWith(gentleMode: true, lockScreenOnBreak: false)
+        base
+            .copyWith(gentleMode: true, lockScreenOnBreak: false)
             .usesFullScreenBreak,
         isFalse,
       );
       // Modo suave com bloqueio: tela cheia tem precedência.
       expect(
-        base.copyWith(gentleMode: true, lockScreenOnBreak: true)
+        base
+            .copyWith(gentleMode: true, lockScreenOnBreak: true)
             .usesFullScreenBreak,
         isTrue,
       );
@@ -87,6 +97,22 @@ void main() {
       });
       expect(s.cycleMinutes, 15);
       expect(s.ballSize, WidgetSettings.defaults().ballSize);
+      expect(
+        s.visualBlinkRemindersEnabled,
+        WidgetSettings.defaults().visualBlinkRemindersEnabled,
+      );
+      expect(
+        s.blinkReminderSoundEnabled,
+        WidgetSettings.defaults().blinkReminderSoundEnabled,
+      );
+      expect(
+        s.blinkReminderSound,
+        WidgetSettings.defaults().blinkReminderSound,
+      );
+      expect(
+        s.blinkReminderVolume,
+        WidgetSettings.defaults().blinkReminderVolume,
+      );
       expect(s.idleColor, WidgetSettings.defaults().idleColor);
       expect(s.dynamicOrbEffect, WidgetSettings.defaults().dynamicOrbEffect);
       expect(s.hoverReactiveBall, WidgetSettings.defaults().hoverReactiveBall);
@@ -94,6 +120,18 @@ void main() {
 
     test('efeito dinamico fica desligado por padrao', () {
       expect(WidgetSettings.defaults().dynamicOrbEffect, isFalse);
+    });
+
+    test('lembretes visuais de piscada ficam ligados por padrao', () {
+      expect(WidgetSettings.defaults().visualBlinkRemindersEnabled, isTrue);
+    });
+
+    test('lembrete sonoro de piscada exige opt-in por padrao', () {
+      final defaults = WidgetSettings.defaults();
+      expect(defaults.blinkReminderSoundEnabled, isFalse);
+      expect(defaults.blinkReminderSound, BlinkReminderSound.softPulse);
+      expect(defaults.blinkReminderVolume, 0.3);
+      expect(BlinkReminderSound.values, hasLength(4));
     });
 
     test(
@@ -128,6 +166,8 @@ void main() {
         'overlayBlur': 200,
         'languageCode': 'es',
         'eyeDropsIntervalHours': 9,
+        'blinkReminderSound': 999,
+        'blinkReminderVolume': 4.2,
       });
 
       expect(restored.cycleMinutes, 1);
@@ -144,6 +184,11 @@ void main() {
         restored.eyeDropsIntervalHours,
         WidgetSettings.defaults().eyeDropsIntervalHours,
       );
+      expect(
+        restored.blinkReminderSound,
+        WidgetSettings.defaults().blinkReminderSound,
+      );
+      expect(restored.blinkReminderVolume, 1.0);
     });
 
     test('permite widget compacto com tamanho minimo de 14 px', () {

@@ -73,3 +73,21 @@ extension BallCornerX on BallCorner {
     }
   }
 }
+
+/// Toques curtos usados no lembrete sonoro de piscada.
+enum BlinkReminderSound { softPulse, clearDrop, warmBell, lightTick }
+
+extension BlinkReminderSoundX on BlinkReminderSound {
+  String get assetName {
+    switch (this) {
+      case BlinkReminderSound.softPulse:
+        return 'blink_soft_pulse.wav';
+      case BlinkReminderSound.clearDrop:
+        return 'blink_clear_drop.wav';
+      case BlinkReminderSound.warmBell:
+        return 'blink_warm_bell.wav';
+      case BlinkReminderSound.lightTick:
+        return 'blink_light_tick.wav';
+    }
+  }
+}
