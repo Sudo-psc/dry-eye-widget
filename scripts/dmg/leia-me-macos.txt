@@ -1,0 +1,93 @@
+===================================================
+  Dry Eye Widget — Como instalar no macOS
+===================================================
+
+Se o macOS disser que o app "esta danificado e nao pode ser
+aberto. Voce deve move-lo para o Lixo", NAO se preocupe:
+o aplicativo NAO esta corrompido.
+
+Isso acontece porque o app nao e assinado com um certificado
+pago da Apple. Ao baixar pelo navegador, o macOS marca o
+arquivo e bloqueia a abertura (recurso "Gatekeeper"). Por isso
+tambem nao aparece o botao "Abrir mesmo assim" em Ajustes do
+Sistema > Privacidade e Seguranca.
+
+---------------------------------------------------
+COMO LIBERAR (apenas uma vez)
+---------------------------------------------------
+
+1. Abra o aplicativo "Terminal".
+   (Pressione Cmd + Espaco, digite Terminal e tecle Enter.)
+
+2. Copie e cole o comando abaixo e tecle Enter:
+
+   xattr -cr ~/Downloads/DryEyeWidget*.dmg
+
+3. Abra o arquivo .dmg de novo (duplo clique). Agora ele
+   monta normalmente.
+
+4. Arraste "Dry Eye Widget" para a pasta Aplicativos.
+
+5. Se, ao abrir o app, o aviso ainda aparecer, rode tambem:
+
+   xattr -cr "/Applications/Dry Eye Widget.app"
+
+Pronto. O app abre normalmente nas proximas vezes.
+
+---------------------------------------------------
+Por que isso e seguro?
+---------------------------------------------------
+O comando apenas remove o carimbo de "baixado da internet"
+deste arquivo. Ele nao desativa nenhuma protecao do sistema.
+
+O Dry Eye Widget e open source (licenca MIT) e funciona 100%
+local, sem coletar nem enviar dados.
+
+Duvidas: https://github.com/Sudo-psc/dry-eye-widget
+
+
+===================================================
+  Dry Eye Widget — How to install on macOS
+===================================================
+
+If macOS says the app "is damaged and can't be opened. You
+should move it to the Trash", don't worry: the app is NOT
+corrupted.
+
+This happens because the app isn't signed with a paid Apple
+certificate. When downloaded through a browser, macOS flags
+the file and blocks it (the "Gatekeeper" feature). That's also
+why the "Open Anyway" button doesn't appear under System
+Settings > Privacy & Security.
+
+---------------------------------------------------
+HOW TO UNBLOCK (one time only)
+---------------------------------------------------
+
+1. Open the "Terminal" app.
+   (Press Cmd + Space, type Terminal, press Enter.)
+
+2. Copy and paste the command below, then press Enter:
+
+   xattr -cr ~/Downloads/DryEyeWidget*.dmg
+
+3. Open the .dmg again (double-click). It now mounts fine.
+
+4. Drag "Dry Eye Widget" to the Applications folder.
+
+5. If the app still warns when opening, also run:
+
+   xattr -cr "/Applications/Dry Eye Widget.app"
+
+That's it. The app opens normally from now on.
+
+---------------------------------------------------
+Why is this safe?
+---------------------------------------------------
+The command only removes the "downloaded from the internet"
+flag from this file. It does not disable any system protection.
+
+Dry Eye Widget is open source (MIT license) and runs 100%
+locally, collecting and sending no data.
+
+Questions: https://github.com/Sudo-psc/dry-eye-widget
