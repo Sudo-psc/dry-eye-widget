@@ -496,7 +496,7 @@ const AppStrings ptStrings = AppStrings(
   dimIntensity: 'Intensidade do escurecimento',
   overlayOpacity: 'Opacidade do overlay',
   overlayBlur: 'Desfoque do overlay',
-  enableSound: 'Ativar som',
+  enableSound: 'Som dos avisos 20-20-20',
   enableNotifications: 'Ativar notificações',
   visualBlinkReminders: 'Lembretes visuais de piscada',
   visualBlinkRemindersHint:
@@ -505,8 +505,8 @@ const AppStrings ptStrings = AppStrings(
   blinkReminderText: 'Pisque',
   blinkReminderSound: 'Aviso sonoro de piscada',
   blinkReminderSoundHint:
-      'Toca um som curto e suave junto do lembrete de piscada. Respeita o '
-      'controle geral de som.',
+      'Toca um som curto e suave junto do lembrete de piscada. Tem controle '
+      'próprio, independente do som dos avisos 20-20-20.',
   blinkReminderVolume: 'Volume do aviso sonoro',
   blinkReminderToneSoftPulse: 'Pulso suave',
   blinkReminderToneClearDrop: 'Gota clara',
@@ -758,7 +758,7 @@ const AppStrings enStrings = AppStrings(
   dimIntensity: 'Dim intensity',
   overlayOpacity: 'Overlay opacity',
   overlayBlur: 'Overlay blur',
-  enableSound: 'Enable sound',
+  enableSound: '20-20-20 break sound',
   enableNotifications: 'Enable notifications',
   visualBlinkReminders: 'Visual blink reminders',
   visualBlinkRemindersHint:
@@ -767,8 +767,8 @@ const AppStrings enStrings = AppStrings(
   blinkReminderText: 'Blink',
   blinkReminderSound: 'Blink sound reminder',
   blinkReminderSoundHint:
-      'Plays a short, gentle sound with the blink reminder. It follows the '
-      'main sound setting.',
+      'Plays a short, gentle sound with the blink reminder. It has its own '
+      'control, independent from the 20-20-20 break sound.',
   blinkReminderVolume: 'Sound reminder volume',
   blinkReminderToneSoftPulse: 'Soft pulse',
   blinkReminderToneClearDrop: 'Clear drop',
