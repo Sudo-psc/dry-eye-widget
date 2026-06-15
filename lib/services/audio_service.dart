@@ -13,47 +13,58 @@ class AudioService {
   AudioService() {
     // Modo low-latency é ideal para sons curtos e repetidos (tique-taque).
     _player.setReleaseMode(ReleaseMode.stop);
+    _blinkPlayer.setReleaseMode(ReleaseMode.stop);
   }
 
+  /// Player dos avisos do ciclo (alerta, tique-taque, sucesso).
   final AudioPlayer _player = AudioPlayer();
+
+  /// Player dedicado ao lembrete de piscada. Mantê-lo separado evita que o
+  /// `stop()`/`setVolume()` de um som interfira no outro — no macOS, reusar o
+  /// mesmo player e passar o volume apenas inline no `play()` deixava o
+  /// lembrete de piscada mudo.
+  final AudioPlayer _blinkPlayer = AudioPlayer();
 
   bool enabled = true;
 
-  Future<void> _play(String asset, {double volume = 1.0}) async {
+  Future<void> _playOn(
+    AudioPlayer player,
+    String asset, {
+    double volume = 1.0,
+  }) async {
     if (!enabled) return;
     try {
       final safeVolume = volume.clamp(0.0, 1.0).toDouble();
-      await _player.stop();
-      await _player.play(AssetSource('sounds/$asset'), volume: safeVolume);
+      await player.stop();
+      // Aplica o volume explicitamente antes de tocar: no macOS o volume
+      // passado apenas como argumento de `play()` nem sempre é respeitado.
+      await player.setVolume(safeVolume);
+      await player.play(AssetSource('sounds/$asset'), volume: safeVolume);
     } catch (e) {
       // Fallback: som de sistema. Não interrompe o fluxo do app.
-      debugPrint(
-        'AudioService: falha ao tocar "$asset" ($e). Usando fallback.',
-      );
-      try {
-        await SystemSound.play(SystemSoundType.alert);
-      } catch (_) {
-        // Silencioso: áudio é opcional por design.
-      }
+      debugPrint('AudioService: falha ao tocar "$asset" ($e). Fallback.');
+      SystemSound.play(SystemSoundType.alert).ignore();
     }
   }
 
   /// Som de alerta no início da pausa (estado ALERTA).
-  Future<void> playAlert() => _play('alert.wav');
+  Future<void> playAlert() => _playOn(_player, 'alert.wav');
 
   /// Tique-taque a cada segundo durante as fases.
-  Future<void> playTick() => _play('tick.wav');
+  Future<void> playTick() => _playOn(_player, 'tick.wav');
 
   /// Som curto de conclusão de fase / sucesso final.
-  Future<void> playSuccess() => _play('success.wav');
+  Future<void> playSuccess() => _playOn(_player, 'success.wav');
 
-  /// Tom suave do lembrete de piscada.
+  /// Tom suave do lembrete de piscada (player dedicado, com o volume aplicado
+  /// explicitamente para garantir áudio no macOS).
   Future<void> playBlinkReminder({
     required BlinkReminderSound sound,
     required double volume,
-  }) => _play(sound.assetName, volume: volume);
+  }) => _playOn(_blinkPlayer, sound.assetName, volume: volume);
 
   void dispose() {
     _player.dispose();
+    _blinkPlayer.dispose();
   }
 }

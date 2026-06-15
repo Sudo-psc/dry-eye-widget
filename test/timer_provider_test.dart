@@ -5,6 +5,7 @@ import 'package:dry_eye_widget/models/screen_time_data.dart';
 import 'package:dry_eye_widget/providers/settings_provider.dart';
 import 'package:dry_eye_widget/providers/timer_provider.dart';
 import 'package:dry_eye_widget/services/audio_service.dart';
+import 'package:dry_eye_widget/services/fullscreen_service.dart';
 import 'package:dry_eye_widget/services/idle_service.dart';
 import 'package:dry_eye_widget/services/notification_service.dart';
 import 'package:dry_eye_widget/services/screen_time_service.dart';
@@ -56,6 +57,77 @@ void main() {
 
         expect(audio.enabled, isTrue);
         expect(notifications.enabled, isTrue);
+      },
+    );
+
+    test(
+      'em tela cheia com notificacoes desligadas, forca a notificacao de pausa',
+      () {
+        fakeAsync((async) {
+          final storage = _MemoryStorage(
+            WidgetSettings.defaults().copyWith(
+              soundEnabled: false,
+              notificationsEnabled: false,
+              pauseOnInactivity: false,
+            ),
+          );
+          final settings = SettingsProvider(storage: storage);
+          final notifications = _FakeNotificationService()..enabled = false;
+          final timer = TimerProvider(
+            settings: settings,
+            storage: storage,
+            audio: _FakeAudioService(),
+            notifications: notifications,
+            presence: PresenceController(
+              model: AdaptiveThresholdModel(),
+              idleSource: _FakeIdleService().idleSeconds,
+            ),
+            fullscreen: _FakeFullscreen(true),
+          );
+          addTearDown(timer.dispose);
+          timer.start();
+
+          // Avança até o fim do ciclo: entra em ALERTA e dispara o aviso.
+          async.elapse(Duration(seconds: timer.cycleSeconds + 1));
+          async.flushMicrotasks();
+
+          expect(notifications.forcedCount, greaterThan(0));
+        });
+      },
+    );
+
+    test(
+      'sem tela cheia e notificacoes desligadas, nao notifica a pausa',
+      () {
+        fakeAsync((async) {
+          final storage = _MemoryStorage(
+            WidgetSettings.defaults().copyWith(
+              soundEnabled: false,
+              notificationsEnabled: false,
+              pauseOnInactivity: false,
+            ),
+          );
+          final settings = SettingsProvider(storage: storage);
+          final notifications = _FakeNotificationService()..enabled = false;
+          final timer = TimerProvider(
+            settings: settings,
+            storage: storage,
+            audio: _FakeAudioService(),
+            notifications: notifications,
+            presence: PresenceController(
+              model: AdaptiveThresholdModel(),
+              idleSource: _FakeIdleService().idleSeconds,
+            ),
+            fullscreen: _FakeFullscreen(false),
+          );
+          addTearDown(timer.dispose);
+          timer.start();
+
+          async.elapse(Duration(seconds: timer.cycleSeconds + 1));
+          async.flushMicrotasks();
+
+          expect(notifications.showCount, 0);
+        });
       },
     );
 
@@ -366,6 +438,9 @@ class _FakeNotificationService implements NotificationService {
   @override
   bool enabled = true;
 
+  int showCount = 0;
+  int forcedCount = 0;
+
   @override
   Future<void> init() async {}
 
@@ -376,7 +451,22 @@ class _FakeNotificationService implements NotificationService {
   Future<void> notifyBreakStart(String title, String body) async {}
 
   @override
-  Future<void> show(String title, String body) async {}
+  Future<void> show(String title, String body, {bool force = false}) async {
+    showCount++;
+    if (force) forcedCount++;
+  }
+
+  @override
+  Future<void> showForced(String title, String body) =>
+      show(title, body, force: true);
+}
+
+class _FakeFullscreen extends FullscreenService {
+  _FakeFullscreen(this.value);
+  bool value;
+
+  @override
+  Future<bool> isFrontmostFullscreen() async => value;
 }
 
 class _FakeIdleService implements IdleService {

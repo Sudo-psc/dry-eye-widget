@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/app_state.dart';
 import '../services/audio_service.dart';
+import '../services/fullscreen_service.dart';
 import '../services/notification_service.dart';
 import '../services/presence/presence_controller.dart';
 import '../services/presence/presence_sensor.dart';
@@ -26,7 +27,9 @@ class TimerProvider extends ChangeNotifier {
     required NotificationService notifications,
     required PresenceController presence,
     ScreenTimeService? screenTime,
-  }) : this._(settings, storage, audio, notifications, presence, screenTime);
+    FullscreenService? fullscreen,
+  }) : this._(settings, storage, audio, notifications, presence, screenTime,
+            fullscreen ?? FullscreenService());
 
   TimerProvider._(
     this._settings,
@@ -35,6 +38,7 @@ class TimerProvider extends ChangeNotifier {
     this._notifications,
     this._presence,
     this._screenTime,
+    this._fullscreen,
   ) {
     _cycleElapsed = _storage.elapsedSeconds.clamp(0, cycleSeconds);
     _eyeDropsElapsed = _storage.eyeDropsElapsed;
@@ -50,6 +54,10 @@ class TimerProvider extends ChangeNotifier {
 
   /// Coleta de tempo de tela (opcional; ausente nos testes de temporização).
   final ScreenTimeService? _screenTime;
+
+  /// Detecção de tela cheia (macOS): roteia o aviso de pausa para uma
+  /// notificação do sistema quando o overlay flutuante não aparece.
+  final FullscreenService _fullscreen;
 
   Timer? _ticker;
   Timer? _alertTimer;
@@ -240,10 +248,8 @@ class TimerProvider extends ChangeNotifier {
     _cycleElapsed = 0;
     _storage.setElapsedSeconds(0);
     if (_soundOn) _audio.playAlert();
-    if (_notifyOn) {
-      final s = _settings.strings;
-      _notifications.notifyBreakStart(s.notifyBreakTitle, s.notifyBreakBody);
-    }
+    final s = _settings.strings;
+    unawaited(_notifyBreak(s.notifyBreakTitle, s.notifyBreakBody));
     notifyListeners();
 
     _alertTimer?.cancel();
@@ -278,10 +284,8 @@ class TimerProvider extends ChangeNotifier {
   void _enterConclusao() {
     _state = AppState.conclusao;
     if (_soundOn) _audio.playSuccess();
-    if (_notifyOn) {
-      final s = _settings.strings;
-      _notifications.notifyBreakDone(s.notifyDoneTitle, s.notifyDoneBody);
-    }
+    final s = _settings.strings;
+    unawaited(_notifyBreak(s.notifyDoneTitle, s.notifyDoneBody));
     notifyListeners();
 
     _completionTimer?.cancel();
@@ -298,6 +302,22 @@ class TimerProvider extends ChangeNotifier {
     _phaseRemaining = 0;
     _storage.setElapsedSeconds(0);
     notifyListeners();
+  }
+
+  /// Dispara a notificação do sistema do aviso de pausa.
+  ///
+  /// - Notificações ligadas: comportamento normal.
+  /// - Notificações desligadas, porém com um app em **tela cheia** ativo:
+  ///   força a notificação, pois o overlay flutuante não aparece sobre apps em
+  ///   tela cheia. Ao sair da tela cheia, volta a respeitar a preferência.
+  Future<void> _notifyBreak(String title, String body) async {
+    if (_notifyOn) {
+      await _notifications.show(title, body);
+      return;
+    }
+    if (await _fullscreen.isFrontmostFullscreen()) {
+      await _notifications.showForced(title, body);
+    }
   }
 
   // --- Ações do menu ------------------------------------------------------
