@@ -239,7 +239,7 @@ enum _WindowLayout {
 }
 
 /// Tamanho do cartão de pausa no modo suave (canto superior direito).
-const Size _gentleWindowSize = Size(340, 150);
+const Size _gentleWindowSize = Size(430, 164);
 
 /// Tamanho do cartão de aviso de pausa por inatividade (canto superior direito).
 const Size _inactivityWindowSize = Size(320, 120);
@@ -964,6 +964,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
               state: timer.state,
               strings: strings,
               secondsRemaining: timer.phaseRemaining,
+              totalSeconds: timer.phaseSeconds,
             );
     } else if (timer.inactivityAlert) {
       body = InactivityPauseCard(

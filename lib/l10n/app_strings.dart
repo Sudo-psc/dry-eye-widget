@@ -455,10 +455,10 @@ const AppStrings ptStrings = AppStrings(
   trayEnable: 'Habilitar widget',
   alertTitle: 'Tire uma pausa de 20 segundos',
   alertSubtitle: 'Vou iniciar um cronômetro',
-  phaseTitle: 'Olhe a uma distância de 6 metros e pisque',
+  phaseTitle: 'Olhe para longe e pisque devagar',
   phaseSubtitle:
-      'Lembre-se de piscar ao olhar a uma distância de 6 m e mantenha o '
-      'olhar até o cronômetro zerar',
+      'Foque a cerca de 6 metros e continue a piscar lenta e completamente '
+      'até o cronômetro zerar.',
   doneTitle: 'Parabéns!',
   doneSubtitle:
       'Você renovou suas lágrimas. Volte ao trabalho com os olhos descansados',
@@ -718,10 +718,10 @@ const AppStrings enStrings = AppStrings(
   trayEnable: 'Enable widget',
   alertTitle: 'Take a 20-second break',
   alertSubtitle: 'Starting a timer',
-  phaseTitle: 'Look 6 meters away and blink',
+  phaseTitle: 'Look away and blink slowly',
   phaseSubtitle:
-      'Remember to blink while looking ~6 m (20 ft) away, and hold your gaze '
-      'until the timer reaches zero',
+      'Focus about 6 m (20 ft) away. Blink slowly and fully until the timer '
+      'reaches zero.',
   doneTitle: 'Well done!',
   doneSubtitle: 'You refreshed your tears. Back to work with rested eyes',
   notifyBreakTitle: 'Time for a break 👀',

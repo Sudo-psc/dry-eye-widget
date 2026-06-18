@@ -4,6 +4,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.11.5] - 2026-06-18
+
+### Alterado
+- **Aviso de pausa suave**: remove o olho piscando do cartão de aviso e troca o
+  visual por um painel liquid glass mais moderno, com rótulo 20-20-20,
+  tipografia refinada e cronômetro circular com brilho.
+- **Texto da pausa**: melhora a orientação para focar a cerca de 6 metros e
+  piscar de forma lenta e completa até o cronômetro zerar.
+
 ## [1.11.4] - 2026-06-18
 
 ### Corrigido

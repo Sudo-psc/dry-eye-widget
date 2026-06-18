@@ -141,10 +141,10 @@ class AppTexts {
   static const String alertTitle = 'Tire uma pausa de 20 segundos';
   static const String alertSubtitle = 'Vou iniciar um cronômetro';
 
-  static const String phaseTitle = 'Olhe para uma distância de 6 metros';
+  static const String phaseTitle = 'Olhe para longe e pisque devagar';
   static const String phaseSubtitle =
-      'Lembre-se de piscar ao olhar a uma distância de 6 m e mantenha o '
-      'olhar até o cronômetro zerar';
+      'Foque a cerca de 6 metros e continue a piscar lenta e completamente '
+      'até o cronômetro zerar.';
 
   static const String doneTitle = 'Parabéns!';
   static const String doneSubtitle =
@@ -178,7 +178,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.11.4';
+  static const String version = '1.11.5';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';
