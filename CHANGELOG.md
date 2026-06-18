@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.11.4] - 2026-06-18
+
+### Corrigido
+- **Botão "Sobre" no macOS**: o item do menu da bolinha volta a abrir uma
+  janela interna ampla, sem depender de diálogo modal depois que a janela é
+  reduzida para o tamanho compacto.
+
+### Alterado
+- **Configurações**: remove o controle "Velocidade do piscar" para deixar o
+  menu mais limpo. O valor interno continua preservado para compatibilidade com
+  preferências já salvas.
+
 ## [1.10.2] - 2026-06-13
 
 ### Corrigido

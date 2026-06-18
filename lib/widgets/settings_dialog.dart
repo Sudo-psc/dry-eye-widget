@@ -296,14 +296,6 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     suffix: '${(_draft.idleOpacity * 100).round()}%',
                     onChanged: (v) => _set(_draft.copyWith(idleOpacity: v)),
                   ),
-                  _slider(
-                    label: s.blinkSpeed,
-                    value: _draft.blinkMs.toDouble(),
-                    min: 200,
-                    max: 1500,
-                    suffix: '${_draft.blinkMs} ms',
-                    onChanged: (v) => _set(_draft.copyWith(blinkMs: v.round())),
-                  ),
                   _switchRow(
                     label: s.progressRing,
                     value: _draft.showProgressRing,
