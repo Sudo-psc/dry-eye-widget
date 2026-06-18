@@ -43,6 +43,7 @@ void main() {
     );
 
     expect(find.text(ptStrings.settingsTitle), findsOneWidget);
+    expect(find.text(ptStrings.blinkSpeed), findsNothing);
     expect(find.text(ptStrings.save), findsOneWidget);
   });
 

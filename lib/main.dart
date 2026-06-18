@@ -30,6 +30,7 @@ import 'services/storage_service.dart';
 import 'services/tray_service.dart';
 import 'services/update_service.dart';
 import 'utils/constants.dart';
+import 'widgets/about_panel.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
@@ -264,6 +265,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   bool _menuOpen = false;
   bool _settingsOpen = false;
+  bool _aboutOpen = false;
   bool _guidanceOpen = false;
   bool _updateOpen = false;
   bool _osdiOpen = false;
@@ -356,6 +358,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool get _isBlinkReminderContextFree =>
       !_menuOpen &&
       !_settingsOpen &&
+      !_aboutOpen &&
       !_guidanceOpen &&
       !_updateOpen &&
       !_osdiOpen &&
@@ -406,6 +409,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _widgetEnabled &&
       !_menuOpen &&
       !_settingsOpen &&
+      !_aboutOpen &&
       !_guidanceOpen &&
       !_updateOpen &&
       !_osdiOpen &&
@@ -430,6 +434,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (drops && !_wasDrops) {
       if (!_menuOpen &&
           !_settingsOpen &&
+          !_aboutOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
           !_osdiOpen &&
@@ -452,6 +457,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !drops &&
           !_menuOpen &&
           !_settingsOpen &&
+          !_aboutOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
           !_osdiOpen &&
@@ -590,6 +596,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       setState(() {
         _menuOpen = false;
         _settingsOpen = false;
+        _aboutOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -750,70 +757,31 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _menuOpen = false;
       _settingsOpen = true;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
 
   void _openAbout() {
-    setState(() => _menuOpen = false);
-    _applyLayout(_WindowLayout.ball);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Row(
-          children: [
-            const Icon(Icons.info_outline, color: AppColors.textPrimary),
-            const SizedBox(width: 8),
-            Text(
-              context.read<SettingsProvider>().strings.menuAbout,
-              style: const TextStyle(color: AppColors.textPrimary),
-            ),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Dry Eye Widget',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Versão: ${AppInfo.version}',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Autor: Philipe Saraiva Cruz',
-              style: TextStyle(color: AppColors.textPrimary),
-            ),
-            Text(
-              'CRM-MG 69.870 | CRM-SP 204.923',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-            Text(
-              'Instagram: @drphilipesaraiva',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              context.read<SettingsProvider>().strings.close,
-              style: const TextStyle(color: AppColors.idleBall),
-            ),
-          ),
-        ],
-      ),
-    );
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = true;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = false;
+    });
+    _applyLayout(_WindowLayout.settings);
+  }
+
+  void _closeAbout() {
+    setState(() => _aboutOpen = false);
+    _restoreAfterPanel();
   }
 
   void _closeSettings() {
@@ -824,8 +792,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
   void _openGuidance() {
     setState(() {
       _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
       _guidanceOpen = true;
+      _updateOpen = false;
       _osdiOpen = false;
+      _screenTimeOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -840,6 +812,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _menuOpen = false;
       _settingsOpen = false;
+      _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = true;
@@ -857,6 +830,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _menuOpen = false;
       _settingsOpen = false;
+      _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
@@ -890,8 +864,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openCheckUpdates() async {
     setState(() {
       _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
       _updateOpen = true;
       _osdiOpen = false;
+      _screenTimeOpen = false;
       _updateResult = null;
     });
     await _applyLayout(_WindowLayout.settings);
@@ -969,6 +947,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       );
     } else if (_settingsOpen) {
       body = _buildSettings();
+    } else if (_aboutOpen) {
+      body = Center(
+        child: AboutPanel(strings: strings, onClose: _closeAbout),
+      );
     } else if (_guidanceOpen) {
       body = Center(
         child: GuidanceDialog(strings: strings, onClose: _closeGuidance),
