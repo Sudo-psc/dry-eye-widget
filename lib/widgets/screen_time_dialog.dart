@@ -57,8 +57,8 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
     final average = nonZero == 0 ? 0 : (total / nonZero).round();
 
     return LiquidGlass(
-      width: 420,
-      constraints: const BoxConstraints(maxHeight: 660),
+      width: 560,
+      constraints: const BoxConstraints(maxHeight: 740),
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -113,7 +113,7 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
                     )
                   else ...[
                     SizedBox(
-                      height: 200,
+                      height: 260,
                       child: _BarChart(
                         values: [for (final p in series) p.seconds],
                         labels: labels,

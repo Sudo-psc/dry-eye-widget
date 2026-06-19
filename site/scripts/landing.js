@@ -39,7 +39,7 @@
   try { window.matchMedia("(max-width: 640px)").addEventListener("change", pickDemoVideo); } catch (e) {}
 
   document.addEventListener("DOMContentLoaded", function () {
-    window.dewInitLang();
+    if (typeof window.dewInitLang === "function") window.dewInitLang();
     pickDemoVideo();
 
     const themeBtn = document.getElementById("theme-toggle");
@@ -49,7 +49,9 @@
     });
 
     document.querySelectorAll(".lang-switch button").forEach(function (b) {
-      b.addEventListener("click", function () { window.dewSetLang(b.dataset.lang); });
+      b.addEventListener("click", function () {
+        if (typeof window.dewSetLang === "function") window.dewSetLang(b.dataset.lang);
+      });
     });
 
     /* ---------- Hero ring countdown (20 s loop) ---------- */

@@ -95,9 +95,9 @@ class _OsdiDialogState extends State<OsdiDialog> {
     final previous = _previousFor(display, history);
 
     return LiquidGlass(
-      width: 540,
-      constraints: const BoxConstraints(maxHeight: 700),
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+      width: 640,
+      constraints: const BoxConstraints(maxHeight: 750),
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,

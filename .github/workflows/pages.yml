@@ -34,6 +34,9 @@ jobs:
       - name: Configurar Pages
         uses: actions/configure-pages@v5
 
+      - name: Smoke test da landing
+        run: node site/scripts/smoke-check.mjs
+
       - name: Subir artefato (pasta site/)
         uses: actions/upload-pages-artifact@v3
         with:
