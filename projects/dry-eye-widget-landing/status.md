@@ -2,7 +2,7 @@
 
 Updated: 2026-06-19
 
-Current phase: priority fixes applied and verified for the static `/app/` landing.
+Current phase: HealthKit dashboard branch in progress for macOS-only native integration.
 
 Completed:
 
@@ -14,13 +14,19 @@ Completed:
 - Local verification passed: check, build, smoke, production audit and Lighthouse.
 - Professional photo of Dr. Philipe added to the medical authority card and article byline.
 - Real app screenshots added to the carousel for floating widget, menu, break timer, settings, guidance and OSDI.
+- Dry Eye Health Dashboard model and HealthKit source mapping defined.
+- Native macOS HealthKit bridge added for permission request, sleep import and average heart-rate import.
+- Dart HealthKit dashboard service added to normalize native rows into explicit dashboard periods.
+- HealthKit privacy description and entitlements added to the macOS target.
 
 In progress:
 
-- Priority fixes completed: JS safety, FAQ i18n coverage, legal docs, static smoke test, Pages smoke gate, and release workflow guardrails.
-- Verification passed on 2026-06-19: `node site/scripts/smoke-check.mjs`, Flutter analysis, and Flutter tests.
+- HealthKit dashboard UI still needs to be connected to `HealthKitDashboardService`.
+- Verification passed on 2026-06-19: `flutter analyze`, focused dashboard tests, and unsigned Xcode release compile.
 
 Risks:
 
 - Windows-specific screenshots are still useful for final launch polish.
 - Production deployment and DNS require external credentials if moving away from GitHub Pages.
+- Signed macOS release build now requires a development/distribution certificate with HealthKit entitlement.
+- Runtime HealthKit availability still needs validation on a signed Mac build with user permission granted.

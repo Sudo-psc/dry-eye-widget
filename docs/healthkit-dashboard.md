@@ -101,11 +101,35 @@ App:
 - preservar ausencia explicita em vez de esconder lacunas;
 - manter cliques e teclas fora do MVP ate existir consentimento granular e modelo agregado.
 
+## Implementacao nativa macOS
+
+Estado em 2026-06-19:
+
+- `HealthKitDashboardBridge.swift` registra o canal `dry_eye_widget/healthkit_dashboard`.
+- `isAvailable` verifica disponibilidade real via `HKHealthStore.isHealthDataAvailable()` quando o framework HealthKit esta presente.
+- `requestAuthorization` solicita somente leitura de sono e frequencia cardiaca.
+- `fetchDailySummaries` normaliza sono em segundos por dia e frequencia cardiaca media em bpm por dia.
+- `HealthKitDashboardService` converte as linhas nativas para `DryEyeDashboardPeriod` e marca ausencia como indisponivel de forma explicita.
+- `NSHealthShareUsageDescription` foi adicionado ao `Info.plist`.
+- A entitlement `com.apple.developer.healthkit` foi adicionada aos perfis DebugProfile e Release.
+
+Comportamento quando HealthKit nao estiver disponivel:
+
+- A ponte retorna `available: false` ou erro `healthkit_unavailable`.
+- O servico Dart preserva os campos do dashboard como indisponiveis, sem comprometer a visualizacao geral.
+
+Verificacao executada em 2026-06-19:
+
+- `flutter analyze`: aprovado.
+- `flutter test test/dry_eye_health_dashboard_test.dart test/healthkit_dashboard_service_test.dart`: aprovado.
+- `xcodebuild -workspace macos/Runner.xcworkspace -scheme Runner -configuration Release CODE_SIGNING_ALLOWED=NO`: aprovado.
+- `flutter build macos --release`: bloqueado por assinatura local, porque a entitlement HealthKit exige certificado de desenvolvimento.
+
 ## Proxima implementacao
 
-1. Criar adaptador nativo macOS/iOS para `HKHealthStore` quando a plataforma permitir.
-2. Solicitar permissao de leitura para sono e frequencia cardiaca.
-3. Normalizar amostras HealthKit para `DryEyeMetricValue`.
-4. Persistir eventos locais de pausas, colirios e piscadas sugeridas.
-5. Criar UI do dashboard usando `DryEyeDashboardPeriod`.
+1. Conectar a UI do dashboard ao `HealthKitDashboardService`.
+2. Criar fluxo visivel para permissao opcional do HealthKit.
+3. Persistir eventos locais de pausas, colirios e piscadas sugeridas.
+4. Criar visualizacao longitudinal usando `DryEyeDashboardPeriod`.
+5. Testar em Mac assinado com conta Apple que tenha HealthKit habilitado.
 6. Adicionar exportacao clinica somente com consentimento explicito.
