@@ -8,9 +8,17 @@
 - [x] Verify build and local render.
 - [x] Apply priority fixes from repository review.
 - [x] Run static smoke check and Flutter checks.
+- [x] Create HealthKit dashboard branch.
+- [x] Define integrative dashboard data model.
+- [x] Add native macOS HealthKit bridge for sleep and average heart rate.
+- [x] Add Dart service that maps native HealthKit rows to dashboard periods.
+- [x] Verify analysis, focused tests, and unsigned Xcode compile.
 
 ## next
 
+- [ ] Connect the dashboard UI to `HealthKitDashboardService`.
+- [ ] Add a visible optional HealthKit permission flow.
+- [ ] Test a signed macOS build with HealthKit entitlement enabled.
 - [x] Capture or replace carousel with real app screenshots when available.
 - [ ] Add Windows-specific installer/tray screenshots when available.
 - [ ] Run production-like Lighthouse after deployment.
@@ -22,11 +30,13 @@
 - VPS deployment is blocked until server access and deployment path are provided.
 - DNS configuration is blocked until DNS provider access is provided.
 - Separate landing repo creation is blocked until the desired GitHub organization/name is confirmed.
+- Signed HealthKit runtime validation is blocked until a valid Apple signing identity/provisioning setup is available locally or in CI.
 
 ## improve
 
 - [x] Add an automated landing smoke test that checks canonical route, script safety, and i18n coverage.
 - [x] Add CI coverage for the static site smoke check.
+- Add an integration test or manual QA script for HealthKit permission states: unavailable, denied, authorized and no samples.
 - Track Flutter macOS Swift Package Manager warnings for `screen_retriever_macos`, `tray_manager`, and `local_notifier`.
 - Add real app screenshots from macOS and Windows release runs.
 - Add structured article metadata for future blog expansion.

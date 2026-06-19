@@ -15,6 +15,8 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: true)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+    HealthKitDashboardBridge.register(
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
 
     // Canal de tempo ocioso do sistema (segundos desde a última entrada do
     // usuário — mouse, cliques, teclas — em todo o sistema).
