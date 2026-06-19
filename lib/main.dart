@@ -45,7 +45,7 @@ import 'widgets/update_dialog.dart';
 
 /// Tamanhos das janelas de configurações (a compacta e a do menu são dinâmicas).
 const Size _settingsWindowSize = Size(460, 700);
-const Size _osdiWindowSize = Size(580, 740);
+const Size _osdiWindowSize = Size(700, 790);
 
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);

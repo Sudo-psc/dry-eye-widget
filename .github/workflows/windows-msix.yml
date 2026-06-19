@@ -12,10 +12,11 @@ on:
   workflow_dispatch:
   push:
     tags:
+      - "v*"
       - "v*-msix"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-msix:
@@ -36,6 +37,12 @@ jobs:
 
       - name: Dependências
         run: flutter pub get
+
+      - name: Análise estática
+        run: flutter analyze
+
+      - name: Testes
+        run: flutter test
 
       - name: Build Release
         run: flutter build windows --release
@@ -62,3 +69,12 @@ jobs:
           name: dry-eye-widget-msix
           path: ${{ steps.find.outputs.path }}
           if-no-files-found: error
+
+      - name: Anexar à Release (apenas em tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.find.outputs.path }}
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

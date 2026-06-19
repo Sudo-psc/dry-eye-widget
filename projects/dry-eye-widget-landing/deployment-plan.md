@@ -4,12 +4,11 @@
 
 Static files are generated in:
 
-- `landing/dist/`
+- `site/`
 
-The generated tree already contains:
+The tree already contains:
 
-- `app/pt/index.html`
-- `app/en/index.html`
+- `index.html`, served publicly at `/app/`
 - blog routes
 - assets
 - `sitemap.xml`
@@ -19,10 +18,10 @@ The generated tree already contains:
 
 Preferred deployment:
 
-1. Build locally or in CI with `cd landing && npm ci && npm run build`.
-2. Upload the contents of `landing/dist/` to the web root that serves `olhossecos.com.br`.
-3. Ensure the server serves `landing/dist/app/pt/index.html` at `https://olhossecos.com.br/app/pt/`.
-4. Ensure the server serves `landing/dist/app/en/index.html` at `https://olhossecos.com.br/app/en/`.
+1. Validate locally with `node site/scripts/smoke-check.mjs`.
+2. Publish the contents of `site/` through the existing GitHub Pages workflow.
+3. Ensure the server serves `site/index.html` at `https://olhossecos.com.br/app/`.
+4. Ensure blog files remain available under `https://olhossecos.com.br/app/blog/`.
 5. Add compression and cache headers:
    - HTML: short cache.
    - CSS, images, SVG: long cache.
@@ -35,4 +34,3 @@ Preferred deployment:
 - Web server type: Nginx, Apache, Caddy or other.
 - DNS provider access.
 - Decision: keep landing in this app repo or create a separate GitHub repo.
-

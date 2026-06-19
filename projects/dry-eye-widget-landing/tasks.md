@@ -4,8 +4,10 @@
 
 - [x] Inspect repository and infer runtime constraints.
 - [x] Create local operating summary and implementation contract.
-- [x] Build Astro landing page V1.
+- [x] Confirm `site/` as the official `/app/` landing.
 - [x] Verify build and local render.
+- [x] Apply priority fixes from repository review.
+- [x] Run static smoke check and Flutter checks.
 
 ## next
 
@@ -23,7 +25,9 @@
 
 ## improve
 
-- [x] Add an automated landing smoke test that checks canonical routes, CTAs, and SEO metadata.
+- [x] Add an automated landing smoke test that checks canonical route, script safety, and i18n coverage.
+- [x] Add CI coverage for the static site smoke check.
+- Track Flutter macOS Swift Package Manager warnings for `screen_retriever_macos`, `tray_manager`, and `local_notifier`.
 - Add real app screenshots from macOS and Windows release runs.
 - Add structured article metadata for future blog expansion.
 

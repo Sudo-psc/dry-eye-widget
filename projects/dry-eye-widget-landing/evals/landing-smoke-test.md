@@ -2,23 +2,19 @@
 
 The V1 smoke test lives at:
 
-- `landing/scripts/smoke-check.mjs`
+- `site/scripts/smoke-check.mjs`
 
 It verifies:
 
-- required static routes exist in `dist/`
-- Portuguese and English canonical URLs are present
-- macOS and Windows CTAs are present
-- GitHub project link is present
-- scientific references are present
+- `/app/` remains the single canonical landing URL
+- `data-i18n` keys used by HTML exist in both PT and EN dictionaries
+- `i18n.js` loads before `landing.js` when both are present
+- `landing.js` safely handles article pages that do not load i18n
+- active project contract files do not point back to obsolete route or build paths
 
 Run:
 
-```bash
-cd landing
-npm run build
-npm run smoke
-```
+`node site/scripts/smoke-check.mjs`
 
 This is the first eval ratchet for the landing page. Future improvements should add:
 
@@ -26,4 +22,3 @@ This is the first eval ratchet for the landing page. Future improvements should 
 - Lighthouse budget thresholds
 - screenshot regression for desktop and mobile
 - real download availability checks
-

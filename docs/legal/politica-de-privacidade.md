@@ -1,8 +1,8 @@
 # Política de Privacidade do Dry Eye Widget
 
-Última atualização: 9 de junho de 2026
+Última atualização: 19 de junho de 2026
 
-Esta Política de Privacidade explica como o Dry Eye Widget trata informações durante o uso do aplicativo para Windows. O princípio central é simples: o aplicativo foi projetado para funcionar localmente e não enviar dados de atividade do usuário para fora da máquina.
+Esta Política de Privacidade explica como o Dry Eye Widget trata informações durante o uso do aplicativo para Windows e macOS. O princípio central é simples: o aplicativo foi projetado para funcionar localmente e não enviar dados de atividade do usuário para fora da máquina.
 
 ## 1. Resumo
 
@@ -18,6 +18,8 @@ O Dry Eye Widget não possui telemetria de atividade, analytics de uso, monitora
 | Câmera (presença) | **Opcional e desligada por padrão.** Quando ativada, tira **uma única foto local**, verifica se há um rosto e **descarta a imagem na hora** — sem gravar nem enviar. |
 | Aprendizado de inatividade | Estado agregado guardado **cifrado** no próprio dispositivo (Keychain/DPAPI), sem histórico de eventos e sem acesso remoto. |
 | Configurações | Salvas localmente para manter preferências do usuário. |
+| Questionário OSDI | Quando usado, respostas, pontuação, gravidade e data ficam salvas localmente para histórico do próprio usuário. |
+| Tempo de tela | Quando ativado, salva histórico diário agregado de tempo ativo de tela, descartando períodos de inatividade. |
 | Atualizações | A checagem opcional consulta o GitHub Releases e não inclui dados de atividade. |
 
 ## 2. Dados que o aplicativo não coleta
@@ -48,7 +50,7 @@ O aplicativo também não usa esses dados para publicidade, perfilamento, vigil�
 
 ## 3. Como funciona a detecção de inatividade
 
-A detecção de inatividade do Dry Eye Widget usa um recurso local do Windows para consultar o tempo decorrido desde a última entrada global do usuário no sistema, como movimento do mouse, clique ou tecla.
+A detecção de inatividade do Dry Eye Widget usa recursos locais do sistema operacional para consultar o tempo decorrido desde a última entrada global do usuário no sistema, como movimento do mouse, clique ou tecla.
 
 Essa consulta retorna apenas um valor de tempo, em segundos. O aplicativo usa esse valor para:
 
@@ -81,9 +83,11 @@ Para funcionar de forma conveniente, o aplicativo pode salvar preferências e es
 - idioma, tema, escala e preferências visuais;
 - posição do widget na tela;
 - progresso de timers para retomada após reiniciar o app;
-- preferência de iniciar ou não com o Windows.
+- preferência de iniciar ou não com o sistema;
+- histórico local do questionário OSDI, quando o usuário usa esse recurso;
+- histórico diário agregado de tempo de tela, quando o usuário ativa essa coleta.
 
-Esses dados são usados apenas para manter a configuração do usuário e a continuidade da experiência. Eles ficam armazenados localmente pelo mecanismo de preferências do aplicativo ou do sistema operacional.
+Esses dados são usados apenas para manter a configuração do usuário, a continuidade da experiência e a visualização local do próprio histórico. Eles ficam armazenados localmente pelo mecanismo de preferências do aplicativo ou do sistema operacional.
 
 O Dry Eye Widget não envia essas preferências para servidores próprios, serviços de analytics ou terceiros.
 
@@ -103,9 +107,9 @@ Quando habilitadas, as notificações do Dry Eye Widget são exibidas localmente
 
 As notificações não exigem envio de dados de atividade para fora da máquina.
 
-## 7. Inicialização com o Windows
+## 7. Inicialização com o sistema
 
-Se o usuário ativar a opção de iniciar com o sistema, o Dry Eye Widget pode registrar essa preferência no mecanismo local de inicialização do Windows.
+Se o usuário ativar a opção de iniciar com o sistema, o Dry Eye Widget pode registrar essa preferência no mecanismo local de inicialização do Windows ou do macOS.
 
 Essa função apenas abre o aplicativo automaticamente. Ela não coleta dados de atividade e não cria monitoramento remoto.
 
@@ -117,11 +121,14 @@ Em geral, o usuário pode:
 
 - desativar notificações;
 - desativar sons;
-- desativar a inicialização com o Windows;
+- desativar a inicialização com o sistema;
+- desativar a confirmação de presença pela câmera;
+- desativar a coleta de tempo de tela;
+- apagar o aprendizado local de inatividade;
 - ajustar tempos e pausas;
 - fechar o aplicativo;
 - desinstalar o aplicativo;
-- apagar dados locais do app pelos mecanismos do Windows, quando desejar limpar preferências.
+- apagar dados locais do app pelos mecanismos do sistema operacional, quando desejar limpar preferências.
 
 Se o usuário sincronizar, copiar ou fizer backup de pastas locais por meio de ferramentas externas, essas ferramentas podem tratar os arquivos conforme suas próprias políticas. Isso fica fora do controle do Dry Eye Widget.
 
@@ -142,4 +149,3 @@ Esta Política de Privacidade pode ser atualizada para refletir mudanças no apl
 ## 12. Contato
 
 Dúvidas, sugestões, relatos de bugs ou pedidos relacionados à privacidade devem ser enviados pelos canais oficiais do repositório do Dry Eye Widget, como issues ou discussões no GitHub quando disponíveis.
-

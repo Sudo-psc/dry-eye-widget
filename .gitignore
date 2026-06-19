@@ -46,6 +46,9 @@ app.*.map.json
 
 # OMC agent state (local scratch)
 .omc/
+.playwright-mcp/
+.serena/
 
 # Distribuição (binários gerados localmente)
 dist/
+dist_msix/

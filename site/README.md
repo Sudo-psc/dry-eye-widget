@@ -1,8 +1,8 @@
 # Dry Eye Widget — Landing page
 
-Landing estática (HTML/CSS/JS puro, sem build) para `olhossecos.com.br/app/pt` e `/app/en`.
+Landing estática (HTML/CSS/JS puro, sem build) para `olhossecos.com.br/app/`.
 
-- **Bilíngue:** PT padrão, toggle PT/EN (persistido em `localStorage`). Para URLs separadas (`/app/pt`, `/app/en`), sirva esta mesma pasta nas duas rotas e defina o idioma inicial com `dewSetLang('pt'|'en')` — ou migre para Astro com duas rotas gerando o HTML já traduzido (os textos estão centralizados em `scripts/i18n.js`).
+- **Bilíngue:** PT padrão, toggle PT/EN persistido em `localStorage` e cookie. A rota oficial continua sendo `/app/`.
 - **Dark/light mode:** segue o sistema, toggle manual persistido.
 - **Sem dependências externas** além do Google Fonts. Sem React, sem framework.
 
@@ -18,6 +18,12 @@ git branch -M main && git push -u origin main
 #   location /app/ { alias /var/www/dry-eye-widget-landing/; try_files $uri $uri/ /app/index.html; }
 ```
 
+## Verificar
+
+```bash
+node site/scripts/smoke-check.mjs
+```
+
 ## Checklist de performance já aplicado
 
 - CSS/JS mínimos e separados, imagens redimensionadas (≤1000px), `loading="lazy"` no carrossel
@@ -29,5 +35,4 @@ git branch -M main && git push -u origin main
 
 - Substituir o avatar "PS" pela foto profissional real (`.doctor-avatar`)
 - Gerar OG image 1200×630 dedicada
-- Migração opcional para Astro (rotas /pt e /en pré-renderizadas) — estrutura atual mapeia 1:1
 - favicon .ico/multi-size + manifest
