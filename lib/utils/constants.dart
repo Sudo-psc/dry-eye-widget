@@ -187,7 +187,7 @@ class AppInfo {
   /// "app danificado" do Gatekeeper (build sem notarização). Mostrado no
   /// diálogo de atualização do macOS.
   static const String macUnblockCommand =
-      'xattr -cr ~/Downloads/DryEyeWidget*.dmg';
+      'xattr -cr ~/Downloads/DryEyeWidget.dmg';
 
   static String get latestReleaseApi =>
       'https://api.github.com/repos/$repoOwner/$repoName/releases/latest';
