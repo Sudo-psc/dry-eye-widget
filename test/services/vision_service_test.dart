@@ -46,7 +46,7 @@ void main() {
         if (methodCall.method == 'hasFace') {
           return null;
         }
-        return true;
+        return null;
       });
 
       final result = await visionService.hasFace();
