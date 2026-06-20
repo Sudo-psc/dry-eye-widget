@@ -67,7 +67,6 @@ class _FloatingBallState extends State<FloatingBall>
   late final Animation<double> _opacity;
   bool _hovered = false;
 
-  @override
   void initState() {
     super.initState();
     _blink = AnimationController(vsync: this, duration: widget.blinkDuration);
