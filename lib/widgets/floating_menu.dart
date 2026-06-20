@@ -47,7 +47,6 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onQuit;
   final VoidCallback onDismiss;
 
-  @override
   Widget build(BuildContext context) {
     final s = strings;
     final items = <_MenuItem>[
