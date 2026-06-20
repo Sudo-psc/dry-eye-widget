@@ -94,13 +94,19 @@ class ScreenTimeData {
   /// Soma por mês (12 meses) do ano de [reference]. O campo `day` aponta para
   /// o primeiro dia de cada mês.
   List<ScreenTimePoint> yearSeries(DateTime reference) {
-    final totals = List<int>.filled(12, 0);
-    for (final entry in secondsByDay.entries) {
-      final day = _dayFromKey(entry.key);
-      if (day.year == reference.year) {
-        totals[day.month - 1] += entry.value;
-      }
-    }
+    final yearPrefix = '${reference.year.toString().padLeft(4, '0')}-';
+
+    final totals = secondsByDay.entries
+        .where((e) => e.key.startsWith(yearPrefix))
+        .fold<List<int>>(
+          List<int>.filled(12, 0),
+          (acc, e) {
+            final month = int.parse(e.key.substring(5, 7));
+            acc[month - 1] += e.value;
+            return acc;
+          },
+        );
+
     return List<ScreenTimePoint>.generate(
       12,
       (i) => ScreenTimePoint(DateTime(reference.year, i + 1, 1), totals[i]),
