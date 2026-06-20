@@ -9,7 +9,6 @@ class FlagIcon extends StatelessWidget {
 
   final CustomPainter _painter;
 
-  @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(3),
