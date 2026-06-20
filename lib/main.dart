@@ -926,7 +926,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     } else if (_screenTimeOpen) {
       body = Center(
         child: Consumer<ScreenTimeService>(
-          builder: (_, screenTime, _) => ScreenTimeDialog(
+          builder: (_, screenTime, __) => ScreenTimeDialog(
             strings: strings,
             data: screenTime.data,
             trackingEnabled: settings.screenTimeTracking,

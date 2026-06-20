@@ -23,7 +23,7 @@ class ScreenTimePoint {
 @immutable
 class ScreenTimeData {
   ScreenTimeData(Map<String, int> secondsByDay)
-    : secondsByDay = Map<String, int>.unmodifiable(secondsByDay);
+      : secondsByDay = Map<String, int>.unmodifiable(secondsByDay);
 
   /// Mapa dia (`'AAAA-MM-DD'`) -> segundos de uso ativo.
   final Map<String, int> secondsByDay;
@@ -143,11 +143,13 @@ class ScreenTimeData {
       final decoded = jsonDecode(source);
       if (decoded is! Map) return ScreenTimeData.empty();
       final result = <String, int>{};
-      decoded.forEach((key, value) {
+      for (final entry in decoded.entries) {
+        final key = entry.key;
+        final value = entry.value;
         if (key is String && value is num && value > 0) {
           result[key] = value.toInt();
         }
-      });
+      }
       return ScreenTimeData(result);
     } catch (_) {
       return ScreenTimeData.empty();
