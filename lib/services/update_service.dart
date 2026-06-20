@@ -65,9 +65,11 @@ class UpdateService {
     }
   }
 
+  static final _versionRegex = RegExp(r'(\d+)\.(\d+)\.(\d+)');
+
   /// Remove o "v" inicial e qualquer sufixo após o número.
   String _normalize(String tag) {
-    final m = RegExp(r'(\d+)\.(\d+)\.(\d+)').firstMatch(tag);
+    final m = _versionRegex.firstMatch(tag);
     return m == null ? '' : '${m[1]}.${m[2]}.${m[3]}';
   }
 
