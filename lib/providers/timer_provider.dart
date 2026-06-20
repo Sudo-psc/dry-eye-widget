@@ -385,7 +385,6 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
-  @override
   void dispose() {
     _disposed = true;
     _settings.removeListener(_syncServiceToggles);
