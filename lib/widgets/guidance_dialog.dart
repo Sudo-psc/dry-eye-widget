@@ -13,7 +13,6 @@ class GuidanceDialog extends StatelessWidget {
   final AppStrings strings;
   final VoidCallback onClose;
 
-  @override
   Widget build(BuildContext context) {
     final s = strings;
     return LiquidGlass(
@@ -98,7 +97,6 @@ class _Section extends StatelessWidget {
   final String title;
   final String body;
 
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -142,7 +140,6 @@ class _Stats extends StatelessWidget {
 
   final AppStrings s;
 
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -180,7 +177,6 @@ class _Stat extends StatelessWidget {
   final String value;
   final String text;
 
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -220,7 +216,6 @@ class _References extends StatelessWidget {
 
   final String title;
 
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 6),
@@ -269,7 +264,6 @@ class _Ref extends StatelessWidget {
   final String n;
   final String text;
 
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
