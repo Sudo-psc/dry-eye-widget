@@ -13,7 +13,6 @@ class AboutPanel extends StatelessWidget {
   final AppStrings strings;
   final VoidCallback onClose;
 
-  @override
   Widget build(BuildContext context) {
     final s = strings;
     return LiquidGlass(
