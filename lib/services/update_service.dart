@@ -21,11 +21,12 @@ class UpdateService {
     try {
       final client = HttpClient()
         ..connectionTimeout = const Duration(seconds: 10);
-      final request =
-          await client.getUrl(Uri.parse(AppInfo.latestReleaseApi));
+      final request = await client.getUrl(Uri.parse(AppInfo.latestReleaseApi));
       request.headers.set(HttpHeaders.userAgentHeader, 'DryEyeWidget');
-      request.headers.set(HttpHeaders.acceptHeader,
-          'application/vnd.github+json');
+      request.headers.set(
+        HttpHeaders.acceptHeader,
+        'application/vnd.github+json',
+      );
       final response = await request.close();
       if (response.statusCode != 200) {
         client.close();
@@ -71,12 +72,18 @@ class UpdateService {
     return m == null ? '' : '${m[1]}.${m[2]}.${m[3]}';
   }
 
+  /// Exposto para testes.
+  @visibleForTesting
+  int compareVersions(String a, String b) => _compare(a, b);
+
   /// Compara duas versões "x.y.z". Retorna >0 se [a] > [b].
   int _compare(String a, String b) {
-    final pa = a.split('.').map(int.parse).toList();
-    final pb = b.split('.').map(int.parse).toList();
+    final pa = a.split('.');
+    final pb = b.split('.');
     for (var i = 0; i < 3; i++) {
-      if (pa[i] != pb[i]) return pa[i] - pb[i];
+      final valA = int.parse(pa[i]);
+      final valB = int.parse(pb[i]);
+      if (valA != valB) return valA - valB;
     }
     return 0;
   }
