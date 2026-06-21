@@ -37,6 +37,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/sounds/
+    - assets/fonts/
 
 # Ícone do app gerado a partir de icon.png (gere com: dart run flutter_launcher_icons)
 flutter_launcher_icons:

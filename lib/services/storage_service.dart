@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/break_stats_data.dart';
+import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/screen_time_data.dart';
 import '../models/widget_settings.dart';
@@ -107,4 +108,20 @@ class StorageService {
 
   /// Apaga todo o histórico de pausas (usado pelo "limpar dados").
   Future<void> clearBreakStats() => _prefs.remove(StorageKeys.breakStats);
+
+  // --- Checklist ambiental ------------------------------------------------
+
+  EnvironmentChecklist? loadEnvironmentChecklist() =>
+      EnvironmentChecklist.fromJson(
+        _prefs.getString(StorageKeys.environmentChecklist),
+      );
+
+  Future<void> saveEnvironmentChecklist(EnvironmentChecklist checklist) =>
+      _prefs.setString(
+        StorageKeys.environmentChecklist,
+        checklist.toJson(),
+      );
+
+  Future<void> clearEnvironmentChecklist() =>
+      _prefs.remove(StorageKeys.environmentChecklist);
 }

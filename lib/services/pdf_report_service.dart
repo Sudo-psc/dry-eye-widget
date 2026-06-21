@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
 
@@ -56,11 +58,33 @@ class PdfReportService {
     color: PdfColors.grey700,
   );
 
+  // Fonte Unicode embutida (DejaVuSans) usada como *fallback*: a Helvetica
+  // padrão cobre o português acentuado e tem negrito/itálico próprios, mas não
+  // desenha símbolos fora do WinAnsi (em-dash, aspas curvas, etc.) que o
+  // usuário pode colar nas observações. Carregada uma única vez.
+  static pw.Font? _fallbackFont;
+  static bool _fallbackAttempted = false;
+
+  Future<List<pw.Font>> _loadFontFallback() async {
+    if (!_fallbackAttempted) {
+      _fallbackAttempted = true;
+      try {
+        final data = await rootBundle.load('assets/fonts/DejaVuSans.ttf');
+        _fallbackFont = pw.Font.ttf(data);
+      } catch (_) {
+        _fallbackFont = null; // ambientes sem asset bundle (ex.: testes puros)
+      }
+    }
+    return _fallbackFont == null ? const [] : [_fallbackFont!];
+  }
+
   /// Gera o documento PDF em formato binário.
   Future<Uint8List> generateReport(ReportData data) async {
+    final fallback = await _loadFontFallback();
     final pdf = pw.Document(
       title: 'Relatório de Saúde Visual Digital',
       author: 'Dry Eye Widget',
+      theme: pw.ThemeData.withFont(fontFallback: fallback),
     );
 
     pdf.addPage(
@@ -87,6 +111,10 @@ class PdfReportService {
           ],
           if (data.options.includeBreaks) ...[
             _buildBreaksSection(data),
+            pw.SizedBox(height: 20),
+          ],
+          if (data.options.includeEnvironment && data.environment != null) ...[
+            _buildEnvironmentSection(data.environment!),
             pw.SizedBox(height: 20),
           ],
           _buildEvaluationSection(data),
@@ -455,6 +483,48 @@ class PdfReportService {
           'aproximada de 20 pés ou 6 metros.',
           style: _italicStyle,
         ),
+      ],
+    );
+  }
+
+  // --- Ambiente visual ----------------------------------------------------
+
+  pw.Widget _buildEnvironmentSection(EnvironmentChecklist env) {
+    final (PdfColor color, String label) = switch (env.risk) {
+      EnvironmentRisk.adequate => (PdfColors.green700, 'Adequado'),
+      EnvironmentRisk.attention => (PdfColors.orange700, 'Atenção'),
+      EnvironmentRisk.increased => (PdfColors.red700, 'Risco aumentado'),
+    };
+
+    final rows = <List<String>>[
+      ['Distância da tela', env.screenDistanceOk ? 'Adequada' : 'Inadequada'],
+      ['Altura do monitor', env.monitorHeightOk ? 'Adequada' : 'Inadequada'],
+      ['Brilho', env.brightnessOk ? 'Confortável' : 'Desconfortável'],
+      ['Contraste', env.contrastOk ? 'Confortável' : 'Desconfortável'],
+      ['Iluminação do ambiente', env.lightingOk ? 'Adequada' : 'Inadequada'],
+      ['Reflexo na tela', env.glare ? 'Presente' : 'Ausente'],
+      ['Ar-condicionado', env.airConditioning ? 'Sim' : 'Não'],
+      ['Ambiente seco / baixa umidade', env.dryAir ? 'Sim' : 'Não'],
+      ['Múltiplos monitores', env.multiMonitor ? 'Sim' : 'Não'],
+      ['Home office', env.homeOffice ? 'Sim' : 'Não'],
+      ['Ventilador direcionado ao rosto', env.fanOnFace ? 'Sim' : 'Não'],
+    ];
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('5. Ambiente visual', style: _headerStyle),
+        pw.SizedBox(height: 8),
+        pw.Row(
+          children: [
+            pw.Text('Classificação do ambiente: ', style: _textStyle),
+            pw.Text(label,
+                style: _textStyle.copyWith(
+                    color: color, fontWeight: pw.FontWeight.bold)),
+          ],
+        ),
+        pw.SizedBox(height: 8),
+        for (final r in rows) _kv(r[0], r[1]),
       ],
     );
   }
