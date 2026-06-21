@@ -1,4 +1,5 @@
 import '../models/break_stats_data.dart';
+import '../models/checklist.dart';
 import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
@@ -29,6 +30,7 @@ class ReportBuilder {
     required BreakStatsData breakStats,
     required List<String> symptomLabels,
     EnvironmentChecklist? environment,
+    List<ChecklistResult> checklistResults = const [],
     DateTime? now,
   }) {
     final generatedAt = now ?? DateTime.now();
@@ -59,6 +61,8 @@ class ReportBuilder {
       alerts: alerts,
       generatedAt: generatedAt,
       environment: options.includeEnvironment ? environment : null,
+      checklists:
+          options.includeChecklists ? checklistResults : const <ChecklistResult>[],
     );
   }
 

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../models/checklist.dart';
 import '../models/environment_checklist.dart';
 import '../models/report_options.dart';
 import '../providers/settings_provider.dart';
+import '../services/checklist_storage_service.dart';
 import '../services/pdf_report_service.dart';
 import '../services/report_builder.dart';
 import '../services/screen_time_service.dart';
@@ -74,6 +76,25 @@ class _ReportDialogState extends State<ReportDialog> {
     );
   }
 
+  /// Últimos resultados por tipo de checklist marcados para inclusão no PDF.
+  ///
+  /// Protegido com try/catch: o provider [ChecklistStorageService] é registrado
+  /// pelo `main.dart`; em contextos de teste que não o registram, devolve lista
+  /// vazia em vez de lançar.
+  List<ChecklistResult> _checklistsForPdf() {
+    try {
+      final service = context.read<ChecklistStorageService>();
+      final results = <ChecklistResult>[];
+      for (final type in ChecklistType.values) {
+        final latest = service.latestByType(type);
+        if (latest != null && latest.includeInPdf) results.add(latest);
+      }
+      return results;
+    } catch (_) {
+      return const <ChecklistResult>[];
+    }
+  }
+
   ReportData _buildReportData() {
     final storage = context.read<StorageService>();
     final screenTimeService = context.read<ScreenTimeService>();
@@ -90,6 +111,7 @@ class _ReportDialogState extends State<ReportDialog> {
       breakStats: storage.loadBreakStats(),
       symptomLabels: strings.osdiQuestions,
       environment: _environment,
+      checklistResults: _checklistsForPdf(),
     );
   }
 
@@ -415,6 +437,9 @@ class _ReportDialogState extends State<ReportDialog> {
     }
     final top = data.topSymptom;
     if (top != null) lines.add(('Sintoma principal', top.label));
+    if (data.checklists.isNotEmpty) {
+      lines.add(('Checklists incluídos', '${data.checklists.length}'));
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),

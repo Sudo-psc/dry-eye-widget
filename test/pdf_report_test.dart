@@ -1,4 +1,5 @@
 import 'package:dry_eye_widget/models/break_stats_data.dart';
+import 'package:dry_eye_widget/models/checklist.dart';
 import 'package:dry_eye_widget/models/environment_checklist.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/report_options.dart';
@@ -24,6 +25,7 @@ void main() {
     ReportOptions? options,
     UserProfile profile = const UserProfile(),
     EnvironmentChecklist? environment,
+    List<ChecklistResult> checklists = const [],
   }) =>
       builder.build(
         profile: profile,
@@ -37,7 +39,26 @@ void main() {
         breakStats: breakStats ?? BreakStatsData.empty(),
         symptomLabels: symptomLabels,
         environment: environment,
+        checklistResults: checklists,
         now: now,
+      );
+
+  ChecklistResult checklist({
+    required ChecklistType type,
+    required ChecklistRiskLevel riskLevel,
+    String classification = 'Resultado',
+    String feedback = 'Considere acompanhar a evolução.',
+  }) =>
+      ChecklistResult(
+        id: type.id,
+        type: type,
+        createdAt: now.subtract(const Duration(days: 1)),
+        answers: const [],
+        totalScore: 5,
+        riskLevel: riskLevel,
+        classification: classification,
+        feedback: feedback,
+        includeInPdf: true,
       );
 
   Future<int> sizeOf(ReportData data) async =>
@@ -106,6 +127,50 @@ void main() {
         environment: EnvironmentChecklist(updatedAt: now, glare: true),
       );
       expect(data.environment, isNull);
+    });
+
+    test('gera PDF com checklists (inclui sinal de atenção urgente)', () async {
+      final data = build(
+        checklists: [
+          checklist(
+            type: ChecklistType.visualSymptoms,
+            riskLevel: ChecklistRiskLevel.attention,
+            classification: 'Sinais de atenção',
+          ),
+          checklist(
+            type: ChecklistType.warningSigns,
+            riskLevel: ChecklistRiskLevel.urgentAttention,
+            classification: 'Atenção prioritária',
+            feedback: 'Considere avaliação oftalmológica com prioridade.',
+          ),
+        ],
+      );
+      expect(data.checklists, hasLength(2));
+      expect(await sizeOf(data), greaterThan(100));
+    });
+
+    test('checklists não entram quando includeChecklists é falso', () async {
+      final data = build(
+        options: ReportOptions(
+          startDate: now.subtract(const Duration(days: 30)),
+          endDate: now,
+          includeChecklists: false,
+        ),
+        checklists: [
+          checklist(
+            type: ChecklistType.visualSymptoms,
+            riskLevel: ChecklistRiskLevel.low,
+          ),
+        ],
+      );
+      expect(data.checklists, isEmpty);
+      expect(await sizeOf(data), greaterThan(100));
+    });
+
+    test('gera PDF sem checklists (lista vazia) sem lançar', () async {
+      final data = build();
+      expect(data.checklists, isEmpty);
+      expect(await sizeOf(data), greaterThan(100));
     });
 
     test('gera PDF sem sintomas quando includeSymptoms é falso', () async {
