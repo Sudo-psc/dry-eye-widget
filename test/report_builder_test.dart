@@ -1,4 +1,5 @@
 import 'package:dry_eye_widget/models/break_stats_data.dart';
+import 'package:dry_eye_widget/models/checklist.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/report_options.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
@@ -147,6 +148,56 @@ void main() {
           .incremented(now, reminders: 10, completed: 3);
       final data = build(breakStats: breaks);
       expect(data.indication, OverallIndication.reinforceBreaks);
+    });
+  });
+
+  group('Checklists', () {
+    final checklist = ChecklistResult(
+      id: 'c1',
+      type: ChecklistType.visualSymptoms,
+      createdAt: now.subtract(const Duration(days: 2)),
+      answers: const [],
+      totalScore: 7,
+      riskLevel: ChecklistRiskLevel.attention,
+      classification: 'Sinais de atenção',
+      feedback: 'Considere ajustar hábitos visuais.',
+      includeInPdf: true,
+    );
+
+    ReportData buildWith({
+      required bool includeChecklists,
+      List<ChecklistResult> checklistResults = const [],
+    }) =>
+        builder.build(
+          profile: const UserProfile(),
+          options: ReportOptions(
+            startDate: now.subtract(const Duration(days: 30)),
+            endDate: now,
+            includeChecklists: includeChecklists,
+          ),
+          osdiHistory: const [],
+          screenTime: ScreenTimeData.empty(),
+          breakStats: BreakStatsData.empty(),
+          symptomLabels: symptomLabels,
+          checklistResults: checklistResults,
+          now: now,
+        );
+
+    test('inclui checklists quando includeChecklists é verdadeiro', () {
+      final data = buildWith(
+        includeChecklists: true,
+        checklistResults: [checklist],
+      );
+      expect(data.checklists, hasLength(1));
+      expect(data.checklists.first.type, ChecklistType.visualSymptoms);
+    });
+
+    test('descarta checklists quando includeChecklists é falso', () {
+      final data = buildWith(
+        includeChecklists: false,
+        checklistResults: [checklist],
+      );
+      expect(data.checklists, isEmpty);
     });
   });
 
