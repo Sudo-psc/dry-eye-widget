@@ -171,6 +171,10 @@ class StorageKeys {
 
   /// JSON serializado com o tempo de uso de tela por dia ({'AAAA-MM-DD': seg}).
   static const String screenTime = 'screen_time_json';
+
+  /// JSON serializado com as estatísticas de pausas visuais por dia
+  /// ({'AAAA-MM-DD': {'r': lembretes, 'c': concluídas}}).
+  static const String breakStats = 'break_stats_json';
 }
 
 /// Informações do app usadas na verificação de atualização.
