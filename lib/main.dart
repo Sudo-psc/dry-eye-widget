@@ -16,6 +16,7 @@ import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
+import 'services/checklist_storage_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
 import 'services/screen_time_service.dart';
@@ -31,6 +32,7 @@ import 'services/tray_service.dart';
 import 'services/update_service.dart';
 import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
+import 'widgets/checklists/checklists_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
@@ -51,9 +53,9 @@ const Size _osdiWindowSize = Size(700, 790);
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
-/// Altura do painel de menu (cabeçalho + 12 itens + paddings do vidro), com
+/// Altura do painel de menu (cabeçalho + 13 itens + paddings do vidro), com
 /// folga para variações de fonte entre plataformas.
-const double _menuPanelHeight = 552;
+const double _menuPanelHeight = 576;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -68,6 +70,7 @@ Future<void> main() async {
   await windowManager.ensureInitialized();
 
   final storage = await StorageService.init();
+  final checklistStorage = await ChecklistStorageService.init();
   final settings = SettingsProvider(storage: storage);
   final screenTime = ScreenTimeService(storage: storage);
   final audio = AudioService()..enabled = settings.value.soundEnabled;
@@ -146,6 +149,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider<StorageService>.value(value: storage),
+        Provider<ChecklistStorageService>.value(value: checklistStorage),
         Provider<AudioService>.value(value: audio),
         Provider<StartupService>.value(value: startup),
         Provider<TrayService>.value(value: tray),
@@ -235,6 +239,7 @@ enum _WindowLayout {
   settings,
   osdi,
   report,
+  checklists,
   breakOverlay,
   gentleBreak,
   inactivity,
@@ -273,6 +278,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _osdiOpen = false;
   bool _screenTimeOpen = false;
   bool _reportOpen = false;
+  bool _checklistsOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
@@ -367,6 +373,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_osdiOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
+      !_checklistsOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       !_timer.isPaused &&
@@ -419,6 +426,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_osdiOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
+      !_checklistsOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       _timer.state == AppState.idle;
@@ -444,7 +452,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_updateOpen &&
           !_osdiOpen &&
           !_screenTimeOpen &&
-          !_reportOpen) {
+          !_reportOpen &&
+          !_checklistsOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.settings);
@@ -468,7 +477,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_updateOpen &&
           !_osdiOpen &&
           !_screenTimeOpen &&
-          !_reportOpen) {
+          !_reportOpen &&
+          !_checklistsOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.inactivity);
@@ -505,6 +515,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
         break;
       case TrayService.keyReports:
         _openReportFromTray();
+        break;
+      case TrayService.keyChecklists:
+        _openChecklistsFromTray();
         break;
       case TrayService.keyGithub:
         _openGithub();
@@ -544,6 +557,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openReportFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openReport();
+  }
+
+  Future<void> _openChecklistsFromTray() async {
+    if (!_widgetEnabled) await windowManager.show();
+    _openChecklists();
   }
 
   Future<void> _openGithub() async {
@@ -613,6 +631,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _settingsOpen = false;
         _aboutOpen = false;
         _reportOpen = false;
+        _checklistsOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -667,6 +686,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           break;
         case _WindowLayout.osdi:
         case _WindowLayout.report:
+        case _WindowLayout.checklists:
           await windowManager.setSize(_osdiWindowSize);
           await windowManager.center();
           break;
@@ -780,6 +800,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
+      _checklistsOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -794,6 +815,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
+      _checklistsOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -818,6 +840,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
+      _checklistsOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -839,6 +862,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiHistory = storage.loadOsdiHistory();
       _screenTimeOpen = false;
       _reportOpen = false;
+      _checklistsOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
   }
@@ -858,6 +882,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = true;
       _reportOpen = false;
+      _checklistsOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
   }
@@ -877,12 +902,33 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _reportOpen = true;
+      _checklistsOpen = false;
     });
     _applyLayout(_WindowLayout.report);
   }
 
   void _closeReport() {
     setState(() => _reportOpen = false);
+    _restoreAfterPanel();
+  }
+
+  void _openChecklists() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = false;
+      _reportOpen = false;
+      _checklistsOpen = true;
+    });
+    _applyLayout(_WindowLayout.checklists);
+  }
+
+  void _closeChecklists() {
+    setState(() => _checklistsOpen = false);
     _restoreAfterPanel();
   }
 
@@ -913,6 +959,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
+      _checklistsOpen = false;
       _updateResult = null;
     });
     await _applyLayout(_WindowLayout.settings);
@@ -993,6 +1040,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
         child: ReportDialog(
           onClose: _closeReport,
         ),
+      );
+    } else if (_checklistsOpen) {
+      body = Center(
+        child: ChecklistsScreen(onClose: _closeChecklists),
       );
     } else if (_settingsOpen) {
       body = _buildSettings();
@@ -1096,6 +1147,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onGuidance: _openGuidance,
                 onOsdi: _openOsdi,
                 onScreenTime: _openScreenTime,
+                onChecklists: _openChecklists,
                 onReports: _openReport,
                 onCheckUpdates: _openCheckUpdates,
                 onGitHub: _openGithub,

@@ -22,6 +22,7 @@ void main() {
               onGuidance: () {},
               onOsdi: () => osdiOpened++,
               onScreenTime: () {},
+              onChecklists: () {},
               onReports: () {},
               onCheckUpdates: () {},
               onGitHub: () {},
@@ -60,6 +61,7 @@ void main() {
               onGuidance: () {},
               onOsdi: () {},
               onScreenTime: () {},
+              onChecklists: () {},
               onReports: () {},
               onCheckUpdates: () {},
               onGitHub: () {},
@@ -76,11 +78,11 @@ void main() {
     // O último item precisa ser renderizado por inteiro.
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
 
-    // A altura intrínseca do painel (cabeçalho + 12 itens) deve caber na
-    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 552).
+    // A altura intrínseca do painel (cabeçalho + 13 itens) deve caber na
+    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 576).
     // Se um novo item estourar esse limite, o último item ("Sair") voltaria a
     // ser cortado pela borda da janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(552));
+    expect(height, lessThanOrEqualTo(576));
   });
 }
