@@ -80,11 +80,7 @@ class ScreenTimeData {
 
   /// Todos os dias do mês de [reference], em ordem.
   List<ScreenTimePoint> monthSeries(DateTime reference) {
-    final daysInMonth = DateTime(
-      reference.year,
-      reference.month + 1,
-      0,
-    ).day;
+    final daysInMonth = DateTime(reference.year, reference.month + 1, 0).day;
     return List<ScreenTimePoint>.generate(daysInMonth, (i) {
       final day = DateTime(reference.year, reference.month, i + 1);
       return ScreenTimePoint(day, secondsForDay(day));
@@ -98,14 +94,11 @@ class ScreenTimeData {
 
     final totals = secondsByDay.entries
         .where((e) => e.key.startsWith(yearPrefix))
-        .fold<List<int>>(
-          List<int>.filled(12, 0),
-          (acc, e) {
-            final month = int.parse(e.key.substring(5, 7));
-            acc[month - 1] += e.value;
-            return acc;
-          },
-        );
+        .fold<List<int>>(List<int>.filled(12, 0), (acc, e) {
+          final month = int.parse(e.key.substring(5, 7));
+          acc[month - 1] += e.value;
+          return acc;
+        });
 
     return List<ScreenTimePoint>.generate(
       12,
@@ -130,9 +123,10 @@ class ScreenTimeData {
       now.month,
       now.day,
     ).subtract(const Duration(days: maxRetainedDays));
+    final cutoffKey = dayKey(cutoff);
     final next = <String, int>{};
     for (final entry in secondsByDay.entries) {
-      if (!_dayFromKey(entry.key).isBefore(cutoff)) {
+      if (entry.key.compareTo(cutoffKey) >= 0) {
         next[entry.key] = entry.value;
       }
     }
