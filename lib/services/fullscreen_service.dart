@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -13,7 +11,7 @@ class FullscreenService {
   /// `true` quando o app frontmost (que não seja este próprio widget) ocupa uma
   /// tela inteira. Em plataformas não-macOS retorna sempre `false`.
   Future<bool> isFrontmostFullscreen() async {
-    if (!Platform.isMacOS) return false;
+    if (defaultTargetPlatform != TargetPlatform.macOS) return false;
     try {
       final result = await _channel.invokeMethod<bool>('frontmostFullscreen');
       return result ?? false;
