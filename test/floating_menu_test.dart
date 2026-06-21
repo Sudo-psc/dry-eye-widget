@@ -22,7 +22,6 @@ void main() {
               onGuidance: () {},
               onOsdi: () => osdiOpened++,
               onScreenTime: () {},
-              onHealthDashboard: () {},
               onReports: () {},
               onCheckUpdates: () {},
               onGitHub: () {},
@@ -61,7 +60,6 @@ void main() {
               onGuidance: () {},
               onOsdi: () {},
               onScreenTime: () {},
-              onHealthDashboard: () {},
               onReports: () {},
               onCheckUpdates: () {},
               onGitHub: () {},
@@ -78,49 +76,11 @@ void main() {
     // O último item precisa ser renderizado por inteiro.
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
 
-    // A altura intrínseca do painel (cabeçalho + 13 itens) deve caber na
-    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 576).
+    // A altura intrínseca do painel (cabeçalho + 12 itens) deve caber na
+    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 552).
     // Se um novo item estourar esse limite, o último item ("Sair") voltaria a
     // ser cortado pela borda da janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(576));
-  });
-
-  testWidgets('menu flutuante abre o painel de saúde', (tester) async {
-    var healthOpened = 0;
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: FloatingMenu(
-              strings: ptStrings,
-              isPaused: false,
-              onStartNow: () {},
-              onReset: () {},
-              onTogglePause: () {},
-              onGuidance: () {},
-              onOsdi: () {},
-              onScreenTime: () {},
-              onHealthDashboard: () => healthOpened++,
-              onReports: () {},
-              onCheckUpdates: () {},
-              onGitHub: () {},
-              onAbout: () {},
-              onSettings: () {},
-              onQuit: () {},
-              onDismiss: () {},
-            ),
-          ),
-        ),
-      ),
-    );
-
-    expect(find.text(ptStrings.menuHealthDashboard), findsOneWidget);
-
-    await tester.tap(find.text(ptStrings.menuHealthDashboard));
-    await tester.pump();
-
-    expect(healthOpened, 1);
+    expect(height, lessThanOrEqualTo(552));
   });
 }
