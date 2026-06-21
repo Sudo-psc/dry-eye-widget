@@ -21,6 +21,7 @@ class TrayService {
   static const String keyOsdi = 'open_osdi';
   static const String keyGithub = 'open_github';
   static const String keyReports = 'open_reports';
+  static const String keyChecklists = 'open_checklists';
   static const String keyQuit = 'quit';
 
   /// Quantidade de passos do progresso. Mantido próximo da largura útil da
@@ -112,6 +113,7 @@ class TrayService {
             MenuItem(key: keyBreak, label: strings.menuStartBreak),
             MenuItem.separator(),
             MenuItem(key: keyOsdi, label: strings.menuOsdi),
+            MenuItem(key: keyChecklists, label: 'Checklists'),
             MenuItem(key: keyReports, label: 'Relatórios'),
             MenuItem(key: keySettings, label: strings.menuSettings),
             MenuItem(key: keyGithub, label: '🐙 GitHub'),
