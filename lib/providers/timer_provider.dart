@@ -247,6 +247,8 @@ class TimerProvider extends ChangeNotifier {
     _state = AppState.alerta;
     _cycleElapsed = 0;
     _storage.setElapsedSeconds(0);
+    // Registra o aviso de pausa para o relatório de adesão.
+    unawaited(_storage.recordBreakReminder());
     if (_soundOn) _audio.playAlert();
     final s = _settings.strings;
     unawaited(_notifyBreak(s.notifyBreakTitle, s.notifyBreakBody));
@@ -283,6 +285,8 @@ class TimerProvider extends ChangeNotifier {
 
   void _enterConclusao() {
     _state = AppState.conclusao;
+    // Registra a pausa concluída para o relatório de adesão.
+    unawaited(_storage.recordBreakCompleted());
     if (_soundOn) _audio.playSuccess();
     final s = _settings.strings;
     unawaited(_notifyBreak(s.notifyDoneTitle, s.notifyDoneBody));

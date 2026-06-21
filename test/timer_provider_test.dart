@@ -1,4 +1,6 @@
 import 'package:dry_eye_widget/models/app_state.dart';
+import 'package:dry_eye_widget/models/break_stats_data.dart';
+import 'package:dry_eye_widget/models/environment_checklist.dart';
 import 'package:dry_eye_widget/models/widget_settings.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
@@ -398,6 +400,46 @@ class _MemoryStorage implements StorageService {
   @override
   Future<void> saveScreenTime(ScreenTimeData data) async {
     _screenTime = data;
+  }
+
+  BreakStatsData _breakStats = BreakStatsData.empty();
+
+  @override
+  BreakStatsData loadBreakStats() => _breakStats;
+
+  @override
+  Future<void> saveBreakStats(BreakStatsData data) async {
+    _breakStats = data;
+  }
+
+  @override
+  Future<void> recordBreakReminder([DateTime? now]) async {
+    _breakStats = _breakStats.incremented(now ?? DateTime.now(), reminders: 1);
+  }
+
+  @override
+  Future<void> recordBreakCompleted([DateTime? now]) async {
+    _breakStats = _breakStats.incremented(now ?? DateTime.now(), completed: 1);
+  }
+
+  @override
+  Future<void> clearBreakStats() async {
+    _breakStats = BreakStatsData.empty();
+  }
+
+  EnvironmentChecklist? _environment;
+
+  @override
+  EnvironmentChecklist? loadEnvironmentChecklist() => _environment;
+
+  @override
+  Future<void> saveEnvironmentChecklist(EnvironmentChecklist checklist) async {
+    _environment = checklist;
+  }
+
+  @override
+  Future<void> clearEnvironmentChecklist() async {
+    _environment = null;
   }
 
   @override
