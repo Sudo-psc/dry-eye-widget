@@ -52,9 +52,9 @@ const Size _osdiWindowSize = Size(700, 790);
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
-/// Altura do painel de menu (cabeçalho + 12 itens + paddings do vidro), com
+/// Altura do painel de menu (cabeçalho + 13 itens + paddings do vidro), com
 /// folga para variações de fonte entre plataformas.
-const double _menuPanelHeight = 552;
+const double _menuPanelHeight = 576;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item

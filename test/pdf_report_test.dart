@@ -1,63 +1,103 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:dry_eye_widget/models/break_stats_data.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/report_options.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
 import 'package:dry_eye_widget/services/pdf_report_service.dart';
+import 'package:dry_eye_widget/services/report_builder.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('PdfReportService', () {
-    test('generateReport não deve falhar mesmo com dados vazios', () async {
-      final data = ReportData(
-        profile: const UserProfile(),
-        options: ReportOptions(
-          startDate: DateTime.now().subtract(const Duration(days: 30)),
-          endDate: DateTime.now(),
-        ),
-        osdiHistory: [],
-        screenTimeData: ScreenTimeData.empty(),
+  const builder = ReportBuilder();
+  final service = PdfReportService();
+  final now = DateTime(2026, 6, 21, 12);
+
+  const symptomLabels = [
+    'Luz', 'Areia', 'Dor', 'Embaçada', 'Visão ruim', 'Ler',
+    'Dirigir', 'Computador', 'TV', 'Vento', 'Seco', 'Ar-condicionado',
+  ];
+
+  ReportData build({
+    List<OsdiAssessment> osdiHistory = const [],
+    ScreenTimeData? screenTime,
+    BreakStatsData? breakStats,
+    ReportOptions? options,
+    UserProfile profile = const UserProfile(),
+  }) =>
+      builder.build(
+        profile: profile,
+        options: options ??
+            ReportOptions(
+              startDate: now.subtract(const Duration(days: 30)),
+              endDate: now,
+            ),
+        osdiHistory: osdiHistory,
+        screenTime: screenTime ?? ScreenTimeData.empty(),
+        breakStats: breakStats ?? BreakStatsData.empty(),
+        symptomLabels: symptomLabels,
+        now: now,
       );
 
-      final service = PdfReportService();
-      final pdfBytes = await service.generateReport(data);
+  Future<int> sizeOf(ReportData data) async =>
+      (await service.generateReport(data)).length;
 
-      expect(pdfBytes, isNotEmpty);
-      expect(pdfBytes.length, greaterThan(100)); // Pelo menos um header de PDF válido
+  group('PdfReportService.generateReport', () {
+    test('gera PDF com todos os dados', () async {
+      final history = [
+        OsdiAssessment.fromAnswers(List.filled(12, 1),
+            completedAt: now.subtract(const Duration(days: 15))),
+        OsdiAssessment.fromAnswers(List.filled(12, 3), completedAt: now),
+      ];
+      final data = build(
+        profile: const UserProfile(
+            name: 'Teste Silva', observations: 'Piora à tarde.'),
+        osdiHistory: history,
+        screenTime: ScreenTimeData({ScreenTimeData.dayKey(now): 3600}),
+        breakStats: BreakStatsData.empty()
+            .incremented(now, reminders: 8, completed: 6),
+      );
+      expect(await sizeOf(data), greaterThan(1000));
     });
 
-    test('generateReport deve gerar PDF com dados mockados', () async {
-      final now = DateTime.now();
-      
-      final history = [
-        OsdiAssessment.fromAnswers(
-          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // score ~ 25
-          completedAt: now.subtract(const Duration(days: 15)),
-        ),
-        OsdiAssessment.fromAnswers(
-          [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3], // score ~ 75
-          completedAt: now,
-        ),
-      ];
+    test('gera PDF sem dados (período vazio) sem lançar', () async {
+      expect(await sizeOf(build()), greaterThan(100));
+    });
 
-      final stData = ScreenTimeData({'${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}': 3600});
+    test('gera PDF sem OSDI mas com tempo de tela', () async {
+      final data = build(
+        screenTime: ScreenTimeData({ScreenTimeData.dayKey(now): 7200}),
+      );
+      expect(await sizeOf(data), greaterThan(100));
+    });
 
-      final data = ReportData(
-        profile: const UserProfile(name: 'Teste Silva', observations: 'Sinto piora.'),
+    test('gera PDF sem tempo de tela mas com OSDI', () async {
+      final data = build(
+        osdiHistory: [
+          OsdiAssessment.fromAnswers(List.filled(12, 2), completedAt: now),
+        ],
+      );
+      expect(await sizeOf(data), greaterThan(100));
+    });
+
+    test('gera PDF sem sintomas quando includeSymptoms é falso', () async {
+      final data = build(
         options: ReportOptions(
           startDate: now.subtract(const Duration(days: 30)),
           endDate: now,
+          includeSymptoms: false,
         ),
-        osdiHistory: history,
-        screenTimeData: stData,
-        latestOsdi: history.last,
-        previousOsdi: history.first,
-        averageScreenTimeSeconds: 3600,
-        totalScreenTimeSeconds: 3600,
+        osdiHistory: [
+          OsdiAssessment.fromAnswers(List.filled(12, 2), completedAt: now),
+        ],
       );
-
-      final service = PdfReportService();
-      final pdfBytes = await service.generateReport(data);
-
-      expect(pdfBytes, isNotEmpty);
+      expect(data.symptoms, isEmpty);
+      expect(await sizeOf(data), greaterThan(100));
     });
+  });
+
+  test('constantes médico-legais obrigatórias presentes', () {
+    expect(PdfReportService.legalFooter, contains('constitui diagnóstico'),
+        reason: 'rodapé deve negar caráter diagnóstico');
+    expect(PdfReportService.osdiDisclaimer, contains('OSDI'));
+    expect(PdfReportService.privacyNotice, contains('informações pessoais de saúde'));
   });
 }
