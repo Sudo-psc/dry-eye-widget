@@ -102,44 +102,7 @@ class _OsdiDialogState extends State<OsdiDialog> {
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.assignment_outlined,
-                color: AppColors.idleBall,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      s.osdiTitle,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 19,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      s.osdiSubtitle,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 12.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                tooltip: s.close,
-                onPressed: widget.onClose,
-                icon: const Icon(Icons.close, color: AppColors.textPrimary),
-              ),
-            ],
-          ),
+          _buildHeader(s),
           const SizedBox(height: 12),
           Expanded(
             child: SingleChildScrollView(
@@ -180,38 +143,80 @@ class _OsdiDialogState extends State<OsdiDialog> {
             ),
           ),
           const Divider(color: AppColors.glassBorder, height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          _buildFooter(s, preview),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(AppStrings s) {
+    return Row(
+      children: [
+        const Icon(
+          Icons.assignment_outlined,
+          color: AppColors.idleBall,
+          size: 24,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                s.osdiDisclaimer,
+                s.osdiTitle,
                 style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 11.5,
-                  height: 1.25,
+                  color: AppColors.textPrimary,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  TextButton(
-                    onPressed: _resetAnswers,
-                    child: Text(s.osdiReset),
-                  ),
-                  FilledButton.icon(
-                    onPressed: preview == null ? null : _save,
-                    icon: const Icon(Icons.save_outlined, size: 18),
-                    label: Text(s.osdiSave),
-                  ),
-                ],
+              const SizedBox(height: 2),
+              Text(
+                s.osdiSubtitle,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12.5,
+                ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        IconButton(
+          tooltip: s.close,
+          onPressed: widget.onClose,
+          icon: const Icon(Icons.close, color: AppColors.textPrimary),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter(AppStrings s, OsdiAssessment? preview) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          s.osdiDisclaimer,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 11.5,
+            height: 1.25,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            TextButton(onPressed: _resetAnswers, child: Text(s.osdiReset)),
+            FilledButton.icon(
+              onPressed: preview == null ? null : _save,
+              icon: const Icon(Icons.save_outlined, size: 18),
+              label: Text(s.osdiSave),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
