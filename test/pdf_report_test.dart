@@ -1,4 +1,5 @@
 import 'package:dry_eye_widget/models/break_stats_data.dart';
+import 'package:dry_eye_widget/models/environment_checklist.dart';
 import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/report_options.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
@@ -22,6 +23,7 @@ void main() {
     BreakStatsData? breakStats,
     ReportOptions? options,
     UserProfile profile = const UserProfile(),
+    EnvironmentChecklist? environment,
   }) =>
       builder.build(
         profile: profile,
@@ -34,6 +36,7 @@ void main() {
         screenTime: screenTime ?? ScreenTimeData.empty(),
         breakStats: breakStats ?? BreakStatsData.empty(),
         symptomLabels: symptomLabels,
+        environment: environment,
         now: now,
       );
 
@@ -76,6 +79,33 @@ void main() {
         ],
       );
       expect(await sizeOf(data), greaterThan(100));
+    });
+
+    test('gera PDF com checklist ambiental incluído', () async {
+      final data = build(
+        options: ReportOptions(
+          startDate: now.subtract(const Duration(days: 30)),
+          endDate: now,
+          includeEnvironment: true,
+        ),
+        environment: EnvironmentChecklist(
+          updatedAt: now,
+          glare: true,
+          airConditioning: true,
+          dryAir: true,
+          screenDistanceOk: false,
+        ),
+      );
+      expect(data.environment, isNotNull);
+      expect(data.environment!.risk, EnvironmentRisk.increased);
+      expect(await sizeOf(data), greaterThan(100));
+    });
+
+    test('checklist não entra quando includeEnvironment é falso', () async {
+      final data = build(
+        environment: EnvironmentChecklist(updatedAt: now, glare: true),
+      );
+      expect(data.environment, isNull);
     });
 
     test('gera PDF sem sintomas quando includeSymptoms é falso', () async {

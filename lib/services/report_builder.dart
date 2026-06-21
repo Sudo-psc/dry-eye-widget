@@ -1,4 +1,5 @@
 import '../models/break_stats_data.dart';
+import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
 import '../models/screen_time_data.dart';
@@ -27,6 +28,7 @@ class ReportBuilder {
     required ScreenTimeData screenTime,
     required BreakStatsData breakStats,
     required List<String> symptomLabels,
+    EnvironmentChecklist? environment,
     DateTime? now,
   }) {
     final generatedAt = now ?? DateTime.now();
@@ -56,6 +58,7 @@ class ReportBuilder {
       indication: indication,
       alerts: alerts,
       generatedAt: generatedAt,
+      environment: options.includeEnvironment ? environment : null,
     );
   }
 

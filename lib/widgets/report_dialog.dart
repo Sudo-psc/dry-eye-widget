@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../models/environment_checklist.dart';
 import '../models/report_options.dart';
 import '../providers/settings_provider.dart';
 import '../services/pdf_report_service.dart';
@@ -30,6 +33,18 @@ class _ReportDialogState extends State<ReportDialog> {
   DateTime _customEnd = DateTime.now();
   bool _isBusy = false;
 
+  /// Checklist ambiental opcional (carregado e persistido localmente).
+  EnvironmentChecklist? _environment;
+
+  /// Último PDF salvo no dispositivo (para permitir exclusão).
+  File? _lastSavedFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _environment = context.read<StorageService>().loadEnvironmentChecklist();
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -41,18 +56,21 @@ class _ReportDialogState extends State<ReportDialog> {
 
   ReportOptions _resolveOptions() {
     final now = DateTime.now();
+    final includeEnv = _environment != null;
     final days = _period.days;
     if (days != null) {
       return ReportOptions(
         period: _period,
         startDate: now.subtract(Duration(days: days)),
         endDate: now,
+        includeEnvironment: includeEnv,
       );
     }
     return ReportOptions(
       period: ReportPeriod.custom,
       startDate: _customStart,
       endDate: _customEnd,
+      includeEnvironment: includeEnv,
     );
   }
 
@@ -71,6 +89,7 @@ class _ReportDialogState extends State<ReportDialog> {
       screenTime: screenTimeService.data,
       breakStats: storage.loadBreakStats(),
       symptomLabels: strings.osdiQuestions,
+      environment: _environment,
     );
   }
 
@@ -86,6 +105,7 @@ class _ReportDialogState extends State<ReportDialog> {
     try {
       final bytes = await _pdfService.generateReport(data);
       final file = await _pdfService.savePdfToDevice(bytes, _fileName());
+      if (mounted) setState(() => _lastSavedFile = file);
       messenger.showSnackBar(
         SnackBar(content: Text('PDF salvo em: ${file.path}')),
       );
@@ -93,6 +113,21 @@ class _ReportDialogState extends State<ReportDialog> {
       _showError(messenger, e);
     } finally {
       if (mounted) setState(() => _isBusy = false);
+    }
+  }
+
+  Future<void> _deleteLastPdf(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final file = _lastSavedFile;
+    if (file == null) return;
+    try {
+      if (await file.exists()) await file.delete();
+      if (mounted) setState(() => _lastSavedFile = null);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('PDF excluído do dispositivo.')),
+      );
+    } catch (e) {
+      _showError(messenger, e);
     }
   }
 
@@ -190,6 +225,8 @@ class _ReportDialogState extends State<ReportDialog> {
                     _periodSelector(theme),
                     const SizedBox(height: 24),
                     _identificationFields(theme),
+                    const SizedBox(height: 24),
+                    _environmentSection(theme),
                     const SizedBox(height: 24),
                     _previewCard(theme, preview),
                     const SizedBox(height: 16),
@@ -468,6 +505,118 @@ class _ReportDialogState extends State<ReportDialog> {
         ),
       );
 
+  // --- Checklist ambiental ------------------------------------------------
+
+  void _toggleEnv(bool on) {
+    final storage = context.read<StorageService>();
+    if (on) {
+      final created = EnvironmentChecklist(updatedAt: DateTime.now());
+      setState(() => _environment = created);
+      storage.saveEnvironmentChecklist(created);
+    } else {
+      setState(() => _environment = null);
+      storage.clearEnvironmentChecklist();
+    }
+  }
+
+  void _updateEnv(EnvironmentChecklist Function(EnvironmentChecklist) f) {
+    final cur = _environment;
+    if (cur == null) return;
+    final next = f(cur).copyWith(updatedAt: DateTime.now());
+    setState(() => _environment = next);
+    context.read<StorageService>().saveEnvironmentChecklist(next);
+  }
+
+  Widget _envCheck(String label, bool value, ValueChanged<bool> onChanged) =>
+      CheckboxListTile(
+        dense: true,
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        value: value,
+        onChanged: (v) => onChanged(v ?? false),
+        title: Text(label, style: const TextStyle(fontSize: 13)),
+      );
+
+  Widget _environmentSection(ThemeData theme) {
+    final env = _environment;
+    final (Color color, String label) = switch (env?.risk) {
+      null => (theme.colorScheme.onSurface, ''),
+      EnvironmentRisk.adequate => (Colors.green, 'Adequado'),
+      EnvironmentRisk.attention => (Colors.orange, 'Atenção'),
+      EnvironmentRisk.increased => (Colors.red, 'Risco aumentado'),
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text('Ambiente visual (opcional)',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              Switch(value: env != null, onChanged: _toggleEnv),
+            ],
+          ),
+          const Text(
+            'Inclua um checklist do seu ambiente de trabalho no relatório.',
+            style: TextStyle(fontSize: 13),
+          ),
+          if (env != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Text('Classificação: ', style: TextStyle(fontSize: 13)),
+                Text(label,
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: color,
+                        fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const Divider(),
+            const Text('Ergonomia adequada',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            _envCheck('Distância da tela adequada', env.screenDistanceOk,
+                (v) => _updateEnv((e) => e.copyWith(screenDistanceOk: v))),
+            _envCheck('Altura do monitor adequada', env.monitorHeightOk,
+                (v) => _updateEnv((e) => e.copyWith(monitorHeightOk: v))),
+            _envCheck('Brilho confortável', env.brightnessOk,
+                (v) => _updateEnv((e) => e.copyWith(brightnessOk: v))),
+            _envCheck('Contraste confortável', env.contrastOk,
+                (v) => _updateEnv((e) => e.copyWith(contrastOk: v))),
+            _envCheck('Iluminação do ambiente adequada', env.lightingOk,
+                (v) => _updateEnv((e) => e.copyWith(lightingOk: v))),
+            const SizedBox(height: 4),
+            const Text('Fatores de risco presentes',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+            _envCheck('Reflexo na tela', env.glare,
+                (v) => _updateEnv((e) => e.copyWith(glare: v))),
+            _envCheck('Ar-condicionado', env.airConditioning,
+                (v) => _updateEnv((e) => e.copyWith(airConditioning: v))),
+            _envCheck('Ambiente seco / baixa umidade', env.dryAir,
+                (v) => _updateEnv((e) => e.copyWith(dryAir: v))),
+            _envCheck('Múltiplos monitores', env.multiMonitor,
+                (v) => _updateEnv((e) => e.copyWith(multiMonitor: v))),
+            _envCheck('Home office', env.homeOffice,
+                (v) => _updateEnv((e) => e.copyWith(homeOffice: v))),
+            _envCheck('Ventilador direcionado ao rosto', env.fanOnFace,
+                (v) => _updateEnv((e) => e.copyWith(fanOnFace: v))),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _actionButtons() => Column(
         children: [
           Row(
@@ -508,6 +657,17 @@ class _ReportDialogState extends State<ReportDialog> {
               ),
             ],
           ),
+          if (_lastSavedFile != null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: _isBusy ? null : () => _deleteLastPdf(context),
+                icon: const Icon(Icons.delete_outline, size: 18),
+                label: const Text('Excluir PDF salvo'),
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           SizedBox(
             height: 44,

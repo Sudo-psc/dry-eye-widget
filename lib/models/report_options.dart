@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import 'environment_checklist.dart';
 import 'osdi_assessment.dart';
 import 'screen_time_data.dart';
 
@@ -174,6 +175,7 @@ class ReportData {
     required this.indication,
     required this.alerts,
     required this.generatedAt,
+    this.environment,
   });
 
   final UserProfile profile;
@@ -182,6 +184,9 @@ class ReportData {
   final List<SymptomStat> symptoms;
   final ScreenTimeSummary screenTime;
   final BreakSummary breaks;
+
+  /// Checklist ambiental autorreferido (opcional).
+  final EnvironmentChecklist? environment;
 
   /// Indicação geral educativa (acompanhar / reforçar pausas / avaliação).
   final OverallIndication indication;

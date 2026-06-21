@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Adicionado
+- **Checklist ambiental** opcional na tela de Relatórios: distância da tela,
+  altura do monitor, brilho, contraste, iluminação, reflexo, ar-condicionado,
+  umidade, múltiplos monitores, home office e ventilador no rosto, com
+  classificação automática (adequado / atenção / risco aumentado) incluída no PDF.
+- **Excluir PDF salvo** diretamente pela tela de Relatórios.
+- **Fonte Unicode embutida** (DejaVuSans) como *fallback* no PDF, garantindo a
+  renderização de símbolos fora do Latin-1 (travessões, aspas curvas, etc.) que
+  o usuário possa colar nas observações.
+
 ## [1.13.0] - 2026-06-21
 
 ### Adicionado
