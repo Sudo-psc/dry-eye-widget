@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import 'checklist.dart';
 import 'environment_checklist.dart';
 import 'osdi_assessment.dart';
 import 'screen_time_data.dart';
@@ -53,6 +54,7 @@ class ReportOptions {
     this.includeBreaks = true,
     this.includeSymptoms = true,
     this.includeEnvironment = false,
+    this.includeChecklists = true,
   });
 
   final DateTime startDate;
@@ -63,6 +65,7 @@ class ReportOptions {
   final bool includeBreaks;
   final bool includeSymptoms;
   final bool includeEnvironment;
+  final bool includeChecklists;
 
   /// Quantidade de dias cobertos pelo intervalo (mínimo 1).
   int get days {
@@ -176,6 +179,7 @@ class ReportData {
     required this.alerts,
     required this.generatedAt,
     this.environment,
+    this.checklists = const [],
   });
 
   final UserProfile profile;
@@ -187,6 +191,10 @@ class ReportData {
 
   /// Checklist ambiental autorreferido (opcional).
   final EnvironmentChecklist? environment;
+
+  /// Resultados de checklists de saúde visual digital a incluir no relatório.
+  /// Em geral, o último resultado por tipo marcado para inclusão.
+  final List<ChecklistResult> checklists;
 
   /// Indicação geral educativa (acompanhar / reforçar pausas / avaliação).
   final OverallIndication indication;

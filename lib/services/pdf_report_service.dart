@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../models/checklist.dart';
 import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
@@ -115,6 +116,10 @@ class PdfReportService {
           ],
           if (data.options.includeEnvironment && data.environment != null) ...[
             _buildEnvironmentSection(data.environment!),
+            pw.SizedBox(height: 20),
+          ],
+          if (data.options.includeChecklists && data.checklists.isNotEmpty) ...[
+            _buildChecklistsSection(context, data),
             pw.SizedBox(height: 20),
           ],
           _buildEvaluationSection(data),
@@ -528,6 +533,106 @@ class PdfReportService {
       ],
     );
   }
+
+  // --- Checklists de saúde visual digital --------------------------------
+
+  pw.Widget _buildChecklistsSection(pw.Context context, ReportData data) {
+    final results = [...data.checklists]
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    final hasAttentionFlag = results.any((r) =>
+        r.riskLevel == ChecklistRiskLevel.urgentAttention ||
+        r.riskLevel == ChecklistRiskLevel.recommendedEvaluation);
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('6. Checklists de saúde visual digital', style: _headerStyle),
+        pw.SizedBox(height: 8),
+        if (hasAttentionFlag) ...[
+          pw.Container(
+            width: double.infinity,
+            padding: const pw.EdgeInsets.all(10),
+            decoration: pw.BoxDecoration(
+              color: PdfColors.amber50,
+              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+              border: pw.Border.all(color: PdfColors.orange200),
+            ),
+            child: pw.Text(
+              'Alguns checklists indicam sinais de atenção — considere '
+              'avaliação oftalmológica.',
+              style: _textStyle.copyWith(
+                  color: PdfColors.orange900, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+          pw.SizedBox(height: 10),
+        ],
+        pw.TableHelper.fromTextArray(
+          context: context,
+          cellStyle: _textStyle,
+          cellAlignments: const {
+            0: pw.Alignment.centerLeft,
+            1: pw.Alignment.center,
+            2: pw.Alignment.centerLeft,
+            3: pw.Alignment.centerLeft,
+          },
+          headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
+          headerDecoration:
+              const pw.BoxDecoration(color: PdfColors.blueGrey50),
+          headers: const ['Checklist', 'Data', 'Resultado', 'Recomendação'],
+          data: results
+              .map((r) => [
+                    _checklistTypeLabel(r.type),
+                    _formatDate(r.createdAt),
+                    r.classification,
+                    _checklistRecommendation(r),
+                  ])
+              .toList(),
+        ),
+        pw.SizedBox(height: 8),
+        pw.Text(
+          'Resultados autorreferidos e educativos. Esta triagem não confirma '
+          'diagnóstico e não substitui consulta médica.',
+          style: _italicStyle,
+        ),
+      ],
+    );
+  }
+
+  String _checklistTypeLabel(ChecklistType type) => switch (type) {
+        ChecklistType.visualErgonomics => 'Ergonomia visual',
+        ChecklistType.screenEnvironment => 'Ambiente de tela',
+        ChecklistType.visualSymptoms => 'Sintomas visuais',
+        ChecklistType.warningSigns => 'Sinais de alerta',
+        ChecklistType.breakHabits => 'Pausas e hábitos',
+        ChecklistType.ophthalmologyTriage => 'Triagem oftalmológica',
+        ChecklistType.visualRiskSummary => 'Resumo de risco visual',
+      };
+
+  /// Recomendação curta: 1ª frase do feedback, ou um texto por nível de risco.
+  String _checklistRecommendation(ChecklistResult result) {
+    final feedback = result.feedback.trim();
+    if (feedback.isNotEmpty) {
+      final match = RegExp(r'^.*?[.!?](\s|$)').firstMatch(feedback);
+      final sentence = (match?.group(0) ?? feedback).trim();
+      if (sentence.isNotEmpty) return sentence;
+    }
+    return _checklistRiskRecommendation(result.riskLevel);
+  }
+
+  String _checklistRiskRecommendation(ChecklistRiskLevel level) =>
+      switch (level) {
+        ChecklistRiskLevel.low =>
+          'Mantenha os hábitos saudáveis e o acompanhamento.',
+        ChecklistRiskLevel.attention =>
+          'Observe os sinais de atenção e reforce hábitos visuais.',
+        ChecklistRiskLevel.increased =>
+          'Considere ajustar hábitos e acompanhar a evolução.',
+        ChecklistRiskLevel.recommendedEvaluation =>
+          'Considere avaliação oftalmológica.',
+        ChecklistRiskLevel.urgentAttention =>
+          'Considere avaliação oftalmológica com prioridade.',
+      };
 
   // --- Quando procurar avaliação -----------------------------------------
 
