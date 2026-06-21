@@ -4,6 +4,7 @@ import '../l10n/app_strings.dart';
 import '../models/screen_time_data.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
+import 'shared/option_card.dart';
 
 /// Períodos de visualização do tempo de tela.
 enum _Range { week, month, year }
@@ -207,32 +208,10 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
   Widget _rangeSelector(AppStrings s) {
     Widget button(_Range range, String label) {
       final selected = _range == range;
-      return Expanded(
-        child: GestureDetector(
-          onTap: () => setState(() => _range = range),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: selected
-                  ? AppColors.idleBall.withValues(alpha: 0.18)
-                  : Colors.white.withValues(alpha: 0.04),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: selected ? AppColors.idleBall : AppColors.glassBorder,
-                width: selected ? 2 : 1,
-              ),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 14,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              ),
-            ),
-          ),
-        ),
+      return OptionCard(
+        label: label,
+        selected: selected,
+        onTap: () => setState(() => _range = range),
       );
     }
 
@@ -437,9 +416,7 @@ class _BarChart extends StatelessWidget {
                       AppColors.idleBall.withValues(alpha: 0.25),
                     ],
             ),
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(4),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           ),
         ),
       ),

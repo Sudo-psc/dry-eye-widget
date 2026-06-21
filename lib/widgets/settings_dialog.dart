@@ -9,6 +9,7 @@ import '../models/widget_settings.dart';
 import '../utils/constants.dart';
 import 'flag_icons.dart';
 import 'liquid_glass.dart';
+import 'shared/option_card.dart';
 
 /// Painel de configurações. Edita uma cópia local de [WidgetSettings] e
 /// devolve o resultado via [onSave]. Os textos são exibidos no idioma do
@@ -578,41 +579,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
     required bool selected,
     required VoidCallback onTap,
   }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: selected
-                ? AppColors.idleBall.withValues(alpha: 0.18)
-                : Colors.white.withValues(alpha: 0.04),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: selected ? AppColors.idleBall : AppColors.glassBorder,
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              flag,
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 14,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return OptionCard(
+      label: label,
+      selected: selected,
+      onTap: onTap,
+      leading: flag,
     );
   }
 
@@ -621,33 +592,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     required bool selected,
     required VoidCallback onTap,
   }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected
-                ? AppColors.idleBall.withValues(alpha: 0.18)
-                : Colors.white.withValues(alpha: 0.04),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: selected ? AppColors.idleBall : AppColors.glassBorder,
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 14,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
-    );
+    return OptionCard(label: label, selected: selected, onTap: onTap);
   }
 
   Widget _slider({
