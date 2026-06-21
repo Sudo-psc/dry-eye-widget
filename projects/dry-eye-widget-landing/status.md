@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-06-19
+Updated: 2026-06-21
 
 Current phase: HealthKit dashboard branch in progress for macOS-only native integration.
 
@@ -18,11 +18,14 @@ Completed:
 - Native macOS HealthKit bridge added for permission request, sleep import and average heart-rate import.
 - Dart HealthKit dashboard service added to normalize native rows into explicit dashboard periods.
 - HealthKit privacy description and entitlements added to the macOS target.
+- Health dashboard UI connected to `HealthKitDashboardService`.
+- Optional HealthKit permission flow added to the app panel.
+- Health dashboard added to the floating menu and system tray/menu bar.
 
 In progress:
 
-- HealthKit dashboard UI still needs to be connected to `HealthKitDashboardService`.
-- Verification passed on 2026-06-19: `flutter analyze`, focused dashboard tests, and unsigned Xcode release compile.
+- Signed runtime validation with real HealthKit permissions and samples is still pending.
+- Verification passed on 2026-06-21: `flutter analyze` and full `flutter test`.
 
 Risks:
 

@@ -430,6 +430,58 @@ class AppStrings {
   static AppStrings of(String code) => code == 'en' ? enStrings : ptStrings;
 }
 
+extension HealthDashboardStrings on AppStrings {
+  String get menuHealthDashboard =>
+      languageCode == 'en' ? 'Health dashboard' : 'Painel de saúde';
+
+  String get healthDashboardTitle => 'Dry Eye Health Dashboard';
+
+  String get healthDashboardSubtitle => languageCode == 'en'
+      ? 'Optional view that combines HealthKit sleep and average heart rate with the dry-eye follow-up model.'
+      : 'Visão opcional que cruza sono e frequência cardíaca média do HealthKit com o modelo de acompanhamento do olho seco.';
+
+  String get healthDashboardPermissionTitle =>
+      languageCode == 'en' ? 'HealthKit permission' : 'Permissão do HealthKit';
+
+  String get healthDashboardPermissionBody => languageCode == 'en'
+      ? 'Dry Eye Widget can read sleep and average heart-rate samples when you allow access. The dashboard stays partial when permission or samples are unavailable.'
+      : 'O Dry Eye Widget pode ler sono e frequência cardíaca média quando você autorizar. O dashboard continua parcial quando a permissão ou as amostras não estiverem disponíveis.';
+
+  String get healthDashboardAuthorize =>
+      languageCode == 'en' ? 'Allow HealthKit' : 'Autorizar HealthKit';
+
+  String get healthDashboardRefresh =>
+      languageCode == 'en' ? 'Refresh data' : 'Atualizar dados';
+
+  String get healthDashboardUnavailable => languageCode == 'en'
+      ? 'HealthKit is unavailable on this Mac or in this build.'
+      : 'HealthKit indisponível neste Mac ou nesta build.';
+
+  String get healthDashboardAuthorized => languageCode == 'en'
+      ? 'HealthKit authorized. Latest available samples are shown below.'
+      : 'HealthKit autorizado. As amostras disponíveis mais recentes aparecem abaixo.';
+
+  String get healthDashboardDenied => languageCode == 'en'
+      ? 'HealthKit permission was not granted.'
+      : 'A permissão do HealthKit não foi concedida.';
+
+  String get healthDashboardNoData => languageCode == 'en'
+      ? 'No HealthKit samples found for this period.'
+      : 'Nenhuma amostra do HealthKit encontrada neste período.';
+
+  String get healthDashboardSleep => languageCode == 'en' ? 'Sleep' : 'Sono';
+
+  String get healthDashboardHeartRate =>
+      languageCode == 'en' ? 'Average heart rate' : 'Frequência cardíaca média';
+
+  String get healthDashboardLastSevenDays =>
+      languageCode == 'en' ? 'Last 7 days' : 'Últimos 7 dias';
+
+  String get healthDashboardPrivacyNote => languageCode == 'en'
+      ? 'Exploratory follow-up only. This view does not diagnose, prescribe, or infer causality.'
+      : 'Acompanhamento exploratório. Esta visão não diagnostica, não prescreve e não infere causalidade.';
+}
+
 const AppStrings ptStrings = AppStrings(
   languageCode: 'pt',
   menuStartBreak: 'Iniciar pausa agora',

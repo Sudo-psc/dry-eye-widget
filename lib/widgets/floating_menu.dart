@@ -24,6 +24,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onGuidance,
     required this.onOsdi,
     required this.onScreenTime,
+    required this.onHealthDashboard,
     required this.onCheckUpdates,
     required this.onGitHub,
     required this.onAbout,
@@ -40,6 +41,7 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onGuidance;
   final VoidCallback onOsdi;
   final VoidCallback onScreenTime;
+  final VoidCallback onHealthDashboard;
   final VoidCallback onCheckUpdates;
   final VoidCallback onGitHub;
   final VoidCallback onAbout;
@@ -61,6 +63,11 @@ class FloatingMenu extends StatelessWidget {
       _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
       _MenuItem(Icons.assignment_outlined, s.menuOsdi, onOsdi),
       _MenuItem(Icons.bar_chart_outlined, s.menuScreenTime, onScreenTime),
+      _MenuItem(
+        Icons.health_and_safety_outlined,
+        s.menuHealthDashboard,
+        onHealthDashboard,
+      ),
       _MenuItem(Icons.system_update_alt, s.menuCheckUpdates, onCheckUpdates),
       _MenuItem(Icons.code, s.menuGitHub, onGitHub),
       _MenuItem(Icons.info_outline, s.menuAbout, onAbout),
