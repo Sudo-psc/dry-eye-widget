@@ -125,11 +125,25 @@ Verificacao executada em 2026-06-19:
 - `xcodebuild -workspace macos/Runner.xcworkspace -scheme Runner -configuration Release CODE_SIGNING_ALLOWED=NO`: aprovado.
 - `flutter build macos --release`: bloqueado por assinatura local, porque a entitlement HealthKit exige certificado de desenvolvimento.
 
+## UI e fluxo de permissao
+
+Estado em 2026-06-21:
+
+- `HealthDashboardDialog` conecta a UI ao `HealthKitDashboardService`.
+- O painel esta disponivel no menu flutuante e no menu da barra do sistema.
+- O usuario pode solicitar permissao opcional do HealthKit diretamente pelo painel.
+- O painel mostra sono e frequencia cardiaca media dos ultimos 7 dias quando ha permissao e amostras.
+- Estados sem dado, sem permissao ou HealthKit indisponivel sao exibidos explicitamente.
+- O texto da tela reforca que o dashboard e exploratorio e nao diagnostico.
+
+Verificacao executada em 2026-06-21:
+
+- `flutter analyze`: aprovado.
+- `flutter test`: aprovado.
+
 ## Proxima implementacao
 
-1. Conectar a UI do dashboard ao `HealthKitDashboardService`.
-2. Criar fluxo visivel para permissao opcional do HealthKit.
-3. Persistir eventos locais de pausas, colirios e piscadas sugeridas.
-4. Criar visualizacao longitudinal usando `DryEyeDashboardPeriod`.
-5. Testar em Mac assinado com conta Apple que tenha HealthKit habilitado.
-6. Adicionar exportacao clinica somente com consentimento explicito.
+1. Testar em Mac assinado com conta Apple que tenha HealthKit habilitado.
+2. Persistir eventos locais de pausas, colirios e piscadas sugeridas.
+3. Expandir a visualizacao longitudinal com metricas do app alem do HealthKit.
+4. Adicionar exportacao clinica somente com consentimento explicito.
