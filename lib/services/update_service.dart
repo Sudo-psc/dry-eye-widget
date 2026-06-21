@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/constants.dart';
 
@@ -54,12 +55,9 @@ class UpdateService {
   Future<void> openReleasesPage() async {
     final url = AppInfo.releasesPage;
     try {
-      if (Platform.isMacOS) {
-        await Process.run('open', [url]);
-      } else if (Platform.isWindows) {
-        await Process.run('cmd', ['/c', 'start', '', url]);
-      } else {
-        await Process.run('xdg-open', [url]);
+      final uri = Uri.parse(url);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $url');
       }
     } catch (e) {
       debugPrint('UpdateService: não foi possível abrir a página ($e).');

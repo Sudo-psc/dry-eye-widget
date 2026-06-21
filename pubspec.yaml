@@ -20,6 +20,7 @@ dependencies:
   google_fonts: ^8.1.0
   launch_at_startup: ^0.5.1
   tray_manager: ^0.5.2
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
