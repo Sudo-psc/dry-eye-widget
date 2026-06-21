@@ -42,15 +42,6 @@ class ScreenTimeData {
     return '$y-$m-$d';
   }
 
-  static DateTime _dayFromKey(String key) {
-    final parts = key.split('-');
-    return DateTime(
-      int.parse(parts[0]),
-      int.parse(parts[1]),
-      int.parse(parts[2]),
-    );
-  }
-
   // --- Consultas ----------------------------------------------------------
 
   int secondsForDay(DateTime date) => secondsByDay[dayKey(date)] ?? 0;
