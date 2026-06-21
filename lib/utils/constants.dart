@@ -171,6 +171,13 @@ class StorageKeys {
 
   /// JSON serializado com o tempo de uso de tela por dia ({'AAAA-MM-DD': seg}).
   static const String screenTime = 'screen_time_json';
+
+  /// JSON serializado com as estatísticas de pausas visuais por dia
+  /// ({'AAAA-MM-DD': {'r': lembretes, 'c': concluídas}}).
+  static const String breakStats = 'break_stats_json';
+
+  /// JSON serializado com o último checklist ambiental autorreferido.
+  static const String environmentChecklist = 'environment_checklist_json';
 }
 
 /// Informações do app usadas na verificação de atualização.
@@ -178,7 +185,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.11.6';
+  static const String version = '1.14.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

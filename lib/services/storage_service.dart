@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/break_stats_data.dart';
+import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/screen_time_data.dart';
 import '../models/widget_settings.dart';
@@ -81,4 +83,45 @@ class StorageService {
 
   Future<void> saveScreenTime(ScreenTimeData data) =>
       _prefs.setString(StorageKeys.screenTime, data.toJson());
+
+  // --- Estatísticas de pausas visuais ------------------------------------
+
+  BreakStatsData loadBreakStats() =>
+      BreakStatsData.fromJson(_prefs.getString(StorageKeys.breakStats));
+
+  Future<void> saveBreakStats(BreakStatsData data) =>
+      _prefs.setString(StorageKeys.breakStats, data.toJson());
+
+  /// Registra a emissão de um aviso de pausa para o dia [now].
+  Future<void> recordBreakReminder([DateTime? now]) async {
+    final moment = now ?? DateTime.now();
+    final updated = loadBreakStats().incremented(moment, reminders: 1);
+    await saveBreakStats(updated.pruned(moment));
+  }
+
+  /// Registra a conclusão de uma pausa para o dia [now].
+  Future<void> recordBreakCompleted([DateTime? now]) async {
+    final moment = now ?? DateTime.now();
+    final updated = loadBreakStats().incremented(moment, completed: 1);
+    await saveBreakStats(updated.pruned(moment));
+  }
+
+  /// Apaga todo o histórico de pausas (usado pelo "limpar dados").
+  Future<void> clearBreakStats() => _prefs.remove(StorageKeys.breakStats);
+
+  // --- Checklist ambiental ------------------------------------------------
+
+  EnvironmentChecklist? loadEnvironmentChecklist() =>
+      EnvironmentChecklist.fromJson(
+        _prefs.getString(StorageKeys.environmentChecklist),
+      );
+
+  Future<void> saveEnvironmentChecklist(EnvironmentChecklist checklist) =>
+      _prefs.setString(
+        StorageKeys.environmentChecklist,
+        checklist.toJson(),
+      );
+
+  Future<void> clearEnvironmentChecklist() =>
+      _prefs.remove(StorageKeys.environmentChecklist);
 }
