@@ -40,6 +40,7 @@ import 'widgets/guidance_dialog.dart';
 import 'widgets/health_dashboard_dialog.dart';
 import 'widgets/inactivity_pause_card.dart';
 import 'widgets/osdi_dialog.dart';
+import 'widgets/report_dialog.dart';
 import 'widgets/screen_time_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/update_dialog.dart';
@@ -234,6 +235,7 @@ enum _WindowLayout {
   menu,
   settings,
   osdi,
+  report,
   breakOverlay,
   gentleBreak,
   inactivity,
@@ -272,6 +274,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _osdiOpen = false;
   bool _screenTimeOpen = false;
   bool _healthDashboardOpen = false;
+  bool _reportOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
@@ -365,6 +368,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_updateOpen &&
       !_osdiOpen &&
       !_screenTimeOpen &&
+      !_reportOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       !_timer.isPaused &&
@@ -416,6 +420,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_updateOpen &&
       !_osdiOpen &&
       !_screenTimeOpen &&
+      !_reportOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       _timer.state == AppState.idle;
@@ -440,7 +445,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_guidanceOpen &&
           !_updateOpen &&
           !_osdiOpen &&
-          !_screenTimeOpen) {
+          !_screenTimeOpen &&
+          !_reportOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.settings);
@@ -463,7 +469,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_guidanceOpen &&
           !_updateOpen &&
           !_osdiOpen &&
-          !_screenTimeOpen) {
+          !_screenTimeOpen &&
+          !_reportOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.inactivity);
@@ -500,6 +507,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
         break;
       case TrayService.keyHealthDashboard:
         _openHealthDashboardFromTray();
+        break;
+      case TrayService.keyReports:
+        _openReportFromTray();
         break;
       case TrayService.keyGithub:
         _openGithub();
@@ -539,6 +549,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openHealthDashboardFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openHealthDashboard();
+  }
+
+  Future<void> _openReportFromTray() async {
+    if (!_widgetEnabled) await windowManager.show();
+    _openReport();
   }
 
   Future<void> _openGithub() async {
@@ -607,6 +622,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _menuOpen = false;
         _settingsOpen = false;
         _aboutOpen = false;
+        _reportOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -660,6 +676,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await windowManager.center();
           break;
         case _WindowLayout.osdi:
+        case _WindowLayout.report:
           await windowManager.setSize(_osdiWindowSize);
           await windowManager.center();
           break;
@@ -773,6 +790,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _healthDashboardOpen = false;
+      _reportOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -787,6 +805,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _healthDashboardOpen = false;
+      _reportOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -811,6 +830,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _healthDashboardOpen = false;
+      _reportOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -832,6 +852,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiHistory = storage.loadOsdiHistory();
       _screenTimeOpen = false;
       _healthDashboardOpen = false;
+      _reportOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
   }
@@ -851,6 +872,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = true;
       _healthDashboardOpen = false;
+      _reportOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
   }
@@ -876,6 +898,26 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _closeHealthDashboard() {
     setState(() => _healthDashboardOpen = false);
+    _restoreAfterPanel();
+  }
+
+  void _openReport() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = false;
+      _healthDashboardOpen = false;
+      _reportOpen = true;
+    });
+    _applyLayout(_WindowLayout.report);
+  }
+
+  void _closeReport() {
+    setState(() => _reportOpen = false);
     _restoreAfterPanel();
   }
 
@@ -906,6 +948,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = false;
       _screenTimeOpen = false;
       _healthDashboardOpen = false;
+      _reportOpen = false;
       _updateResult = null;
     });
     await _applyLayout(_WindowLayout.settings);
@@ -987,6 +1030,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
           _updater.openReleasesPage();
           _closeUpdate();
         },
+      );
+    } else if (_reportOpen) {
+      body = Center(
+        child: ReportDialog(
+          onClose: _closeReport,
+        ),
       );
     } else if (_settingsOpen) {
       body = _buildSettings();
@@ -1091,6 +1140,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onOsdi: _openOsdi,
                 onScreenTime: _openScreenTime,
                 onHealthDashboard: _openHealthDashboard,
+                onReports: _openReport,
                 onCheckUpdates: _openCheckUpdates,
                 onGitHub: _openGithub,
                 onAbout: _openAbout,
