@@ -4,12 +4,10 @@ import 'package:share_plus/share_plus.dart';
 
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
-import '../models/screen_time_data.dart';
 import '../services/pdf_report_service.dart';
 import '../services/screen_time_service.dart';
 import '../services/storage_service.dart';
-import '../utils/constants.dart';
-import 'glass_overlay.dart';
+import 'liquid_glass.dart';
 
 class ReportDialog extends StatefulWidget {
   const ReportDialog({super.key, required this.onClose});
@@ -100,11 +98,10 @@ class _ReportDialogState extends State<ReportDialog> {
 
     } catch (e) {
       debugPrint('Erro ao gerar relatório: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao gerar relatório: $e')),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao gerar relatório: $e')),
+      );
     } finally {
       if (mounted) {
         setState(() => _isGenerating = false);
@@ -120,9 +117,9 @@ class _ReportDialogState extends State<ReportDialog> {
       backgroundColor: Colors.transparent,
       body: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: GlassOverlay(
-          opacity: 0.8,
-          sigma: 20,
+        child: LiquidGlass(
+          fillOpacity: 0.8,
+          blur: 20,
           child: Column(
             children: [
               // Header
@@ -130,10 +127,10 @@ class _ReportDialogState extends State<ReportDialog> {
                 height: 56,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withOpacity(0.5),
+                  color: theme.colorScheme.surface.withValues(alpha: 0.5),
                   border: Border(
                     bottom: BorderSide(
-                      color: theme.colorScheme.onSurface.withOpacity(0.1),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                     ),
                   ),
                 ),
@@ -166,10 +163,10 @@ class _ReportDialogState extends State<ReportDialog> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: theme.colorScheme.primary.withOpacity(0.3),
+                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -224,7 +221,7 @@ class _ReportDialogState extends State<ReportDialog> {
                       decoration: InputDecoration(
                         labelText: 'Seu Nome',
                         filled: true,
-                        fillColor: theme.colorScheme.surface.withOpacity(0.5),
+                        fillColor: theme.colorScheme.surface.withValues(alpha: 0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -239,7 +236,7 @@ class _ReportDialogState extends State<ReportDialog> {
                         labelText: 'Observações Pessoais',
                         alignLabelWithHint: true,
                         filled: true,
-                        fillColor: theme.colorScheme.surface.withOpacity(0.5),
+                        fillColor: theme.colorScheme.surface.withValues(alpha: 0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -251,7 +248,7 @@ class _ReportDialogState extends State<ReportDialog> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.errorContainer.withOpacity(0.5),
+                        color: theme.colorScheme.errorContainer.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
