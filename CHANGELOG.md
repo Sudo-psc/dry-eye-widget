@@ -4,6 +4,26 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.15.0] - 2026-06-21
+
+### Adicionado
+- **Área "Checklists" de saúde visual digital** — educativa e de triagem (não
+  diagnóstica), com 7 módulos:
+  - Ergonomia visual, Ambiente de tela, Sintomas visuais, Sinais de alerta e
+    Pausas e hábitos: questionários com pontuação, classificação de risco e
+    feedback educativo.
+  - Triagem oftalmológica: combina OSDI, tempo de tela, adesão a pausas e os
+    demais checklists para orientar quando considerar avaliação.
+  - Resumo de risco visual: panorama consolidado por indicador.
+- Histórico longitudinal por checklist (comparação último × anterior) com
+  opção de excluir registros.
+- Inclusão dos resultados no **relatório PDF** (seção "Checklists de saúde
+  visual digital", com tabela Checklist | Data | Resultado | Recomendação).
+
+### Privacidade
+- Resultados armazenados localmente; exclusão pelo usuário; sem compartilhamento
+  automático; linguagem de triagem/educativa, nunca diagnóstica.
+
 ## [1.14.0] - 2026-06-21
 
 ### Adicionado
