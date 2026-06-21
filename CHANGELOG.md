@@ -4,6 +4,27 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.13.0] - 2026-06-21
+
+### Adicionado
+- **Relatório de Saúde Visual Digital em PDF**: nova tela "Relatórios" que
+  exporta um documento clínico-educativo (triagem, não diagnóstico) com:
+  - Resumo executivo e indicação geral (acompanhar / reforçar pausas /
+    considerar avaliação oftalmológica).
+  - Evolução do escore OSDI com gráfico de barras por severidade.
+  - Sintomas derivados das respostas OSDI (frequência, intensidade e tendência).
+  - Tempo de tela: média diária, total, dia de pico e comparação entre dias
+    úteis e fins de semana.
+  - Adesão às pausas visuais, com rastreamento persistido a cada ciclo.
+  - Seção "Quando procurar avaliação oftalmológica" com gatilhos educativos.
+- Períodos de 7, 30 e 90 dias e intervalo personalizado, com prévia do relatório.
+- Ações separadas de salvar, compartilhar e cancelar, com confirmação de
+  privacidade (LGPD) antes de qualquer compartilhamento.
+
+### Privacidade
+- O PDF é gerado integralmente no dispositivo (pacote `pdf`), sem envio a
+  servidores ou terceiros sem ação explícita do usuário.
+
 ## [1.11.5] - 2026-06-18
 
 ### Alterado
