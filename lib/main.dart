@@ -37,7 +37,6 @@ import 'widgets/floating_menu.dart';
 import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
-import 'widgets/health_dashboard_dialog.dart';
 import 'widgets/inactivity_pause_card.dart';
 import 'widgets/osdi_dialog.dart';
 import 'widgets/report_dialog.dart';
@@ -52,9 +51,9 @@ const Size _osdiWindowSize = Size(700, 790);
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
-/// Altura do painel de menu (cabeçalho + 13 itens + paddings do vidro), com
+/// Altura do painel de menu (cabeçalho + 12 itens + paddings do vidro), com
 /// folga para variações de fonte entre plataformas.
-const double _menuPanelHeight = 576;
+const double _menuPanelHeight = 552;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -273,7 +272,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _updateOpen = false;
   bool _osdiOpen = false;
   bool _screenTimeOpen = false;
-  bool _healthDashboardOpen = false;
   bool _reportOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
@@ -505,9 +503,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keyOsdi:
         _openOsdiFromTray();
         break;
-      case TrayService.keyHealthDashboard:
-        _openHealthDashboardFromTray();
-        break;
       case TrayService.keyReports:
         _openReportFromTray();
         break;
@@ -544,11 +539,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openOsdiFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openOsdi();
-  }
-
-  Future<void> _openHealthDashboardFromTray() async {
-    if (!_widgetEnabled) await windowManager.show();
-    _openHealthDashboard();
   }
 
   Future<void> _openReportFromTray() async {
@@ -789,7 +779,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _updateOpen = false;
       _osdiOpen = false;
       _screenTimeOpen = false;
-      _healthDashboardOpen = false;
       _reportOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
@@ -804,7 +793,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _updateOpen = false;
       _osdiOpen = false;
       _screenTimeOpen = false;
-      _healthDashboardOpen = false;
       _reportOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
@@ -829,7 +817,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _updateOpen = false;
       _osdiOpen = false;
       _screenTimeOpen = false;
-      _healthDashboardOpen = false;
       _reportOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
@@ -851,7 +838,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _osdiOpen = true;
       _osdiHistory = storage.loadOsdiHistory();
       _screenTimeOpen = false;
-      _healthDashboardOpen = false;
       _reportOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
@@ -871,7 +857,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _updateOpen = false;
       _osdiOpen = false;
       _screenTimeOpen = true;
-      _healthDashboardOpen = false;
       _reportOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
@@ -879,25 +864,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _closeScreenTime() {
     setState(() => _screenTimeOpen = false);
-    _restoreAfterPanel();
-  }
-
-  void _openHealthDashboard() {
-    setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _aboutOpen = false;
-      _guidanceOpen = false;
-      _updateOpen = false;
-      _osdiOpen = false;
-      _screenTimeOpen = false;
-      _healthDashboardOpen = true;
-    });
-    _applyLayout(_WindowLayout.osdi);
-  }
-
-  void _closeHealthDashboard() {
-    setState(() => _healthDashboardOpen = false);
     _restoreAfterPanel();
   }
 
@@ -910,7 +876,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _updateOpen = false;
       _osdiOpen = false;
       _screenTimeOpen = false;
-      _healthDashboardOpen = false;
       _reportOpen = true;
     });
     _applyLayout(_WindowLayout.report);
@@ -947,7 +912,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _updateOpen = true;
       _osdiOpen = false;
       _screenTimeOpen = false;
-      _healthDashboardOpen = false;
       _reportOpen = false;
       _updateResult = null;
     });
@@ -1012,13 +976,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
             onClose: _closeScreenTime,
             onClear: _clearScreenTime,
           ),
-        ),
-      );
-    } else if (_healthDashboardOpen) {
-      body = Center(
-        child: HealthDashboardDialog(
-          strings: strings,
-          onClose: _closeHealthDashboard,
         ),
       );
     } else if (_updateOpen) {
@@ -1139,7 +1096,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onGuidance: _openGuidance,
                 onOsdi: _openOsdi,
                 onScreenTime: _openScreenTime,
-                onHealthDashboard: _openHealthDashboard,
                 onReports: _openReport,
                 onCheckUpdates: _openCheckUpdates,
                 onGitHub: _openGithub,
