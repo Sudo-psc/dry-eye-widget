@@ -127,7 +127,7 @@ class PdfReportService {
             if (data.osdiHistory.isEmpty)
               pw.Text('Ainda não há dados suficientes de OSDI neste período.', style: textStyle)
             else ...[
-              pw.Table.fromTextArray(
+              pw.TableHelper.fromTextArray(
                 context: context,
                 headers: ['Data', 'Escore', 'Classificação'],
                 data: data.osdiHistory.map((e) => [
