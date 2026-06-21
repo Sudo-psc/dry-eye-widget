@@ -4,7 +4,7 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
-## [Não lançado]
+## [1.14.0] - 2026-06-21
 
 ### Adicionado
 - **Checklist ambiental** opcional na tela de Relatórios: distância da tela,
@@ -15,6 +15,17 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - **Fonte Unicode embutida** (DejaVuSans) como *fallback* no PDF, garantindo a
   renderização de símbolos fora do Latin-1 (travessões, aspas curvas, etc.) que
   o usuário possa colar nas observações.
+
+### Removido
+- **Dashboard de saúde e integração com HealthKit**: removidos o painel de saúde,
+  o serviço/modelo associados e a ponte nativa do macOS. O HealthKit não está
+  disponível no macOS nativo e o entitlement correspondente impedia a compilação
+  local (assinatura ad-hoc), além de exigir descrição de uso desnecessária.
+
+### Corrigido
+- **Build local do macOS**: removido o entitlement `com.apple.developer.healthkit`
+  que exigia certificado/perfil de desenvolvimento e impedia a abertura do app
+  em builds ad-hoc.
 
 ## [1.13.0] - 2026-06-21
 
