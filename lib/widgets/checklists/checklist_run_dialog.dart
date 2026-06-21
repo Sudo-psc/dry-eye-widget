@@ -249,6 +249,30 @@ class _ChecklistRunDialogState extends State<ChecklistRunDialog> {
             '$number. ${q.text}',
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
+          if (q.detail != null) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.straighten,
+                  size: 14,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    q.detail!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.35,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 12),
           if (useSegmented)
             _segmentedOptions(q, selected)

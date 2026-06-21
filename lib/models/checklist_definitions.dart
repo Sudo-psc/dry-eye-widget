@@ -92,63 +92,119 @@ const ChecklistDefinition _ergonomics = ChecklistDefinition(
       id: 'erg_glare',
       text: 'Você percebe reflexos de luz ou janelas na sua tela?',
       options: _yesRisk,
+      detail:
+          'Referência: tela posicionada perpendicular às janelas (de lado para '
+          'a luz), sem fontes de luz diretamente atrás ou à frente do monitor. '
+          'Em telas brilhantes, considere acabamento fosco ou reduzir a luz '
+          'incidente; reflexos forçam o foco e aumentam o esforço visual.',
     ),
     ChecklistQuestion(
       id: 'erg_distance',
       text:
           'A tela fica a uma distância confortável (cerca de um braço estendido)?',
       options: _noRisk,
+      detail:
+          'Referência: cerca de 50–70 cm dos olhos (aproximadamente um braço '
+          'estendido). Telas maiores (27"+) pedem um pouco mais de distância. '
+          'Se precisar aproximar o rosto para ler, aumente a fonte em vez de '
+          'encurtar a distância.',
     ),
     ChecklistQuestion(
       id: 'erg_height',
       text:
           'A parte superior da tela está na altura dos olhos ou um pouco abaixo?',
       options: _noRisk,
+      detail:
+          'Referência: topo da área útil na linha dos olhos ou até ~5 cm abaixo, '
+          'com o centro da tela cerca de 15–20° abaixo da horizontal do olhar. '
+          'O olhar levemente para baixo reduz a exposição da superfície ocular '
+          'e o esforço do pescoço.',
     ),
     ChecklistQuestion(
       id: 'erg_font',
       text: 'O tamanho da fonte é confortável para ler sem esforço?',
       options: _noRisk,
+      detail:
+          'Referência: o texto deve ser legível com folga na distância de uso '
+          '(regra prática: legível a cerca do dobro da distância habitual). '
+          'Se necessário, use zoom de 100–125% ou aumente o tamanho do sistema '
+          'em vez de aproximar os olhos.',
     ),
     ChecklistQuestion(
       id: 'erg_squint',
       text: 'Você aperta os olhos para enxergar o conteúdo da tela?',
       options: _yesRisk,
+      detail:
+          'Apertar os olhos costuma indicar fonte pequena, baixo contraste ou '
+          'reflexo. Ajuste tamanho/contraste e a iluminação; apertar os olhos de '
+          'forma repetida aumenta a fadiga visual.',
     ),
     ChecklistQuestion(
       id: 'erg_lean',
       text: 'Você costuma inclinar o corpo para frente para enxergar melhor?',
       options: _yesRisk,
+      detail:
+          'Referência: tronco apoiado no encosto, ombros relaxados e a tela '
+          'trazida para perto (não o corpo para a tela). Inclinar-se para frente '
+          'sinaliza distância/fonte inadequadas.',
     ),
     ChecklistQuestion(
       id: 'erg_brightness',
       text: 'O brilho da tela está bem ajustado ao ambiente (nem forte demais)?',
       options: _noRisk,
+      detail:
+          'Referência: o brilho da tela deve se aproximar do brilho do entorno '
+          '— a tela não deve parecer uma "lâmpada" no ambiente nem ficar apagada. '
+          'Reavalie pela manhã, à tarde e à noite, acompanhando a luz do local.',
     ),
     ChecklistQuestion(
       id: 'erg_contrast',
       text: 'O contraste do texto facilita a leitura?',
       options: _noRisk,
+      detail:
+          'Referência: texto escuro sobre fundo claro (ou tema escuro bem '
+          'contrastado), evitando cinza sobre cinza. Bom contraste reduz o '
+          'esforço de foco; em leitura prolongada, prefira fundos sem brilho '
+          'excessivo.',
     ),
     ChecklistQuestion(
       id: 'erg_position',
       text: 'A tela fica posicionada bem à sua frente (não muito lateral)?',
       options: _noRisk,
+      detail:
+          'Referência: monitor principal centralizado à frente, a um braço de '
+          'distância, evitando girar o pescoço. Com dois monitores de uso '
+          'parecido, alinhe-os lado a lado na mesma altura, com a junção à '
+          'frente; se um for o principal, deixe-o centralizado.',
     ),
     ChecklistQuestion(
       id: 'erg_eyestrain',
       text: 'Você sente cansaço visual após algumas horas de uso?',
       options: _yesRisk,
+      detail:
+          'Referência: aplique a regra 20-20-20 (a cada 20 minutos, olhe ~20 '
+          'segundos para cerca de 6 metros) e faça pausas curtas regulares. '
+          'Cansaço ao fim do dia também pode refletir distância, brilho ou '
+          'reflexos inadequados.',
     ),
     ChecklistQuestion(
       id: 'erg_headache',
       text: 'Você tem dores de cabeça associadas ao tempo de tela?',
       options: _yesRisk,
+      detail:
+          'Dores de cabeça ligadas à tela costumam melhorar revisando fonte, '
+          'contraste, brilho, reflexos e pausas. Se forem frequentes ou '
+          'intensas, considere avaliação oftalmológica.',
     ),
     ChecklistQuestion(
       id: 'erg_blink',
       text: 'Você nota que pisca menos enquanto usa a tela?',
       options: _yesRisk,
+      detail:
+          'Em foco na tela, a frequência de piscadas cai bastante. Referência: '
+          'pisque de forma consciente e completa nas pausas; baixar levemente o '
+          'olhar (tela um pouco abaixo dos olhos) ajuda a reduzir a evaporação '
+          'lacrimal.',
     ),
   ],
   bands: [
@@ -159,8 +215,11 @@ const ChecklistDefinition _ergonomics = ChecklistDefinition(
       classification: 'Boa ergonomia visual',
       feedback:
           'Seu posto de trabalho aparenta estar bem ajustado para o conforto '
-          'visual. Mantenha os bons hábitos e continue acompanhando como seus '
-          'olhos respondem ao longo do dia.',
+          'visual. Especificações de referência para manter: tela a ~50–70 cm '
+          '(um braço), topo na linha dos olhos ou até ~5 cm abaixo (centro '
+          '15–20° abaixo da horizontal), brilho equiparado ao ambiente, sem '
+          'reflexos e com fonte legível. Continue acompanhando como seus olhos '
+          'respondem ao longo do dia.',
     ),
     RiskBand(
       minScore: 3,
@@ -169,7 +228,10 @@ const ChecklistDefinition _ergonomics = ChecklistDefinition(
       classification: 'Sinais de atenção',
       feedback:
           'Alguns pontos do seu ambiente podem ser ajustados para reduzir o '
-          'esforço visual. Revise a distância, a altura e o brilho da tela e '
+          'esforço visual. Compare com as referências: distância ~50–70 cm, '
+          'topo da tela na linha dos olhos ou um pouco abaixo, monitor '
+          'centralizado e perpendicular às janelas, brilho próximo ao do '
+          'ambiente e fonte/contraste confortáveis. Faça um ajuste por vez e '
           'observe se o conforto melhora. Acompanhe a evolução.',
     ),
     RiskBand(
@@ -179,9 +241,14 @@ const ChecklistDefinition _ergonomics = ChecklistDefinition(
       classification: 'Risco visual aumentado',
       feedback:
           'Vários fatores ergonômicos podem estar contribuindo para o esforço '
-          'visual. Considere revisar seu ambiente de trabalho com cuidado e, '
-          'se o desconforto persistir, considere avaliação oftalmológica. '
-          'Este resultado não substitui consulta médica.',
+          'visual. Revise o posto com base nas referências: tela a ~50–70 cm e '
+          'centralizada à frente; topo na linha dos olhos ou até ~5 cm abaixo '
+          '(centro 15–20° abaixo da horizontal); para notebook em uso '
+          'prolongado, use suporte com teclado/mouse externos; elimine reflexos '
+          '(tela perpendicular às janelas); equipare o brilho ao ambiente; '
+          'aumente fonte/contraste em vez de aproximar os olhos; e aplique a '
+          'regra 20-20-20. Se o desconforto persistir, considere avaliação '
+          'oftalmológica. Este resultado não substitui consulta médica.',
     ),
   ],
 );

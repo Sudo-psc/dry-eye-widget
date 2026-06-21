@@ -105,6 +105,7 @@ class ChecklistQuestion {
     required this.text,
     required this.options,
     this.critical = false,
+    this.detail,
   });
 
   /// Id estável da pergunta (usado para casar respostas com perguntas).
@@ -119,6 +120,11 @@ class ChecklistQuestion {
   /// Marca itens de alerta crítico (apenas no módulo de sinais de alerta).
   /// Quando `true` e a resposta soma pontos, dispara atenção prioritária.
   final bool critical;
+
+  /// Especificação/orientação educativa com valores de referência (opcional).
+  /// Exibida abaixo do enunciado para ajudar o usuário a responder e a ajustar
+  /// o posto de trabalho. É informativa — não constitui prescrição.
+  final String? detail;
 }
 
 /// Uma resposta dada pelo usuário a uma pergunta.

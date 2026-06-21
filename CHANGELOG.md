@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.15.1] - 2026-06-21
+
+### Alterado
+- **Checklist de ergonomia visual** com especificações detalhadas: cada pergunta
+  agora traz valores de referência (distância ~50–70 cm; topo da tela na linha
+  dos olhos ou até ~5 cm abaixo, centro 15–20° abaixo da horizontal; brilho
+  equiparado ao ambiente; tela perpendicular às janelas; suporte + teclado/mouse
+  externos para notebook; regra 20-20-20), exibidos abaixo de cada item.
+- Feedbacks de ergonomia (baixo/atenção/risco aumentado) enriquecidos com as
+  mesmas referências de ajuste do posto de trabalho. Conteúdo educativo, não
+  prescritivo.
+
 ## [1.15.0] - 2026-06-21
 
 ### Adicionado
