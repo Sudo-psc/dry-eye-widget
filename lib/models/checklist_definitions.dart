@@ -1,0 +1,674 @@
+import 'checklist.dart';
+
+/// Faixa de pontuação que mapeia um intervalo de score para um nível de risco,
+/// uma classificação curta e um feedback educativo.
+class RiskBand {
+  const RiskBand({
+    required this.minScore,
+    required this.maxScore,
+    required this.level,
+    required this.classification,
+    required this.feedback,
+  });
+
+  /// Pontuação mínima (inclusiva) coberta pela faixa.
+  final int minScore;
+
+  /// Pontuação máxima (inclusiva) coberta pela faixa. Use um valor alto
+  /// (ex.: 9999) para a última faixa, aberta à direita.
+  final int maxScore;
+
+  final ChecklistRiskLevel level;
+  final String classification;
+  final String feedback;
+
+  /// `true` se [score] cai dentro de [minScore, maxScore].
+  bool contains(int score) => score >= minScore && score <= maxScore;
+}
+
+/// Definição completa de um módulo de checklist (módulos 1–5).
+class ChecklistDefinition {
+  const ChecklistDefinition({
+    required this.type,
+    required this.title,
+    required this.shortDescription,
+    required this.version,
+    required this.questions,
+    required this.bands,
+  });
+
+  final ChecklistType type;
+  final String title;
+  final String shortDescription;
+  final String version;
+  final List<ChecklistQuestion> questions;
+  final List<RiskBand> bands;
+}
+
+// --- Opções reutilizáveis ---------------------------------------------------
+
+/// Opções Sim/Não/Não sei/Não se aplica onde "Sim" é o fator de risco (1 pt).
+const List<ChecklistOption> _yesRisk = [
+  ChecklistOption(label: 'Sim', score: 1),
+  ChecklistOption(label: 'Não', score: 0),
+  ChecklistOption(label: 'Não sei', score: 0),
+  ChecklistOption(label: 'Não se aplica', score: 0),
+];
+
+/// Opções Sim/Não/Não sei/Não se aplica onde "Não" é o fator de risco (1 pt).
+const List<ChecklistOption> _noRisk = [
+  ChecklistOption(label: 'Sim', score: 0),
+  ChecklistOption(label: 'Não', score: 1),
+  ChecklistOption(label: 'Não sei', score: 0),
+  ChecklistOption(label: 'Não se aplica', score: 0),
+];
+
+/// Escala de frequência de sintomas (Nunca…Quase sempre).
+const List<ChecklistOption> _frequency = [
+  ChecklistOption(label: 'Nunca', score: 0),
+  ChecklistOption(label: 'Raramente', score: 1),
+  ChecklistOption(label: 'Às vezes', score: 2),
+  ChecklistOption(label: 'Frequentemente', score: 3),
+  ChecklistOption(label: 'Quase sempre', score: 4),
+];
+
+/// Opções Sim/Não simples, "Sim" soma 1 (usado em sinais de alerta).
+const List<ChecklistOption> _yesNoRisk = [
+  ChecklistOption(label: 'Sim', score: 1),
+  ChecklistOption(label: 'Não', score: 0),
+];
+
+// --- Módulo 1: Ergonomia visual --------------------------------------------
+
+const ChecklistDefinition _ergonomics = ChecklistDefinition(
+  type: ChecklistType.visualErgonomics,
+  title: 'Ergonomia visual',
+  shortDescription:
+      'Como a distância, altura e ajustes da tela influenciam seu conforto '
+      'visual durante o trabalho.',
+  version: '1',
+  questions: [
+    ChecklistQuestion(
+      id: 'erg_glare',
+      text: 'Você percebe reflexos de luz ou janelas na sua tela?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_distance',
+      text:
+          'A tela fica a uma distância confortável (cerca de um braço estendido)?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_height',
+      text:
+          'A parte superior da tela está na altura dos olhos ou um pouco abaixo?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_font',
+      text: 'O tamanho da fonte é confortável para ler sem esforço?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_squint',
+      text: 'Você aperta os olhos para enxergar o conteúdo da tela?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_lean',
+      text: 'Você costuma inclinar o corpo para frente para enxergar melhor?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_brightness',
+      text: 'O brilho da tela está bem ajustado ao ambiente (nem forte demais)?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_contrast',
+      text: 'O contraste do texto facilita a leitura?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_position',
+      text: 'A tela fica posicionada bem à sua frente (não muito lateral)?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_eyestrain',
+      text: 'Você sente cansaço visual após algumas horas de uso?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_headache',
+      text: 'Você tem dores de cabeça associadas ao tempo de tela?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'erg_blink',
+      text: 'Você nota que pisca menos enquanto usa a tela?',
+      options: _yesRisk,
+    ),
+  ],
+  bands: [
+    RiskBand(
+      minScore: 0,
+      maxScore: 2,
+      level: ChecklistRiskLevel.low,
+      classification: 'Boa ergonomia visual',
+      feedback:
+          'Seu posto de trabalho aparenta estar bem ajustado para o conforto '
+          'visual. Mantenha os bons hábitos e continue acompanhando como seus '
+          'olhos respondem ao longo do dia.',
+    ),
+    RiskBand(
+      minScore: 3,
+      maxScore: 5,
+      level: ChecklistRiskLevel.attention,
+      classification: 'Sinais de atenção',
+      feedback:
+          'Alguns pontos do seu ambiente podem ser ajustados para reduzir o '
+          'esforço visual. Revise a distância, a altura e o brilho da tela e '
+          'observe se o conforto melhora. Acompanhe a evolução.',
+    ),
+    RiskBand(
+      minScore: 6,
+      maxScore: 9999,
+      level: ChecklistRiskLevel.increased,
+      classification: 'Risco visual aumentado',
+      feedback:
+          'Vários fatores ergonômicos podem estar contribuindo para o esforço '
+          'visual. Considere revisar seu ambiente de trabalho com cuidado e, '
+          'se o desconforto persistir, considere avaliação oftalmológica. '
+          'Este resultado não substitui consulta médica.',
+    ),
+  ],
+);
+
+// --- Módulo 2: Ambiente de tela --------------------------------------------
+
+const ChecklistDefinition _environment = ChecklistDefinition(
+  type: ChecklistType.screenEnvironment,
+  title: 'Ambiente de tela',
+  shortDescription:
+      'Fatores do ambiente — ar, iluminação, umidade — que afetam o conforto '
+      'dos olhos ao usar telas.',
+  version: '1',
+  questions: [
+    ChecklistQuestion(
+      id: 'env_airflow',
+      text: 'Há fluxo de ar (ventilador, ar-condicionado) direcionado ao rosto?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_ac',
+      text: 'O ambiente tem ar-condicionado ligado a maior parte do tempo?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_dryair',
+      text: 'O ar do ambiente costuma parecer seco?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_lighting',
+      text: 'A iluminação do ambiente é adequada (nem escura, nem ofuscante)?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_glare',
+      text: 'Há reflexos de luz ou janelas atingindo a tela?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_windowback',
+      text: 'Há uma janela muito clara atrás ou em frente à sua tela?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_brightness',
+      text: 'O brilho da tela está equilibrado com a luz do ambiente?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_dust',
+      text: 'O ambiente costuma ter poeira, fumaça ou poluição perceptível?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_breaks',
+      text: 'Você consegue fazer pausas visuais regulares no ambiente?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_distance',
+      text: 'O monitor está posicionado a uma distância confortável?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_multiscreen',
+      text: 'Você usa várias telas ao mesmo tempo na maior parte do dia?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'env_humidity',
+      text: 'Você sente que o ambiente tem baixa umidade (pele/olhos secos)?',
+      options: _yesRisk,
+    ),
+  ],
+  bands: [
+    RiskBand(
+      minScore: 0,
+      maxScore: 2,
+      level: ChecklistRiskLevel.low,
+      classification: 'Ambiente favorável',
+      feedback:
+          'Seu ambiente de tela parece favorável ao conforto visual. Continue '
+          'evitando fluxo de ar direto nos olhos e mantendo a iluminação '
+          'equilibrada. Acompanhe a evolução ao longo do tempo.',
+    ),
+    RiskBand(
+      minScore: 3,
+      maxScore: 5,
+      level: ChecklistRiskLevel.attention,
+      classification: 'Sinais de atenção',
+      feedback:
+          'Alguns fatores do ambiente podem incomodar seus olhos. Considere '
+          'evitar fluxo de ar nos olhos, ajustar o brilho da tela, reduzir '
+          'reflexos e melhorar a iluminação. Inclua pausas visuais ao longo do '
+          'dia e revise seu ambiente de trabalho.',
+    ),
+    RiskBand(
+      minScore: 6,
+      maxScore: 9999,
+      level: ChecklistRiskLevel.increased,
+      classification: 'Risco visual aumentado',
+      feedback:
+          'Vários fatores ambientais podem estar contribuindo para o '
+          'desconforto visual. Considere avaliar a umidade do ambiente, '
+          'reposicionar o monitor, reduzir reflexos e reforçar as pausas. Se o '
+          'desconforto persistir, considere avaliação oftalmológica. Este '
+          'resultado não substitui consulta médica.',
+    ),
+  ],
+);
+
+// --- Módulo 3: Sintomas visuais --------------------------------------------
+
+const ChecklistDefinition _symptoms = ChecklistDefinition(
+  type: ChecklistType.visualSymptoms,
+  title: 'Sintomas visuais',
+  shortDescription:
+      'Com que frequência você percebe sintomas visuais relacionados ao uso '
+      'de telas.',
+  version: '1',
+  questions: [
+    ChecklistQuestion(
+      id: 'sym_dryness',
+      text: 'Sensação de olhos secos',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_grit',
+      text: 'Sensação de areia ou corpo estranho nos olhos',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_burning',
+      text: 'Ardência ou queimação nos olhos',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_tearing',
+      text: 'Lacrimejamento excessivo',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_redness',
+      text: 'Olhos avermelhados ao fim do dia',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_blur',
+      text: 'Visão embaçada que melhora ao piscar',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_fatigue',
+      text: 'Cansaço visual',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_heavy',
+      text: 'Sensação de peso ou pálpebras pesadas',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_lightsens',
+      text: 'Incômodo com luz (sensibilidade luminosa)',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_headache',
+      text: 'Dor de cabeça relacionada ao uso de telas',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_focus',
+      text: 'Dificuldade para focar de perto e de longe',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_itch',
+      text: 'Coceira nos olhos',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_strain',
+      text: 'Sensação de esforço para manter os olhos abertos',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_double',
+      text: 'Visão dupla ocasional ao fim do dia',
+      options: _frequency,
+    ),
+    ChecklistQuestion(
+      id: 'sym_discomfort',
+      text: 'Desconforto geral nos olhos após o trabalho',
+      options: _frequency,
+    ),
+  ],
+  bands: [
+    RiskBand(
+      minScore: 0,
+      maxScore: 10,
+      level: ChecklistRiskLevel.low,
+      classification: 'Poucos sintomas',
+      feedback:
+          'Você relata poucos sintomas visuais. Continue cuidando das pausas e '
+          'do ambiente e acompanhe a evolução ao longo das semanas.',
+    ),
+    RiskBand(
+      minScore: 11,
+      maxScore: 25,
+      level: ChecklistRiskLevel.attention,
+      classification: 'Sintomas leves a moderados',
+      feedback:
+          'Há sinais de atenção: alguns sintomas visuais aparecem com certa '
+          'frequência. Revise seu ambiente de trabalho, reforce as pausas e '
+          'acompanhe a evolução. Se os sintomas aumentarem, considere '
+          'avaliação oftalmológica.',
+    ),
+    RiskBand(
+      minScore: 26,
+      maxScore: 40,
+      level: ChecklistRiskLevel.increased,
+      classification: 'Sintomas frequentes',
+      feedback:
+          'Seus sintomas visuais aparecem com frequência, o que indica risco '
+          'visual aumentado. Considere avaliação oftalmológica para entender '
+          'melhor o que está acontecendo. Este resultado não substitui '
+          'consulta médica.',
+    ),
+    RiskBand(
+      minScore: 41,
+      maxScore: 9999,
+      level: ChecklistRiskLevel.recommendedEvaluation,
+      classification: 'Sintomas relevantes',
+      feedback:
+          'Você relata sintomas visuais relevantes e frequentes. Considere '
+          'avaliação oftalmológica para investigar a causa e acompanhar a '
+          'evolução. Este resultado não substitui consulta médica.',
+    ),
+  ],
+);
+
+// --- Módulo 4: Sinais de alerta --------------------------------------------
+
+const ChecklistDefinition _warningSigns = ChecklistDefinition(
+  type: ChecklistType.warningSigns,
+  title: 'Sinais de alerta',
+  shortDescription:
+      'Situações que pedem mais atenção e podem justificar uma avaliação com '
+      'prioridade.',
+  version: '1',
+  questions: [
+    ChecklistQuestion(
+      id: 'warn_pain',
+      text: 'Você sente dor ocular persistente?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_vision_drop',
+      text: 'Notou queda da visão (visão piorando) recentemente?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_red_pain',
+      text: 'Tem olho vermelho acompanhado de dor?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_contact_pain',
+      text: 'Usa lente de contato e sente dor ou vermelhidão?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_photophobia',
+      text: 'Tem fotofobia importante (luz causa muito incômodo)?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_progressive',
+      text: 'Percebe piora progressiva dos sintomas a cada dia?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_persistent',
+      text: 'Os sintomas persistem mesmo após descanso e pausas?',
+      options: _yesNoRisk,
+      critical: true,
+    ),
+    ChecklistQuestion(
+      id: 'warn_secretion',
+      text: 'Tem secreção ocular incomum?',
+      options: _yesNoRisk,
+    ),
+    ChecklistQuestion(
+      id: 'warn_swelling',
+      text: 'Notou inchaço ao redor dos olhos?',
+      options: _yesNoRisk,
+    ),
+    ChecklistQuestion(
+      id: 'warn_flashes',
+      text: 'Vê flashes de luz ou muitos pontos flutuantes novos?',
+      options: _yesNoRisk,
+    ),
+    ChecklistQuestion(
+      id: 'warn_foreign',
+      text: 'Sensação constante de corpo estranho que não passa?',
+      options: _yesNoRisk,
+    ),
+    ChecklistQuestion(
+      id: 'warn_watering',
+      text: 'Lacrimejamento intenso e contínuo sem melhora?',
+      options: _yesNoRisk,
+    ),
+  ],
+  bands: [
+    RiskBand(
+      minScore: 0,
+      maxScore: 0,
+      level: ChecklistRiskLevel.low,
+      classification: 'Sem sinais de alerta',
+      feedback:
+          'Você não relatou sinais de alerta no momento. Continue acompanhando '
+          'a evolução e mantenha seus cuidados visuais habituais.',
+    ),
+    RiskBand(
+      minScore: 1,
+      maxScore: 2,
+      level: ChecklistRiskLevel.attention,
+      classification: 'Sinais de atenção',
+      feedback:
+          'Você marcou alguns itens que merecem atenção. Acompanhe a evolução '
+          'e, se os sinais persistirem ou aumentarem, considere avaliação '
+          'oftalmológica. Este resultado não substitui consulta médica.',
+    ),
+    RiskBand(
+      minScore: 3,
+      maxScore: 9999,
+      level: ChecklistRiskLevel.increased,
+      classification: 'Vários sinais de atenção',
+      feedback:
+          'Você marcou vários sinais que indicam risco visual aumentado. '
+          'Considere avaliação oftalmológica para entender melhor o quadro. '
+          'Este resultado não substitui consulta médica.',
+    ),
+  ],
+);
+
+/// Feedback usado quando qualquer item crítico de sinais de alerta é marcado.
+const String kWarningSignsUrgentFeedback =
+    'Você marcou um ou mais sinais que merecem atenção prioritária. Considere '
+    'procurar avaliação oftalmológica com prioridade para verificar o que está '
+    'acontecendo. Este resultado não substitui consulta médica.';
+
+/// Classificação usada no caso crítico de sinais de alerta.
+const String kWarningSignsUrgentClassification = 'Atenção prioritária sugerida';
+
+// --- Módulo 5: Pausas e hábitos --------------------------------------------
+
+const ChecklistDefinition _breakHabits = ChecklistDefinition(
+  type: ChecklistType.breakHabits,
+  title: 'Pausas e hábitos',
+  shortDescription:
+      'Como estão seus hábitos de pausa visual e cuidados durante o uso de '
+      'telas.',
+  version: '1',
+  questions: [
+    ChecklistQuestion(
+      id: 'brk_rule2020',
+      text: 'Você faz pausas visuais (ex.: a cada 20 minutos)?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_lookaway',
+      text: 'Durante as pausas, você olha para longe por alguns segundos?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_blink',
+      text: 'Você lembra de piscar completamente durante o trabalho?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_standup',
+      text: 'Você se levanta e se movimenta em intervalos?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_continuous',
+      text: 'Você costuma usar a tela por horas seguidas sem parar?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_skip',
+      text: 'Você ignora os avisos de pausa quando aparecem?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_night',
+      text: 'Você usa telas até pouco antes de dormir?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_hydration',
+      text: 'Você mantém uma boa hidratação ao longo do dia?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_distance_breaks',
+      text: 'Você inclui atividades longe da tela no seu dia?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_weekend',
+      text: 'Você reduz o tempo de tela nos fins de semana?',
+      options: _noRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_overload',
+      text: 'Você sente que passa mais tempo na tela do que gostaria?',
+      options: _yesRisk,
+    ),
+    ChecklistQuestion(
+      id: 'brk_plan',
+      text: 'As pausas estão organizadas no seu fluxo de trabalho?',
+      options: _noRisk,
+    ),
+  ],
+  bands: [
+    RiskBand(
+      minScore: 0,
+      maxScore: 2,
+      level: ChecklistRiskLevel.low,
+      classification: 'Boa adesão',
+      feedback:
+          'Seus hábitos de pausa estão bem estabelecidos. Pausas visuais devem '
+          'ser desenhadas no fluxo de trabalho — continue mantendo esse '
+          'cuidado e acompanhe a evolução.',
+    ),
+    RiskBand(
+      minScore: 3,
+      maxScore: 5,
+      level: ChecklistRiskLevel.attention,
+      classification: 'Adesão irregular',
+      feedback:
+          'Suas pausas acontecem de forma irregular. Pausas visuais devem ser '
+          'desenhadas no fluxo de trabalho, não deixadas ao acaso. Tente '
+          'organizar lembretes e revise seu ambiente de trabalho.',
+    ),
+    RiskBand(
+      minScore: 6,
+      maxScore: 8,
+      level: ChecklistRiskLevel.increased,
+      classification: 'Baixa adesão',
+      feedback:
+          'Há baixa adesão às pausas, o que pode aumentar o esforço visual. '
+          'Pausas visuais devem ser desenhadas no fluxo de trabalho. Considere '
+          'reforçar os lembretes e reduzir os períodos contínuos de tela.',
+    ),
+    RiskBand(
+      minScore: 9,
+      maxScore: 9999,
+      level: ChecklistRiskLevel.increased,
+      classification: 'Alto risco comportamental',
+      feedback:
+          'Seus hábitos atuais indicam alto risco comportamental para o '
+          'conforto visual. Pausas visuais devem ser desenhadas no fluxo de '
+          'trabalho. Considere revisar seu ambiente e a rotina de pausas e '
+          'acompanhe a evolução.',
+    ),
+  ],
+);
+
+/// Registro com as definições completas dos módulos 1–5.
+///
+/// Os módulos 6 (triagem) e 7 (resumo) NÃO entram aqui: são computados pelo
+/// engine a partir dos demais dados.
+const Map<ChecklistType, ChecklistDefinition> kChecklistDefinitions = {
+  ChecklistType.visualErgonomics: _ergonomics,
+  ChecklistType.screenEnvironment: _environment,
+  ChecklistType.visualSymptoms: _symptoms,
+  ChecklistType.warningSigns: _warningSigns,
+  ChecklistType.breakHabits: _breakHabits,
+};

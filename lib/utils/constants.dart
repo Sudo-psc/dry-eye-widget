@@ -178,6 +178,10 @@ class StorageKeys {
 
   /// JSON serializado com o último checklist ambiental autorreferido.
   static const String environmentChecklist = 'environment_checklist_json';
+
+  /// JSON serializado com o histórico de resultados dos checklists de saúde
+  /// visual digital (módulos 1–7).
+  static const String checklistResults = 'checklist_results_json';
 }
 
 /// Informações do app usadas na verificação de atualização.
