@@ -54,9 +54,9 @@ const Size _osdiWindowSize = Size(700, 790);
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
-/// Altura do painel de menu (cabeçalho + 13 itens + paddings do vidro), com
+/// Altura do painel de menu (cabeçalho + 14 itens + paddings do vidro), com
 /// folga para variações de fonte entre plataformas.
-const double _menuPanelHeight = 576;
+const double _menuPanelHeight = 608;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -331,7 +331,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _settings.addListener(_onSettingsChanged);
     trayManager.addListener(this);
     _startBlinkReminderLoop();
-    _cacheCurrentPosition();
+    // Com posição salva, o storage é a fonte de verdade (já aplicada no
+    // bootstrap). Sem posição salva (primeira execução), captura o canto
+    // inicial aplicado no bootstrap. Não sobrescrever a posição salva com
+    // getPosition evita saltos no startup.
+    if (savedX == null || savedY == null) {
+      _cacheCurrentPosition();
+    }
     // Aplica o estado inicial de visibilidade da bolinha após o primeiro frame.
     if (!_widgetEnabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) => windowManager.hide());
@@ -765,9 +771,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
       var y = _ballPosition.dy;
       x = x.clamp(origin.dx, origin.dx + screen.width - windowSize.width);
       y = y.clamp(origin.dy, origin.dy + screen.height - windowSize.height);
-      final newPos = Offset(x, y);
-      await windowManager.setPosition(newPos);
-      _ballPosition = newPos;
+      // Reposiciona apenas a janela transitória (lembrete/menu, que são
+      // maiores) para caber na tela. NÃO grava em [_ballPosition]: a posição
+      // canônica da bolinha só muda por arraste do usuário ou no startup —
+      // caso contrário, o encaixe da janela maior empurraria a bolinha para
+      // dentro a cada lembrete de piscada (a cada 7,5s), fazendo-a "andar".
+      await windowManager.setPosition(Offset(x, y));
     } catch (_) {
       /* ignora */
     }

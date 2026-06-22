@@ -7,6 +7,10 @@ void main() {
   testWidgets('menu flutuante exibe e abre o questionário OSDI', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     var osdiOpened = 0;
 
     await tester.pumpWidget(
@@ -23,6 +27,7 @@ void main() {
               onOsdi: () => osdiOpened++,
               onScreenTime: () {},
               onChecklists: () {},
+              onDashboard: () {},
               onReports: () {},
               onCheckUpdates: () {},
               onGitHub: () {},
@@ -47,6 +52,10 @@ void main() {
   testWidgets('painel do menu cabe na janela e mostra o item "Sair"', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -62,6 +71,7 @@ void main() {
               onOsdi: () {},
               onScreenTime: () {},
               onChecklists: () {},
+              onDashboard: () {},
               onReports: () {},
               onCheckUpdates: () {},
               onGitHub: () {},
@@ -78,11 +88,11 @@ void main() {
     // O último item precisa ser renderizado por inteiro.
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
 
-    // A altura intrínseca do painel (cabeçalho + 13 itens) deve caber na
-    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 576).
+    // A altura intrínseca do painel (cabeçalho + 14 itens) deve caber na
+    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 608).
     // Se um novo item estourar esse limite, o último item ("Sair") voltaria a
     // ser cortado pela borda da janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(576));
+    expect(height, lessThanOrEqualTo(608));
   });
 }
