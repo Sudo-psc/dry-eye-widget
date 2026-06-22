@@ -8,6 +8,8 @@ The active branch is `codex/healthkit-dashboard`. The macOS-only HealthKit found
 
 The Health dashboard UI is connected to `HealthKitDashboardService`. It is available from the floating menu and the system tray/menu bar, requests optional HealthKit permission, and renders the last 7 days of sleep and average heart-rate values with explicit missing-data states.
 
+A widget positioning bug was fixed: the floating widget no longer jumps to random locations when switching layouts (menu, blink reminder, ball). The root causes were `_ballPosition` not syncing with saved storage on startup, `_nudgeIntoScreen` not updating the cached position after clamping, and `blinkReminder` layout not refreshing position before applying.
+
 ## Next Actions
 
 1. Validate a signed macOS build with HealthKit entitlement enabled.

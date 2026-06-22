@@ -21,6 +21,7 @@ Completed:
 - Health dashboard UI connected to `HealthKitDashboardService`.
 - Optional HealthKit permission flow added to the app panel.
 - Health dashboard added to the floating menu and system tray/menu bar.
+- Fixed widget positioning bug: `_ballPosition` now syncs with saved storage on startup, `_nudgeIntoScreen` updates the cached position, and `blinkReminder` layout caches position before applying.
 
 In progress:
 

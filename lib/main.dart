@@ -33,6 +33,7 @@ import 'services/update_service.dart';
 import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/checklists/checklists_screen.dart';
+import 'widgets/dashboard/dashboard_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
@@ -240,6 +241,7 @@ enum _WindowLayout {
   osdi,
   report,
   checklists,
+  dashboard,
   breakOverlay,
   gentleBreak,
   inactivity,
@@ -279,6 +281,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _screenTimeOpen = false;
   bool _reportOpen = false;
   bool _checklistsOpen = false;
+  bool _dashboardOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
@@ -315,6 +318,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _lastHideFloating = _settings.value.hideFloatingWidget;
     _lastLanguage = _settings.value.languageCode;
     _widgetEnabled = !_settings.value.hideFloatingWidget;
+
+    // Inicializa a posicao com o valor salvo para evitar salto para (100, 100).
+    final storage = context.read<StorageService>();
+    final savedX = storage.ballX;
+    final savedY = storage.ballY;
+    if (savedX != null && savedY != null) {
+      _ballPosition = Offset(savedX, savedY);
+    }
+
     _timer.addListener(_onStateChanged);
     _settings.addListener(_onSettingsChanged);
     trayManager.addListener(this);
@@ -374,6 +386,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_screenTimeOpen &&
       !_reportOpen &&
       !_checklistsOpen &&
+      !_dashboardOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       !_timer.isPaused &&
@@ -427,6 +440,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_screenTimeOpen &&
       !_reportOpen &&
       !_checklistsOpen &&
+      !_dashboardOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       _timer.state == AppState.idle;
@@ -453,7 +467,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_osdiOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-          !_checklistsOpen) {
+          !_checklistsOpen &&
+          !_dashboardOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.settings);
@@ -478,7 +493,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_osdiOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-          !_checklistsOpen) {
+          !_checklistsOpen &&
+          !_dashboardOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           await _applyLayout(_WindowLayout.inactivity);
@@ -632,6 +648,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _aboutOpen = false;
         _reportOpen = false;
         _checklistsOpen = false;
+        _dashboardOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -666,6 +683,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await windowManager.setPosition(_ballPosition);
           break;
         case _WindowLayout.blinkReminder:
+          await _cacheCurrentPosition();
           final reminderSize = _blinkReminderWindowSize(
             _settings.value.ballSize,
           );
@@ -687,6 +705,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         case _WindowLayout.osdi:
         case _WindowLayout.report:
         case _WindowLayout.checklists:
+        case _WindowLayout.dashboard:
           await windowManager.setSize(_osdiWindowSize);
           await windowManager.center();
           break;
@@ -746,7 +765,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       var y = _ballPosition.dy;
       x = x.clamp(origin.dx, origin.dx + screen.width - windowSize.width);
       y = y.clamp(origin.dy, origin.dy + screen.height - windowSize.height);
-      await windowManager.setPosition(Offset(x, y));
+      final newPos = Offset(x, y);
+      await windowManager.setPosition(newPos);
+      _ballPosition = newPos;
     } catch (_) {
       /* ignora */
     }
@@ -801,6 +822,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -816,6 +838,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -841,6 +864,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -863,6 +887,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
   }
@@ -883,6 +908,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = true;
       _reportOpen = false;
       _checklistsOpen = false;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.osdi);
   }
@@ -903,6 +929,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = true;
       _checklistsOpen = false;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.report);
   }
@@ -923,12 +950,34 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = true;
+      _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.checklists);
   }
 
   void _closeChecklists() {
     setState(() => _checklistsOpen = false);
+    _restoreAfterPanel();
+  }
+
+  void _openDashboard() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = false;
+      _reportOpen = false;
+      _checklistsOpen = false;
+      _dashboardOpen = true;
+    });
+    _applyLayout(_WindowLayout.dashboard);
+  }
+
+  void _closeDashboard() {
+    setState(() => _dashboardOpen = false);
     _restoreAfterPanel();
   }
 
@@ -960,6 +1009,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
+      _dashboardOpen = false;
       _updateResult = null;
     });
     await _applyLayout(_WindowLayout.settings);
@@ -1044,6 +1094,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
     } else if (_checklistsOpen) {
       body = Center(
         child: ChecklistsScreen(onClose: _closeChecklists),
+      );
+    } else if (_dashboardOpen) {
+      body = Center(
+        child: DashboardScreen(onClose: _closeDashboard),
       );
     } else if (_settingsOpen) {
       body = _buildSettings();
@@ -1148,6 +1202,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onOsdi: _openOsdi,
                 onScreenTime: _openScreenTime,
                 onChecklists: _openChecklists,
+                onDashboard: _openDashboard,
                 onReports: _openReport,
                 onCheckUpdates: _openCheckUpdates,
                 onGitHub: _openGithub,

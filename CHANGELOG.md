@@ -4,6 +4,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.15.5] - 2026-06-22
+
+### Corrigido
+- Mecanismo de posicionamento do widget: corrige bug que fazia a bolinha flutuante
+  mudar de local aleatoriamente ao alternar entre layouts (menu, lembrete de piscada,
+  modo compacto). Agora a posição é sincronizada com o storage no startup, o cache
+  interno é atualizado após ajustes de tela e o lembrete de piscada preserva a
+  posição antes de expandir.
+
 ## [1.15.4] - 2026-06-22
 
 ### Alterado

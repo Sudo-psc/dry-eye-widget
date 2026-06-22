@@ -17,6 +17,7 @@
 - [x] Add a visible optional HealthKit permission flow.
 - [x] Add menu and tray access to the Health dashboard.
 - [x] Add widget tests for Health dashboard permission/data states.
+- [x] Fix widget positioning bug: random position jumps when switching layouts (menu, blink reminder, ball).
 
 ## next
 
