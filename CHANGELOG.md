@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.15.2] - 2026-06-21
+
+### Alterado
+- **Checklist de ambiente de tela** com especificações detalhadas por item:
+  umidade ~40–60%, iluminação ~300–500 lux, tela perpendicular às janelas,
+  brilho equiparado ao ambiente, fluxo de ar longe do rosto, distância ~50–70 cm.
+- **Checklist de pausas e hábitos** com especificações detalhadas por item:
+  regra 20-20-20 (20 min / 20 s / ~6 m), pausa de corpo a cada ~30–60 min,
+  blocos contínuos abaixo de ~1–2 horas, redução de telas ~1 h antes de dormir.
+- Feedbacks (baixo/atenção/risco) dos dois módulos enriquecidos com as mesmas
+  referências. Conteúdo educativo, não prescritivo.
+
 ## [1.15.1] - 2026-06-21
 
 ### Alterado

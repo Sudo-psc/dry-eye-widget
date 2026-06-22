@@ -267,61 +267,108 @@ const ChecklistDefinition _environment = ChecklistDefinition(
       id: 'env_airflow',
       text: 'Há fluxo de ar (ventilador, ar-condicionado) direcionado ao rosto?',
       options: _yesRisk,
+      detail:
+          'Referência: redirecione saídas de ar, ventiladores e difusores para '
+          'longe do rosto. Fluxo de ar direto nos olhos acelera a evaporação da '
+          'lágrima e é um dos fatores ambientais mais comuns de desconforto.',
     ),
     ChecklistQuestion(
       id: 'env_ac',
       text: 'O ambiente tem ar-condicionado ligado a maior parte do tempo?',
       options: _yesRisk,
+      detail:
+          'Ambientes climatizados costumam ressecar o ar. Referência: faça '
+          'pausas, mantenha-se hidratado e evite ficar na linha direta do fluxo; '
+          'se possível, combine com umidificação do ambiente.',
     ),
     ChecklistQuestion(
       id: 'env_dryair',
       text: 'O ar do ambiente costuma parecer seco?',
       options: _yesRisk,
+      detail:
+          'Referência: umidade relativa confortável em torno de 40–60%. Abaixo '
+          'disso o ressecamento ocular aumenta; um umidificador ou plantas/água '
+          'no ambiente ajudam a elevar a umidade.',
     ),
     ChecklistQuestion(
       id: 'env_lighting',
       text: 'A iluminação do ambiente é adequada (nem escura, nem ofuscante)?',
       options: _noRisk,
+      detail:
+          'Referência: cerca de 300–500 lux para tarefas de escritório/leitura. '
+          'Evite trabalhar no escuro com a tela muito brilhante e evite luzes '
+          'que ofusquem; prefira luz indireta e uniforme.',
     ),
     ChecklistQuestion(
       id: 'env_glare',
       text: 'Há reflexos de luz ou janelas atingindo a tela?',
       options: _yesRisk,
+      detail:
+          'Referência: posicione a tela perpendicular às janelas e use '
+          'cortinas/persianas para controlar a luz. Acabamento fosco ajuda; '
+          'reflexos competem com o conteúdo e aumentam o esforço de foco.',
     ),
     ChecklistQuestion(
       id: 'env_windowback',
       text: 'Há uma janela muito clara atrás ou em frente à sua tela?',
       options: _yesRisk,
+      detail:
+          'Referência: evite janela diretamente atrás da tela (ofuscamento ao '
+          'fundo) ou de frente para você (reflexo na tela). O ideal é a janela '
+          'ficar de lado, com a tela perpendicular a ela.',
     ),
     ChecklistQuestion(
       id: 'env_brightness',
       text: 'O brilho da tela está equilibrado com a luz do ambiente?',
       options: _noRisk,
+      detail:
+          'Referência: o brilho da tela deve se aproximar do brilho do entorno '
+          '— a tela não deve parecer um farol no ambiente nem ficar apagada. '
+          'Reavalie conforme a luz muda ao longo do dia.',
     ),
     ChecklistQuestion(
       id: 'env_dust',
       text: 'O ambiente costuma ter poeira, fumaça ou poluição perceptível?',
       options: _yesRisk,
+      detail:
+          'Poeira, fumaça e poluição irritam a superfície ocular. Referência: '
+          'mantenha o ambiente ventilado e limpo, evite fumaça direta e, em '
+          'locais muito empoeirados, considere purificação do ar.',
     ),
     ChecklistQuestion(
       id: 'env_breaks',
       text: 'Você consegue fazer pausas visuais regulares no ambiente?',
       options: _noRisk,
+      detail:
+          'Referência: aplique a regra 20-20-20 (a cada 20 min, ~20 s olhando '
+          'para cerca de 6 metros). Ter um ponto distante para onde olhar no '
+          'ambiente facilita o relaxamento do foco.',
     ),
     ChecklistQuestion(
       id: 'env_distance',
       text: 'O monitor está posicionado a uma distância confortável?',
       options: _noRisk,
+      detail:
+          'Referência: cerca de 50–70 cm dos olhos (um braço estendido), com o '
+          'topo da tela na linha dos olhos ou um pouco abaixo.',
     ),
     ChecklistQuestion(
       id: 'env_multiscreen',
       text: 'Você usa várias telas ao mesmo tempo na maior parte do dia?',
       options: _yesRisk,
+      detail:
+          'Referência: alinhe os monitores na mesma altura, mantenha o principal '
+          'centralizado e faça pausas mais frequentes — a varredura constante '
+          'entre telas aumenta a carga visual.',
     ),
     ChecklistQuestion(
       id: 'env_humidity',
       text: 'Você sente que o ambiente tem baixa umidade (pele/olhos secos)?',
       options: _yesRisk,
+      detail:
+          'Referência: umidade relativa em torno de 40–60%. Pele e olhos secos '
+          'são sinais de ar ressecado; umidificação e pausas ajudam a reduzir o '
+          'desconforto.',
     ),
   ],
   bands: [
@@ -331,9 +378,11 @@ const ChecklistDefinition _environment = ChecklistDefinition(
       level: ChecklistRiskLevel.low,
       classification: 'Ambiente favorável',
       feedback:
-          'Seu ambiente de tela parece favorável ao conforto visual. Continue '
-          'evitando fluxo de ar direto nos olhos e mantendo a iluminação '
-          'equilibrada. Acompanhe a evolução ao longo do tempo.',
+          'Seu ambiente de tela parece favorável ao conforto visual. '
+          'Especificações de referência para manter: sem fluxo de ar direto no '
+          'rosto, umidade ~40–60%, iluminação ~300–500 lux sem ofuscamento, '
+          'tela perpendicular às janelas e brilho equiparado ao ambiente. '
+          'Acompanhe a evolução ao longo do tempo.',
     ),
     RiskBand(
       minScore: 3,
@@ -341,10 +390,11 @@ const ChecklistDefinition _environment = ChecklistDefinition(
       level: ChecklistRiskLevel.attention,
       classification: 'Sinais de atenção',
       feedback:
-          'Alguns fatores do ambiente podem incomodar seus olhos. Considere '
-          'evitar fluxo de ar nos olhos, ajustar o brilho da tela, reduzir '
-          'reflexos e melhorar a iluminação. Inclua pausas visuais ao longo do '
-          'dia e revise seu ambiente de trabalho.',
+          'Alguns fatores do ambiente podem incomodar seus olhos. Compare com '
+          'as referências: redirecione o fluxo de ar para longe do rosto, '
+          'busque umidade ~40–60%, iluminação ~300–500 lux, tela perpendicular '
+          'às janelas e brilho próximo ao do ambiente. Inclua pausas visuais '
+          '(20-20-20) e revise seu ambiente de trabalho.',
     ),
     RiskBand(
       minScore: 6,
@@ -353,10 +403,13 @@ const ChecklistDefinition _environment = ChecklistDefinition(
       classification: 'Risco visual aumentado',
       feedback:
           'Vários fatores ambientais podem estar contribuindo para o '
-          'desconforto visual. Considere avaliar a umidade do ambiente, '
-          'reposicionar o monitor, reduzir reflexos e reforçar as pausas. Se o '
-          'desconforto persistir, considere avaliação oftalmológica. Este '
-          'resultado não substitui consulta médica.',
+          'desconforto visual. Revise com base nas referências: elimine o fluxo '
+          'de ar direto nos olhos; eleve a umidade para ~40–60% (umidificador); '
+          'ajuste a iluminação para ~300–500 lux sem ofuscamento; posicione a '
+          'tela perpendicular às janelas para remover reflexos; equipare o '
+          'brilho ao ambiente; reposicione o monitor a ~50–70 cm; e reforce as '
+          'pausas. Se o desconforto persistir, considere avaliação '
+          'oftalmológica. Este resultado não substitui consulta médica.',
     ),
   ],
 );
@@ -626,61 +679,108 @@ const ChecklistDefinition _breakHabits = ChecklistDefinition(
       id: 'brk_rule2020',
       text: 'Você faz pausas visuais (ex.: a cada 20 minutos)?',
       options: _noRisk,
+      detail:
+          'Referência: regra 20-20-20 — a cada 20 minutos, ~20 segundos olhando '
+          'para uma distância de cerca de 6 metros (20 pés). Pausas curtas e '
+          'frequentes funcionam melhor que poucas pausas longas.',
     ),
     ChecklistQuestion(
       id: 'brk_lookaway',
       text: 'Durante as pausas, você olha para longe por alguns segundos?',
       options: _noRisk,
+      detail:
+          'Referência: olhe para ~6 metros por ~20 segundos. Focar ao longe '
+          'relaxa o músculo de acomodação, que fica tensionado na visão de '
+          'perto prolongada.',
     ),
     ChecklistQuestion(
       id: 'brk_blink',
       text: 'Você lembra de piscar completamente durante o trabalho?',
       options: _noRisk,
+      detail:
+          'Em foco na tela, a frequência de piscadas cai bastante. Referência: '
+          'pisque de forma consciente e completa (pálpebra fechando por inteiro) '
+          'nas pausas, para reespalhar a lágrima.',
     ),
     ChecklistQuestion(
       id: 'brk_standup',
       text: 'Você se levanta e se movimenta em intervalos?',
       options: _noRisk,
+      detail:
+          'Referência: faça uma pausa de corpo a cada ~30–60 minutos (levantar, '
+          'alongar, andar). O movimento ajuda a circulação e dá uma pausa '
+          'natural à visão de perto.',
     ),
     ChecklistQuestion(
       id: 'brk_continuous',
       text: 'Você costuma usar a tela por horas seguidas sem parar?',
       options: _yesRisk,
+      detail:
+          'Referência: evite blocos acima de ~1–2 horas sem pausa visual. '
+          'Períodos contínuos longos somam carga sobre o foco e a lubrificação '
+          'ocular.',
     ),
     ChecklistQuestion(
       id: 'brk_skip',
       text: 'Você ignora os avisos de pausa quando aparecem?',
       options: _yesRisk,
+      detail:
+          'Referência: trate o aviso de pausa como parte do fluxo, não como '
+          'interrupção. Ignorar com frequência anula o benefício; ajuste o '
+          'horário/intervalo dos lembretes à sua rotina.',
     ),
     ChecklistQuestion(
       id: 'brk_night',
       text: 'Você usa telas até pouco antes de dormir?',
       options: _yesRisk,
+      detail:
+          'Referência: reduza o uso intenso de telas na ~1 hora antes de dormir. '
+          'Ajuda no descanso visual e na qualidade do sono; use modo noturno se '
+          'precisar usar à noite.',
     ),
     ChecklistQuestion(
       id: 'brk_hydration',
       text: 'Você mantém uma boa hidratação ao longo do dia?',
       options: _noRisk,
+      detail:
+          'A hidratação geral contribui para o conforto ocular, especialmente '
+          'em ambientes climatizados/secos. Referência: beba água ao longo do '
+          'dia, sem esperar a sede.',
     ),
     ChecklistQuestion(
       id: 'brk_distance_breaks',
       text: 'Você inclui atividades longe da tela no seu dia?',
       options: _noRisk,
+      detail:
+          'Referência: intercale tarefas de tela com atividades fora dela '
+          '(telefonemas em pé, leitura em papel, conversas). Alternar reduz a '
+          'sobrecarga da visão de perto.',
     ),
     ChecklistQuestion(
       id: 'brk_weekend',
       text: 'Você reduz o tempo de tela nos fins de semana?',
       options: _noRisk,
+      detail:
+          'Referência: períodos de menor exposição (fins de semana, folgas) '
+          'ajudam a recuperar do esforço visual acumulado na semana.',
     ),
     ChecklistQuestion(
       id: 'brk_overload',
       text: 'Você sente que passa mais tempo na tela do que gostaria?',
       options: _yesRisk,
+      detail:
+          'A percepção de excesso costuma acompanhar maior fadiga visual. '
+          'Referência: acompanhe seu tempo de tela e defina metas realistas de '
+          'pausas e de redução quando possível.',
     ),
     ChecklistQuestion(
       id: 'brk_plan',
       text: 'As pausas estão organizadas no seu fluxo de trabalho?',
       options: _noRisk,
+      detail:
+          'Referência: pausas funcionam melhor quando agendadas (lembretes, '
+          'blocos de foco com intervalos), e não dependentes só de força de '
+          'vontade. Configure lembretes em horários compatíveis com sua rotina.',
     ),
   ],
   bands: [
@@ -690,9 +790,10 @@ const ChecklistDefinition _breakHabits = ChecklistDefinition(
       level: ChecklistRiskLevel.low,
       classification: 'Boa adesão',
       feedback:
-          'Seus hábitos de pausa estão bem estabelecidos. Pausas visuais devem '
-          'ser desenhadas no fluxo de trabalho — continue mantendo esse '
-          'cuidado e acompanhe a evolução.',
+          'Seus hábitos de pausa estão bem estabelecidos. Referência para '
+          'manter: regra 20-20-20 (a cada 20 min, ~20 s olhando a ~6 m), pausa '
+          'de corpo a cada ~30–60 min e blocos contínuos abaixo de ~1–2 horas. '
+          'Continue mantendo esse cuidado e acompanhe a evolução.',
     ),
     RiskBand(
       minScore: 3,
@@ -701,8 +802,10 @@ const ChecklistDefinition _breakHabits = ChecklistDefinition(
       classification: 'Adesão irregular',
       feedback:
           'Suas pausas acontecem de forma irregular. Pausas visuais devem ser '
-          'desenhadas no fluxo de trabalho, não deixadas ao acaso. Tente '
-          'organizar lembretes e revise seu ambiente de trabalho.',
+          'desenhadas no fluxo de trabalho, não deixadas ao acaso. Referência: '
+          'configure lembretes (regra 20-20-20), faça pausa de corpo a cada '
+          '~30–60 min e evite blocos acima de ~1–2 horas. Revise seu ambiente '
+          'de trabalho.',
     ),
     RiskBand(
       minScore: 6,
@@ -711,8 +814,9 @@ const ChecklistDefinition _breakHabits = ChecklistDefinition(
       classification: 'Baixa adesão',
       feedback:
           'Há baixa adesão às pausas, o que pode aumentar o esforço visual. '
-          'Pausas visuais devem ser desenhadas no fluxo de trabalho. Considere '
-          'reforçar os lembretes e reduzir os períodos contínuos de tela.',
+          'Referência: ative a regra 20-20-20, reduza períodos contínuos para '
+          'abaixo de ~1–2 horas e reforce os lembretes em horários compatíveis '
+          'com sua rotina. Pausas devem ser desenhadas no fluxo de trabalho.',
     ),
     RiskBand(
       minScore: 9,
@@ -721,9 +825,10 @@ const ChecklistDefinition _breakHabits = ChecklistDefinition(
       classification: 'Alto risco comportamental',
       feedback:
           'Seus hábitos atuais indicam alto risco comportamental para o '
-          'conforto visual. Pausas visuais devem ser desenhadas no fluxo de '
-          'trabalho. Considere revisar seu ambiente e a rotina de pausas e '
-          'acompanhe a evolução.',
+          'conforto visual. Referência: adote a regra 20-20-20, pausas de corpo '
+          'a cada ~30–60 min, blocos contínuos abaixo de ~1–2 horas e redução '
+          'do uso intenso na ~1 hora antes de dormir. Configure lembretes no '
+          'fluxo de trabalho e acompanhe a evolução.',
     ),
   ],
 );
