@@ -89,10 +89,10 @@ void main() {
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
 
     // A altura intrínseca do painel (cabeçalho + 14 itens) deve caber na
-    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 608).
+    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 624).
     // Se um novo item estourar esse limite, o último item ("Sair") voltaria a
     // ser cortado pela borda da janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(608));
+    expect(height, lessThanOrEqualTo(624));
   });
 }

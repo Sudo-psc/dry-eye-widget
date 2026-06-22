@@ -79,8 +79,13 @@ class FloatingMenu extends StatelessWidget {
 
     return LiquidGlass(
       width: 280,
-      borderRadius: 16,
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      borderRadius: 20,
+      // Mais translúcido que o padrão (vidro de verdade), compensado com blur e
+      // saturação maiores para manter a vibrância e a profundidade.
+      fillOpacity: 0.58,
+      blur: 32,
+      saturation: 1.6,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -129,29 +134,32 @@ class _MenuRowState extends State<_MenuRow> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOut,
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
           // Pequeno "deslize" para a direita ao passar o mouse.
           padding: EdgeInsets.only(
-            left: _hover ? 18 : 14,
-            right: 14,
-            top: 11,
-            bottom: 11,
+            left: _hover ? 14 : 10,
+            right: 12,
+            top: 10,
+            bottom: 10,
           ),
           decoration: BoxDecoration(
-            // Realce em gradiente translúcido no hover.
+            borderRadius: BorderRadius.circular(12),
+            // Realce em gradiente translúcido no hover (pílula arredondada).
             gradient: _hover
                 ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                     colors: [
-                      Colors.white.withValues(alpha: 0.14),
-                      Colors.white.withValues(alpha: 0.04),
+                      Colors.white.withValues(alpha: 0.20),
+                      Colors.white.withValues(alpha: 0.06),
                     ],
                   )
                 : null,
-            // Barra de destaque à esquerda.
-            border: Border(
-              left: BorderSide(
-                color: _hover ? AppColors.idleBall : Colors.transparent,
-                width: 3,
-              ),
+            border: Border.all(
+              color: _hover
+                  ? Colors.white.withValues(alpha: 0.20)
+                  : Colors.transparent,
+              width: 0.5,
             ),
           ),
           child: Row(
@@ -164,6 +172,10 @@ class _MenuRowState extends State<_MenuRow> {
                   widget.icon,
                   size: 18,
                   color: _hover ? AppColors.idleBall : AppColors.textPrimary,
+                  // Sombra mantém o ícone legível sobre o vidro translúcido.
+                  shadows: const [
+                    Shadow(color: Colors.black54, blurRadius: 4),
+                  ],
                 ),
               ),
               const SizedBox(width: 12),
@@ -176,6 +188,10 @@ class _MenuRowState extends State<_MenuRow> {
                     fontSize: 14,
                     color: AppColors.textPrimary,
                     fontWeight: _hover ? FontWeight.w600 : FontWeight.w400,
+                    // Sombra sutil = contraste garantido em fundos claros.
+                    shadows: const [
+                      Shadow(color: Colors.black54, blurRadius: 4),
+                    ],
                   ),
                 ),
               ),
