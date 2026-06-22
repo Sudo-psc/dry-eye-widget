@@ -4,6 +4,19 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.15.4] - 2026-06-22
+
+### Alterado
+- **Checklist de sinais de alerta** com detalhes por item no formato "o que
+  observar" + "por que importa", diferenciando cada sinal de sintomas comuns de
+  fadiga (ex.: dor persistente, queda de visão, olho vermelho com dor, dor com
+  lente de contato, fotofobia importante, piora progressiva, flashes/pontos
+  flutuantes novos). Conteúdo educativo e de triagem, não diagnóstico.
+
+### Concluído
+- Todos os 5 checklists de questionário (ergonomia, ambiente, sintomas, sinais
+  de alerta e pausas) agora trazem especificações/descrições detalhadas por item.
+
 ## [1.15.3] - 2026-06-22
 
 ### Alterado

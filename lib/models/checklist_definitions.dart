@@ -609,67 +609,115 @@ const ChecklistDefinition _warningSigns = ChecklistDefinition(
       text: 'Você sente dor ocular persistente?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que observar: dor que não passa, diferente de cansaço ou ardência '
+          'leve do fim do dia. Por que importa: dor ocular persistente pode ir '
+          'além da fadiga visual e merece avaliação oftalmológica.',
     ),
     ChecklistQuestion(
       id: 'warn_vision_drop',
       text: 'Notou queda da visão (visão piorando) recentemente?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que observar: perda real de nitidez que NÃO melhora ao piscar ou '
+          'descansar. Por que importa: queda de visão recente deve ser avaliada '
+          'sem demora.',
     ),
     ChecklistQuestion(
       id: 'warn_red_pain',
       text: 'Tem olho vermelho acompanhado de dor?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que observar: vermelhidão com dor (diferente de leve vermelhidão '
+          'ao fim do dia). Por que importa: a combinação dor + vermelhidão pede '
+          'avaliação com prioridade.',
     ),
     ChecklistQuestion(
       id: 'warn_contact_pain',
       text: 'Usa lente de contato e sente dor ou vermelhidão?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que fazer: retire a lente e não volte a usá-la até avaliação. Por '
+          'que importa: dor ou vermelhidão com lentes pode envolver a córnea e '
+          'exige avaliação oftalmológica com prioridade.',
     ),
     ChecklistQuestion(
       id: 'warn_photophobia',
       text: 'Tem fotofobia importante (luz causa muito incômodo)?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que observar: incômodo intenso com a luz, que atrapalha atividades '
+          '— além da sensibilidade comum. Por que importa: fotofobia importante '
+          'merece avaliação.',
     ),
     ChecklistQuestion(
       id: 'warn_progressive',
       text: 'Percebe piora progressiva dos sintomas a cada dia?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que observar: sintomas que pioram dia após dia, em vez de apenas '
+          'oscilar. Por que importa: piora progressiva sugere algo em evolução '
+          'e merece avaliação.',
     ),
     ChecklistQuestion(
       id: 'warn_persistent',
       text: 'Os sintomas persistem mesmo após descanso e pausas?',
       options: _yesNoRisk,
       critical: true,
+      detail:
+          'O que observar: sintomas que não aliviam com pausas, sono ou fins de '
+          'semana. Por que importa: a falta de alívio sugere causa além da '
+          'fadiga visual; considere avaliação.',
     ),
     ChecklistQuestion(
       id: 'warn_secretion',
       text: 'Tem secreção ocular incomum?',
       options: _yesNoRisk,
+      detail:
+          'O que observar: secreção amarelada/esverdeada, abundante ou que cola '
+          'os cílios. Por que importa: secreção incomum merece avaliação, '
+          'especialmente com vermelhidão ou dor.',
     ),
     ChecklistQuestion(
       id: 'warn_swelling',
       text: 'Notou inchaço ao redor dos olhos?',
       options: _yesNoRisk,
+      detail:
+          'O que observar: inchaço das pálpebras ou ao redor dos olhos, '
+          'sobretudo de um lado. Por que importa: inchaço com dor ou vermelhidão '
+          'merece atenção.',
     ),
     ChecklistQuestion(
       id: 'warn_flashes',
       text: 'Vê flashes de luz ou muitos pontos flutuantes novos?',
       options: _yesNoRisk,
+      detail:
+          'O que observar: flashes de luz ou aumento súbito de "moscas '
+          'volantes". Por que importa: flashes/pontos flutuantes novos devem ser '
+          'avaliados sem demora.',
     ),
     ChecklistQuestion(
       id: 'warn_foreign',
       text: 'Sensação constante de corpo estranho que não passa?',
       options: _yesNoRisk,
+      detail:
+          'O que observar: sensação de cisco contínua que não alivia (diferente '
+          'da sensação arenosa passageira). Por que importa: pode indicar lesão '
+          'na superfície; evite coçar e procure avaliação.',
     ),
     ChecklistQuestion(
       id: 'warn_watering',
       text: 'Lacrimejamento intenso e contínuo sem melhora?',
       options: _yesNoRisk,
+      detail:
+          'O que observar: lacrimejamento forte e contínuo que não cede. Por '
+          'que importa: quando persistente, pode ter causas variadas e merece '
+          'avaliação.',
     ),
   ],
   bands: [
