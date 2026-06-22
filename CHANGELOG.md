@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.15.6] - 2026-06-22
+
+### Alterado
+- **Menu flutuante com visual liquid glass renovado**: vidro mais translúcido
+  (preenchimento reduzido para mostrar o fundo), com saturação que dá vibrância
+  de vidro real em vez de fundo lavado, sombra dupla de profundidade e realce de
+  borda luminosa. O contraste é preservado por sombras sutis no texto e nos
+  ícones, mantendo a legibilidade sobre fundos claros. O destaque de hover passa
+  a ser uma pílula arredondada coerente com a estética de vidro.
+
 ## [1.15.5] - 2026-06-22
 
 ### Corrigido
