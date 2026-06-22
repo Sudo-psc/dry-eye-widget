@@ -201,6 +201,24 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   border: 1px solid var(--line); box-shadow: var(--shadow);
 }
 .btn-dl.secondary:hover { background: var(--surface-strong); transform: translateY(-2px); }
+/* Botão da Microsoft Store — badge escuro com a logo de 4 cores, em destaque. */
+.btn-store {
+  display: inline-flex; align-items: center; gap: 11px;
+  padding: 10px 20px; border-radius: 14px;
+  background: #0a1020; color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 28px -8px rgba(8, 12, 24, 0.55);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+.btn-store:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 18px 38px -10px rgba(8, 12, 24, 0.65);
+}
+.btn-store .ms-logo { width: 22px; height: 22px; flex: none; }
+.btn-store span { display: flex; flex-direction: column; line-height: 1.18; text-align: left; }
+.btn-store small { font-size: 11px; font-weight: 600; opacity: 0.78; letter-spacing: 0.02em; }
+.btn-store strong { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
 .dl-meta { font-size: 13px; color: var(--text-3); display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .dl-meta a { color: var(--text-2); font-weight: 600; border-bottom: 1px solid var(--line); transition: color 160ms ease, border-color 160ms ease; }
 .dl-meta a:hover { color: var(--accent); border-color: var(--accent); }
