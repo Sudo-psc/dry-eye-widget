@@ -420,84 +420,133 @@ const ChecklistDefinition _symptoms = ChecklistDefinition(
   type: ChecklistType.visualSymptoms,
   title: 'Sintomas visuais',
   shortDescription:
-      'Com que frequência você percebe sintomas visuais relacionados ao uso '
-      'de telas.',
+      'Com que frequência você percebe cada sintoma relacionado ao uso de '
+      'telas. Escala: Nunca (não percebe) · Raramente (esporádico, poucas vezes) '
+      '· Às vezes (alguns dias na semana) · Frequentemente (na maioria dos dias) '
+      '· Quase sempre (praticamente todos os dias ou boa parte do dia).',
   version: '1',
   questions: [
     ChecklistQuestion(
       id: 'sym_dryness',
       text: 'Sensação de olhos secos',
       options: _frequency,
+      detail:
+          'Sensação de ressecamento ou falta de lubrificação. Costuma piorar '
+          'com ar-condicionado, ambiente seco e longos períodos de tela (quando '
+          'piscamos menos).',
     ),
     ChecklistQuestion(
       id: 'sym_grit',
       text: 'Sensação de areia ou corpo estranho nos olhos',
       options: _frequency,
+      detail:
+          'Sensação arenosa, como se houvesse um cisco no olho, sem que haja '
+          'algo de fato — comum quando o filme lacrimal está instável.',
     ),
     ChecklistQuestion(
       id: 'sym_burning',
       text: 'Ardência ou queimação nos olhos',
       options: _frequency,
+      detail:
+          'Sensação de calor ou irritação na superfície dos olhos, que tende a '
+          'aumentar ao fim do dia ou após uso contínuo de telas.',
     ),
     ChecklistQuestion(
       id: 'sym_tearing',
       text: 'Lacrimejamento excessivo',
       options: _frequency,
+      detail:
+          'Olhos que lacrimejam mais que o habitual. Pode acompanhar a sensação '
+          'de ressecamento (lágrima reflexa) e variar ao longo do dia.',
     ),
     ChecklistQuestion(
       id: 'sym_redness',
       text: 'Olhos avermelhados ao fim do dia',
       options: _frequency,
+      detail:
+          'Vermelhidão que aparece após horas de uso. Vermelhidão intensa, com '
+          'dor ou secreção, é tratada à parte no checklist de sinais de alerta.',
     ),
     ChecklistQuestion(
       id: 'sym_blur',
       text: 'Visão embaçada que melhora ao piscar',
       options: _frequency,
+      detail:
+          'A visão oscila e clareia ao piscar — sinal típico de filme lacrimal '
+          'instável. Diferente de embaçamento que NÃO melhora ao piscar, que '
+          'merece avaliação.',
     ),
     ChecklistQuestion(
       id: 'sym_fatigue',
       text: 'Cansaço visual',
       options: _frequency,
+      detail:
+          'Olhos cansados após uso prolongado, geralmente aliviando com pausas '
+          'e ao olhar para longe (regra 20-20-20).',
     ),
     ChecklistQuestion(
       id: 'sym_heavy',
       text: 'Sensação de peso ou pálpebras pesadas',
       options: _frequency,
+      detail:
+          'Pálpebras pesadas e vontade de fechar os olhos, comum em jornadas '
+          'longas e com poucas pausas.',
     ),
     ChecklistQuestion(
       id: 'sym_lightsens',
       text: 'Incômodo com luz (sensibilidade luminosa)',
       options: _frequency,
+      detail:
+          'Desconforto com luz ou brilho. Sensibilidade intensa ou persistente '
+          'é um sinal de atenção tratado no checklist de sinais de alerta.',
     ),
     ChecklistQuestion(
       id: 'sym_headache',
       text: 'Dor de cabeça relacionada ao uso de telas',
       options: _frequency,
+      detail:
+          'Cefaleia que surge ou piora com o tempo de tela. Costuma melhorar '
+          'revisando fonte, contraste, brilho, reflexos e pausas.',
     ),
     ChecklistQuestion(
       id: 'sym_focus',
       text: 'Dificuldade para focar de perto e de longe',
       options: _frequency,
+      detail:
+          'Demora para o foco "ajustar" ao alternar entre a tela e objetos '
+          'distantes — reflexo da tensão de acomodação na visão de perto.',
     ),
     ChecklistQuestion(
       id: 'sym_itch',
       text: 'Coceira nos olhos',
       options: _frequency,
+      detail:
+          'Prurido ocular. Pode ter componente irritativo ou alérgico; observe '
+          'se aparece em ambientes ou épocas específicas.',
     ),
     ChecklistQuestion(
       id: 'sym_strain',
       text: 'Sensação de esforço para manter os olhos abertos',
       options: _frequency,
+      detail:
+          'Esforço para manter os olhos abertos e atentos, frequente no fim de '
+          'tarefas visuais longas.',
     ),
     ChecklistQuestion(
       id: 'sym_double',
       text: 'Visão dupla ocasional ao fim do dia',
       options: _frequency,
+      detail:
+          'Imagens levemente duplicadas por fadiga ao fim do dia. Visão dupla '
+          'constante, súbita ou frequente merece avaliação oftalmológica.',
     ),
     ChecklistQuestion(
       id: 'sym_discomfort',
       text: 'Desconforto geral nos olhos após o trabalho',
       options: _frequency,
+      detail:
+          'Incômodo inespecífico nos olhos após a jornada — útil para '
+          'acompanhar a tendência geral ao longo das semanas.',
     ),
   ],
   bands: [

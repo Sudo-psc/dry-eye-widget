@@ -111,6 +111,7 @@ void main() {
         }
         for (final q in def.questions) {
           texts.add(q.text);
+          if (q.detail != null) texts.add(q.detail!);
           for (final o in q.options) {
             texts.add(o.label);
           }
