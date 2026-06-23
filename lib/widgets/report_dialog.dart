@@ -164,10 +164,12 @@ class _ReportDialogState extends State<ReportDialog> {
     try {
       final bytes = await _pdfService.generateReport(data);
       final file = await _pdfService.savePdfFile(bytes, _fileName());
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: PdfReportService.privacyNotice,
-        subject: 'Relatório de Saúde Visual Digital — Dry Eye Widget',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          text: PdfReportService.privacyNotice,
+          subject: 'Relatório de Saúde Visual Digital — Dry Eye Widget',
+        ),
       );
     } catch (e) {
       _showError(messenger, e);
