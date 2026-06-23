@@ -18,9 +18,9 @@ class UpdateResult {
 class UpdateService {
   /// Consulta a última release e compara com [AppInfo.version].
   Future<UpdateResult> check() async {
+    final client = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 10);
     try {
-      final client = HttpClient()
-        ..connectionTimeout = const Duration(seconds: 10);
       final request = await client.getUrl(Uri.parse(AppInfo.latestReleaseApi));
       request.headers.set(HttpHeaders.userAgentHeader, 'DryEyeWidget');
       request.headers.set(
@@ -29,11 +29,9 @@ class UpdateService {
       );
       final response = await request.close();
       if (response.statusCode != 200) {
-        client.close();
         return const UpdateResult(UpdateStatus.error);
       }
       final body = await response.transform(utf8.decoder).join();
-      client.close();
       final json = jsonDecode(body) as Map<String, dynamic>;
       final tag = (json['tag_name'] as String?) ?? '';
       final latest = _normalize(tag);
@@ -47,6 +45,8 @@ class UpdateService {
     } catch (e) {
       debugPrint('UpdateService: falha ($e).');
       return const UpdateResult(UpdateStatus.error);
+    } finally {
+      client.close();
     }
   }
 

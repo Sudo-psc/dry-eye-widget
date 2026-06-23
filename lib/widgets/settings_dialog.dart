@@ -543,7 +543,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(s.save),
+                child: _saving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(s.save),
               ),
             ],
           ),

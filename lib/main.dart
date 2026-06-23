@@ -359,6 +359,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     trayManager.removeListener(this);
     _blinkReminderTicker?.cancel();
     _blinkReminderHideTimer?.cancel();
+    // Libera os players de áudio (regra 20-20-20 + piscada). O TimerProvider,
+    // disposto em seguida pelo provider, não toca som no teardown.
+    _audio.dispose();
     super.dispose();
   }
 
@@ -477,6 +480,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_dashboardOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
+          if (!mounted) return;
           await _applyLayout(_WindowLayout.settings);
         }();
       }
@@ -503,6 +507,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_dashboardOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
+          if (!mounted) return;
           await _applyLayout(_WindowLayout.inactivity);
         }();
       }
@@ -1163,6 +1168,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       orbIntensity: s.orbIntensity,
       blinkReminderVisible: blinkReminderVisible,
       blinkReminderText: blinkReminderText,
+      semanticLabel: interactive
+          ? AppStrings.of(_settings.value.languageCode).ballSemanticLabel
+          : null,
       onTap: interactive ? _onBallTap : null,
       onSecondaryTap: interactive ? _onBallSecondaryTap : null,
       onDragStart: interactive ? _onBallDragStart : null,

@@ -13,6 +13,10 @@ class AppStrings {
     required this.menuGuidance,
     required this.menuOsdi,
     required this.menuScreenTime,
+    required this.menuChecklists,
+    required this.menuDashboard,
+    required this.menuReports,
+    required this.ballSemanticLabel,
     required this.menuCheckUpdates,
     required this.menuSettings,
     required this.menuQuit,
@@ -195,6 +199,10 @@ class AppStrings {
   final String menuGuidance;
   final String menuOsdi;
   final String menuScreenTime;
+  final String menuChecklists;
+  final String menuDashboard;
+  final String menuReports;
+  final String ballSemanticLabel;
   final String menuCheckUpdates;
   final String menuSettings;
   final String menuQuit;
@@ -439,6 +447,10 @@ const AppStrings ptStrings = AppStrings(
   menuGuidance: 'Orientações',
   menuOsdi: 'Questionário OSDI',
   menuScreenTime: 'Tempo de tela',
+  menuChecklists: 'Checklists',
+  menuDashboard: 'Painel',
+  menuReports: 'Relatórios',
+  ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
   menuCheckUpdates: 'Verificar atualizações',
   menuSettings: 'Configurações',
   menuQuit: 'Sair',
@@ -703,6 +715,10 @@ const AppStrings enStrings = AppStrings(
   menuGuidance: 'Eye care guide',
   menuOsdi: 'OSDI questionnaire',
   menuScreenTime: 'Screen time',
+  menuChecklists: 'Checklists',
+  menuDashboard: 'Dashboard',
+  menuReports: 'Reports',
+  ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
   menuCheckUpdates: 'Check for updates',
   menuSettings: 'Settings',
   menuQuit: 'Quit',

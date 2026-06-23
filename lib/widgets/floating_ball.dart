@@ -27,6 +27,7 @@ class FloatingBall extends StatefulWidget {
     this.orbIntensity = AppDefaults.orbIntensity,
     this.blinkReminderVisible = false,
     this.blinkReminderText = '',
+    this.semanticLabel,
     this.onTap,
     this.onSecondaryTap,
     this.onDragStart,
@@ -46,6 +47,7 @@ class FloatingBall extends StatefulWidget {
   final double orbIntensity;
   final bool blinkReminderVisible;
   final String blinkReminderText;
+  final String? semanticLabel;
   final VoidCallback? onTap;
   final VoidCallback? onSecondaryTap;
   final VoidCallback? onDragStart;
@@ -310,6 +312,23 @@ class _FloatingBallState extends State<FloatingBall>
       );
     }
 
+    Widget interactive = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: widget.onTap,
+      onSecondaryTap: widget.onSecondaryTap,
+      onPanStart: (_) => widget.onDragStart?.call(),
+      onPanEnd: (_) => widget.onDragEnd?.call(),
+      child: visual,
+    );
+    final label = widget.semanticLabel;
+    if (label != null) {
+      interactive = Semantics(
+        button: true,
+        label: label,
+        child: ExcludeSemantics(child: interactive),
+      );
+    }
+
     return MouseRegion(
       cursor: SystemMouseCursors.grab,
       onEnter: (_) {
@@ -318,14 +337,7 @@ class _FloatingBallState extends State<FloatingBall>
       onExit: (_) {
         if (widget.hoverReactiveBall) setState(() => _hovered = false);
       },
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onTap,
-        onSecondaryTap: widget.onSecondaryTap,
-        onPanStart: (_) => widget.onDragStart?.call(),
-        onPanEnd: (_) => widget.onDragEnd?.call(),
-        child: visual,
-      ),
+      child: interactive,
     );
   }
 }
