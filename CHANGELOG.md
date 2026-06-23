@@ -4,6 +4,29 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.16.0] - 2026-06-23
+
+### Adicionado
+- **Acessibilidade da bolinha flutuante**: a bolinha passa a expor um rótulo
+  semântico para leitores de tela (anúncio único via Semantics + ExcludeSemantics),
+  indicando tratar-se de um lembrete de descanso ocular e que o toque abre o menu.
+
+### Alterado
+- **Internacionalização do menu**: os itens Checklists, Painel e Relatórios agora
+  respeitam o idioma selecionado (PT/EN) em vez de texto fixo em português.
+- **Aviso clínico do OSDI em destaque**: o aviso não-diagnóstico passa a aparecer
+  no topo do questionário, em banner com ícone, em vez de ficar no rodapé.
+- **Atualização de dependências multiplataforma**: audioplayers 6.8.0,
+  path_provider 2.1.6, screen_retriever 0.2.1, tray_manager 0.5.3 e migração do
+  share_plus para a API ShareParams (12.0.2). Builds validados em macOS e Windows.
+- Botão **Salvar** das configurações exibe indicador de progresso enquanto persiste.
+
+### Corrigido
+- **Vazamento de recursos de áudio**: os players da regra 20-20-20 e do lembrete
+  de piscada são liberados corretamente no encerramento da tela.
+- **Robustez assíncrona**: callbacks de layout verificam o estado de montagem
+  antes de tocar a interface, evitando erros após a tela ser descartada.
+
 ## [1.15.6] - 2026-06-22
 
 ### Alterado
