@@ -147,6 +147,8 @@ class _OsdiDialogState extends State<OsdiDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _DisclaimerBanner(text: s.osdiDisclaimer),
+                  const SizedBox(height: 14),
                   _ScoreSummary(
                     strings: s,
                     assessment: display,
@@ -180,33 +182,19 @@ class _OsdiDialogState extends State<OsdiDialog> {
             ),
           ),
           const Divider(color: AppColors.glassBorder, height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 6,
             children: [
-              Text(
-                s.osdiDisclaimer,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 11.5,
-                  height: 1.25,
-                ),
+              TextButton(
+                onPressed: _resetAnswers,
+                child: Text(s.osdiReset),
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  TextButton(
-                    onPressed: _resetAnswers,
-                    child: Text(s.osdiReset),
-                  ),
-                  FilledButton.icon(
-                    onPressed: preview == null ? null : _save,
-                    icon: const Icon(Icons.save_outlined, size: 18),
-                    label: Text(s.osdiSave),
-                  ),
-                ],
+              FilledButton.icon(
+                onPressed: preview == null ? null : _save,
+                icon: const Icon(Icons.save_outlined, size: 18),
+                label: Text(s.osdiSave),
               ),
             ],
           ),
@@ -226,6 +214,50 @@ class _OsdiDialogState extends State<OsdiDialog> {
     if (index > 0) return history[index - 1];
     if (index == -1) return history.last;
     return null;
+  }
+}
+
+/// Aviso clínico exibido no topo do questionário, antes das perguntas, para
+/// reforçar que a triagem não substitui avaliação profissional.
+class _DisclaimerBanner extends StatelessWidget {
+  const _DisclaimerBanner({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.textSecondary.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: AppColors.glassBorder,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.info_outline,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 12,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
