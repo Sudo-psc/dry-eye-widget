@@ -80,6 +80,74 @@ class BreakStatsData {
     return BreakDayStat(reminders: reminders, completed: completed);
   }
 
+  /// Adesão padrão mínima para um dia "contar" na sequência (60%).
+  static const double defaultMinAdherence = 0.6;
+
+  /// Total de pausas concluídas em todo o histórico retido.
+  int get totalCompleted =>
+      byDay.values.fold(0, (acc, s) => acc + s.completed);
+
+  /// Total de avisos de pausa emitidos em todo o histórico retido.
+  int get totalReminders =>
+      byDay.values.fold(0, (acc, s) => acc + s.reminders);
+
+  /// Taxa de adesão (0–1) no intervalo [start, end]; 0 se não houve avisos.
+  double adherenceForRange(DateTime start, DateTime end) {
+    final sum = sumForRange(start, end);
+    if (sum.reminders == 0) return 0;
+    return sum.completed / sum.reminders;
+  }
+
+  /// Sequência atual de dias consecutivos atingindo a adesão mínima, contada
+  /// para trás a partir de [now].
+  ///
+  /// Dias **sem avisos** (computador desligado / sem uso de tela) são neutros:
+  /// não incrementam nem quebram a sequência — reforço de hábito sem punição.
+  int currentStreak(DateTime now, {double minAdherence = defaultMinAdherence}) {
+    var streak = 0;
+    var day = DateTime(now.year, now.month, now.day);
+    for (var i = 0; i <= maxRetainedDays; i++) {
+      final s = forDay(day);
+      if (s.reminders == 0) {
+        // Dia neutro: pula sem contar nem zerar.
+        day = day.subtract(const Duration(days: 1));
+        continue;
+      }
+      if (s.completed / s.reminders >= minAdherence) {
+        streak++;
+        day = day.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  /// Maior sequência já alcançada em todo o histórico retido. Dias neutros
+  /// preservam a sequência em curso (mesma semântica de [currentStreak]).
+  int bestStreak({double minAdherence = defaultMinAdherence}) {
+    if (byDay.isEmpty) return 0;
+    final days = byDay.keys.map(_dayFromKey).toList()..sort();
+    final first = days.first;
+    final last = days.last;
+    var best = 0;
+    var run = 0;
+    var day = first;
+    while (!day.isAfter(last)) {
+      final s = forDay(day);
+      if (s.reminders == 0) {
+        // Neutro: mantém a sequência em curso.
+      } else if (s.completed / s.reminders >= minAdherence) {
+        run++;
+        if (run > best) best = run;
+      } else {
+        run = 0;
+      }
+      day = day.add(const Duration(days: 1));
+    }
+    return best;
+  }
+
   // --- Mutação imutável ---------------------------------------------------
 
   /// Devolve uma cópia com +[reminders] e +[completed] somados ao dia [date].

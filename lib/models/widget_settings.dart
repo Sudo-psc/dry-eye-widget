@@ -47,6 +47,8 @@ class WidgetSettings {
     required this.eyeDropsIntervalHours,
     required this.pauseOnInactivity,
     required this.cameraPresence,
+    required this.uiScale,
+    required this.onboardingComplete,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -155,6 +157,13 @@ class WidgetSettings {
   /// (opt-in, desligado por padrão; só consulta a câmera no limiar).
   final bool cameraPresence;
 
+  /// Escala global da interface para acessibilidade (0.8–1.6). Aplicada via
+  /// `MediaQuery.textScaler`, afeta todo o texto dos diálogos e telas.
+  final double uiScale;
+
+  /// Marca que o onboarding de primeira execução já foi concluído.
+  final bool onboardingComplete;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
     cycleMinutes: AppDefaults.cycleMinutes,
@@ -191,6 +200,8 @@ class WidgetSettings {
     eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
     pauseOnInactivity: AppDefaults.pauseOnInactivity,
     cameraPresence: AppDefaults.cameraPresence,
+    uiScale: AppDefaults.uiScale,
+    onboardingComplete: AppDefaults.onboardingComplete,
   );
 
   // --- Conveniências ------------------------------------------------------
@@ -234,6 +245,8 @@ class WidgetSettings {
     int? eyeDropsIntervalHours,
     bool? pauseOnInactivity,
     bool? cameraPresence,
+    double? uiScale,
+    bool? onboardingComplete,
   }) {
     final nextHideMenuBarItem = hideMenuBarItem ?? this.hideMenuBarItem;
     final nextHideFloatingWidget =
@@ -277,6 +290,8 @@ class WidgetSettings {
           eyeDropsIntervalHours ?? this.eyeDropsIntervalHours,
       pauseOnInactivity: pauseOnInactivity ?? this.pauseOnInactivity,
       cameraPresence: cameraPresence ?? this.cameraPresence,
+      uiScale: uiScale ?? this.uiScale,
+      onboardingComplete: onboardingComplete ?? this.onboardingComplete,
     ).normalized();
   }
 
@@ -336,6 +351,13 @@ class WidgetSettings {
           : d.eyeDropsIntervalHours,
       pauseOnInactivity: pauseOnInactivity,
       cameraPresence: cameraPresence,
+      uiScale: _clampDouble(
+        uiScale,
+        AppDefaults.minUiScale,
+        AppDefaults.maxUiScale,
+        d.uiScale,
+      ),
+      onboardingComplete: onboardingComplete,
     );
   }
 
@@ -387,6 +409,8 @@ class WidgetSettings {
     'eyeDropsIntervalHours': eyeDropsIntervalHours,
     'pauseOnInactivity': pauseOnInactivity,
     'cameraPresence': cameraPresence,
+    'uiScale': uiScale,
+    'onboardingComplete': onboardingComplete,
   };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -455,6 +479,9 @@ class WidgetSettings {
       pauseOnInactivity:
           map['pauseOnInactivity'] as bool? ?? d.pauseOnInactivity,
       cameraPresence: map['cameraPresence'] as bool? ?? d.cameraPresence,
+      uiScale: (map['uiScale'] as num?)?.toDouble() ?? d.uiScale,
+      onboardingComplete:
+          map['onboardingComplete'] as bool? ?? d.onboardingComplete,
     ).normalized();
   }
 

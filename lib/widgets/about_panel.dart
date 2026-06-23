@@ -8,10 +8,16 @@ import 'liquid_glass.dart';
 /// Renderizada como painel interno (mesmo padrão de [GuidanceDialog]), pois um
 /// `showDialog` numa janela do tamanho da bolinha não tem espaço para aparecer.
 class AboutPanel extends StatelessWidget {
-  const AboutPanel({super.key, required this.strings, required this.onClose});
+  const AboutPanel({
+    super.key,
+    required this.strings,
+    required this.onClose,
+    required this.onGitHub,
+  });
 
   final AppStrings strings;
   final VoidCallback onClose;
+  final VoidCallback onGitHub;
 
   @override
   Widget build(BuildContext context) {
@@ -124,11 +130,56 @@ class AboutPanel extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  const Divider(color: AppColors.glassBorder),
+                  const SizedBox(height: 6),
+                  _AboutLink(
+                    icon: Icons.code,
+                    label: s.menuGitHub,
+                    onTap: onGitHub,
+                  ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Link clicável dentro do painel Sobre (ex.: repositório no GitHub).
+class _AboutLink extends StatelessWidget {
+  const _AboutLink({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 18, color: AppColors.idleBall),
+        label: Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.idleBall,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
       ),
     );
   }

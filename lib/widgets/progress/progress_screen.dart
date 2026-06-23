@@ -1,0 +1,365 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../l10n/app_strings.dart';
+import '../../models/break_stats_data.dart';
+import '../../providers/settings_provider.dart';
+import '../../services/storage_service.dart';
+import '../../utils/constants.dart';
+import '../liquid_glass.dart';
+
+/// Tela "Meu Progresso": devolve ao usuário a narrativa dos dados de pausas já
+/// coletados localmente ([BreakStatsData]).
+///
+/// Foco em **reforço de hábito sem punição**: sequência (streak) respeitosa,
+/// taxa de adesão recente, total de pausas e um insight proativo. Todos os
+/// dados são locais — lidos diretamente do [StorageService].
+class ProgressScreen extends StatefulWidget {
+  const ProgressScreen({super.key, required this.onClose});
+
+  final VoidCallback onClose;
+
+  @override
+  State<ProgressScreen> createState() => _ProgressScreenState();
+}
+
+class _ProgressScreenState extends State<ProgressScreen> {
+  BreakStatsData _stats = BreakStatsData.empty();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _stats = context.read<StorageService>().loadBreakStats());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = context.read<SettingsProvider>().strings;
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: LiquidGlass(
+          fillOpacity: 0.8,
+          blur: 20,
+          child: Column(
+            children: [
+              _header(theme, s),
+              Expanded(child: _body(theme, s)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _header(ThemeData theme, AppStrings s) => Container(
+    decoration: BoxDecoration(
+      color: theme.colorScheme.surface.withValues(alpha: 0.5),
+      border: Border(
+        bottom: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+        ),
+      ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: widget.onClose,
+            tooltip: 'Fechar',
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              s.progressTitle,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const Icon(
+            Icons.local_florist_outlined,
+            color: AppColors.idleBall,
+            size: 22,
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _body(ThemeData theme, AppStrings s) {
+    if (_stats.totalReminders == 0) return _empty(theme, s);
+
+    final now = DateTime.now();
+    final streak = _stats.currentStreak(now);
+    final best = _stats.bestStreak();
+    final total = _stats.totalCompleted;
+
+    final from7 = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 6));
+    final from30 = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 29));
+    final adh7 = _stats.adherenceForRange(from7, now);
+    final adh30 = _stats.adherenceForRange(from30, now);
+    final has7 = _stats.sumForRange(from7, now).reminders > 0;
+    final has30 = _stats.sumForRange(from30, now).reminders > 0;
+
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        _streakCard(theme, s, streak, best),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _statCard(
+                theme,
+                icon: Icons.task_alt,
+                color: const Color(0xFF50C878),
+                label: s.progressTotalBreaksLabel,
+                value: '$total',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _statCard(
+                theme,
+                icon: Icons.percent,
+                color: AppColors.idleBall,
+                label: s.progressAdherence7Label,
+                value: has7 ? '${(adh7 * 100).round()}%' : '—',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _statCard(
+                theme,
+                icon: Icons.calendar_month_outlined,
+                color: const Color(0xFF9B59B6),
+                label: s.progressAdherence30Label,
+                value: has30 ? '${(adh30 * 100).round()}%' : '—',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _insightCard(theme, s, streak, adh7, has7, total),
+        const SizedBox(height: 20),
+        Text(
+          s.progressDisclaimer,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 11,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _streakCard(ThemeData theme, AppStrings s, int streak, int best) {
+    const accent = Color(0xFFFF8C00);
+    final active = streak > 0;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: active ? 0.12 : 0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: accent.withValues(alpha: active ? 0.4 : 0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              active ? Icons.local_fire_department : Icons.local_fire_department_outlined,
+              color: accent,
+              size: 32,
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  s.progressStreakCurrentLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  s.progressDaysCount(streak),
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: active
+                        ? accent
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                if (active)
+                  Text(
+                    '${s.progressStreakBestLabel}: ${s.progressDaysCount(best)}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  )
+                else
+                  Text(
+                    s.progressStreakZeroHint,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statCard(
+    ThemeData theme, {
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _insightCard(
+    ThemeData theme,
+    AppStrings s,
+    int streak,
+    double adh7,
+    bool has7,
+    int total,
+  ) {
+    final String text;
+    if (streak >= 2) {
+      text = s.progressInsightStreakText(streak);
+    } else if (has7) {
+      text = s.progressInsightAdherenceText((adh7 * 100).round());
+    } else if (total > 0) {
+      text = s.progressInsightConsistencyText(total);
+    } else {
+      text = s.progressInsightStart;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.idleBall.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.idleBall.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.lightbulb_outline, color: AppColors.idleBall, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  s.progressInsightLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: AppColors.idleBall,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.35,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _empty(ThemeData theme, AppStrings s) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.insights_outlined,
+            size: 40,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            s.progressEmpty,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}

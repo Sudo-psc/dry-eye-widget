@@ -104,6 +104,14 @@ class AppDefaults {
 
   static const double minBallSize = 14.0;
   static const double maxBallSize = 80.0;
+
+  /// Escala global da interface (acessibilidade). 1.0 = tamanho padrão.
+  static const double uiScale = 1.0;
+  static const double minUiScale = 0.8;
+  static const double maxUiScale = 1.6;
+
+  /// Indica se o usuário já concluiu o onboarding de primeira execução.
+  static const bool onboardingComplete = false;
 }
 
 /// Durações fixas (não configuráveis) usadas em animações.
@@ -189,7 +197,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.16.0';
+  static const String version = '1.17.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

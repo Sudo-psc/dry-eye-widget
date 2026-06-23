@@ -50,6 +50,8 @@ class AppStrings {
     required this.workCycle,
     required this.breakDuration,
     required this.ballSize,
+    required this.uiScale,
+    required this.uiScaleHint,
     required this.colorNormal,
     required this.colorAlert,
     required this.opacityNormal,
@@ -188,6 +190,37 @@ class AppStrings {
     required this.unitHour,
     required this.weekdayShort,
     required this.monthShort,
+    required this.menuProgress,
+    required this.menuGroupActions,
+    required this.menuGroupHealth,
+    required this.menuGroupSystem,
+    required this.progressTitle,
+    required this.progressStreakCurrentLabel,
+    required this.progressStreakBestLabel,
+    required this.progressDayUnit,
+    required this.progressDaysUnit,
+    required this.progressTotalBreaksLabel,
+    required this.progressAdherence7Label,
+    required this.progressAdherence30Label,
+    required this.progressInsightLabel,
+    required this.progressEmpty,
+    required this.progressDisclaimer,
+    required this.progressStreakZeroHint,
+    required this.progressInsightStreak,
+    required this.progressInsightAdherence,
+    required this.progressInsightStart,
+    required this.progressInsightConsistency,
+    required this.onboardingSkip,
+    required this.onboardingNext,
+    required this.onboardingStart,
+    required this.onboardingStep1Title,
+    required this.onboardingStep1Body,
+    required this.onboardingStep2Title,
+    required this.onboardingStep2Body,
+    required this.onboardingStep3Title,
+    required this.onboardingStep3Body,
+    required this.onboardingStep4Title,
+    required this.onboardingStep4Body,
   });
 
   final String languageCode;
@@ -201,7 +234,13 @@ class AppStrings {
   final String menuScreenTime;
   final String menuChecklists;
   final String menuDashboard;
+  final String menuProgress;
   final String menuReports;
+
+  /// Títulos dos grupos do menu flutuante.
+  final String menuGroupActions;
+  final String menuGroupHealth;
+  final String menuGroupSystem;
   final String ballSemanticLabel;
   final String menuCheckUpdates;
   final String menuSettings;
@@ -236,6 +275,8 @@ class AppStrings {
   final String workCycle;
   final String breakDuration;
   final String ballSize;
+  final String uiScale;
+  final String uiScaleHint;
   final String colorNormal;
   final String colorAlert;
   final String opacityNormal;
@@ -379,6 +420,40 @@ class AppStrings {
   /// Rótulos curtos dos meses (janeiro a dezembro).
   final List<String> monthShort;
 
+  // --- Tela "Meu Progresso" ---------------------------------------------
+  final String progressTitle;
+  final String progressStreakCurrentLabel;
+  final String progressStreakBestLabel;
+  final String progressDayUnit;
+  final String progressDaysUnit;
+  final String progressTotalBreaksLabel;
+  final String progressAdherence7Label;
+  final String progressAdherence30Label;
+  final String progressInsightLabel;
+  final String progressEmpty;
+  final String progressDisclaimer;
+  final String progressStreakZeroHint;
+
+  /// Modelos de insight com marcadores `{n}` / `{pct}` preenchidos pelos
+  /// métodos `progressInsight*Text`.
+  final String progressInsightStreak;
+  final String progressInsightAdherence;
+  final String progressInsightStart;
+  final String progressInsightConsistency;
+
+  // --- Onboarding de primeira execução ----------------------------------
+  final String onboardingSkip;
+  final String onboardingNext;
+  final String onboardingStart;
+  final String onboardingStep1Title;
+  final String onboardingStep1Body;
+  final String onboardingStep2Title;
+  final String onboardingStep2Body;
+  final String onboardingStep3Title;
+  final String onboardingStep3Body;
+  final String onboardingStep4Title;
+  final String onboardingStep4Body;
+
   // --- Helpers dependentes de enum --------------------------------------
 
   String stateTitle(AppState state) {
@@ -435,6 +510,19 @@ class AppStrings {
     }
   }
 
+  /// Formata uma contagem de dias com a unidade correta (singular/plural).
+  String progressDaysCount(int n) =>
+      '$n ${n == 1 ? progressDayUnit : progressDaysUnit}';
+
+  String progressInsightStreakText(int days) =>
+      progressInsightStreak.replaceAll('{n}', '$days');
+
+  String progressInsightAdherenceText(int pct) =>
+      progressInsightAdherence.replaceAll('{pct}', '$pct');
+
+  String progressInsightConsistencyText(int total) =>
+      progressInsightConsistency.replaceAll('{n}', '$total');
+
   static AppStrings of(String code) => code == 'en' ? enStrings : ptStrings;
 }
 
@@ -449,6 +537,10 @@ const AppStrings ptStrings = AppStrings(
   menuScreenTime: 'Tempo de tela',
   menuChecklists: 'Checklists',
   menuDashboard: 'Painel',
+  menuProgress: 'Meu progresso',
+  menuGroupActions: 'Pausas',
+  menuGroupHealth: 'Saúde visual',
+  menuGroupSystem: 'Sistema',
   menuReports: 'Relatórios',
   ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
   menuCheckUpdates: 'Verificar atualizações',
@@ -488,6 +580,10 @@ const AppStrings ptStrings = AppStrings(
   workCycle: 'Ciclo de trabalho',
   breakDuration: 'Duração da pausa',
   ballSize: 'Tamanho da bolinha',
+  uiScale: 'Tamanho do texto e da interface',
+  uiScaleHint:
+      'Aumenta ou reduz o tamanho de textos e elementos em todas as telas e '
+      'janelas. Útil para maior conforto visual.',
   colorNormal: 'Cor (normal)',
   colorAlert: 'Cor (alerta)',
   opacityNormal: 'Opacidade (normal)',
@@ -704,6 +800,49 @@ const AppStrings ptStrings = AppStrings(
     'Nov',
     'Dez',
   ],
+  progressTitle: 'Meu Progresso',
+  progressStreakCurrentLabel: 'Sequência atual',
+  progressStreakBestLabel: 'Recorde',
+  progressDayUnit: 'dia',
+  progressDaysUnit: 'dias',
+  progressTotalBreaksLabel: 'Pausas concluídas',
+  progressAdherence7Label: 'Adesão · 7 dias',
+  progressAdherence30Label: 'Adesão · 30 dias',
+  progressInsightLabel: 'Destaque',
+  progressEmpty:
+      'Ainda não há dados de pausas.\nQuando você concluir suas primeiras '
+      'pausas, seu progresso aparece aqui.',
+  progressDisclaimer:
+      'Acompanhamento educativo — reforço de hábito, sem substituir cuidado '
+      'médico.',
+  progressStreakZeroHint: 'Cada pausa conta. Comece sua sequência hoje.',
+  progressInsightStreak:
+      'Você cuidou dos olhos por {n} dias seguidos. Continue assim!',
+  progressInsightAdherence:
+      'Nos últimos 7 dias, você concluiu {pct}% das pausas sugeridas.',
+  progressInsightStart:
+      'Conclua sua primeira pausa para começar a acompanhar seu progresso.',
+  progressInsightConsistency:
+      'Você já concluiu {n} pausas no total. Seu maior aliado é a constância.',
+  onboardingSkip: 'Pular',
+  onboardingNext: 'Próximo',
+  onboardingStart: 'Começar',
+  onboardingStep1Title: 'Bem-vindo ao Dry Eye Widget',
+  onboardingStep1Body:
+      'Um lembrete gentil para descansar os olhos enquanto você usa o '
+      'computador, ajudando a prevenir o desconforto do olho seco digital.',
+  onboardingStep2Title: 'A regra 20-20-20',
+  onboardingStep2Body:
+      'A cada 20 minutos, olhe para algo a cerca de 6 metros de distância por '
+      '20 segundos. O app cuida do tempo e avisa você na hora certa.',
+  onboardingStep3Title: 'Sempre por perto',
+  onboardingStep3Body:
+      'A bolinha flutuante fica discreta na tela. Clique nela para iniciar '
+      'pausas, ver seu progresso, responder o questionário OSDI e ajustar tudo.',
+  onboardingStep4Title: 'Seus dados são só seus',
+  onboardingStep4Body:
+      '100% local: sem nuvem, sem telemetria e sem cadastro. Gratuito e de '
+      'código aberto.',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -717,6 +856,10 @@ const AppStrings enStrings = AppStrings(
   menuScreenTime: 'Screen time',
   menuChecklists: 'Checklists',
   menuDashboard: 'Dashboard',
+  menuProgress: 'My progress',
+  menuGroupActions: 'Breaks',
+  menuGroupHealth: 'Eye health',
+  menuGroupSystem: 'System',
   menuReports: 'Reports',
   ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
   menuCheckUpdates: 'Check for updates',
@@ -754,6 +897,10 @@ const AppStrings enStrings = AppStrings(
   workCycle: 'Work cycle',
   breakDuration: 'Break duration',
   ballSize: 'Ball size',
+  uiScale: 'Text and interface size',
+  uiScaleHint:
+      'Scales text and elements up or down across all screens and windows. '
+      'Helpful for greater visual comfort.',
   colorNormal: 'Color (normal)',
   colorAlert: 'Color (alert)',
   opacityNormal: 'Opacity (normal)',
@@ -959,4 +1106,47 @@ const AppStrings enStrings = AppStrings(
     'Nov',
     'Dec',
   ],
+  progressTitle: 'My Progress',
+  progressStreakCurrentLabel: 'Current streak',
+  progressStreakBestLabel: 'Best',
+  progressDayUnit: 'day',
+  progressDaysUnit: 'days',
+  progressTotalBreaksLabel: 'Completed breaks',
+  progressAdherence7Label: 'Adherence · 7 days',
+  progressAdherence30Label: 'Adherence · 30 days',
+  progressInsightLabel: 'Highlight',
+  progressEmpty:
+      'No break data yet.\nOnce you complete your first breaks, your progress '
+      'shows up here.',
+  progressDisclaimer:
+      'Educational tracking — habit reinforcement, not a substitute for '
+      'medical care.',
+  progressStreakZeroHint: 'Every break counts. Start your streak today.',
+  progressInsightStreak:
+      'You cared for your eyes {n} days in a row. Keep it up!',
+  progressInsightAdherence:
+      'In the last 7 days, you completed {pct}% of suggested breaks.',
+  progressInsightStart:
+      'Complete your first break to start tracking your progress.',
+  progressInsightConsistency:
+      'You have completed {n} breaks in total. Consistency is your best ally.',
+  onboardingSkip: 'Skip',
+  onboardingNext: 'Next',
+  onboardingStart: 'Get started',
+  onboardingStep1Title: 'Welcome to Dry Eye Widget',
+  onboardingStep1Body:
+      'A gentle reminder to rest your eyes while you use the computer, helping '
+      'to prevent digital dry eye discomfort.',
+  onboardingStep2Title: 'The 20-20-20 rule',
+  onboardingStep2Body:
+      'Every 20 minutes, look at something about 20 feet (6 meters) away for '
+      '20 seconds. The app keeps the time and reminds you at the right moment.',
+  onboardingStep3Title: 'Always within reach',
+  onboardingStep3Body:
+      'The floating ball stays discreet on your screen. Click it to start '
+      'breaks, see your progress, take the OSDI questionnaire and tweak '
+      'everything.',
+  onboardingStep4Title: 'Your data stays yours',
+  onboardingStep4Body:
+      '100% local: no cloud, no telemetry, no sign-up. Free and open source.',
 );

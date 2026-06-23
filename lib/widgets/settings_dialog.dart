@@ -271,6 +271,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
                   _sectionTitle(s.secAppearance),
                   _slider(
+                    label: s.uiScale,
+                    value: _draft.uiScale,
+                    min: AppDefaults.minUiScale,
+                    max: AppDefaults.maxUiScale,
+                    suffix: '${(_draft.uiScale * 100).round()}%',
+                    onChanged: (v) => _set(_draft.copyWith(uiScale: v)),
+                  ),
+                  _hint(s.uiScaleHint),
+                  const SizedBox(height: 8),
+                  _slider(
                     label: s.ballSize,
                     value: _draft.ballSize,
                     min: AppDefaults.minBallSize,

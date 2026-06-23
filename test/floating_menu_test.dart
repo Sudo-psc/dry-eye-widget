@@ -28,9 +28,9 @@ void main() {
               onScreenTime: () {},
               onChecklists: () {},
               onDashboard: () {},
+              onProgress: () {},
               onReports: () {},
               onCheckUpdates: () {},
-              onGitHub: () {},
               onAbout: () {},
               onSettings: () {},
               onQuit: () {},
@@ -72,9 +72,9 @@ void main() {
               onScreenTime: () {},
               onChecklists: () {},
               onDashboard: () {},
+              onProgress: () {},
               onReports: () {},
               onCheckUpdates: () {},
-              onGitHub: () {},
               onAbout: () {},
               onSettings: () {},
               onQuit: () {},
@@ -88,11 +88,12 @@ void main() {
     // O último item precisa ser renderizado por inteiro.
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
 
-    // A altura intrínseca do painel (cabeçalho + 14 itens) deve caber na
-    // altura reservada para o menu em main.dart (`_menuPanelHeight` = 624).
-    // Se um novo item estourar esse limite, o último item ("Sair") voltaria a
-    // ser cortado pela borda da janela — este teste é o guarda dessa regressão.
+    // A altura intrínseca do painel (3 cabeçalhos de grupo + linha compacta de
+    // pausas + 11 itens + 2 divisórias) deve caber na altura reservada para o
+    // menu em main.dart (`_menuPanelHeight` = 660). Se um novo item estourar
+    // esse limite, o último item ("Sair") voltaria a ser cortado pela borda da
+    // janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(624));
+    expect(height, lessThanOrEqualTo(660));
   });
 }

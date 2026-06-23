@@ -4,6 +4,30 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.17.0] - 2026-06-23
+
+### Adicionado
+- **Onboarding de primeira execução**: um fluxo de boas-vindas em quatro passos
+  (propósito, regra 20-20-20, como a bolinha flutuante funciona e a postura de
+  privacidade) é exibido na primeira abertura. A conclusão é persistida
+  (`onboardingComplete`), então não reaparece. Suporta pular a qualquer momento.
+- **Tela "Meu progresso"**: acompanhamento local de sequência (streak), adesão e
+  estatísticas de pausas, com insights — sem telemetria, 100% no dispositivo.
+- **Link do GitHub no painel "Sobre"**: o repositório passa a ser acessível por
+  um botão dentro de "Sobre", liberando espaço no menu.
+- **Escala da interface (UI scale)** nas Configurações: controle deslizante para
+  ajustar o tamanho dos elementos conforme a preferência/leitura do usuário.
+
+### Alterado
+- **Menu flutuante agrupado por intenção**: as ações foram reorganizadas em três
+  grupos rotulados — Pausas, Saúde visual e Sistema — reduzindo a carga cognitiva
+  da lista plana anterior.
+- **Pausas compactadas**: as ações de pausa (iniciar, resetar, pausar/retomar)
+  agora ocupam uma única linha de ícones, com tooltip e rótulo semântico para
+  leitores de tela, deixando o menu mais curto.
+- **Reordenação do menu Sistema**: "Sobre" passou a ficar imediatamente acima de
+  "Sair"; o item separado de GitHub foi removido (migrado para "Sobre").
+
 ## [1.16.0] - 2026-06-23
 
 ### Adicionado

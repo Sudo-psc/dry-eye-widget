@@ -34,6 +34,7 @@ import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/checklists/checklists_screen.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
+import 'widgets/progress/progress_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
@@ -41,6 +42,7 @@ import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
 import 'widgets/inactivity_pause_card.dart';
+import 'widgets/onboarding/onboarding_flow.dart';
 import 'widgets/osdi_dialog.dart';
 import 'widgets/report_dialog.dart';
 import 'widgets/screen_time_dialog.dart';
@@ -50,13 +52,15 @@ import 'widgets/update_dialog.dart';
 /// Tamanhos das janelas de configurações (a compacta e a do menu são dinâmicas).
 const Size _settingsWindowSize = Size(460, 700);
 const Size _osdiWindowSize = Size(700, 790);
+const Size _onboardingWindowSize = Size(480, 560);
 
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
 
-/// Altura do painel de menu (cabeçalho + 14 itens + paddings do vidro), com
-/// folga para variações de fonte entre plataformas.
-const double _menuPanelHeight = 624;
+/// Altura do painel de menu (linha compacta de pausas + 11 itens + 3 cabeçalhos
+/// de grupo + 2 divisórias + paddings do vidro), com folga para variações de
+/// fonte entre plataformas.
+const double _menuPanelHeight = 660;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -228,6 +232,16 @@ class DryEyeApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
+      // Aplica a escala de UI (acessibilidade) a toda a árvore de telas e
+      // diálogos. Lê do SettingsProvider e reage a mudanças em tempo real.
+      builder: (context, child) {
+        final scale = context.watch<SettingsProvider>().value.uiScale;
+        final media = MediaQuery.of(context);
+        return MediaQuery(
+          data: media.copyWith(textScaler: TextScaler.linear(scale)),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       home: const HomePage(),
     );
   }
@@ -242,6 +256,8 @@ enum _WindowLayout {
   report,
   checklists,
   dashboard,
+  progress,
+  onboarding,
   breakOverlay,
   gentleBreak,
   inactivity,
@@ -282,6 +298,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _reportOpen = false;
   bool _checklistsOpen = false;
   bool _dashboardOpen = false;
+  bool _progressOpen = false;
+  bool _onboardingOpen = false;
   bool _wasActive = false;
   bool _wasDrops = false;
   bool _wasInactive = false;
@@ -342,6 +360,25 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (!_widgetEnabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) => windowManager.hide());
     }
+    // Primeira execução: exibe o onboarding de boas-vindas por cima de tudo.
+    if (!_settings.value.onboardingComplete) {
+      _onboardingOpen = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await windowManager.show();
+        await _applyLayout(_WindowLayout.onboarding);
+      });
+    }
+  }
+
+  /// Conclui (ou pula) o onboarding: persiste a flag e volta ao estado normal.
+  Future<void> _finishOnboarding() async {
+    await _settings.update(
+      _settings.value.copyWith(onboardingComplete: true),
+    );
+    if (!mounted) return;
+    setState(() => _onboardingOpen = false);
+    _restoreAfterPanel();
   }
 
   Future<void> _cacheCurrentPosition() async {
@@ -396,6 +433,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_reportOpen &&
       !_checklistsOpen &&
       !_dashboardOpen &&
+      !_progressOpen &&
+      !_onboardingOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       !_timer.isPaused &&
@@ -450,6 +489,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_reportOpen &&
       !_checklistsOpen &&
       !_dashboardOpen &&
+      !_progressOpen &&
+      !_onboardingOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
       _timer.state == AppState.idle;
@@ -477,7 +518,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_screenTimeOpen &&
           !_reportOpen &&
           !_checklistsOpen &&
-          !_dashboardOpen) {
+          !_dashboardOpen &&
+          !_progressOpen &&
+          !_onboardingOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           if (!mounted) return;
@@ -504,7 +547,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_screenTimeOpen &&
           !_reportOpen &&
           !_checklistsOpen &&
-          !_dashboardOpen) {
+          !_dashboardOpen &&
+          !_progressOpen &&
+          !_onboardingOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           if (!mounted) return;
@@ -660,6 +705,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _reportOpen = false;
         _checklistsOpen = false;
         _dashboardOpen = false;
+        _progressOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -717,7 +763,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
         case _WindowLayout.report:
         case _WindowLayout.checklists:
         case _WindowLayout.dashboard:
+        case _WindowLayout.progress:
           await windowManager.setSize(_osdiWindowSize);
+          await windowManager.center();
+          break;
+        case _WindowLayout.onboarding:
+          await windowManager.setSize(_onboardingWindowSize);
           await windowManager.center();
           break;
         case _WindowLayout.breakOverlay:
@@ -986,12 +1037,35 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _reportOpen = false;
       _checklistsOpen = false;
       _dashboardOpen = true;
+      _progressOpen = false;
     });
     _applyLayout(_WindowLayout.dashboard);
   }
 
   void _closeDashboard() {
     setState(() => _dashboardOpen = false);
+    _restoreAfterPanel();
+  }
+
+  void _openProgress() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _screenTimeOpen = false;
+      _reportOpen = false;
+      _checklistsOpen = false;
+      _dashboardOpen = false;
+      _progressOpen = true;
+    });
+    _applyLayout(_WindowLayout.progress);
+  }
+
+  void _closeProgress() {
+    setState(() => _progressOpen = false);
     _restoreAfterPanel();
   }
 
@@ -1068,7 +1142,14 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final strings = provider.strings;
 
     Widget body;
-    if (_osdiOpen) {
+    if (_onboardingOpen) {
+      body = Center(
+        child: OnboardingFlow(
+          strings: strings,
+          onFinish: _finishOnboarding,
+        ),
+      );
+    } else if (_osdiOpen) {
       body = Center(
         child: OsdiDialog(
           strings: strings,
@@ -1113,11 +1194,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = Center(
         child: DashboardScreen(onClose: _closeDashboard),
       );
+    } else if (_progressOpen) {
+      body = Center(
+        child: ProgressScreen(onClose: _closeProgress),
+      );
     } else if (_settingsOpen) {
       body = _buildSettings();
     } else if (_aboutOpen) {
       body = Center(
-        child: AboutPanel(strings: strings, onClose: _closeAbout),
+        child: AboutPanel(
+          strings: strings,
+          onClose: _closeAbout,
+          onGitHub: _openGithub,
+        ),
       );
     } else if (_guidanceOpen) {
       body = Center(
@@ -1220,9 +1309,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onScreenTime: _openScreenTime,
                 onChecklists: _openChecklists,
                 onDashboard: _openDashboard,
+                onProgress: _openProgress,
                 onReports: _openReport,
                 onCheckUpdates: _openCheckUpdates,
-                onGitHub: _openGithub,
                 onAbout: _openAbout,
                 onSettings: _openSettings,
                 onQuit: _quit,
