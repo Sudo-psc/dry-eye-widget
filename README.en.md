@@ -99,7 +99,7 @@ The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**
 
 <p align="center">
   <img src="docs/media/app-break-timer.jpg" width="400" alt="Silent Alert and Break Reminder">
-  <img src="docs/media/app-osdi.jpg" width="400" alt="Clinical OSDI Questionnaire">
+  <img src="docs/media/app-symptoms.jpg" width="400" alt="Symptom Tracker Questionnaire">
   <br>
   <img src="docs/media/app-settings.jpg" width="400" alt="Settings and Customization">
   <img src="docs/media/app-guidance.jpg" width="400" alt="Guidelines and Scientific Evidence">
