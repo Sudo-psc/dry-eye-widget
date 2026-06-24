@@ -56,3 +56,4 @@ dist_msix/
 # AI and confidential files
 claude.md
 .claude/
+inpi/
