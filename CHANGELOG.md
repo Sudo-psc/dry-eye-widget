@@ -4,6 +4,11 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.18.0] - 2026-06-24
+
+### Modificado
+- **Rastreador de Sintomas**: substituição do questionário clínico OSDI por um rastreador de sintomas genérico (Escala Visual Analógica - VAS) de uso livre, evitando violação de direitos autorais.
+
 ## [1.17.0] - 2026-06-23
 
 ### Adicionado
