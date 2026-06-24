@@ -52,3 +52,7 @@ app.*.map.json
 # Distribuição (binários gerados localmente)
 dist/
 dist_msix/
+
+# AI and confidential files
+claude.md
+.claude/
