@@ -21,10 +21,6 @@ class TrayService {
   static const String keyDvrs = 'open_dvrs';
   static const String keyGithub = 'open_github';
   static const String keyReports = 'open_reports';
-
-  /// Chaves legadas mantidas por compatibilidade (não exibidas no menu).
-  static const String keyOsdi = 'open_osdi';
-  static const String keyChecklists = 'open_checklists';
   static const String keyQuit = 'quit';
 
   /// Quantidade de passos do progresso. Mantido próximo da largura útil da

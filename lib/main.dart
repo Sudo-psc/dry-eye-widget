@@ -11,12 +11,10 @@ import 'package:window_manager/window_manager.dart';
 
 import 'l10n/app_strings.dart';
 import 'models/app_state.dart';
-import 'models/osdi_assessment.dart';
 import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
-import 'services/checklist_storage_service.dart';
 import 'services/dvrs_storage_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
@@ -33,7 +31,6 @@ import 'services/tray_service.dart';
 import 'services/update_service.dart';
 import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
-import 'widgets/checklists/checklists_screen.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
 import 'widgets/dvrs/dvrs_screen.dart';
 import 'widgets/progress/progress_screen.dart';
@@ -45,7 +42,6 @@ import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
 import 'widgets/inactivity_pause_card.dart';
 import 'widgets/onboarding/onboarding_flow.dart';
-import 'widgets/osdi_dialog.dart';
 import 'widgets/report_dialog.dart';
 import 'widgets/screen_time_dialog.dart';
 import 'widgets/settings_dialog.dart';
@@ -53,7 +49,7 @@ import 'widgets/update_dialog.dart';
 
 /// Tamanhos das janelas de configurações (a compacta e a do menu são dinâmicas).
 const Size _settingsWindowSize = Size(460, 700);
-const Size _osdiWindowSize = Size(700, 790);
+const Size _panelWindowSize = Size(700, 790);
 const Size _onboardingWindowSize = Size(480, 560);
 
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
@@ -77,7 +73,6 @@ Future<void> main() async {
   await windowManager.ensureInitialized();
 
   final storage = await StorageService.init();
-  final checklistStorage = await ChecklistStorageService.init();
   final dvrsStorage = await DvrsStorageService.init();
   final settings = SettingsProvider(storage: storage);
   final screenTime = ScreenTimeService(storage: storage);
@@ -157,7 +152,6 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider<StorageService>.value(value: storage),
-        Provider<ChecklistStorageService>.value(value: checklistStorage),
         Provider<DvrsStorageService>.value(value: dvrsStorage),
         Provider<AudioService>.value(value: audio),
         Provider<StartupService>.value(value: startup),
@@ -256,10 +250,8 @@ enum _WindowLayout {
   blinkReminder,
   menu,
   settings,
-  osdi,
   dvrs,
   report,
-  checklists,
   dashboard,
   progress,
   onboarding,
@@ -298,11 +290,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _aboutOpen = false;
   bool _guidanceOpen = false;
   bool _updateOpen = false;
-  bool _osdiOpen = false;
   bool _dvrsOpen = false;
   bool _screenTimeOpen = false;
   bool _reportOpen = false;
-  bool _checklistsOpen = false;
   bool _dashboardOpen = false;
   bool _progressOpen = false;
   bool _onboardingOpen = false;
@@ -315,7 +305,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   final UpdateService _updater = UpdateService();
   UpdateResult? _updateResult;
-  List<OsdiAssessment> _osdiHistory = const [];
 
   /// Widget habilitado = bolinha visível. Quando desabilitado (pela opção
   /// nas configurações ou pelo item da barra de menu), a janela é escondida
@@ -434,11 +423,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_aboutOpen &&
       !_guidanceOpen &&
       !_updateOpen &&
-      !_osdiOpen &&
       !_dvrsOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
-      !_checklistsOpen &&
       !_dashboardOpen &&
       !_progressOpen &&
       !_onboardingOpen &&
@@ -491,11 +478,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_aboutOpen &&
       !_guidanceOpen &&
       !_updateOpen &&
-      !_osdiOpen &&
       !_dvrsOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
-      !_checklistsOpen &&
       !_dashboardOpen &&
       !_progressOpen &&
       !_onboardingOpen &&
@@ -522,12 +507,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_aboutOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
-          !_osdiOpen &&
-          !_dvrsOpen &&
+              !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-          !_checklistsOpen &&
-          !_dashboardOpen &&
+              !_dashboardOpen &&
           !_progressOpen &&
           !_onboardingOpen) {
         () async {
@@ -552,12 +535,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_aboutOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
-          !_osdiOpen &&
-          !_dvrsOpen &&
+              !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-          !_checklistsOpen &&
-          !_dashboardOpen &&
+              !_dashboardOpen &&
           !_progressOpen &&
           !_onboardingOpen) {
         () async {
@@ -595,14 +576,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keyDvrs:
         _openDvrsFromTray();
         break;
-      case TrayService.keyOsdi:
-        _openOsdiFromTray();
-        break;
       case TrayService.keyReports:
         _openReportFromTray();
-        break;
-      case TrayService.keyChecklists:
-        _openChecklistsFromTray();
         break;
       case TrayService.keyGithub:
         _openGithub();
@@ -639,19 +614,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _openDvrs();
   }
 
-  Future<void> _openOsdiFromTray() async {
-    if (!_widgetEnabled) await windowManager.show();
-    _openOsdi();
-  }
-
   Future<void> _openReportFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openReport();
-  }
-
-  Future<void> _openChecklistsFromTray() async {
-    if (!_widgetEnabled) await windowManager.show();
-    _openChecklists();
   }
 
   Future<void> _openGithub() async {
@@ -721,8 +686,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _settingsOpen = false;
         _aboutOpen = false;
         _reportOpen = false;
-        _checklistsOpen = false;
-        _dashboardOpen = false;
+          _dashboardOpen = false;
         _progressOpen = false;
       });
     }
@@ -777,13 +741,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await windowManager.setSize(_settingsWindowSize);
           await windowManager.center();
           break;
-        case _WindowLayout.osdi:
         case _WindowLayout.dvrs:
         case _WindowLayout.report:
-        case _WindowLayout.checklists:
         case _WindowLayout.dashboard:
         case _WindowLayout.progress:
-          await windowManager.setSize(_osdiWindowSize);
+          await windowManager.setSize(_panelWindowSize);
           await windowManager.center();
           break;
         case _WindowLayout.onboarding:
@@ -902,11 +864,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
@@ -919,11 +879,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = true;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
@@ -946,11 +904,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = true;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
@@ -961,29 +917,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
-  void _openOsdi() {
-    final storage = context.read<StorageService>();
-    setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _aboutOpen = false;
-      _guidanceOpen = false;
-      _updateOpen = false;
-      _osdiOpen = true;
-      _osdiHistory = storage.loadOsdiHistory();
-      _screenTimeOpen = false;
-      _reportOpen = false;
-      _checklistsOpen = false;
-      _dashboardOpen = false;
-    });
-    _applyLayout(_WindowLayout.osdi);
-  }
-
-  void _closeOsdi() {
-    setState(() => _osdiOpen = false);
-    _restoreAfterPanel();
-  }
-
   void _openDvrs() {
     setState(() {
       _menuOpen = false;
@@ -991,11 +924,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = true;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.dvrs);
@@ -1013,14 +944,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = true;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
     });
-    _applyLayout(_WindowLayout.osdi);
+    _applyLayout(_WindowLayout.dvrs);
   }
 
   void _closeScreenTime() {
@@ -1035,11 +964,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = true;
-      _checklistsOpen = false;
       _dashboardOpen = false;
     });
     _applyLayout(_WindowLayout.report);
@@ -1050,28 +977,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
-  void _openChecklists() {
-    setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _aboutOpen = false;
-      _guidanceOpen = false;
-      _updateOpen = false;
-      _osdiOpen = false;
-      _dvrsOpen = false;
-      _screenTimeOpen = false;
-      _reportOpen = false;
-      _checklistsOpen = true;
-      _dashboardOpen = false;
-    });
-    _applyLayout(_WindowLayout.checklists);
-  }
-
-  void _closeChecklists() {
-    setState(() => _checklistsOpen = false);
-    _restoreAfterPanel();
-  }
-
   void _openDashboard() {
     setState(() {
       _menuOpen = false;
@@ -1079,11 +984,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = true;
       _progressOpen = false;
     });
@@ -1102,11 +1005,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = false;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
       _progressOpen = true;
     });
@@ -1122,17 +1023,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
     await context.read<ScreenTimeService>().clear();
   }
 
-  void _saveOsdi(OsdiAssessment assessment) {
-    unawaited(_persistOsdiAssessment(assessment));
-  }
-
-  Future<void> _persistOsdiAssessment(OsdiAssessment assessment) async {
-    final storage = context.read<StorageService>();
-    await storage.addOsdiAssessment(assessment);
-    if (!mounted) return;
-    setState(() => _osdiHistory = storage.loadOsdiHistory());
-  }
-
   // --- Verificação de atualização ----------------------------------------
 
   Future<void> _openCheckUpdates() async {
@@ -1142,11 +1032,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _aboutOpen = false;
       _guidanceOpen = false;
       _updateOpen = true;
-      _osdiOpen = false;
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _checklistsOpen = false;
       _dashboardOpen = false;
       _updateResult = null;
     });
@@ -1206,15 +1094,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
           onExportPdf: (_) async => _openReport(),
         ),
       );
-    } else if (_osdiOpen) {
-      body = Center(
-        child: OsdiDialog(
-          strings: strings,
-          history: _osdiHistory,
-          onSave: _saveOsdi,
-          onClose: _closeOsdi,
-        ),
-      );
     } else if (_screenTimeOpen) {
       body = Center(
         child: Consumer<ScreenTimeService>(
@@ -1242,10 +1121,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
         child: ReportDialog(
           onClose: _closeReport,
         ),
-      );
-    } else if (_checklistsOpen) {
-      body = Center(
-        child: ChecklistsScreen(onClose: _closeChecklists),
       );
     } else if (_dashboardOpen) {
       body = Center(

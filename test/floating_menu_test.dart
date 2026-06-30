@@ -41,9 +41,6 @@ void main() {
     );
 
     expect(find.text(ptStrings.menuDvrs), findsOneWidget);
-    // OSDI e Checklists não devem mais aparecer no menu.
-    expect(find.text(ptStrings.menuOsdi), findsNothing);
-    expect(find.text(ptStrings.menuChecklists), findsNothing);
 
     await tester.tap(find.text(ptStrings.menuDvrs));
     await tester.pump();

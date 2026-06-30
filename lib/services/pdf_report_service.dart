@@ -6,11 +6,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-import '../models/checklist.dart';
 import '../models/dvrs_assessment.dart';
 import '../models/dvrs_definitions.dart';
 import '../models/environment_checklist.dart';
-import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
 
 /// Gera o "Relatório de Saúde Visual Digital" em PDF.
@@ -25,11 +23,6 @@ class PdfReportService {
       'oftalmológica. Em caso de sintomas persistentes, dor ocular, fotofobia, '
       'visão embaçada recorrente ou piora progressiva, procure um médico '
       'oftalmologista.';
-
-  static const String osdiDisclaimer =
-      'O escore OSDI é um instrumento de sintomas e não confirma diagnóstico '
-      'isoladamente. Escores elevados, piora progressiva ou sintomas persistentes '
-      'devem ser avaliados por um oftalmologista.';
 
   static const String mandatoryClosing =
       'Este relatório não substitui consulta médica. Ele organiza informações '
@@ -104,14 +97,6 @@ class PdfReportService {
             _buildDvrsSection(context, data.dvrs!),
             pw.SizedBox(height: 20),
           ],
-          if (data.options.includeOsdi) ...[
-            _buildOsdiSection(context, data),
-            pw.SizedBox(height: 20),
-          ],
-          if (data.options.includeSymptoms) ...[
-            _buildSymptomsSection(context, data),
-            pw.SizedBox(height: 20),
-          ],
           if (data.options.includeScreenTime) ...[
             _buildScreenTimeSection(data),
             pw.SizedBox(height: 20),
@@ -122,10 +107,6 @@ class PdfReportService {
           ],
           if (data.options.includeEnvironment && data.environment != null) ...[
             _buildEnvironmentSection(data.environment!),
-            pw.SizedBox(height: 20),
-          ],
-          if (data.options.includeChecklists && data.checklists.isNotEmpty) ...[
-            _buildChecklistsSection(context, data),
             pw.SizedBox(height: 20),
           ],
           _buildEvaluationSection(data),
@@ -187,22 +168,16 @@ class PdfReportService {
 
   pw.Widget _buildExecutiveSummary(ReportData data) {
     final rows = <List<String>>[];
-    final osdi = data.osdi;
-    if (data.options.includeOsdi) {
+    final dvrs = data.dvrs;
+    if (data.options.includeDvrs && dvrs != null) {
       rows.add([
-        'Escore OSDI mais recente',
-        osdi.latest == null
-            ? 'Sem dados'
-            : '${osdi.latest!.score.toStringAsFixed(1)} (${_severityLabel(osdi.latest!.severity)})',
+        'DVRS mais recente',
+        '${dvrs.latest.totalScore}/100 (${dvrs.latest.classificationLabel})',
       ]);
-      final variation = osdi.variation;
-      if (variation != null) {
-        final pct = osdi.variationPercent;
-        rows.add([
-          'Variação no período',
-          '${_signed(variation)} pontos'
-              '${pct != null ? ' (${_signed(pct, decimals: 0)}%)' : ''}',
-        ]);
+      if (dvrs.history.length >= 2) {
+        final previous = dvrs.history[dvrs.history.length - 2];
+        final delta = dvrs.latest.totalScore - previous.totalScore;
+        rows.add(['Variação no período', '${_signed(delta.toDouble())} pontos']);
       }
     }
     if (data.options.includeScreenTime) {
@@ -231,10 +206,6 @@ class PdfReportService {
         'Adesão às pausas',
         adh != null ? '${(adh * 100).toStringAsFixed(0)}%' : 'Sem dados',
       ]);
-    }
-    if (data.options.includeSymptoms) {
-      final top = data.topSymptom;
-      rows.add(['Sintoma mais frequente', top?.label ?? 'Sem registro']);
     }
 
     return pw.Column(
@@ -303,7 +274,7 @@ class PdfReportService {
     );
   }
 
-  // --- OSDI ---------------------------------------------------------------
+  // --- DVRS ---------------------------------------------------------------
 
   /// Seção do DVRS — Índice de Risco Visual Digital (questionário principal).
   pw.Widget _buildDvrsSection(pw.Context context, DvrsReportData dvrs) {
@@ -415,133 +386,6 @@ class PdfReportService {
         DvrsClassification.veryHighRisk => PdfColors.red900,
       };
 
-  pw.Widget _buildOsdiSection(pw.Context context, ReportData data) {
-    final osdi = data.osdi;
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text('1. Escore OSDI', style: _headerStyle),
-        pw.SizedBox(height: 8),
-        if (!osdi.hasData)
-          pw.Text('Ainda não há dados suficientes de OSDI neste período.',
-              style: _textStyle)
-        else ...[
-          _buildOsdiChart(osdi.history),
-          pw.SizedBox(height: 10),
-          pw.TableHelper.fromTextArray(
-            context: context,
-            cellStyle: _textStyle,
-            headerStyle:
-                _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
-            headerDecoration:
-                const pw.BoxDecoration(color: PdfColors.blueGrey50),
-            headers: const ['Data', 'Escore', 'Classificação'],
-            data: osdi.history
-                .map((e) => [
-                      _formatDate(e.completedAt),
-                      e.score.toStringAsFixed(1),
-                      _severityLabel(e.severity),
-                    ])
-                .toList(),
-          ),
-        ],
-        pw.SizedBox(height: 8),
-        pw.Text(osdiDisclaimer, style: _italicStyle),
-      ],
-    );
-  }
-
-  /// Gráfico de barras simples (sem dependência de fontes de eixo) com a
-  /// evolução do escore OSDI. Mostra as até 12 avaliações mais recentes.
-  pw.Widget _buildOsdiChart(List<OsdiAssessment> history) {
-    final items =
-        history.length > 12 ? history.sublist(history.length - 12) : history;
-    if (items.length < 2) return pw.SizedBox();
-    const maxScore = 100.0;
-    const chartHeight = 70.0;
-
-    return pw.Container(
-      height: chartHeight + 28,
-      padding: const pw.EdgeInsets.only(top: 4),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
-        crossAxisAlignment: pw.CrossAxisAlignment.end,
-        children: items.map((e) {
-          final h = (e.score / maxScore).clamp(0.04, 1.0) * chartHeight;
-          return pw.Column(
-            mainAxisSize: pw.MainAxisSize.min,
-            children: [
-              pw.Text(e.score.toStringAsFixed(0),
-                  style: const pw.TextStyle(fontSize: 7)),
-              pw.SizedBox(height: 2),
-              pw.Container(
-                width: 16,
-                height: h,
-                color: _severityColor(e.severity),
-              ),
-              pw.SizedBox(height: 2),
-              pw.Text(_formatShortDate(e.completedAt),
-                  style: const pw.TextStyle(
-                      fontSize: 6, color: PdfColors.grey600)),
-            ],
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  // --- Sintomas -----------------------------------------------------------
-
-  pw.Widget _buildSymptomsSection(pw.Context context, ReportData data) {
-    final present = data.symptoms.where((s) => s.frequency > 0).toList()
-      ..sort((a, b) => b.frequency.compareTo(a.frequency));
-
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text('2. Sintomas registrados', style: _headerStyle),
-        pw.SizedBox(height: 8),
-        if (!data.osdi.hasData)
-          pw.Text(
-            'Os sintomas são derivados das avaliações OSDI. Preencha o '
-            'questionário para acompanhar a frequência e a tendência.',
-            style: _textStyle,
-          )
-        else if (present.isEmpty)
-          pw.Text('Nenhum sintoma relevante foi registrado neste período.',
-              style: _textStyle)
-        else
-          pw.TableHelper.fromTextArray(
-            context: context,
-            cellStyle: _textStyle,
-            cellAlignments: const {
-              0: pw.Alignment.centerLeft,
-              1: pw.Alignment.center,
-              2: pw.Alignment.center,
-              3: pw.Alignment.center,
-            },
-            headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
-            headerDecoration:
-                const pw.BoxDecoration(color: PdfColors.blueGrey50),
-            headers: const [
-              'Sintoma',
-              'Frequência',
-              'Intensidade média',
-              'Tendência',
-            ],
-            data: present
-                .map((s) => [
-                      s.label,
-                      '${s.frequency}x',
-                      s.averageIntensity.toStringAsFixed(1),
-                      _trendLabel(s.trend),
-                    ])
-                .toList(),
-          ),
-      ],
-    );
-  }
-
   // --- Tempo de tela ------------------------------------------------------
 
   pw.Widget _buildScreenTimeSection(ReportData data) {
@@ -650,106 +494,6 @@ class PdfReportService {
     );
   }
 
-  // --- Checklists de saúde visual digital --------------------------------
-
-  pw.Widget _buildChecklistsSection(pw.Context context, ReportData data) {
-    final results = [...data.checklists]
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-    final hasAttentionFlag = results.any((r) =>
-        r.riskLevel == ChecklistRiskLevel.urgentAttention ||
-        r.riskLevel == ChecklistRiskLevel.recommendedEvaluation);
-
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text('6. Checklists de saúde visual digital', style: _headerStyle),
-        pw.SizedBox(height: 8),
-        if (hasAttentionFlag) ...[
-          pw.Container(
-            width: double.infinity,
-            padding: const pw.EdgeInsets.all(10),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.amber50,
-              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
-              border: pw.Border.all(color: PdfColors.orange200),
-            ),
-            child: pw.Text(
-              'Alguns checklists indicam sinais de atenção — considere '
-              'avaliação oftalmológica.',
-              style: _textStyle.copyWith(
-                  color: PdfColors.orange900, fontWeight: pw.FontWeight.bold),
-            ),
-          ),
-          pw.SizedBox(height: 10),
-        ],
-        pw.TableHelper.fromTextArray(
-          context: context,
-          cellStyle: _textStyle,
-          cellAlignments: const {
-            0: pw.Alignment.centerLeft,
-            1: pw.Alignment.center,
-            2: pw.Alignment.centerLeft,
-            3: pw.Alignment.centerLeft,
-          },
-          headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
-          headerDecoration:
-              const pw.BoxDecoration(color: PdfColors.blueGrey50),
-          headers: const ['Checklist', 'Data', 'Resultado', 'Recomendação'],
-          data: results
-              .map((r) => [
-                    _checklistTypeLabel(r.type),
-                    _formatDate(r.createdAt),
-                    r.classification,
-                    _checklistRecommendation(r),
-                  ])
-              .toList(),
-        ),
-        pw.SizedBox(height: 8),
-        pw.Text(
-          'Resultados autorreferidos e educativos. Esta triagem não confirma '
-          'diagnóstico e não substitui consulta médica.',
-          style: _italicStyle,
-        ),
-      ],
-    );
-  }
-
-  String _checklistTypeLabel(ChecklistType type) => switch (type) {
-        ChecklistType.visualErgonomics => 'Ergonomia visual',
-        ChecklistType.screenEnvironment => 'Ambiente de tela',
-        ChecklistType.visualSymptoms => 'Sintomas visuais',
-        ChecklistType.warningSigns => 'Sinais de alerta',
-        ChecklistType.breakHabits => 'Pausas e hábitos',
-        ChecklistType.ophthalmologyTriage => 'Triagem oftalmológica',
-        ChecklistType.visualRiskSummary => 'Resumo de risco visual',
-      };
-
-  /// Recomendação curta: 1ª frase do feedback, ou um texto por nível de risco.
-  String _checklistRecommendation(ChecklistResult result) {
-    final feedback = result.feedback.trim();
-    if (feedback.isNotEmpty) {
-      final match = RegExp(r'^.*?[.!?](\s|$)').firstMatch(feedback);
-      final sentence = (match?.group(0) ?? feedback).trim();
-      if (sentence.isNotEmpty) return sentence;
-    }
-    return _checklistRiskRecommendation(result.riskLevel);
-  }
-
-  String _checklistRiskRecommendation(ChecklistRiskLevel level) =>
-      switch (level) {
-        ChecklistRiskLevel.low =>
-          'Mantenha os hábitos saudáveis e o acompanhamento.',
-        ChecklistRiskLevel.attention =>
-          'Observe os sinais de atenção e reforce hábitos visuais.',
-        ChecklistRiskLevel.increased =>
-          'Considere ajustar hábitos e acompanhar a evolução.',
-        ChecklistRiskLevel.recommendedEvaluation =>
-          'Considere avaliação oftalmológica.',
-        ChecklistRiskLevel.urgentAttention =>
-          'Considere avaliação oftalmológica com prioridade.',
-      };
-
   // --- Quando procurar avaliação -----------------------------------------
 
   pw.Widget _buildEvaluationSection(ReportData data) {
@@ -855,35 +599,10 @@ class PdfReportService {
   String _formatDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
-  String _formatShortDate(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}';
-
   String _signed(double value, {int decimals = 1}) {
     final sign = value > 0 ? '+' : '';
     return '$sign${value.toStringAsFixed(decimals)}';
   }
-
-  String _severityLabel(OsdiSeverity severity) => switch (severity) {
-        OsdiSeverity.normal => 'Normal',
-        OsdiSeverity.mild => 'Leve',
-        OsdiSeverity.moderate => 'Moderado',
-        OsdiSeverity.severe => 'Grave',
-      };
-
-  PdfColor _severityColor(OsdiSeverity severity) => switch (severity) {
-        OsdiSeverity.normal => PdfColors.green400,
-        OsdiSeverity.mild => PdfColors.blue400,
-        OsdiSeverity.moderate => PdfColors.orange400,
-        OsdiSeverity.severe => PdfColors.red400,
-      };
-
-  String _trendLabel(SymptomTrend trend) => switch (trend) {
-        SymptomTrend.improving => 'Melhorando',
-        SymptomTrend.worsening => 'Piorando',
-        SymptomTrend.stable => 'Estável',
-        // Hífen ASCII: a Helvetica embutida do PDF não cobre o em-dash (U+2014).
-        SymptomTrend.unknown => '-',
-      };
 
   String _formatDuration(int totalSeconds) {
     final hours = totalSeconds ~/ 3600;

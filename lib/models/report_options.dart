@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import 'checklist.dart';
 import 'dvrs_assessment.dart';
 import 'environment_checklist.dart';
-import 'osdi_assessment.dart';
 import 'screen_time_data.dart';
 
 /// Período pré-definido do relatório. [custom] usa um intervalo de datas livre.
@@ -21,9 +19,6 @@ extension ReportPeriodDays on ReportPeriod {
 
 /// Indicação geral, educativa e não diagnóstica, exibida no resumo executivo.
 enum OverallIndication { monitor, reinforceBreaks, seekEvaluation }
-
-/// Tendência de um sintoma ao longo do período analisado.
-enum SymptomTrend { improving, stable, worsening, unknown }
 
 @immutable
 class UserProfile {
@@ -51,12 +46,9 @@ class ReportOptions {
     required this.endDate,
     this.period = ReportPeriod.last30,
     this.includeDvrs = true,
-    this.includeOsdi = false,
     this.includeScreenTime = true,
     this.includeBreaks = true,
-    this.includeSymptoms = false,
     this.includeEnvironment = false,
-    this.includeChecklists = false,
   });
 
   final DateTime startDate;
@@ -65,65 +57,14 @@ class ReportOptions {
 
   /// Inclui a seção do DVRS (questionário principal).
   final bool includeDvrs;
-  final bool includeOsdi;
   final bool includeScreenTime;
   final bool includeBreaks;
-  final bool includeSymptoms;
   final bool includeEnvironment;
-  final bool includeChecklists;
 
   /// Quantidade de dias cobertos pelo intervalo (mínimo 1).
   int get days {
     final diff = endDate.difference(startDate).inDays;
     return diff < 1 ? 1 : diff;
-  }
-}
-
-/// Estatística agregada de um sintoma derivado das respostas OSDI.
-@immutable
-class SymptomStat {
-  const SymptomStat({
-    required this.label,
-    required this.frequency,
-    required this.averageIntensity,
-    required this.trend,
-  });
-
-  /// Rótulo do sintoma (texto da pergunta OSDI correspondente).
-  final String label;
-
-  /// Em quantas avaliações o sintoma esteve presente (resposta > 0).
-  final int frequency;
-
-  /// Intensidade média (0–4) considerando as avaliações respondidas.
-  final double averageIntensity;
-
-  final SymptomTrend trend;
-}
-
-/// Resumo do escore OSDI no período.
-@immutable
-class OsdiSummary {
-  const OsdiSummary({
-    required this.history,
-    this.latest,
-    this.previous,
-  });
-
-  final List<OsdiAssessment> history;
-  final OsdiAssessment? latest;
-  final OsdiAssessment? previous;
-
-  bool get hasData => history.isNotEmpty;
-
-  /// Variação absoluta do escore (atual − anterior); `null` sem base de comparação.
-  double? get variation =>
-      (latest != null && previous != null) ? latest!.score - previous!.score : null;
-
-  /// Variação percentual em relação ao escore anterior; `null` se não calculável.
-  double? get variationPercent {
-    if (latest == null || previous == null || previous!.score == 0) return null;
-    return (latest!.score - previous!.score) / previous!.score * 100;
   }
 }
 
@@ -190,8 +131,6 @@ class ReportData {
   const ReportData({
     required this.profile,
     required this.options,
-    required this.osdi,
-    required this.symptoms,
     required this.screenTime,
     required this.breaks,
     required this.indication,
@@ -199,7 +138,6 @@ class ReportData {
     required this.generatedAt,
     this.dvrs,
     this.environment,
-    this.checklists = const [],
   });
 
   /// Dados do DVRS (questionário principal). `null` se não houver resultados.
@@ -207,17 +145,11 @@ class ReportData {
 
   final UserProfile profile;
   final ReportOptions options;
-  final OsdiSummary osdi;
-  final List<SymptomStat> symptoms;
   final ScreenTimeSummary screenTime;
   final BreakSummary breaks;
 
   /// Checklist ambiental autorreferido (opcional).
   final EnvironmentChecklist? environment;
-
-  /// Resultados de checklists de saúde visual digital a incluir no relatório.
-  /// Em geral, o último resultado por tipo marcado para inclusão.
-  final List<ChecklistResult> checklists;
 
   /// Indicação geral educativa (acompanhar / reforçar pausas / avaliação).
   final OverallIndication indication;
@@ -226,12 +158,4 @@ class ReportData {
   final List<String> alerts;
 
   final DateTime generatedAt;
-
-  /// Sintoma mais frequente no período, se houver.
-  SymptomStat? get topSymptom {
-    if (symptoms.isEmpty) return null;
-    final present = symptoms.where((s) => s.frequency > 0).toList()
-      ..sort((a, b) => b.frequency.compareTo(a.frequency));
-    return present.isEmpty ? null : present.first;
-  }
 }

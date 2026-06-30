@@ -11,10 +11,8 @@ class AppStrings {
     required this.menuPause,
     required this.menuResume,
     required this.menuGuidance,
-    required this.menuOsdi,
     required this.menuDvrs,
     required this.menuScreenTime,
-    required this.menuChecklists,
     required this.menuDashboard,
     required this.menuReports,
     required this.ballSemanticLabel,
@@ -135,28 +133,6 @@ class AppStrings {
     required this.updateCopyCommand,
     required this.updateCommandCopied,
     required this.close,
-    // OSDI
-    required this.osdiTitle,
-    required this.osdiSubtitle,
-    required this.osdiInstruction,
-    required this.osdiHistoryTitle,
-    required this.osdiNoHistory,
-    required this.osdiSave,
-    required this.osdiReset,
-    required this.osdiScoreLabel,
-    required this.osdiAnsweredLabel,
-    required this.osdiLatestLabel,
-    required this.osdiSeverityNormal,
-    required this.osdiSeverityMild,
-    required this.osdiSeverityModerate,
-    required this.osdiSeveritySevere,
-    required this.osdiTrendBetter,
-    required this.osdiTrendWorse,
-    required this.osdiTrendSame,
-    required this.osdiNotApplicable,
-    required this.osdiAnswerLabels,
-    required this.osdiQuestions,
-    required this.osdiDisclaimer,
     // Inatividade
     required this.pauseOnInactivityLabel,
     required this.inactivityTitle,
@@ -231,10 +207,8 @@ class AppStrings {
   final String menuPause;
   final String menuResume;
   final String menuGuidance;
-  final String menuOsdi;
   final String menuDvrs;
   final String menuScreenTime;
-  final String menuChecklists;
   final String menuDashboard;
   final String menuProgress;
   final String menuReports;
@@ -362,27 +336,6 @@ class AppStrings {
   final String updateCommandCopied;
   final String close;
 
-  final String osdiTitle;
-  final String osdiSubtitle;
-  final String osdiInstruction;
-  final String osdiHistoryTitle;
-  final String osdiNoHistory;
-  final String osdiSave;
-  final String osdiReset;
-  final String osdiScoreLabel;
-  final String osdiAnsweredLabel;
-  final String osdiLatestLabel;
-  final String osdiSeverityNormal;
-  final String osdiSeverityMild;
-  final String osdiSeverityModerate;
-  final String osdiSeveritySevere;
-  final String osdiTrendBetter;
-  final String osdiTrendWorse;
-  final String osdiTrendSame;
-  final String osdiNotApplicable;
-  final List<String> osdiAnswerLabels;
-  final List<String> osdiQuestions;
-  final String osdiDisclaimer;
 
   final String pauseOnInactivityLabel;
   final String inactivityTitle;
@@ -535,10 +488,8 @@ const AppStrings ptStrings = AppStrings(
   menuPause: 'Pausar cronômetro',
   menuResume: 'Retomar cronômetro',
   menuGuidance: 'Orientações',
-  menuOsdi: 'Rastreador de Sintomas',
   menuDvrs: 'DVRS — Risco Visual Digital',
   menuScreenTime: 'Tempo de tela',
-  menuChecklists: 'Checklists',
   menuDashboard: 'Painel',
   menuProgress: 'Meu progresso',
   menuGroupActions: 'Pausas',
@@ -702,48 +653,6 @@ const AppStrings ptStrings = AppStrings(
   updateCopyCommand: 'Copiar comando',
   updateCommandCopied: 'Comando copiado',
   close: 'Fechar',
-  osdiTitle: 'Rastreador de Sintomas',
-  osdiSubtitle: 'Acompanhe sintomas de fadiga e olho seco ao longo do tempo.',
-  osdiInstruction:
-      'Na última semana, com que frequência você percebeu cada situação?',
-  osdiHistoryTitle: 'Histórico e comparação',
-  osdiNoHistory: 'Nenhum resultado salvo ainda.',
-  osdiSave: 'Salvar resultado',
-  osdiReset: 'Limpar respostas',
-  osdiScoreLabel: 'Índice de Desconforto: {score}',
-  osdiAnsweredLabel: '{count}/12 respondidas',
-  osdiLatestLabel: 'Último resultado',
-  osdiSeverityNormal: 'Normal',
-  osdiSeverityMild: 'Leve',
-  osdiSeverityModerate: 'Moderado',
-  osdiSeveritySevere: 'Severo',
-  osdiTrendBetter: 'Melhorou {delta} pontos',
-  osdiTrendWorse: 'Piorou {delta} pontos',
-  osdiTrendSame: 'Estável',
-  osdiNotApplicable: 'Não se aplica',
-  osdiAnswerLabels: [
-    'Nunca',
-    'Raramente',
-    'Às vezes',
-    'Frequentemente',
-    'Sempre',
-  ],
-  osdiQuestions: [
-    'Sensibilidade excessiva à luz ou claridade',
-    'Sensação de ressecamento nos olhos',
-    'Desconforto ou fadiga ocular ao longo do dia',
-    'Dificuldade em manter o foco',
-    'Oscilação na nitidez da visão',
-    'Cansaço ao ler telas ou papéis',
-    'Desconforto visual à noite',
-    'Fadiga após longos períodos no computador ou celular',
-    'Necessidade de piscar mais para focar',
-    'Incômodo visual em ambientes externos',
-    'Irritação ocular em dias muito secos',
-    'Ardência em ambientes com ar-condicionado',
-  ],
-  osdiDisclaimer:
-      'Triagem educativa. O resultado não substitui avaliação oftalmológica.',
   pauseOnInactivityLabel: 'Pausar por inatividade (adaptativo)',
   inactivityTitle: 'Timer pausado',
   inactivityBody:
@@ -841,7 +750,7 @@ const AppStrings ptStrings = AppStrings(
   onboardingStep3Title: 'Sempre por perto',
   onboardingStep3Body:
       'A bolinha flutuante fica discreta na tela. Clique nela para iniciar '
-      'pausas, ver seu progresso, responder o questionário OSDI e ajustar tudo.',
+      'pausas, ver seu progresso, responder o DVRS e ajustar tudo.',
   onboardingStep4Title: 'Seus dados são só seus',
   onboardingStep4Body:
       '100% local: sem nuvem, sem telemetria e sem cadastro. Gratuito e de '
@@ -855,10 +764,8 @@ const AppStrings enStrings = AppStrings(
   menuPause: 'Pause timer',
   menuResume: 'Resume timer',
   menuGuidance: 'Eye care guide',
-  menuOsdi: 'Symptom Tracker',
   menuDvrs: 'DVRS — Digital Visual Risk',
   menuScreenTime: 'Screen time',
-  menuChecklists: 'Checklists',
   menuDashboard: 'Dashboard',
   menuProgress: 'My progress',
   menuGroupActions: 'Breaks',
@@ -1016,42 +923,6 @@ const AppStrings enStrings = AppStrings(
   updateCopyCommand: 'Copy command',
   updateCommandCopied: 'Command copied',
   close: 'Close',
-  osdiTitle: 'Symptom Tracker',
-  osdiSubtitle: 'Track eye fatigue and dryness symptoms over time.',
-  osdiInstruction:
-      'During the last week, how often did you notice each situation?',
-  osdiHistoryTitle: 'History and comparison',
-  osdiNoHistory: 'No saved result yet.',
-  osdiSave: 'Save result',
-  osdiReset: 'Clear answers',
-  osdiScoreLabel: 'Discomfort Index: {score}',
-  osdiAnsweredLabel: '{count}/12 answered',
-  osdiLatestLabel: 'Latest result',
-  osdiSeverityNormal: 'Normal',
-  osdiSeverityMild: 'Mild',
-  osdiSeverityModerate: 'Moderate',
-  osdiSeveritySevere: 'Severe',
-  osdiTrendBetter: 'Improved by {delta} points',
-  osdiTrendWorse: 'Worsened by {delta} points',
-  osdiTrendSame: 'Stable',
-  osdiNotApplicable: 'Not applicable',
-  osdiAnswerLabels: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'],
-  osdiQuestions: [
-    'Excessive sensitivity to light',
-    'Dryness sensation in the eyes',
-    'Eye discomfort or fatigue throughout the day',
-    'Difficulty maintaining visual focus',
-    'Fluctuations in vision clarity',
-    'Tiredness when reading screens or paper',
-    'Visual discomfort at night',
-    'Fatigue after long periods on a computer or phone',
-    'Need to blink more often to focus',
-    'Eye discomfort outdoors',
-    'Eye irritation on very dry days',
-    'Burning sensation in air-conditioned environments',
-  ],
-  osdiDisclaimer:
-      'Educational screening. The result does not replace an eye exam.',
   pauseOnInactivityLabel: 'Pause when inactive (adaptive)',
   inactivityTitle: 'Timer paused',
   inactivityBody: 'Inactivity detected. The cycle will resume when you return.',
@@ -1148,7 +1019,7 @@ const AppStrings enStrings = AppStrings(
   onboardingStep3Title: 'Always within reach',
   onboardingStep3Body:
       'The floating ball stays discreet on your screen. Click it to start '
-      'breaks, see your progress, take the OSDI questionnaire and tweak '
+      'breaks, see your progress, take the DVRS questionnaire and tweak '
       'everything.',
   onboardingStep4Title: 'Your data stays yours',
   onboardingStep4Body:

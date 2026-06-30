@@ -174,9 +174,6 @@ class StorageKeys {
   /// Estado agregado, cifrado, do modelo de presença.
   static const String presenceModel = 'presence_model_enc';
 
-  /// JSON serializado com o histórico local de avaliações OSDI.
-  static const String osdiHistory = 'osdi_history_json';
-
   /// JSON serializado com o tempo de uso de tela por dia ({'AAAA-MM-DD': seg}).
   static const String screenTime = 'screen_time_json';
 
@@ -186,11 +183,6 @@ class StorageKeys {
 
   /// JSON serializado com o último checklist ambiental autorreferido.
   static const String environmentChecklist = 'environment_checklist_json';
-
-  /// JSON serializado com o histórico de resultados dos checklists de saúde
-  /// visual digital (módulos 1–7). Legado: mantido apenas para preservar dados
-  /// de versões anteriores ao DVRS.
-  static const String checklistResults = 'checklist_results_json';
 
   /// JSON serializado com o histórico de resultados do DVRS — Índice de Risco
   /// Visual Digital (questionário principal).

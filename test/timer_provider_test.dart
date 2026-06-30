@@ -2,7 +2,6 @@ import 'package:dry_eye_widget/models/app_state.dart';
 import 'package:dry_eye_widget/models/break_stats_data.dart';
 import 'package:dry_eye_widget/models/environment_checklist.dart';
 import 'package:dry_eye_widget/models/widget_settings.dart';
-import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
 import 'package:dry_eye_widget/providers/settings_provider.dart';
 import 'package:dry_eye_widget/providers/timer_provider.dart';
@@ -382,15 +381,6 @@ class _MemoryStorage implements StorageService {
   Future<void> saveSettings(WidgetSettings settings) async {
     _settings = settings;
   }
-
-  @override
-  List<OsdiAssessment> loadOsdiHistory() => const [];
-
-  @override
-  Future<void> saveOsdiHistory(List<OsdiAssessment> history) async {}
-
-  @override
-  Future<void> addOsdiAssessment(OsdiAssessment assessment) async {}
 
   ScreenTimeData _screenTime = ScreenTimeData.empty();
 

@@ -50,10 +50,8 @@ void main() {
               startDate: now.subtract(const Duration(days: 30)),
               endDate: now,
             ),
-        osdiHistory: const [],
         screenTime: ScreenTimeData.empty(),
         breakStats: BreakStatsData.empty(),
-        symptomLabels: const [],
         dvrsHistory: dvrsHistory,
         now: now,
       );

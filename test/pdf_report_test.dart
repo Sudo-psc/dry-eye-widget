@@ -1,9 +1,9 @@
 import 'package:dry_eye_widget/models/break_stats_data.dart';
-import 'package:dry_eye_widget/models/checklist.dart';
+import 'package:dry_eye_widget/models/dvrs_assessment.dart';
 import 'package:dry_eye_widget/models/environment_checklist.dart';
-import 'package:dry_eye_widget/models/osdi_assessment.dart';
 import 'package:dry_eye_widget/models/report_options.dart';
 import 'package:dry_eye_widget/models/screen_time_data.dart';
+import 'package:dry_eye_widget/services/dvrs_engine.dart';
 import 'package:dry_eye_widget/services/pdf_report_service.dart';
 import 'package:dry_eye_widget/services/report_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,19 +13,38 @@ void main() {
   final service = PdfReportService();
   final now = DateTime(2026, 6, 21, 12);
 
-  const symptomLabels = [
-    'Luz', 'Areia', 'Dor', 'Embaçada', 'Visão ruim', 'Ler',
-    'Dirigir', 'Computador', 'TV', 'Vento', 'Seco', 'Ar-condicionado',
-  ];
+  DvrsResult dvrs(int value, {int daysAgo = 1, String id = 'r'}) {
+    final answers = [
+      for (var i = 0; i < 16; i++)
+        DvrsAnswer(
+          questionId: 'q${i + 1}',
+          domain: i < 6
+              ? DvrsDomain.symptoms
+              : i < 9
+                  ? DvrsDomain.functional
+                  : i < 12
+                      ? DvrsDomain.exposure
+                      : i < 15
+                          ? DvrsDomain.environment
+                          : DvrsDomain.warning,
+          value: value,
+          label: 'opt',
+        ),
+    ];
+    return evaluateDvrs(
+      answers: answers,
+      id: id,
+      now: now.subtract(Duration(days: daysAgo)),
+    );
+  }
 
   ReportData build({
-    List<OsdiAssessment> osdiHistory = const [],
+    List<DvrsResult> dvrsHistory = const [],
     ScreenTimeData? screenTime,
     BreakStatsData? breakStats,
     ReportOptions? options,
     UserProfile profile = const UserProfile(),
     EnvironmentChecklist? environment,
-    List<ChecklistResult> checklists = const [],
   }) =>
       builder.build(
         profile: profile,
@@ -33,37 +52,12 @@ void main() {
             ReportOptions(
               startDate: now.subtract(const Duration(days: 30)),
               endDate: now,
-              // OSDI/sintomas/checklists viraram opcionais (DVRS é o principal).
-              // Estes testes cobrem as seções legadas, então as habilitamos.
-              includeOsdi: true,
-              includeSymptoms: true,
-              includeChecklists: true,
             ),
-        osdiHistory: osdiHistory,
         screenTime: screenTime ?? ScreenTimeData.empty(),
         breakStats: breakStats ?? BreakStatsData.empty(),
-        symptomLabels: symptomLabels,
         environment: environment,
-        checklistResults: checklists,
+        dvrsHistory: dvrsHistory,
         now: now,
-      );
-
-  ChecklistResult checklist({
-    required ChecklistType type,
-    required ChecklistRiskLevel riskLevel,
-    String classification = 'Resultado',
-    String feedback = 'Considere acompanhar a evolução.',
-  }) =>
-      ChecklistResult(
-        id: type.id,
-        type: type,
-        createdAt: now.subtract(const Duration(days: 1)),
-        answers: const [],
-        totalScore: 5,
-        riskLevel: riskLevel,
-        classification: classification,
-        feedback: feedback,
-        includeInPdf: true,
       );
 
   Future<int> sizeOf(ReportData data) async =>
@@ -71,18 +65,16 @@ void main() {
 
   group('PdfReportService.generateReport', () {
     test('gera PDF com todos os dados', () async {
-      final history = [
-        OsdiAssessment.fromAnswers(List.filled(12, 1),
-            completedAt: now.subtract(const Duration(days: 15))),
-        OsdiAssessment.fromAnswers(List.filled(12, 3), completedAt: now),
-      ];
       final data = build(
         profile: const UserProfile(
             name: 'Teste Silva', observations: 'Piora à tarde.'),
-        osdiHistory: history,
+        dvrsHistory: [
+          dvrs(1, daysAgo: 15, id: 'a'),
+          dvrs(3, daysAgo: 1, id: 'b'),
+        ],
         screenTime: ScreenTimeData({ScreenTimeData.dayKey(now): 3600}),
-        breakStats: BreakStatsData.empty()
-            .incremented(now, reminders: 8, completed: 6),
+        breakStats:
+            BreakStatsData.empty().incremented(now, reminders: 8, completed: 6),
       );
       expect(await sizeOf(data), greaterThan(1000));
     });
@@ -91,19 +83,20 @@ void main() {
       expect(await sizeOf(build()), greaterThan(100));
     });
 
-    test('gera PDF sem OSDI mas com tempo de tela', () async {
+    test('gera PDF sem DVRS mas com tempo de tela', () async {
       final data = build(
         screenTime: ScreenTimeData({ScreenTimeData.dayKey(now): 7200}),
       );
+      expect(data.dvrs, isNull);
       expect(await sizeOf(data), greaterThan(100));
     });
 
-    test('gera PDF sem tempo de tela mas com OSDI', () async {
-      final data = build(
-        osdiHistory: [
-          OsdiAssessment.fromAnswers(List.filled(12, 2), completedAt: now),
-        ],
-      );
+    test('gera PDF com a seção DVRS (inclui alerta prioritário da Q16)',
+        () async {
+      final data = build(dvrsHistory: [dvrs(4)]);
+      expect(data.dvrs, isNotNull);
+      expect(data.dvrs!.latest.safetyAlertLevel,
+          DvrsSafetyAlertLevel.priorityEvaluation);
       expect(await sizeOf(data), greaterThan(100));
     });
 
@@ -127,77 +120,18 @@ void main() {
       expect(await sizeOf(data), greaterThan(100));
     });
 
-    test('checklist não entra quando includeEnvironment é falso', () async {
+    test('ambiente não entra quando includeEnvironment é falso', () async {
       final data = build(
         environment: EnvironmentChecklist(updatedAt: now, glare: true),
       );
       expect(data.environment, isNull);
-    });
-
-    test('gera PDF com checklists (inclui sinal de atenção urgente)', () async {
-      final data = build(
-        checklists: [
-          checklist(
-            type: ChecklistType.visualSymptoms,
-            riskLevel: ChecklistRiskLevel.attention,
-            classification: 'Sinais de atenção',
-          ),
-          checklist(
-            type: ChecklistType.warningSigns,
-            riskLevel: ChecklistRiskLevel.urgentAttention,
-            classification: 'Atenção prioritária',
-            feedback: 'Considere avaliação oftalmológica com prioridade.',
-          ),
-        ],
-      );
-      expect(data.checklists, hasLength(2));
-      expect(await sizeOf(data), greaterThan(100));
-    });
-
-    test('checklists não entram quando includeChecklists é falso', () async {
-      final data = build(
-        options: ReportOptions(
-          startDate: now.subtract(const Duration(days: 30)),
-          endDate: now,
-          includeChecklists: false,
-        ),
-        checklists: [
-          checklist(
-            type: ChecklistType.visualSymptoms,
-            riskLevel: ChecklistRiskLevel.low,
-          ),
-        ],
-      );
-      expect(data.checklists, isEmpty);
-      expect(await sizeOf(data), greaterThan(100));
-    });
-
-    test('gera PDF sem checklists (lista vazia) sem lançar', () async {
-      final data = build();
-      expect(data.checklists, isEmpty);
-      expect(await sizeOf(data), greaterThan(100));
-    });
-
-    test('gera PDF sem sintomas quando includeSymptoms é falso', () async {
-      final data = build(
-        options: ReportOptions(
-          startDate: now.subtract(const Duration(days: 30)),
-          endDate: now,
-          includeSymptoms: false,
-        ),
-        osdiHistory: [
-          OsdiAssessment.fromAnswers(List.filled(12, 2), completedAt: now),
-        ],
-      );
-      expect(data.symptoms, isEmpty);
-      expect(await sizeOf(data), greaterThan(100));
     });
   });
 
   test('constantes médico-legais obrigatórias presentes', () {
     expect(PdfReportService.legalFooter, contains('constitui diagnóstico'),
         reason: 'rodapé deve negar caráter diagnóstico');
-    expect(PdfReportService.osdiDisclaimer, contains('OSDI'));
-    expect(PdfReportService.privacyNotice, contains('informações pessoais de saúde'));
+    expect(PdfReportService.privacyNotice,
+        contains('informações pessoais de saúde'));
   });
 }

@@ -1,8 +1,6 @@
 import '../models/break_stats_data.dart';
-import '../models/checklist.dart';
 import '../models/dvrs_assessment.dart';
 import '../models/environment_checklist.dart';
-import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
 import '../models/screen_time_data.dart';
 import 'dvrs_engine.dart';
@@ -10,9 +8,9 @@ import 'dvrs_engine.dart';
 /// Constrói o [ReportData] a partir dos dados brutos do app.
 ///
 /// Camada **pura** (sem I/O, sem Flutter widgets) — todo o cálculo do relatório
-/// vive aqui para ser facilmente testável: filtragem por período, médias,
-/// adesão às pausas, variação do OSDI, derivação de sintomas a partir das
-/// respostas OSDI, indicação geral e gatilhos de alerta educativo.
+/// vive aqui para ser facilmente testável: preparação do DVRS, médias de tempo
+/// de tela, adesão às pausas, indicação geral e gatilhos de alerta educativo.
+/// Toda a saída é de triagem/educação, nunca diagnóstica.
 class ReportBuilder {
   const ReportBuilder();
 
@@ -21,34 +19,24 @@ class ReportBuilder {
   static const int highScreenTimeSeconds = 6 * 3600; // 6h/dia
   static const double lowAdherenceThreshold = 0.7; // < 70% de pausas concluídas
 
-  /// Variação de escore OSDI considerada piora relevante (pontos).
-  static const double relevantOsdiWorsening = 10;
-
   ReportData build({
     required UserProfile profile,
     required ReportOptions options,
-    required List<OsdiAssessment> osdiHistory,
     required ScreenTimeData screenTime,
     required BreakStatsData breakStats,
-    required List<String> symptomLabels,
     EnvironmentChecklist? environment,
-    List<ChecklistResult> checklistResults = const [],
     List<DvrsResult> dvrsHistory = const [],
     DateTime? now,
   }) {
     final generatedAt = now ?? DateTime.now();
 
-    final osdi = _buildOsdiSummary(osdiHistory, options);
-    final symptoms = options.includeSymptoms
-        ? _buildSymptoms(osdi.history, symptomLabels)
-        : const <SymptomStat>[];
+    final dvrs = options.includeDvrs ? prepareDvrsForPdf(dvrsHistory) : null;
     final screen = _buildScreenTimeSummary(screenTime, options);
     final breaks = _buildBreakSummary(breakStats, options);
 
-    final alerts = _buildAlerts(osdi: osdi, symptoms: symptoms);
+    final alerts = _buildAlerts(dvrs: dvrs, screen: screen, breaks: breaks);
     final indication = _resolveIndication(
-      osdi: osdi,
-      symptoms: symptoms,
+      dvrs: dvrs,
       screen: screen,
       breaks: breaks,
     );
@@ -56,92 +44,14 @@ class ReportBuilder {
     return ReportData(
       profile: profile,
       options: options,
-      osdi: osdi,
-      symptoms: symptoms,
       screenTime: screen,
       breaks: breaks,
       indication: indication,
       alerts: alerts,
       generatedAt: generatedAt,
-      dvrs: options.includeDvrs ? prepareDvrsForPdf(dvrsHistory) : null,
+      dvrs: dvrs,
       environment: options.includeEnvironment ? environment : null,
-      checklists:
-          options.includeChecklists ? checklistResults : const <ChecklistResult>[],
     );
-  }
-
-  // --- OSDI ---------------------------------------------------------------
-
-  OsdiSummary _buildOsdiSummary(
-    List<OsdiAssessment> history,
-    ReportOptions options,
-  ) {
-    final filtered = history
-        .where((e) => _inPeriod(e.completedAt, options))
-        .toList()
-      ..sort((a, b) => a.completedAt.compareTo(b.completedAt));
-
-    OsdiAssessment? latest;
-    OsdiAssessment? previous;
-    if (filtered.isNotEmpty) {
-      latest = filtered.last;
-      if (filtered.length > 1) previous = filtered[filtered.length - 2];
-    }
-    return OsdiSummary(history: filtered, latest: latest, previous: previous);
-  }
-
-  // --- Sintomas (derivados das respostas OSDI) ----------------------------
-
-  List<SymptomStat> _buildSymptoms(
-    List<OsdiAssessment> history,
-    List<String> labels,
-  ) {
-    if (labels.isEmpty) return const [];
-    final result = <SymptomStat>[];
-
-    for (var q = 0; q < labels.length; q++) {
-      final answered = <int>[]; // respostas não nulas
-      final firstHalf = <int>[];
-      final secondHalf = <int>[];
-      final mid = history.length ~/ 2;
-
-      for (var i = 0; i < history.length; i++) {
-        final answers = history[i].answers;
-        if (q >= answers.length) continue;
-        final value = answers[q];
-        if (value == null) continue;
-        answered.add(value);
-        if (history.length > 1) {
-          (i < mid ? firstHalf : secondHalf).add(value);
-        }
-      }
-
-      final frequency = answered.where((v) => v > 0).length;
-      final averageIntensity = answered.isEmpty
-          ? 0.0
-          : answered.reduce((a, b) => a + b) / answered.length;
-      final trend = _symptomTrend(firstHalf, secondHalf);
-
-      result.add(
-        SymptomStat(
-          label: labels[q],
-          frequency: frequency,
-          averageIntensity: averageIntensity,
-          trend: trend,
-        ),
-      );
-    }
-    return result;
-  }
-
-  SymptomTrend _symptomTrend(List<int> firstHalf, List<int> secondHalf) {
-    if (firstHalf.isEmpty || secondHalf.isEmpty) return SymptomTrend.unknown;
-    final a = firstHalf.reduce((x, y) => x + y) / firstHalf.length;
-    final b = secondHalf.reduce((x, y) => x + y) / secondHalf.length;
-    final diff = b - a;
-    if (diff > 0.5) return SymptomTrend.worsening;
-    if (diff < -0.5) return SymptomTrend.improving;
-    return SymptomTrend.stable;
   }
 
   // --- Tempo de tela ------------------------------------------------------
@@ -210,84 +120,75 @@ class ReportBuilder {
   // --- Indicação geral e alertas -----------------------------------------
 
   List<String> _buildAlerts({
-    required OsdiSummary osdi,
-    required List<SymptomStat> symptoms,
+    required DvrsReportData? dvrs,
+    required ScreenTimeSummary screen,
+    required BreakSummary breaks,
   }) {
     final alerts = <String>[];
-    final latest = osdi.latest;
+    final latest = dvrs?.latest;
 
-    if (latest != null &&
-        (latest.severity == OsdiSeverity.moderate ||
-            latest.severity == OsdiSeverity.severe)) {
-      alerts.add('Escore OSDI em faixa elevada na avaliação mais recente.');
-    }
-    final variation = osdi.variation;
-    if (variation != null && variation >= relevantOsdiWorsening) {
-      alerts.add(
-        'Piora relevante do escore OSDI (+${variation.toStringAsFixed(1)} pontos) '
-        'em relação à avaliação anterior.',
-      );
-    }
-
-    // Sintomas de alerta (dor, fotofobia/sensibilidade à luz, embaçamento)
-    // persistentes. Mapeados pelos índices canônicos do OSDI: 0=luz, 2=dor,
-    // 3=visão embaçada.
-    void flagSymptom(int index, String message) {
-      if (index < symptoms.length && symptoms[index].frequency >= 2) {
-        alerts.add(message);
+    if (latest != null) {
+      if (latest.classification == DvrsClassification.highRisk ||
+          latest.classification == DvrsClassification.veryHighRisk) {
+        alerts.add(
+          'DVRS em faixa elevada (${latest.totalScore}/100 — '
+          '${latest.classificationLabel}) na avaliação mais recente.',
+        );
+      }
+      if (latest.safetyAlertLevel != DvrsSafetyAlertLevel.none &&
+          latest.safetyAlertMessage != null) {
+        alerts.add(latest.safetyAlertMessage!);
+      }
+      // Piora relevante do score desde a avaliação anterior.
+      if (dvrs!.history.length >= 2) {
+        final previous = dvrs.history[dvrs.history.length - 2];
+        final delta = latest.totalScore - previous.totalScore;
+        if (delta >= 15) {
+          alerts.add(
+            'Piora relevante do DVRS (+$delta pontos) em relação à avaliação '
+            'anterior.',
+          );
+        }
       }
     }
 
-    flagSymptom(2, 'Dor ou desconforto ocular registrado de forma recorrente.');
-    flagSymptom(0, 'Sensibilidade à luz (fotofobia) registrada de forma recorrente.');
-    flagSymptom(3, 'Visão embaçada registrada de forma recorrente.');
+    if (screen.averageDailySeconds >= highScreenTimeSeconds) {
+      alerts.add('Tempo médio de tela elevado no período.');
+    }
+    if (breaks.adherenceRate != null &&
+        breaks.adherenceRate! < lowAdherenceThreshold) {
+      alerts.add('Baixa adesão às pausas visuais no período.');
+    }
 
     return alerts;
   }
 
   OverallIndication _resolveIndication({
-    required OsdiSummary osdi,
-    required List<SymptomStat> symptoms,
+    required DvrsReportData? dvrs,
     required ScreenTimeSummary screen,
     required BreakSummary breaks,
   }) {
-    final latest = osdi.latest;
-    final variation = osdi.variation;
+    final latest = dvrs?.latest;
 
-    final highOsdi = latest != null &&
-        (latest.severity == OsdiSeverity.moderate ||
-            latest.severity == OsdiSeverity.severe);
-    final worsened = variation != null && variation >= relevantOsdiWorsening;
+    final highDvrs = latest != null &&
+        (latest.classification == DvrsClassification.highRisk ||
+            latest.classification == DvrsClassification.veryHighRisk);
+    final safetyEvaluation = latest != null &&
+        (latest.safetyAlertLevel == DvrsSafetyAlertLevel.medicalEvaluation ||
+            latest.safetyAlertLevel == DvrsSafetyAlertLevel.priorityEvaluation);
+    final moderateDvrs =
+        latest != null && latest.classification == DvrsClassification.moderateRisk;
 
-    final frequentSymptoms = symptoms.where((s) => s.frequency >= 2).length >= 2;
     final highScreen = screen.averageDailySeconds >= highScreenTimeSeconds;
     final lowAdherence = breaks.adherenceRate != null &&
         breaks.adherenceRate! < lowAdherenceThreshold;
 
-    if (highOsdi ||
-        worsened ||
-        (highScreen && lowAdherence && frequentSymptoms)) {
+    if (highDvrs || safetyEvaluation) {
       return OverallIndication.seekEvaluation;
     }
-    if (lowAdherence || highScreen) {
+    if (moderateDvrs || lowAdherence || highScreen) {
       return OverallIndication.reinforceBreaks;
     }
     return OverallIndication.monitor;
-  }
-
-  // --- Helpers ------------------------------------------------------------
-
-  bool _inPeriod(DateTime date, ReportOptions options) {
-    final start = DateTime(
-      options.startDate.year,
-      options.startDate.month,
-      options.startDate.day,
-    );
-    final end = DateTime(
-      options.endDate.year,
-      options.endDate.month,
-      options.endDate.day,
-    ).add(const Duration(days: 1));
-    return !date.isBefore(start) && date.isBefore(end);
   }
 }
