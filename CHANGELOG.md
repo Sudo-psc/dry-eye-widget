@@ -4,6 +4,20 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.19.1] - 2026-06-30
+
+### Removido
+- **OSDI e checklists removidos por completo do código** (não apenas da
+  interface): modelos, telas, armazenamento, strings, seções de relatório/PDF e
+  testes. O DVRS passa a ser o único questionário do app. Dados antigos no disco
+  são preservados (órfãos, não lidos e não apagados).
+
+### Modificado
+- Relatório/PDF: a indicação geral e os alertas passam a derivar do DVRS, do
+  tempo de tela e da adesão às pausas (sem dependência do OSDI/sintomas).
+- Landing page atualizada (PT/EN) com o DVRS e novo screenshot da tela de
+  resultado.
+
 ## [1.19.0] - 2026-06-30
 
 ### Adicionado
