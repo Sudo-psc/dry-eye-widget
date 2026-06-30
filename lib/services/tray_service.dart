@@ -18,9 +18,12 @@ class TrayService {
   static const String keyToggle = 'toggle_widget';
   static const String keyBreak = 'start_break';
   static const String keySettings = 'open_settings';
-  static const String keyOsdi = 'open_osdi';
+  static const String keyDvrs = 'open_dvrs';
   static const String keyGithub = 'open_github';
   static const String keyReports = 'open_reports';
+
+  /// Chaves legadas mantidas por compatibilidade (não exibidas no menu).
+  static const String keyOsdi = 'open_osdi';
   static const String keyChecklists = 'open_checklists';
   static const String keyQuit = 'quit';
 
@@ -112,8 +115,7 @@ class TrayService {
             ),
             MenuItem(key: keyBreak, label: strings.menuStartBreak),
             MenuItem.separator(),
-            MenuItem(key: keyOsdi, label: strings.menuOsdi),
-            MenuItem(key: keyChecklists, label: 'Checklists'),
+            MenuItem(key: keyDvrs, label: strings.menuDvrs),
             MenuItem(key: keyReports, label: 'Relatórios'),
             MenuItem(key: keySettings, label: strings.menuSettings),
             MenuItem(key: keyGithub, label: '🐙 GitHub'),

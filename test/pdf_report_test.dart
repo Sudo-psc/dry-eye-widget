@@ -33,6 +33,11 @@ void main() {
             ReportOptions(
               startDate: now.subtract(const Duration(days: 30)),
               endDate: now,
+              // OSDI/sintomas/checklists viraram opcionais (DVRS é o principal).
+              // Estes testes cobrem as seções legadas, então as habilitamos.
+              includeOsdi: true,
+              includeSymptoms: true,
+              includeChecklists: true,
             ),
         osdiHistory: osdiHistory,
         screenTime: screenTime ?? ScreenTimeData.empty(),

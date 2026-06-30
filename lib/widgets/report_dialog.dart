@@ -5,10 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/checklist.dart';
+import '../models/dvrs_assessment.dart';
 import '../models/environment_checklist.dart';
 import '../models/report_options.dart';
 import '../providers/settings_provider.dart';
 import '../services/checklist_storage_service.dart';
+import '../services/dvrs_storage_service.dart';
 import '../services/pdf_report_service.dart';
 import '../services/report_builder.dart';
 import '../services/screen_time_service.dart';
@@ -95,6 +97,16 @@ class _ReportDialogState extends State<ReportDialog> {
     }
   }
 
+  /// Histórico do DVRS para o relatório. Protegido com try/catch: em contextos
+  /// de teste que não registram o provider, devolve lista vazia.
+  List<DvrsResult> _dvrsHistory() {
+    try {
+      return context.read<DvrsStorageService>().getDvrsHistory();
+    } catch (_) {
+      return const <DvrsResult>[];
+    }
+  }
+
   ReportData _buildReportData() {
     final storage = context.read<StorageService>();
     final screenTimeService = context.read<ScreenTimeService>();
@@ -112,6 +124,7 @@ class _ReportDialogState extends State<ReportDialog> {
       symptomLabels: strings.osdiQuestions,
       environment: _environment,
       checklistResults: _checklistsForPdf(),
+      dvrsHistory: _dvrsHistory(),
     );
   }
 
@@ -422,8 +435,12 @@ class _ReportDialogState extends State<ReportDialog> {
     };
 
     final lines = <(String, String)>[];
-    if (data.osdi.latest != null) {
-      lines.add(('Escore OSDI', data.osdi.latest!.score.toStringAsFixed(1)));
+    final dvrs = data.dvrs;
+    if (dvrs != null) {
+      lines.add((
+        'DVRS',
+        '${dvrs.latest.totalScore}/100 · ${dvrs.latest.classificationLabel}',
+      ));
     }
     if (data.screenTime.hasData) {
       lines.add((
@@ -436,11 +453,6 @@ class _ReportDialogState extends State<ReportDialog> {
         'Adesão às pausas',
         '${(data.breaks.adherenceRate! * 100).toStringAsFixed(0)}%',
       ));
-    }
-    final top = data.topSymptom;
-    if (top != null) lines.add(('Sintoma principal', top.label));
-    if (data.checklists.isNotEmpty) {
-      lines.add(('Checklists incluídos', '${data.checklists.length}'));
     }
 
     return Container(

@@ -12,6 +12,7 @@ class AppStrings {
     required this.menuResume,
     required this.menuGuidance,
     required this.menuOsdi,
+    required this.menuDvrs,
     required this.menuScreenTime,
     required this.menuChecklists,
     required this.menuDashboard,
@@ -231,6 +232,7 @@ class AppStrings {
   final String menuResume;
   final String menuGuidance;
   final String menuOsdi;
+  final String menuDvrs;
   final String menuScreenTime;
   final String menuChecklists;
   final String menuDashboard;
@@ -534,6 +536,7 @@ const AppStrings ptStrings = AppStrings(
   menuResume: 'Retomar cronômetro',
   menuGuidance: 'Orientações',
   menuOsdi: 'Rastreador de Sintomas',
+  menuDvrs: 'DVRS — Risco Visual Digital',
   menuScreenTime: 'Tempo de tela',
   menuChecklists: 'Checklists',
   menuDashboard: 'Painel',
@@ -853,6 +856,7 @@ const AppStrings enStrings = AppStrings(
   menuResume: 'Resume timer',
   menuGuidance: 'Eye care guide',
   menuOsdi: 'Symptom Tracker',
+  menuDvrs: 'DVRS — Digital Visual Risk',
   menuScreenTime: 'Screen time',
   menuChecklists: 'Checklists',
   menuDashboard: 'Dashboard',

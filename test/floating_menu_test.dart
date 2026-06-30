@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('menu flutuante exibe e abre o questionário OSDI', (
+  testWidgets('menu flutuante exibe e abre o questionário DVRS', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(800, 1200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    var osdiOpened = 0;
+    var dvrsOpened = 0;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -24,9 +24,8 @@ void main() {
               onReset: () {},
               onTogglePause: () {},
               onGuidance: () {},
-              onOsdi: () => osdiOpened++,
+              onDvrs: () => dvrsOpened++,
               onScreenTime: () {},
-              onChecklists: () {},
               onDashboard: () {},
               onProgress: () {},
               onReports: () {},
@@ -41,12 +40,15 @@ void main() {
       ),
     );
 
-    expect(find.text(ptStrings.menuOsdi), findsOneWidget);
+    expect(find.text(ptStrings.menuDvrs), findsOneWidget);
+    // OSDI e Checklists não devem mais aparecer no menu.
+    expect(find.text(ptStrings.menuOsdi), findsNothing);
+    expect(find.text(ptStrings.menuChecklists), findsNothing);
 
-    await tester.tap(find.text(ptStrings.menuOsdi));
+    await tester.tap(find.text(ptStrings.menuDvrs));
     await tester.pump();
 
-    expect(osdiOpened, 1);
+    expect(dvrsOpened, 1);
   });
 
   testWidgets('painel do menu cabe na janela e mostra o item "Sair"', (
@@ -68,9 +70,8 @@ void main() {
               onReset: () {},
               onTogglePause: () {},
               onGuidance: () {},
-              onOsdi: () {},
+              onDvrs: () {},
               onScreenTime: () {},
-              onChecklists: () {},
               onDashboard: () {},
               onProgress: () {},
               onReports: () {},

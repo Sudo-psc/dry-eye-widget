@@ -17,6 +17,7 @@ import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
 import 'services/checklist_storage_service.dart';
+import 'services/dvrs_storage_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
 import 'services/screen_time_service.dart';
@@ -34,6 +35,7 @@ import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/checklists/checklists_screen.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
+import 'widgets/dvrs/dvrs_screen.dart';
 import 'widgets/progress/progress_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'widgets/floating_ball.dart';
@@ -76,6 +78,7 @@ Future<void> main() async {
 
   final storage = await StorageService.init();
   final checklistStorage = await ChecklistStorageService.init();
+  final dvrsStorage = await DvrsStorageService.init();
   final settings = SettingsProvider(storage: storage);
   final screenTime = ScreenTimeService(storage: storage);
   final audio = AudioService()..enabled = settings.value.soundEnabled;
@@ -155,6 +158,7 @@ Future<void> main() async {
       providers: [
         Provider<StorageService>.value(value: storage),
         Provider<ChecklistStorageService>.value(value: checklistStorage),
+        Provider<DvrsStorageService>.value(value: dvrsStorage),
         Provider<AudioService>.value(value: audio),
         Provider<StartupService>.value(value: startup),
         Provider<TrayService>.value(value: tray),
@@ -253,6 +257,7 @@ enum _WindowLayout {
   menu,
   settings,
   osdi,
+  dvrs,
   report,
   checklists,
   dashboard,
@@ -294,6 +299,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _guidanceOpen = false;
   bool _updateOpen = false;
   bool _osdiOpen = false;
+  bool _dvrsOpen = false;
   bool _screenTimeOpen = false;
   bool _reportOpen = false;
   bool _checklistsOpen = false;
@@ -429,6 +435,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_guidanceOpen &&
       !_updateOpen &&
       !_osdiOpen &&
+      !_dvrsOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
       !_checklistsOpen &&
@@ -485,6 +492,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_guidanceOpen &&
       !_updateOpen &&
       !_osdiOpen &&
+      !_dvrsOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
       !_checklistsOpen &&
@@ -515,6 +523,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_guidanceOpen &&
           !_updateOpen &&
           !_osdiOpen &&
+          !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
           !_checklistsOpen &&
@@ -544,6 +553,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_guidanceOpen &&
           !_updateOpen &&
           !_osdiOpen &&
+          !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
           !_checklistsOpen &&
@@ -582,6 +592,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keySettings:
         _openSettingsFromTray();
         break;
+      case TrayService.keyDvrs:
+        _openDvrsFromTray();
+        break;
       case TrayService.keyOsdi:
         _openOsdiFromTray();
         break;
@@ -619,6 +632,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openSettingsFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openSettings();
+  }
+
+  Future<void> _openDvrsFromTray() async {
+    if (!_widgetEnabled) await windowManager.show();
+    _openDvrs();
   }
 
   Future<void> _openOsdiFromTray() async {
@@ -760,6 +778,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           await windowManager.center();
           break;
         case _WindowLayout.osdi:
+        case _WindowLayout.dvrs:
         case _WindowLayout.report:
         case _WindowLayout.checklists:
         case _WindowLayout.dashboard:
@@ -884,6 +903,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -900,6 +920,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -926,6 +947,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = true;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -962,6 +984,28 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
+  void _openDvrs() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _osdiOpen = false;
+      _dvrsOpen = true;
+      _screenTimeOpen = false;
+      _reportOpen = false;
+      _checklistsOpen = false;
+      _dashboardOpen = false;
+    });
+    _applyLayout(_WindowLayout.dvrs);
+  }
+
+  void _closeDvrs() {
+    setState(() => _dvrsOpen = false);
+    _restoreAfterPanel();
+  }
+
   void _openScreenTime() {
     setState(() {
       _menuOpen = false;
@@ -970,6 +1014,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = true;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -991,6 +1036,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = true;
       _checklistsOpen = false;
@@ -1012,6 +1058,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = true;
@@ -1033,6 +1080,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -1055,6 +1103,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = false;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -1094,6 +1143,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _guidanceOpen = false;
       _updateOpen = true;
       _osdiOpen = false;
+      _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
       _checklistsOpen = false;
@@ -1147,6 +1197,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
         child: OnboardingFlow(
           strings: strings,
           onFinish: _finishOnboarding,
+        ),
+      );
+    } else if (_dvrsOpen) {
+      body = Center(
+        child: DvrsScreen(
+          onClose: _closeDvrs,
+          onExportPdf: (_) async => _openReport(),
         ),
       );
     } else if (_osdiOpen) {
@@ -1305,9 +1362,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
                 onGuidance: _openGuidance,
-                onOsdi: _openOsdi,
+                onDvrs: _openDvrs,
                 onScreenTime: _openScreenTime,
-                onChecklists: _openChecklists,
                 onDashboard: _openDashboard,
                 onProgress: _openProgress,
                 onReports: _openReport,

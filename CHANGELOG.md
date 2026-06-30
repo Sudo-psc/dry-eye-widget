@@ -4,6 +4,31 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.19.0] - 2026-06-30
+
+### Adicionado
+- **DVRS — Índice de Risco Visual Digital**: novo questionário principal de
+  triagem educativa (16 perguntas em 5 domínios: sintomas, impacto funcional,
+  exposição/pausas, ambiente/ergonomia e sinais de alerta). Calcula um score
+  ponderado de 0 a 100, classifica o risco em cinco faixas, gera mensagem
+  educativa e alertas de segurança (a partir da pergunta de sinais de alerta,
+  independentes do score). Avalia sempre os últimos 7 dias.
+- **Acompanhamento longitudinal do DVRS**: histórico local, gráfico de evolução
+  do score e por domínio, variação desde o último resultado e exclusão de
+  registros.
+- **DVRS no relatório PDF**: seção com score, classificação, scores por domínio,
+  evolução e aviso médico-legal obrigatório.
+
+### Modificado
+- O DVRS substitui o Rastreador de Sintomas (OSDI) e os checklists como
+  questionário principal no menu, na bandeja e no painel.
+- Painel reorganizado para três abas (Resumo · Tempo de tela · DVRS).
+
+### Removido (da interface)
+- Rastreador de Sintomas (OSDI) e checklists deixam de aparecer no menu/bandeja/
+  painel/PDF. O código e os dados anteriores são preservados (não há perda nem
+  mistura de históricos); o DVRS usa um armazenamento próprio.
+
 ## [1.18.0] - 2026-06-24
 
 ### Modificado

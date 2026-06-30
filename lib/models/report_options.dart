@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'checklist.dart';
+import 'dvrs_assessment.dart';
 import 'environment_checklist.dart';
 import 'osdi_assessment.dart';
 import 'screen_time_data.dart';
@@ -49,17 +50,21 @@ class ReportOptions {
     required this.startDate,
     required this.endDate,
     this.period = ReportPeriod.last30,
-    this.includeOsdi = true,
+    this.includeDvrs = true,
+    this.includeOsdi = false,
     this.includeScreenTime = true,
     this.includeBreaks = true,
-    this.includeSymptoms = true,
+    this.includeSymptoms = false,
     this.includeEnvironment = false,
-    this.includeChecklists = true,
+    this.includeChecklists = false,
   });
 
   final DateTime startDate;
   final DateTime endDate;
   final ReportPeriod period;
+
+  /// Inclui a seção do DVRS (questionário principal).
+  final bool includeDvrs;
   final bool includeOsdi;
   final bool includeScreenTime;
   final bool includeBreaks;
@@ -165,6 +170,20 @@ class BreakSummary {
   double? get adherenceRate => reminders > 0 ? completed / reminders : null;
 }
 
+/// Dados do DVRS preparados para o relatório PDF.
+@immutable
+class DvrsReportData {
+  const DvrsReportData({required this.latest, required this.history});
+
+  /// Resultado mais recente (exibido em destaque).
+  final DvrsResult latest;
+
+  /// Histórico ordenado (antigo → recente) para a curva de evolução.
+  final List<DvrsResult> history;
+
+  bool get hasEvolution => history.length >= 2;
+}
+
 /// Pacote completo, já calculado, pronto para renderização do PDF e da prévia.
 @immutable
 class ReportData {
@@ -178,9 +197,13 @@ class ReportData {
     required this.indication,
     required this.alerts,
     required this.generatedAt,
+    this.dvrs,
     this.environment,
     this.checklists = const [],
   });
+
+  /// Dados do DVRS (questionário principal). `null` se não houver resultados.
+  final DvrsReportData? dvrs;
 
   final UserProfile profile;
   final ReportOptions options;

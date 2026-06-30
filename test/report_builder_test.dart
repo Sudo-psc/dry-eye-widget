@@ -33,6 +33,10 @@ void main() {
   ReportOptions options({int days = 30}) => ReportOptions(
         startDate: now.subtract(Duration(days: days)),
         endDate: now,
+        // O OSDI/sintomas viraram opcionais (DVRS é o principal); estes testes
+        // cobrem a lógica legada do builder, então habilitamos explicitamente.
+        includeOsdi: true,
+        includeSymptoms: true,
       );
 
   ReportData build({

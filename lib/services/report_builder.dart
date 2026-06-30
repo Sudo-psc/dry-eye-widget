@@ -1,9 +1,11 @@
 import '../models/break_stats_data.dart';
 import '../models/checklist.dart';
+import '../models/dvrs_assessment.dart';
 import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
 import '../models/screen_time_data.dart';
+import 'dvrs_engine.dart';
 
 /// Constrói o [ReportData] a partir dos dados brutos do app.
 ///
@@ -31,6 +33,7 @@ class ReportBuilder {
     required List<String> symptomLabels,
     EnvironmentChecklist? environment,
     List<ChecklistResult> checklistResults = const [],
+    List<DvrsResult> dvrsHistory = const [],
     DateTime? now,
   }) {
     final generatedAt = now ?? DateTime.now();
@@ -60,6 +63,7 @@ class ReportBuilder {
       indication: indication,
       alerts: alerts,
       generatedAt: generatedAt,
+      dvrs: options.includeDvrs ? prepareDvrsForPdf(dvrsHistory) : null,
       environment: options.includeEnvironment ? environment : null,
       checklists:
           options.includeChecklists ? checklistResults : const <ChecklistResult>[],

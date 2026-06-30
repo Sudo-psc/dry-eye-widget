@@ -7,6 +7,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../models/checklist.dart';
+import '../models/dvrs_assessment.dart';
+import '../models/dvrs_definitions.dart';
 import '../models/environment_checklist.dart';
 import '../models/osdi_assessment.dart';
 import '../models/report_options.dart';
@@ -98,6 +100,10 @@ class PdfReportService {
           pw.SizedBox(height: 16),
           _buildExecutiveSummary(data),
           pw.SizedBox(height: 20),
+          if (data.options.includeDvrs && data.dvrs != null) ...[
+            _buildDvrsSection(context, data.dvrs!),
+            pw.SizedBox(height: 20),
+          ],
           if (data.options.includeOsdi) ...[
             _buildOsdiSection(context, data),
             pw.SizedBox(height: 20),
@@ -298,6 +304,116 @@ class PdfReportService {
   }
 
   // --- OSDI ---------------------------------------------------------------
+
+  /// Seção do DVRS — Índice de Risco Visual Digital (questionário principal).
+  pw.Widget _buildDvrsSection(pw.Context context, DvrsReportData dvrs) {
+    final latest = dvrs.latest;
+    final color = _dvrsColor(latest.classification);
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('DVRS — Índice de Risco Visual Digital', style: _headerStyle),
+        pw.SizedBox(height: 8),
+        pw.Text('Preenchido em ${_formatDate(latest.createdAt)}',
+            style: _mutedStyle),
+        pw.SizedBox(height: 6),
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.end,
+          children: [
+            pw.Text('${latest.totalScore}',
+                style: pw.TextStyle(
+                  color: color,
+                  fontSize: 30,
+                  fontWeight: pw.FontWeight.bold,
+                )),
+            pw.Text(' /100',
+                style: _mutedStyle.copyWith(fontSize: 12)),
+            pw.SizedBox(width: 10),
+            pw.Container(
+              padding:
+                  const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.grey100,
+                borderRadius: pw.BorderRadius.circular(4),
+                border: pw.Border.all(color: color),
+              ),
+              child: pw.Text(latest.classificationLabel,
+                  style: pw.TextStyle(
+                      color: color, fontWeight: pw.FontWeight.bold)),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 12),
+        pw.Text('Scores por domínio', style: _textStyle.copyWith(
+            fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 6),
+        pw.TableHelper.fromTextArray(
+          context: context,
+          cellStyle: _textStyle,
+          headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
+          headerDecoration:
+              const pw.BoxDecoration(color: PdfColors.blueGrey50),
+          headers: const ['Domínio', 'Score (0–100)'],
+          data: DvrsDomain.values
+              .map((d) => [
+                    kDvrsDomainLabels[d] ?? d.id,
+                    latest.domainScores.valueFor(d).round().toString(),
+                  ])
+              .toList(),
+        ),
+        if (dvrs.hasEvolution) ...[
+          pw.SizedBox(height: 12),
+          pw.Text('Evolução do score', style: _textStyle.copyWith(
+              fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 6),
+          pw.TableHelper.fromTextArray(
+            context: context,
+            cellStyle: _textStyle,
+            headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
+            headerDecoration:
+                const pw.BoxDecoration(color: PdfColors.blueGrey50),
+            headers: const ['Data', 'Score', 'Classificação'],
+            data: dvrs.history
+                .map((r) => [
+                      _formatDate(r.createdAt),
+                      r.totalScore.toString(),
+                      r.classificationLabel,
+                    ])
+                .toList(),
+          ),
+        ],
+        pw.SizedBox(height: 10),
+        pw.Text(latest.educationalMessage, style: _textStyle),
+        if (latest.safetyAlertLevel != DvrsSafetyAlertLevel.none &&
+            latest.safetyAlertMessage != null) ...[
+          pw.SizedBox(height: 10),
+          pw.Container(
+            width: double.infinity,
+            padding: const pw.EdgeInsets.all(8),
+            decoration: pw.BoxDecoration(
+              color: PdfColors.grey100,
+              border: pw.Border.all(color: _dvrsColor(latest.classification)),
+              borderRadius: pw.BorderRadius.circular(4),
+            ),
+            child: pw.Text(
+              'Atenção: ${latest.safetyAlertMessage}',
+              style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+        ],
+        pw.SizedBox(height: 8),
+        pw.Text(kDvrsPdfLegalNotice, style: _italicStyle),
+      ],
+    );
+  }
+
+  PdfColor _dvrsColor(DvrsClassification c) => switch (c) {
+        DvrsClassification.low => PdfColors.green800,
+        DvrsClassification.mildAttention => PdfColors.orange800,
+        DvrsClassification.moderateRisk => PdfColors.deepOrange,
+        DvrsClassification.highRisk => PdfColors.red,
+        DvrsClassification.veryHighRisk => PdfColors.red900,
+      };
 
   pw.Widget _buildOsdiSection(pw.Context context, ReportData data) {
     final osdi = data.osdi;
