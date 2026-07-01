@@ -176,17 +176,6 @@ coletado, vendido ou enviado para fora da máquina pelo aplicativo.
 
 **Código de Distribuição Livre.** Arquitetura open-source governada sob a Licença **MIT** — garantindo prerrogativas irrestritas de uso, replicação, auditoria de código e derivação comercial ou não-comercial. O objetivo fundamental desta ferramenta é universalizar o cuidado ergonômico. 💙
 
-## 🔏 Assinatura de Código
-
-A assinatura de código do instalador Windows é provida pelo **SignPath
-Foundation** (programa gratuito para projetos open-source), reduzindo os alertas
-de "Editor desconhecido" do SmartScreen.
-
-> Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
-
-Papéis da equipe, processo de aprovação de releases e privacidade na
-[Política de Assinatura de Código](docs/legal/code-signing-policy.md).
-
 ## 👨‍⚕️ Autoria Científica
 
 Concebido e documentado clinicamente pelo **Dr. Philipe Saraiva Cruz** — Médico Oftalmologista · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903

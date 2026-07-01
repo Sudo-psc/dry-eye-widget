@@ -179,17 +179,6 @@ Architecture and Dependencies: The project complies with `flutter analyze` witho
 
 **Open Distribution Code.** Open-source architecture governed under the **MIT** License — guaranteeing unrestricted prerogatives for use, replication, code auditing, and commercial or non-commercial derivation. The fundamental goal of this tool is to universalize ergonomic care. 💙
 
-## 🔏 Code Signing
-
-Code signing for the Windows installer is provided by the **SignPath
-Foundation** (free program for open-source projects), reducing SmartScreen
-"unknown publisher" warnings.
-
-> Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
-
-Team roles, the release approval process and privacy are described in our
-[Code Signing Policy](docs/legal/code-signing-policy.en.md).
-
 ## 👨‍⚕️ Scientific Authorship
 
 Conceptualized and clinically documented by **Dr. Philipe Saraiva Cruz** — Ophthalmologist · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903
