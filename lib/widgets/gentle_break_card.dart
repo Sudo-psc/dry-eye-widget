@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
@@ -56,7 +55,8 @@ class GentleBreakCard extends StatelessWidget {
                       strings.stateTitle(state),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         color: AppColors.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -68,7 +68,8 @@ class GentleBreakCard extends StatelessWidget {
                       strings.stateSubtitle(state),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
                         color: AppColors.textSecondary,
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
@@ -115,7 +116,8 @@ class _BreakLabel extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         child: Text(
           '20-20-20',
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Inter',
             color: Colors.white.withValues(alpha: 0.92),
             fontSize: 10.5,
             fontWeight: FontWeight.w800,
@@ -182,7 +184,8 @@ class _CountdownDial extends StatelessWidget {
             ),
             child: Text(
               timeText,
-              style: GoogleFonts.robotoMono(
+              style: const TextStyle(
+                fontFamily: 'RobotoMono',
                 color: AppColors.textPrimary,
                 fontSize: 21,
                 fontWeight: FontWeight.w900,
