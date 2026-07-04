@@ -6,10 +6,13 @@ import 'liquid_glass.dart';
 
 /// Item do menu flutuante.
 class _MenuItem {
-  const _MenuItem(this.icon, this.label, this.onTap);
+  const _MenuItem(this.icon, this.label, this.onTap,
+      {this.accent, this.emphasized = false});
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Color? accent;
+  final bool emphasized;
 }
 
 /// Menu flutuante exibido ao clicar na bolinha (apenas no estado IDLE).
@@ -58,23 +61,32 @@ class FloatingMenu extends StatelessWidget {
     // Pausas: ações frequentes e de baixa carga textual → linha única de ícones
     // (com tooltip/Semantics para acessibilidade), economizando bastante altura.
     final pauseItems = <_MenuItem>[
-      _MenuItem(Icons.play_circle_outline, s.menuStartBreak, onStartNow),
-      _MenuItem(Icons.refresh, s.menuReset, onReset),
+      _MenuItem(Icons.play_circle_outline, s.menuStartBreak, onStartNow,
+          accent: AppColors.idleBall),
+      _MenuItem(Icons.refresh, s.menuReset, onReset,
+          accent: AppColors.idleBall),
       _MenuItem(
         isPaused ? Icons.play_arrow : Icons.pause,
         isPaused ? s.menuResume : s.menuPause,
         onTogglePause,
+        accent: AppColors.idleBall,
       ),
     ];
 
     // Saúde visual: avaliação e acompanhamento (linhas completas, são destinos).
     final healthItems = <_MenuItem>[
-      _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
-      _MenuItem(Icons.assignment_outlined, s.menuDvrs, onDvrs),
-      _MenuItem(Icons.bar_chart_outlined, s.menuScreenTime, onScreenTime),
-      _MenuItem(Icons.dashboard_outlined, s.menuDashboard, onDashboard),
-      _MenuItem(Icons.trending_up, s.menuProgress, onProgress),
-      _MenuItem(Icons.picture_as_pdf_outlined, s.menuReports, onReports),
+      _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance,
+          accent: const Color(0xFF1ABC9C)),
+      _MenuItem(Icons.assignment, s.menuDvrs, onDvrs,
+          accent: AppColors.idleBall, emphasized: true),
+      _MenuItem(Icons.bar_chart_outlined, s.menuScreenTime, onScreenTime,
+          accent: const Color(0xFF1ABC9C)),
+      _MenuItem(Icons.dashboard_outlined, s.menuDashboard, onDashboard,
+          accent: const Color(0xFF1ABC9C)),
+      _MenuItem(Icons.trending_up, s.menuProgress, onProgress,
+          accent: const Color(0xFF1ABC9C)),
+      _MenuItem(Icons.picture_as_pdf_outlined, s.menuReports, onReports,
+          accent: const Color(0xFF1ABC9C)),
     ];
 
     // Sistema: manutenção do app. "Sobre" (com link do GitHub dentro) fica logo
@@ -89,6 +101,8 @@ class FloatingMenu extends StatelessWidget {
     _MenuRow rowFor(_MenuItem item) => _MenuRow(
       icon: item.icon,
       label: item.label,
+      accent: item.accent,
+      emphasized: item.emphasized,
       onTap: () {
         item.onTap();
         onDismiss();
@@ -141,6 +155,7 @@ class _CompactActionRow extends StatelessWidget {
               child: _CompactActionButton(
                 icon: item.icon,
                 tooltip: item.label,
+                accent: item.accent,
                 onTap: () {
                   item.onTap();
                   onDismiss();
@@ -160,11 +175,13 @@ class _CompactActionButton extends StatefulWidget {
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.accent,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
+  final Color? accent;
 
   @override
   State<_CompactActionButton> createState() => _CompactActionButtonState();
@@ -218,7 +235,10 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
                 child: Icon(
                   widget.icon,
                   size: 22,
-                  color: _hover ? AppColors.idleBall : AppColors.textPrimary,
+                  color: _hover
+                      ? (widget.accent ?? AppColors.idleBall)
+                      : (widget.accent ?? AppColors.textPrimary).withValues(
+                          alpha: widget.accent == null ? 1.0 : 0.95),
                   shadows: const [
                     Shadow(color: Colors.black54, blurRadius: 4),
                   ],
@@ -279,11 +299,15 @@ class _MenuRow extends StatefulWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.accent,
+    this.emphasized = false,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Color? accent;
+  final bool emphasized;
 
   @override
   State<_MenuRow> createState() => _MenuRowState();
@@ -341,7 +365,10 @@ class _MenuRowState extends State<_MenuRow> {
                 child: Icon(
                   widget.icon,
                   size: 18,
-                  color: _hover ? AppColors.idleBall : AppColors.textPrimary,
+                  color: _hover
+                      ? (widget.accent ?? AppColors.idleBall)
+                      : (widget.accent ?? AppColors.textPrimary).withValues(
+                          alpha: widget.accent == null ? 1.0 : 0.95),
                   // Sombra mantém o ícone legível sobre o vidro translúcido.
                   shadows: const [
                     Shadow(color: Colors.black54, blurRadius: 4),
@@ -357,7 +384,9 @@ class _MenuRowState extends State<_MenuRow> {
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textPrimary,
-                    fontWeight: _hover ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: widget.emphasized
+                        ? FontWeight.w600
+                        : (_hover ? FontWeight.w600 : FontWeight.w400),
                     // Sombra sutil = contraste garantido em fundos claros.
                     shadows: const [
                       Shadow(color: Colors.black54, blurRadius: 4),
