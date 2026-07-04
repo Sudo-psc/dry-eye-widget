@@ -29,6 +29,7 @@ import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
 import 'services/update_service.dart';
+import 'ui/app_theme.dart';
 import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
@@ -223,13 +224,7 @@ class DryEyeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        scaffoldBackgroundColor: Colors.transparent,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.idleBall,
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: buildAppTheme(),
       // Aplica a escala de UI (acessibilidade) a toda a árvore de telas e
       // diálogos. Lê do SettingsProvider e reage a mudanças em tempo real.
       builder: (context, child) {
