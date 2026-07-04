@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
+import '../../ui/glass_card.dart';
+import '../../ui/section_header.dart';
+import '../../ui/score_gauge.dart';
 import 'dvrs_ui.dart';
 
 /// Exibe o conteúdo de um [DvrsResult] (sem botões de ação): score,
@@ -23,8 +26,7 @@ class DvrsResultView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _card(
-          theme,
+        GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -38,49 +40,24 @@ class DvrsResultView extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
               ],
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${result.totalScore}',
-                    style: TextStyle(
-                      fontSize: 44,
-                      fontWeight: FontWeight.bold,
-                      height: 1,
-                      color: color,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6, left: 2),
-                    child: Text(
-                      '/100',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  DvrsUi.classificationChip(result.classification),
-                ],
+              Center(
+                child: ScoreGauge(
+                  score: result.totalScore,
+                  color: color,
+                  segments: DvrsUi.classificationSegments,
+                ),
               ),
-              const SizedBox(height: 12),
-              DvrsUi.riskBar(result.classification, result.totalScore),
+              const SizedBox(height: 10),
+              Center(child: DvrsUi.classificationChip(result.classification)),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        _card(
-          theme,
+        GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Scores por domínio',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 12),
+              SectionHeader('Scores por domínio'),
               for (final domain in DvrsDomain.values) ...[
                 _domainBar(theme, domain, result.domainScores.valueFor(domain)),
                 const SizedBox(height: 10),
@@ -89,8 +66,7 @@ class DvrsResultView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        _card(
-          theme,
+        GlassCard(
           child: Text(
             result.educationalMessage,
             style: const TextStyle(fontSize: 14, height: 1.4),
@@ -105,19 +81,6 @@ class DvrsResultView extends StatelessWidget {
       ],
     );
   }
-
-  Widget _card(ThemeData theme, {required Widget child}) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
-          ),
-        ),
-        child: child,
-      );
 
   Widget _domainBar(ThemeData theme, DvrsDomain domain, double value) {
     final pct = value.clamp(0.0, 100.0);
@@ -139,13 +102,18 @@ class DvrsResultView extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: pct / 100,
-            minHeight: 7,
-            backgroundColor:
-                theme.colorScheme.onSurface.withValues(alpha: 0.08),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: pct / 100),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          builder: (context, v, _) => ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: v,
+              minHeight: 7,
+              backgroundColor:
+                  theme.colorScheme.onSurface.withValues(alpha: 0.08),
+            ),
           ),
         ),
       ],

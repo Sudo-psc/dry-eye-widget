@@ -205,6 +205,11 @@ class DvrsUi {
       '${d.day.toString().padLeft(2, '0')}/'
       '${d.month.toString().padLeft(2, '0')}/${d.year}';
 
+  /// Cores das 5 faixas de classificação em ordem (0–19 … 80–100).
+  static List<Color> get classificationSegments => [
+        for (final c in DvrsClassification.values) classificationColor(c),
+      ];
+
   /// Barra de risco 0–100 com marcador na posição do [score].
   static Widget riskBar(DvrsClassification classification, int score) {
     final color = classificationColor(classification);
