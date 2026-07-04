@@ -190,6 +190,7 @@ class _OverviewTab extends StatelessWidget {
                         showGrid: false,
                         dateLabels: false,
                         height: 44,
+                        formatValue: (v) => _fmtSecs(v.round()),
                       )
                     : null,
               ),
