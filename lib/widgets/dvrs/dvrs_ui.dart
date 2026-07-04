@@ -176,6 +176,38 @@ class DvrsUi {
     }
   }
 
+  /// Ícone de cada domínio do DVRS.
+  static IconData domainIcon(DvrsDomain d) {
+    switch (d) {
+      case DvrsDomain.symptoms:
+        return Icons.visibility_outlined;
+      case DvrsDomain.functional:
+        return Icons.speed_outlined;
+      case DvrsDomain.exposure:
+        return Icons.devices_outlined;
+      case DvrsDomain.environment:
+        return Icons.light_mode_outlined;
+      case DvrsDomain.warning:
+        return Icons.priority_high;
+    }
+  }
+
+  /// Cor de apoio de cada domínio (nunca o único indicador).
+  static Color domainColor(DvrsDomain d) {
+    switch (d) {
+      case DvrsDomain.symptoms:
+        return Colors.lightBlue;
+      case DvrsDomain.functional:
+        return Colors.teal;
+      case DvrsDomain.exposure:
+        return Colors.amber;
+      case DvrsDomain.environment:
+        return Colors.purpleAccent;
+      case DvrsDomain.warning:
+        return Colors.redAccent;
+    }
+  }
+
   /// Aviso fixo de não-diagnóstico.
   static const String disclaimer =
       'Este resultado é educativo, não confirma diagnóstico e não substitui '
