@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
+import '../ui/breathing_circle.dart';
+import '../ui/progress_ring.dart';
 import '../utils/constants.dart';
 import 'blinking_eye.dart';
 import 'liquid_glass.dart';
@@ -17,6 +19,8 @@ class GlassOverlay extends StatelessWidget {
     required this.state,
     required this.strings,
     required this.secondsRemaining,
+    required this.phaseTotalSeconds,
+    this.currentStreak = 0,
     this.fillOpacity = 0.15,
     this.blur = 20.0,
   });
@@ -24,6 +28,8 @@ class GlassOverlay extends StatelessWidget {
   final AppState state;
   final AppStrings strings;
   final int secondsRemaining;
+  final int phaseTotalSeconds;
+  final int currentStreak;
 
   /// Opacidade do preenchimento branco do vidro.
   final double fillOpacity;
@@ -73,7 +79,13 @@ class GlassOverlay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (state.showsCountdown) ...[
-            const BlinkingEye(size: 96),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                const BreathingCircle(size: 150),
+                const BlinkingEye(size: 96),
+              ],
+            ),
             const SizedBox(height: 16),
           ],
           Text(
@@ -96,9 +108,42 @@ class GlassOverlay extends StatelessWidget {
               height: 1.4,
             ),
           ),
+          if (state == AppState.conclusao) ...[
+            const SizedBox(height: 16),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.elasticOut,
+              builder: (context, v, child) =>
+                  Transform.scale(scale: v, child: child),
+              child: const Icon(Icons.check_circle,
+                  size: 44, color: AppColors.textPrimary),
+            ),
+            if (currentStreak >= 2) ...[
+              const SizedBox(height: 10),
+              Text(
+                // Localizado: reusa o helper existente do "Meu Progresso"
+                // (ex.: "5 dias" / "5 days").
+                '🔥 ${strings.progressDaysCount(currentStreak)}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ],
           if (state.showsCountdown) ...[
             const SizedBox(height: 24),
-            TimerDisplay(secondsRemaining: secondsRemaining),
+            ProgressRing(
+              value: phaseTotalSeconds <= 0
+                  ? 0
+                  : 1 - secondsRemaining / phaseTotalSeconds,
+              size: 118,
+              strokeWidth: 5,
+              color: Colors.white,
+              child: TimerDisplay(secondsRemaining: secondsRemaining),
+            ),
           ],
         ],
       ),
