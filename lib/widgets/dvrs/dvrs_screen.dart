@@ -45,6 +45,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
   /// Índice da pergunta atual (0..15).
   int _index = 0;
 
+  /// Direção da última navegação (true = avançar, false = voltar).
+  bool _navForward = true;
+
   DvrsResult? _result;
   bool _saved = false;
 
@@ -58,6 +61,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
       });
 
   void _next() {
+    _navForward = true;
     if (_index < kDvrsQuestions.length - 1) {
       setState(() => _index++);
     } else {
@@ -66,6 +70,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
   }
 
   void _back() {
+    _navForward = false;
     if (_index > 0) {
       setState(() => _index--);
     } else {
@@ -321,24 +326,70 @@ class _DvrsScreenState extends State<DvrsScreen> {
           ),
         ),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              Text(
-                q.title,
-                style:
-                    const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: Offset(_navForward ? 0.08 : -0.08, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
               ),
-              const SizedBox(height: 8),
-              Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
-              const SizedBox(height: 20),
-              for (var i = 0; i < q.options.length; i++) ...[
-                _optionTile(theme, q.options[i].label, selected == i, () {
-                  setState(() => _selected[q.id] = i);
-                }),
-                const SizedBox(height: 10),
+            ),
+            child: ListView(
+              key: ValueKey(_index),
+              padding: const EdgeInsets.all(24),
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: DvrsUi.domainColor(q.domain)
+                            .withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(DvrsUi.domainIcon(q.domain),
+                              size: 14, color: DvrsUi.domainColor(q.domain)),
+                          const SizedBox(width: 6),
+                          Text(
+                            kDvrsDomainLabels[q.domain] ?? '',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: DvrsUi.domainColor(q.domain),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  q.title,
+                  style:
+                      const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
+                const SizedBox(height: 20),
+                for (var i = 0; i < q.options.length; i++) ...[
+                  _optionTile(theme, q.options[i].label, selected == i, () {
+                    setState(() => _selected[q.id] = i);
+                  }),
+                  const SizedBox(height: 10),
+                ],
               ],
-            ],
+            ),
           ),
         ),
         _questionsFooter(theme, selected != null),
@@ -555,7 +606,15 @@ class _DvrsScreenState extends State<DvrsScreen> {
           height: 52,
           child: FilledButton.icon(
             onPressed: _saved ? null : _save,
-            icon: const Icon(Icons.save_alt),
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
+              child: Icon(
+                _saved ? Icons.check_circle : Icons.save_alt,
+                key: ValueKey(_saved),
+              ),
+            ),
             label: Text(_saved ? 'Salvo' : 'Salvar resultado'),
             style: FilledButton.styleFrom(
               shape:

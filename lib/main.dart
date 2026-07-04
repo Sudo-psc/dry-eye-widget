@@ -29,6 +29,7 @@ import 'services/startup_service.dart';
 import 'services/storage_service.dart';
 import 'services/tray_service.dart';
 import 'services/update_service.dart';
+import 'ui/app_theme.dart';
 import 'utils/constants.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
@@ -223,13 +224,7 @@ class DryEyeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        scaffoldBackgroundColor: Colors.transparent,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.idleBall,
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: buildAppTheme(),
       // Aplica a escala de UI (acessibilidade) a toda a árvore de telas e
       // diálogos. Lê do SettingsProvider e reage a mudanças em tempo real.
       builder: (context, child) {
@@ -297,6 +292,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _progressOpen = false;
   bool _onboardingOpen = false;
   bool _wasActive = false;
+  int _currentStreak = 0;
   bool _wasDrops = false;
   bool _wasInactive = false;
   bool _blinkReminderVisible = false;
@@ -489,6 +485,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _timer.state == AppState.idle;
 
   void _onStateChanged() {
+    // Streak para a tela de conclusão (calculado só na transição, não a cada tick).
+    if (_timer.state == AppState.conclusao && _wasActive) {
+      _currentStreak = context
+          .read<StorageService>()
+          .loadBreakStats()
+          .currentStreak(DateTime.now());
+    }
     // Mantém o ícone da barra de menu em sincronia com o progresso do ciclo.
     _tray.updateProgress(_timer.cycleProgress);
     final active = _timer.state.isActive;
@@ -1278,6 +1281,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
             state: timer.state,
             strings: strings,
             secondsRemaining: timer.phaseRemaining,
+            phaseTotalSeconds: timer.phaseSeconds,
+            currentStreak: _currentStreak,
             fillOpacity: settings.overlayOpacity,
             blur: settings.overlayBlur,
           ),

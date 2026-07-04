@@ -176,6 +176,38 @@ class DvrsUi {
     }
   }
 
+  /// Ícone de cada domínio do DVRS.
+  static IconData domainIcon(DvrsDomain d) {
+    switch (d) {
+      case DvrsDomain.symptoms:
+        return Icons.visibility_outlined;
+      case DvrsDomain.functional:
+        return Icons.speed_outlined;
+      case DvrsDomain.exposure:
+        return Icons.devices_outlined;
+      case DvrsDomain.environment:
+        return Icons.light_mode_outlined;
+      case DvrsDomain.warning:
+        return Icons.priority_high;
+    }
+  }
+
+  /// Cor de apoio de cada domínio (nunca o único indicador).
+  static Color domainColor(DvrsDomain d) {
+    switch (d) {
+      case DvrsDomain.symptoms:
+        return Colors.lightBlue;
+      case DvrsDomain.functional:
+        return Colors.teal;
+      case DvrsDomain.exposure:
+        return Colors.amber;
+      case DvrsDomain.environment:
+        return Colors.purpleAccent;
+      case DvrsDomain.warning:
+        return Colors.redAccent;
+    }
+  }
+
   /// Aviso fixo de não-diagnóstico.
   static const String disclaimer =
       'Este resultado é educativo, não confirma diagnóstico e não substitui '
@@ -205,52 +237,9 @@ class DvrsUi {
       '${d.day.toString().padLeft(2, '0')}/'
       '${d.month.toString().padLeft(2, '0')}/${d.year}';
 
-  /// Barra de risco 0–100 com marcador na posição do [score].
-  static Widget riskBar(DvrsClassification classification, int score) {
-    final color = classificationColor(classification);
-    return Semantics(
-      label: 'Score $score de 100',
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final pos = (score / 100).clamp(0.0, 1.0) * width;
-          return SizedBox(
-            height: 18,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  height: 10,
-                  margin: const EdgeInsets.only(top: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Colors.green,
-                        Colors.orange,
-                        Colors.deepOrange,
-                        Colors.red,
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: (pos - 6).clamp(0.0, width - 12),
-                  child: Container(
-                    width: 12,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(3),
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+  /// Cores das 5 faixas de classificação em ordem (0–19 … 80–100).
+  static List<Color> get classificationSegments => [
+        for (final c in DvrsClassification.values) classificationColor(c),
+      ];
+
 }

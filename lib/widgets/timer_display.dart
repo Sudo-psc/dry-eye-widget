@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants.dart';
 
@@ -29,7 +28,8 @@ class TimerDisplay extends StatelessWidget {
           Transform.scale(scale: scale, child: child),
       child: Text(
         _formatted,
-        style: GoogleFonts.robotoMono(
+        style: const TextStyle(
+          fontFamily: 'RobotoMono',
           fontSize: 34,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,

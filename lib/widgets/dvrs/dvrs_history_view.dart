@@ -5,6 +5,9 @@ import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
+import '../../ui/glass_card.dart';
+import '../../ui/section_header.dart';
+import '../../ui/trend_line_chart.dart';
 import 'dvrs_ui.dart';
 
 /// Histórico longitudinal do DVRS: último resultado, variação, gráfico de
@@ -58,9 +61,12 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     }
 
     final latest = _history.last;
-    final previous = _history.length >= 2 ? _history[_history.length - 2] : null;
-    final trend = previous == null ? null : compareDvrsTrend(previous, latest);
-    final delta = previous == null ? null : latest.totalScore - previous.totalScore;
+    final previous =
+        _history.length >= 2 ? _history[_history.length - 2] : null;
+    final trend =
+        previous == null ? null : compareDvrsTrend(previous, latest);
+    final delta =
+        previous == null ? null : latest.totalScore - previous.totalScore;
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -68,21 +74,23 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
         _latestCard(theme, latest, trend, delta),
         const SizedBox(height: 16),
         _chartCard(
-          theme,
           title: 'Evolução do score',
-          points: [for (final r in _history) (r.createdAt, r.totalScore.toDouble())],
+          points: [
+            for (final r in _history) (r.createdAt, r.totalScore.toDouble()),
+          ],
         ),
         const SizedBox(height: 16),
-        _domainEvolutionCard(theme),
+        _domainEvolutionCard(),
         const SizedBox(height: 16),
         _historyListCard(theme),
         const SizedBox(height: 16),
-        _card(
-          theme,
+        GlassCard(
           child: Row(
             children: [
-              Icon(Icons.event_repeat,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+              Icon(
+                Icons.event_repeat,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
@@ -105,8 +113,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     int? delta,
   ) {
     final color = DvrsUi.classificationColor(latest.classification);
-    return _card(
-      theme,
+    return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -169,17 +176,32 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     );
   }
 
-  Widget _domainEvolutionCard(ThemeData theme) {
-    return _card(
-      theme,
+  Widget _chartCard({
+    required String title,
+    required List<(DateTime, double)> points,
+  }) {
+    return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Evolução por domínio',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          SectionHeader(title),
+          TrendLineChart(
+            points: points,
+            minY: 0,
+            maxY: 100,
+            height: 160,
           ),
-          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _domainEvolutionCard() {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionHeader('Evolução por domínio'),
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -196,50 +218,14 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
             ],
           ),
           const SizedBox(height: 12),
-          SizedBox(
+          TrendLineChart(
+            points: [
+              for (final r in _history)
+                (r.createdAt, r.domainScores.valueFor(_selectedDomain)),
+            ],
+            minY: 0,
+            maxY: 100,
             height: 140,
-            child: CustomPaint(
-              painter: _DvrsLineChartPainter(
-                points: [
-                  for (final r in _history)
-                    (r.createdAt, r.domainScores.valueFor(_selectedDomain))
-                ],
-                lineColor: theme.colorScheme.primary,
-                axisColor: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                gridColor: theme.colorScheme.onSurface.withValues(alpha: 0.12),
-              ),
-              child: const SizedBox.expand(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _chartCard(
-    ThemeData theme, {
-    required String title,
-    required List<(DateTime, double)> points,
-  }) {
-    return _card(
-      theme,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 160,
-            child: CustomPaint(
-              painter: _DvrsLineChartPainter(
-                points: points,
-                lineColor: theme.colorScheme.primary,
-                axisColor: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                gridColor: theme.colorScheme.onSurface.withValues(alpha: 0.12),
-              ),
-              child: const SizedBox.expand(),
-            ),
           ),
         ],
       ),
@@ -248,16 +234,11 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
 
   Widget _historyListCard(ThemeData theme) {
     final reversed = _history.reversed.toList();
-    return _card(
-      theme,
+    return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Resultados',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
+          const SectionHeader('Resultados'),
           for (final r in reversed)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -305,90 +286,4 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
       ),
     );
   }
-
-  Widget _card(ThemeData theme, {required Widget child}) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.4),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
-          ),
-        ),
-        child: child,
-      );
-}
-
-/// Gráfico de linha simples 0–100 com linhas de referência em 20/40/60/80.
-class _DvrsLineChartPainter extends CustomPainter {
-  _DvrsLineChartPainter({
-    required this.points,
-    required this.lineColor,
-    required this.axisColor,
-    required this.gridColor,
-  });
-
-  final List<(DateTime, double)> points;
-  final Color lineColor;
-  final Color axisColor;
-  final Color gridColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double left = 28;
-    const double bottom = 16;
-    final chartW = size.width - left;
-    final chartH = size.height - bottom;
-    if (chartW <= 0 || chartH <= 0) return;
-
-    double yFor(double v) => chartH * (1 - (v.clamp(0, 100) / 100));
-
-    final gridPaint = Paint()
-      ..color = gridColor
-      ..strokeWidth = 0.5;
-    final textStyle = TextStyle(color: axisColor, fontSize: 9);
-    for (final ref in [0, 20, 40, 60, 80, 100]) {
-      final y = yFor(ref.toDouble());
-      canvas.drawLine(Offset(left, y), Offset(size.width, y), gridPaint);
-      final tp = TextPainter(
-        text: TextSpan(text: '$ref', style: textStyle),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      tp.paint(canvas, Offset(0, y - tp.height / 2));
-    }
-
-    if (points.isEmpty) return;
-
-    double xFor(int i) {
-      if (points.length == 1) return left + chartW / 2;
-      return left + chartW * (i / (points.length - 1));
-    }
-
-    final linePaint = Paint()
-      ..color = lineColor
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-    final dotPaint = Paint()..color = lineColor;
-
-    final path = Path();
-    for (var i = 0; i < points.length; i++) {
-      final x = xFor(i);
-      final y = yFor(points[i].$2);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    canvas.drawPath(path, linePaint);
-    for (var i = 0; i < points.length; i++) {
-      canvas.drawCircle(Offset(xFor(i), yFor(points[i].$2)), 3, dotPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DvrsLineChartPainter old) =>
-      old.points != points || old.lineColor != lineColor;
 }

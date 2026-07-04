@@ -7,6 +7,13 @@ import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/screen_time_service.dart';
+import '../../services/storage_service.dart';
+import '../../ui/app_theme.dart';
+import '../../ui/glass_card.dart';
+import '../../ui/score_gauge.dart';
+import '../../ui/section_header.dart';
+import '../../ui/stat_tile.dart';
+import '../../ui/trend_line_chart.dart';
 import '../../utils/constants.dart';
 import '../dvrs/dvrs_history_view.dart';
 import '../dvrs/dvrs_ui.dart';
@@ -125,10 +132,13 @@ class _OverviewTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     final screenTime = context.watch<ScreenTimeService>();
     final now = DateTime.now();
     final todaySecs = screenTime.data.secondsForDay(now);
+    final screenTodayLabel = _fmtSecs(todaySecs);
 
+    // DVRS — reusa as variáveis que a aba já usava.
     final dvrsHistory = context.read<DvrsStorageService>().getDvrsHistory();
     final latest = dvrsHistory.isNotEmpty ? dvrsHistory.last : null;
     final previous =
@@ -137,125 +147,111 @@ class _OverviewTab extends StatelessWidget {
         ? compareDvrsTrend(previous, latest)
         : null;
 
+    // Adesão às pausas — 7 dias.
+    final breakStats = context.read<StorageService>().loadBreakStats();
+    final adh7Start = now.subtract(const Duration(days: 6));
+    final double? adherence7 =
+        breakStats.sumForRange(adh7Start, now).reminders > 0
+            ? breakStats.adherenceForRange(adh7Start, now)
+            : null;
+
+    // Sparkline de tempo de tela — últimos 7 dias.
+    final last7 = <(DateTime, double)>[
+      for (final p in screenTime.data.dailySeries(now, 7))
+        (p.day, p.seconds.toDouble()),
+    ];
+
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       children: [
-        _bigCard(
-          theme,
-          icon: Icons.monitor_outlined,
-          color: AppColors.idleBall,
-          label: 'Tempo de tela hoje',
-          value: _fmtSecs(todaySecs),
-          sub: _screenTimeSub(todaySecs),
-        ),
-        const SizedBox(height: 12),
-        _bigCard(
-          theme,
-          icon: Icons.assignment_outlined,
-          color: latest != null
-              ? DvrsUi.classificationColor(latest.classification)
-              : Colors.blueGrey,
-          label: 'DVRS — Risco Visual Digital',
-          value: latest != null ? '${latest.totalScore}' : '—',
-          sub: latest != null
-              ? '${latest.classificationLabel} · ${DvrsUi.formatDate(latest.createdAt)}'
-              : 'Nenhum DVRS respondido ainda',
-        ),
-        if (latest != null) ...[
-          const SizedBox(height: 12),
-          DvrsUi.riskBar(latest.classification, latest.totalScore),
-          if (trend != null) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Icon(DvrsUi.trendIcon(trend),
-                    size: 16, color: DvrsUi.trendColor(trend)),
-                const SizedBox(width: 6),
-                Text(
-                  DvrsUi.trendLabel(trend),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: DvrsUi.trendColor(trend),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: StatTile(
+                label: 'Adesão às pausas · 7 dias',
+                value: adherence7 == null
+                    ? '—'
+                    : '${(adherence7 * 100).round()}%',
+                ringValue: adherence7 ?? 0,
+                icon: Icons.free_breakfast_outlined,
+                color: semantic.success,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: StatTile(
+                label: 'Tela hoje',
+                value: screenTodayLabel,
+                icon: Icons.desktop_windows_outlined,
+                footer: last7.length >= 2
+                    ? TrendLineChart(
+                        points: last7,
+                        showGrid: false,
+                        dateLabels: false,
+                        height: 44,
+                        formatValue: (v) => _fmtSecs(v.round()),
+                      )
+                    : null,
+              ),
             ),
           ],
-        ],
-        const SizedBox(height: 20),
+        ),
+        const SizedBox(height: 12),
+        GlassCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SectionHeader('DVRS — Risco Visual Digital'),
+              if (latest == null)
+                Text(
+                  'Responda o DVRS para acompanhar seu risco visual digital.',
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
+                  ),
+                )
+              else ...[
+                Center(
+                  child: ScoreGauge(
+                    score: latest.totalScore,
+                    color: DvrsUi.classificationColor(latest.classification),
+                    segments: DvrsUi.classificationSegments,
+                    size: 150,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: DvrsUi.classificationChip(latest.classification),
+                ),
+                // Linha de tendência (compareDvrsTrend) — mantida da versão anterior.
+                if (trend != null) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(DvrsUi.trendIcon(trend),
+                          size: 16, color: DvrsUi.trendColor(trend)),
+                      const SizedBox(width: 6),
+                      Text(
+                        DvrsUi.trendLabel(trend),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: DvrsUi.trendColor(trend),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
         DvrsUi.disclaimerBanner(theme),
       ],
-    );
-  }
-
-  String _screenTimeSub(int secs) {
-    final h = secs ~/ 3600;
-    if (secs == 0) return 'Nenhum registro hoje';
-    if (h >= 8) return 'Alto uso — considere pausas frequentes';
-    if (h >= 6) return 'Uso elevado';
-    if (h >= 4) return 'Uso moderado';
-    return 'Uso dentro do esperado';
-  }
-
-  Widget _bigCard(
-    ThemeData theme, {
-    required IconData icon,
-    required Color color,
-    required String label,
-    required String value,
-    required String sub,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 26),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  sub,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -4,6 +4,28 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.20.0] - 2026-07-04
+
+### Adicionado
+- **Design system**: componentes visuais unificados (cards, anéis de progresso,
+  gauge de score, gráfico de tendência com área) e tema central com tipografia
+  Inter/RobotoMono embutida no app (sem download de fontes em tempo de execução).
+- **DVRS**: gauge semicircular animado no resultado, transições suaves entre as
+  16 perguntas com identificação do domínio, barras de domínio animadas e
+  confirmação visual ao salvar.
+- **Pausa 20-20-20**: anel de progresso ao redor do cronômetro, círculo de
+  respiração guiada durante a pausa e sequência (streak) na tela de conclusão.
+- **Painel**: aba Resumo com indicadores visuais (adesão às pausas em anel,
+  tempo de tela com miniatura de tendência e mini gauge do DVRS).
+
+### Modificado
+- Menu flutuante com cores por grupo e o DVRS em destaque.
+- Tipografia e espaçamentos consistentes em todas as telas.
+
+### Removido
+- Dependência `google_fonts` (fontes agora locais — melhor para uso offline e
+  privacidade).
+
 ## [1.19.1] - 2026-06-30
 
 ### Removido
