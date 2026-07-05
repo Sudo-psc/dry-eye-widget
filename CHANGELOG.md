@@ -4,6 +4,27 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.21.0] - 2026-07-05
+
+### Adicionado
+- **Encaixe na borda (meia-lua)**: ao arrastar a bolinha até a borda lateral,
+  ela encosta e some pela metade — translúcida e discreta. Um clique a solta.
+  Nova opção nas Configurações (ligada por padrão) e estado preservado entre
+  reinícios.
+- **Monitoramento de atividade (opt-in, desligado por padrão)**: contagem
+  agregada de cliques e teclas por dia — apenas quantidades, nunca quais teclas
+  — e tempo de uso por app, com ranking dos mais usados. Dados 100% locais,
+  sem envio a servidores, com retenção reduzida (180 dias). Resumo do dia no
+  diálogo de Tempo de tela. No macOS, a contagem de teclas exige permissão de
+  Acessibilidade.
+
+### Modificado
+- **Aviso visual de piscada** mais perceptível: a bolinha brilha, clareia e
+  ganha opacidade por um instante ao emitir o lembrete, voltando ao normal em
+  seguida.
+- **Menu flutuante** sem cores por grupo — ícones neutros, com o DVRS ainda em
+  destaque.
+
 ## [1.20.0] - 2026-07-04
 
 ### Adicionado
