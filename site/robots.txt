@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://app.olhossecos.com.br/sitemap.xml
+Sitemap: https://sudo-psc.github.io/dry-eye-widget/sitemap.xml

@@ -3,7 +3,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://app.olhossecos.com.br/</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
@@ -11,128 +11,128 @@
 
   <!-- Blog index -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/"/>
   </url>
 
   <!-- Article 1 -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/olho-seco-trabalhadores-terminais-digitais.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/olho-seco-trabalhadores-terminais-digitais.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/olho-seco-trabalhadores-terminais-digitais.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/dry-eye-vdt-workers.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/olho-seco-trabalhadores-terminais-digitais.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/dry-eye-vdt-workers.html"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/dry-eye-vdt-workers.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/dry-eye-vdt-workers.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/olho-seco-trabalhadores-terminais-digitais.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/dry-eye-vdt-workers.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/olho-seco-trabalhadores-terminais-digitais.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/dry-eye-vdt-workers.html"/>
   </url>
 
   <!-- Article 2 -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/produtividade-e-olho-seco.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/produtividade-e-olho-seco.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/produtividade-e-olho-seco.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/productivity-and-dry-eye.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/produtividade-e-olho-seco.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/productivity-and-dry-eye.html"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/productivity-and-dry-eye.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/productivity-and-dry-eye.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/produtividade-e-olho-seco.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/productivity-and-dry-eye.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/produtividade-e-olho-seco.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/productivity-and-dry-eye.html"/>
   </url>
 
   <!-- Article 3 -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/presenteismo-olho-seco-empresas.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/presenteismo-olho-seco-empresas.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/presenteismo-olho-seco-empresas.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/presenteeism-dry-eye-companies.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/presenteismo-olho-seco-empresas.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/presenteeism-dry-eye-companies.html"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/presenteeism-dry-eye-companies.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/presenteeism-dry-eye-companies.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/presenteismo-olho-seco-empresas.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/presenteeism-dry-eye-companies.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/presenteismo-olho-seco-empresas.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/presenteeism-dry-eye-companies.html"/>
   </url>
 
   <!-- Article 4 -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/sindrome-visao-computador.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/sindrome-visao-computador.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/sindrome-visao-computador.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/computer-vision-syndrome.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/sindrome-visao-computador.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/computer-vision-syndrome.html"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/computer-vision-syndrome.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/computer-vision-syndrome.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/sindrome-visao-computador.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/computer-vision-syndrome.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/sindrome-visao-computador.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/computer-vision-syndrome.html"/>
   </url>
 
   <!-- Article 5 -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/regra-20-20-20-guia-pratico.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/regra-20-20-20-guia-pratico.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/regra-20-20-20-guia-pratico.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/20-20-20-rule-practical-guide.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/regra-20-20-20-guia-pratico.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/20-20-20-rule-practical-guide.html"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/20-20-20-rule-practical-guide.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/20-20-20-rule-practical-guide.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/regra-20-20-20-guia-pratico.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/20-20-20-rule-practical-guide.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/regra-20-20-20-guia-pratico.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/20-20-20-rule-practical-guide.html"/>
   </url>
 
   <!-- Article 6 -->
   <url>
-    <loc>https://app.olhossecos.com.br/blog/home-office-olho-seco.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/home-office-olho-seco.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/home-office-olho-seco.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/remote-work-dry-eye.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/home-office-olho-seco.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/remote-work-dry-eye.html"/>
   </url>
   <url>
-    <loc>https://app.olhossecos.com.br/blog/en/remote-work-dry-eye.html</loc>
+    <loc>https://sudo-psc.github.io/dry-eye-widget/blog/en/remote-work-dry-eye.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://app.olhossecos.com.br/blog/home-office-olho-seco.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://app.olhossecos.com.br/blog/en/remote-work-dry-eye.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://sudo-psc.github.io/dry-eye-widget/blog/home-office-olho-seco.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sudo-psc.github.io/dry-eye-widget/blog/en/remote-work-dry-eye.html"/>
   </url>
 
 </urlset>
