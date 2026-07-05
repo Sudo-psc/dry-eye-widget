@@ -43,6 +43,7 @@ class WidgetSettings {
     required this.gentleMode,
     required this.lockScreenOnBreak,
     required this.screenTimeTracking,
+    required this.activityMonitorEnabled,
     required this.languageCode,
     required this.eyeDropsEnabled,
     required this.eyeDropsIntervalHours,
@@ -141,6 +142,9 @@ class WidgetSettings {
   /// inatividade). Alimenta a janela de visualização de tempo de tela.
   final bool screenTimeTracking;
 
+  /// Monitora cliques, teclas (só contagem) e apps em foco. Opt-in.
+  final bool activityMonitorEnabled;
+
   /// Idioma da interface: 'pt' ou 'en'.
   final String languageCode;
 
@@ -200,6 +204,7 @@ class WidgetSettings {
     gentleMode: AppDefaults.gentleMode,
     lockScreenOnBreak: AppDefaults.lockScreenOnBreak,
     screenTimeTracking: AppDefaults.screenTimeTracking,
+    activityMonitorEnabled: AppDefaults.activityMonitorEnabled,
     languageCode: AppDefaults.languageCode,
     eyeDropsEnabled: AppDefaults.eyeDropsEnabled,
     eyeDropsIntervalHours: AppDefaults.eyeDropsIntervalHours,
@@ -246,6 +251,7 @@ class WidgetSettings {
     bool? gentleMode,
     bool? lockScreenOnBreak,
     bool? screenTimeTracking,
+    bool? activityMonitorEnabled,
     String? languageCode,
     bool? eyeDropsEnabled,
     int? eyeDropsIntervalHours,
@@ -291,6 +297,8 @@ class WidgetSettings {
       gentleMode: gentleMode ?? this.gentleMode,
       lockScreenOnBreak: lockScreenOnBreak ?? this.lockScreenOnBreak,
       screenTimeTracking: screenTimeTracking ?? this.screenTimeTracking,
+      activityMonitorEnabled:
+          activityMonitorEnabled ?? this.activityMonitorEnabled,
       languageCode: languageCode ?? this.languageCode,
       eyeDropsEnabled: eyeDropsEnabled ?? this.eyeDropsEnabled,
       eyeDropsIntervalHours:
@@ -349,6 +357,7 @@ class WidgetSettings {
       gentleMode: gentleMode,
       lockScreenOnBreak: lockScreenOnBreak,
       screenTimeTracking: screenTimeTracking,
+      activityMonitorEnabled: activityMonitorEnabled,
       languageCode: languageCode == 'en' || languageCode == 'pt'
           ? languageCode
           : d.languageCode,
@@ -413,6 +422,7 @@ class WidgetSettings {
     'gentleMode': gentleMode,
     'lockScreenOnBreak': lockScreenOnBreak,
     'screenTimeTracking': screenTimeTracking,
+    'activityMonitorEnabled': activityMonitorEnabled,
     'languageCode': languageCode,
     'eyeDropsEnabled': eyeDropsEnabled,
     'eyeDropsIntervalHours': eyeDropsIntervalHours,
@@ -481,6 +491,8 @@ class WidgetSettings {
           map['lockScreenOnBreak'] as bool? ?? d.lockScreenOnBreak,
       screenTimeTracking:
           map['screenTimeTracking'] as bool? ?? d.screenTimeTracking,
+      activityMonitorEnabled:
+          map['activityMonitorEnabled'] as bool? ?? d.activityMonitorEnabled,
       languageCode: map['languageCode'] as String? ?? d.languageCode,
       eyeDropsEnabled: map['eyeDropsEnabled'] as bool? ?? d.eyeDropsEnabled,
       eyeDropsIntervalHours:

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/break_stats_data.dart';
+import '../models/activity_stats_data.dart';
 import '../models/environment_checklist.dart';
 import '../models/screen_time_data.dart';
 import '../models/widget_settings.dart';
@@ -69,7 +70,18 @@ class StorageService {
     }
   }
 
-  // --- Tempo de tela ------------------------------------------------------
+  // --- Atividade (cliques, teclas, apps) ----------------------------------
+
+  ActivityStatsData loadActivityStats() =>
+      ActivityStatsData.fromJson(_prefs.getString(StorageKeys.activityStats));
+
+  Future<void> saveActivityStats(ActivityStatsData data) =>
+      _prefs.setString(StorageKeys.activityStats, data.toJson());
+
+  Future<void> clearActivityStats() =>
+      _prefs.remove(StorageKeys.activityStats);
+
+    // --- Tempo de tela ------------------------------------------------------
 
   ScreenTimeData loadScreenTime() =>
       ScreenTimeData.fromJson(_prefs.getString(StorageKeys.screenTime));

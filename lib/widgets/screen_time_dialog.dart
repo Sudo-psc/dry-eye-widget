@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/activity_stats_data.dart';
 import '../models/screen_time_data.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
@@ -22,6 +23,7 @@ class ScreenTimeDialog extends StatefulWidget {
     required this.trackingEnabled,
     required this.onClose,
     required this.onClear,
+    this.activity,
   });
 
   final AppStrings strings;
@@ -29,6 +31,9 @@ class ScreenTimeDialog extends StatefulWidget {
   final bool trackingEnabled;
   final VoidCallback onClose;
   final VoidCallback onClear;
+
+  /// Estatísticas de atividade do dia (opt-in). `null` = monitor desligado.
+  final ActivityStatsData? activity;
 
   @override
   State<ScreenTimeDialog> createState() => _ScreenTimeDialogState();
@@ -94,6 +99,10 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
           ),
           const SizedBox(height: 16),
           _todayCard(s, formatDuration(data.secondsForDay(now), s)),
+          if (widget.activity != null) ...[
+            const SizedBox(height: 12),
+            _activityCard(s, widget.activity!, now),
+          ],
           const SizedBox(height: 16),
           if (!widget.trackingEnabled) ...[
             _hint(s.screenTimeDisabledHint),
@@ -169,6 +178,111 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
   }
 
   // --- Componentes --------------------------------------------------------
+
+  Widget _activityCard(AppStrings s, ActivityStatsData a, DateTime now) {
+    final clicks = a.clicksForDay(now);
+    final keys = a.keysForDay(now);
+    final top = a.topApps(now, now, limit: 3);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.glassBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _metric(Icons.mouse_outlined, s.activityClicks,
+                    _compactCount(clicks)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _metric(Icons.keyboard_outlined, s.activityKeys,
+                    _compactCount(keys)),
+              ),
+            ],
+          ),
+          if (top.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              s.activityTopApps,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 6),
+            for (final app in top)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        app.appName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      formatDuration(app.seconds, s),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _metric(IconData icon, String label, String value) => Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.idleBall),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+
+  String _compactCount(int n) {
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
+    return '$n';
+  }
 
   Widget _todayCard(AppStrings s, String value) {
     return Container(

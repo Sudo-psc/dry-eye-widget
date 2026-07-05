@@ -455,6 +455,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         _set(_draft.copyWith(screenTimeTracking: v)),
                   ),
                   _hint(s.screenTimeHint),
+                  _switchRow(
+                    label: s.activityMonitorEnable,
+                    value: _draft.activityMonitorEnabled,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(activityMonitorEnabled: v)),
+                  ),
+                  _hint(s.activityMonitorHint),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerLeft,

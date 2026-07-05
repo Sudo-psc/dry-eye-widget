@@ -151,6 +151,11 @@ class AppStrings {
     // Tempo de tela
     required this.secScreenTime,
     required this.screenTimeEnable,
+    required this.activityMonitorEnable,
+    required this.activityMonitorHint,
+    required this.activityClicks,
+    required this.activityKeys,
+    required this.activityTopApps,
     required this.screenTimeHint,
     required this.screenTimeView,
     required this.screenTimeTitle,
@@ -355,6 +360,11 @@ class AppStrings {
 
   final String secScreenTime;
   final String screenTimeEnable;
+  final String activityMonitorEnable;
+  final String activityMonitorHint;
+  final String activityClicks;
+  final String activityKeys;
+  final String activityTopApps;
   final String screenTimeHint;
   final String screenTimeView;
   final String screenTimeTitle;
@@ -679,6 +689,14 @@ const AppStrings ptStrings = AppStrings(
   cameraConsentCancel: 'Agora não',
   secScreenTime: 'Tempo de tela',
   screenTimeEnable: 'Coletar tempo de tela',
+  activityMonitorEnable: 'Monitorar atividade (cliques, teclas e apps)',
+  activityMonitorHint:
+      'Conta apenas a QUANTIDADE de cliques e teclas (nunca quais teclas) e o '
+      'tempo por app, tudo local no seu computador. No macOS, a contagem de '
+      'teclas exige permissão de Acessibilidade.',
+  activityClicks: 'Cliques',
+  activityKeys: 'Teclas',
+  activityTopApps: 'Apps mais usados',
   screenTimeHint:
       'Mede o tempo de uso ativo de tela por dia, descartando a '
       'inatividade. Os dados ficam só no seu computador.',
@@ -949,6 +967,14 @@ const AppStrings enStrings = AppStrings(
   cameraConsentCancel: 'Not now',
   secScreenTime: 'Screen time',
   screenTimeEnable: 'Collect screen time',
+  activityMonitorEnable: 'Monitor activity (clicks, keys and apps)',
+  activityMonitorHint:
+      'Counts only the NUMBER of clicks and keystrokes (never which keys) and '
+      'time per app, all local on your computer. On macOS, key counting '
+      'requires Accessibility permission.',
+  activityClicks: 'Clicks',
+  activityKeys: 'Keystrokes',
+  activityTopApps: 'Most used apps',
   screenTimeHint:
       'Measures your active screen time per day, discarding inactivity. '
       'The data stays on your computer only.',

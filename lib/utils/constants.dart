@@ -89,6 +89,9 @@ class AppDefaults {
   /// por padrão — alimenta a janela de visualização de tempo de tela.
   static const bool screenTimeTracking = true;
 
+  /// Monitorar cliques, teclas (só contagem) e apps em foco (opt-in, OFF).
+  static const bool activityMonitorEnabled = false;
+
   static const String languageCode = 'pt';
   static const bool eyeDropsEnabled = false;
   static const int eyeDropsIntervalHours = 4;
@@ -193,6 +196,9 @@ class StorageKeys {
 
   /// Borda em que a bolinha está encaixada ('left'/'right'), vazio = solta.
   static const String dockEdge = 'ball_dock_edge';
+
+  /// JSON com estatísticas de atividade por dia (cliques, teclas, tempo/app).
+  static const String activityStats = 'activity_stats_json';
 }
 
 /// Informações do app usadas na verificação de atualização.

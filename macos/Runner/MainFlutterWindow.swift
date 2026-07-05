@@ -1,4 +1,5 @@
 import AVFoundation
+import ApplicationServices
 import Cocoa
 import CoreGraphics
 import FlutterMacOS
@@ -7,6 +8,7 @@ import Vision
 
 class MainFlutterWindow: NSWindow {
   private var faceDetector: FaceDetector?
+  private let activityMonitor = ActivityMonitor()
 
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
@@ -123,6 +125,42 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    // Canal de monitoramento de atividade (opt-in): conta cliques e teclas
+    // (apenas QUANTIDADES — nunca quais teclas) e o app em primeiro plano.
+    // Cliques e app em foco não exigem permissão; a contagem de teclas usa um
+    // monitor global de eventos, que requer permissão de Acessibilidade.
+    let activityChannel = FlutterMethodChannel(
+      name: "dry_eye_widget/activity",
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
+    activityChannel.setMethodCallHandler { [weak self] (call, result) in
+      guard let monitor = self?.activityMonitor else {
+        result(FlutterMethodNotImplemented)
+        return
+      }
+      switch call.method {
+      case "start":
+        monitor.start()
+        result(nil)
+      case "stop":
+        monitor.stop()
+        result(nil)
+      case "poll":
+        result(monitor.poll())
+      case "hasKeyPermission":
+        result(AXIsProcessTrusted())
+      case "openPermissionSettings":
+        if let url = URL(
+          string:
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
+        {
+          NSWorkspace.shared.open(url)
+        }
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     super.awakeFromNib()
   }
 
@@ -172,6 +210,63 @@ class MainFlutterWindow: NSWindow {
     self.level = .floating
     self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
   }
+}
+
+/// Monitor de atividade local: acumula contagens de cliques e teclas (apenas
+/// QUANTIDADES — jamais quais teclas) e o nome do app em primeiro plano.
+///
+/// Privacidade: nada é gravado nem enviado; os contadores vivem em memória e
+/// são zerados a cada `poll`. Cliques e app em foco usam APIs que não exigem
+/// permissão; a contagem de teclas usa um monitor GLOBAL de eventos, que só
+/// funciona com permissão de Acessibilidade concedida pelo usuário.
+final class ActivityMonitor {
+  private var clickMonitor: Any?
+  private var keyMonitor: Any?
+  private var clicks = 0
+  private var keys = 0
+  private let lock = NSLock()
+
+  func start() {
+    stop()
+    // Cliques do mouse (esquerdo/direito/outros), globalmente.
+    clickMonitor = NSEvent.addGlobalMonitorForEvents(
+      matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+    ) { [weak self] _ in
+      guard let self = self else { return }
+      self.lock.lock(); self.clicks += 1; self.lock.unlock()
+    }
+    // Teclas pressionadas — SÓ conta; nunca inspeciona qual tecla. Exige
+    // permissão de Acessibilidade (senão o monitor simplesmente não dispara).
+    keyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) {
+      [weak self] _ in
+      guard let self = self else { return }
+      self.lock.lock(); self.keys += 1; self.lock.unlock()
+    }
+  }
+
+  func stop() {
+    if let m = clickMonitor { NSEvent.removeMonitor(m); clickMonitor = nil }
+    if let m = keyMonitor { NSEvent.removeMonitor(m); keyMonitor = nil }
+  }
+
+  /// Devolve as contagens acumuladas + o app em foco, e ZERA os contadores.
+  func poll() -> [String: Any] {
+    lock.lock()
+    let c = clicks
+    let k = keys
+    clicks = 0
+    keys = 0
+    lock.unlock()
+    var frontApp = ""
+    if let app = NSWorkspace.shared.frontmostApplication,
+      app.processIdentifier != ProcessInfo.processInfo.processIdentifier
+    {
+      frontApp = app.localizedName ?? ""
+    }
+    return ["clicks": c, "keys": k, "frontApp": frontApp]
+  }
+
+  deinit { stop() }
 }
 
 /// Detecta presença de rosto capturando um único frame da webcam e rodando o

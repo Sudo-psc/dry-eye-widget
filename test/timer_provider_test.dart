@@ -1,3 +1,4 @@
+import 'package:dry_eye_widget/models/activity_stats_data.dart';
 import 'package:dry_eye_widget/models/app_state.dart';
 import 'package:dry_eye_widget/models/break_stats_data.dart';
 import 'package:dry_eye_widget/models/environment_checklist.dart';
@@ -357,6 +358,21 @@ class _MemoryStorage implements StorageService {
   double? _ballY;
 
   String? _dockEdge;
+
+  ActivityStatsData _activity = ActivityStatsData.empty();
+
+  @override
+  ActivityStatsData loadActivityStats() => _activity;
+
+  @override
+  Future<void> saveActivityStats(ActivityStatsData data) async {
+    _activity = data;
+  }
+
+  @override
+  Future<void> clearActivityStats() async {
+    _activity = ActivityStatsData.empty();
+  }
 
   @override
   String? loadDockEdge() => _dockEdge;

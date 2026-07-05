@@ -18,6 +18,8 @@ import 'services/audio_service.dart';
 import 'services/dvrs_storage_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
+import 'services/activity_monitor_service.dart';
+import 'services/activity_stats_service.dart';
 import 'services/screen_time_service.dart';
 import 'services/presence/adaptive_threshold_model.dart';
 import 'services/presence/camera_presence_sensor.dart';
@@ -78,6 +80,13 @@ Future<void> main() async {
   final dvrsStorage = await DvrsStorageService.init();
   final settings = SettingsProvider(storage: storage);
   final screenTime = ScreenTimeService(storage: storage);
+  final activityStats = ActivityStatsService(
+    storage: storage,
+    monitor: const ActivityMonitorService(),
+  );
+  if (settings.value.activityMonitorEnabled) {
+    unawaited(activityStats.start());
+  }
   final audio = AudioService()..enabled = settings.value.soundEnabled;
   final notifications = NotificationService()
     ..enabled = settings.value.notificationsEnabled;
@@ -160,6 +169,7 @@ Future<void> main() async {
         Provider<TrayService>.value(value: tray),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
         ChangeNotifierProvider<ScreenTimeService>.value(value: screenTime),
+        ChangeNotifierProvider<ActivityStatsService>.value(value: activityStats),
         ChangeNotifierProvider<TimerProvider>(
           create: (_) => TimerProvider(
             settings: settings,
@@ -316,6 +326,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _lastDockHidden = AppDefaults.hideDockIcon;
   bool _lastHideMenuBar = AppDefaults.hideMenuBarItem;
   bool _lastHideFloating = AppDefaults.hideFloatingWidget;
+  bool _lastActivityMonitor = AppDefaults.activityMonitorEnabled;
   String _lastLanguage = AppDefaults.languageCode;
 
   @override
@@ -687,6 +698,16 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
     if (!_settings.value.visualBlinkRemindersEnabled && _blinkReminderVisible) {
       _hideBlinkReminder(restoreLayout: true);
+    }
+    final activityOn = _settings.value.activityMonitorEnabled;
+    if (activityOn != _lastActivityMonitor) {
+      _lastActivityMonitor = activityOn;
+      final svc = context.read<ActivityStatsService>();
+      if (activityOn) {
+        unawaited(svc.start());
+      } else {
+        unawaited(svc.stop());
+      }
     }
   }
 
@@ -1164,10 +1185,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
     } else if (_screenTimeOpen) {
       body = Center(
         child: Consumer<ScreenTimeService>(
-          builder: (_, screenTime, _) => ScreenTimeDialog(
+          builder: (context, screenTime, _) => ScreenTimeDialog(
             strings: strings,
             data: screenTime.data,
             trackingEnabled: settings.screenTimeTracking,
+            activity: settings.activityMonitorEnabled
+                ? context.watch<ActivityStatsService>().data
+                : null,
             onClose: _closeScreenTime,
             onClear: _clearScreenTime,
           ),
