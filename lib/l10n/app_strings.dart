@@ -22,6 +22,8 @@ class AppStrings {
     required this.menuGitHub,
     required this.menuAbout,
     required this.aboutDescription,
+    required this.aboutPrivacyTitle,
+    required this.aboutPrivacyBody,
     required this.aboutAuthorLabel,
     required this.aboutAuthorRole,
     required this.trayDisable,
@@ -156,6 +158,8 @@ class AppStrings {
     required this.activityClicks,
     required this.activityKeys,
     required this.activityTopApps,
+    required this.activitySectionTitle,
+    required this.activityPrivacyNote,
     required this.screenTimeHint,
     required this.screenTimeView,
     required this.screenTimeTitle,
@@ -204,6 +208,8 @@ class AppStrings {
     required this.onboardingStep3Body,
     required this.onboardingStep4Title,
     required this.onboardingStep4Body,
+    required this.onboardingStep5Title,
+    required this.onboardingStep5Body,
   });
 
   final String languageCode;
@@ -230,6 +236,8 @@ class AppStrings {
   final String menuGitHub;
   final String menuAbout;
   final String aboutDescription;
+  final String aboutPrivacyTitle;
+  final String aboutPrivacyBody;
   final String aboutAuthorLabel;
   final String aboutAuthorRole;
   final String trayDisable;
@@ -365,6 +373,8 @@ class AppStrings {
   final String activityClicks;
   final String activityKeys;
   final String activityTopApps;
+  final String activitySectionTitle;
+  final String activityPrivacyNote;
   final String screenTimeHint;
   final String screenTimeView;
   final String screenTimeTitle;
@@ -420,6 +430,8 @@ class AppStrings {
   final String onboardingStep3Body;
   final String onboardingStep4Title;
   final String onboardingStep4Body;
+  final String onboardingStep5Title;
+  final String onboardingStep5Body;
 
   // --- Helpers dependentes de enum --------------------------------------
 
@@ -519,6 +531,10 @@ const AppStrings ptStrings = AppStrings(
       'prolongado de telas, ajudando a aliviar a fadiga ocular digital. '
       'Funciona localmente, sem coletar dados de atividade nem enviar '
       'informações para fora do computador.',
+  aboutPrivacyTitle: 'Privacidade',
+  aboutPrivacyBody:
+      'Não coletamos nem armazenamos seus dados. Todo o processamento é local, '
+      'no seu computador — nada é enviado para servidores.',
   aboutAuthorLabel: 'AUTOR',
   aboutAuthorRole: 'Médico oftalmologista',
   trayDisable: 'Desabilitar widget',
@@ -697,6 +713,10 @@ const AppStrings ptStrings = AppStrings(
   activityClicks: 'Cliques',
   activityKeys: 'Teclas',
   activityTopApps: 'Apps mais usados',
+  activitySectionTitle: 'Atividade',
+  activityPrivacyNote:
+      'Contamos apenas quantidades (nunca o conteúdo). Fica tudo local, no seu '
+      'computador — nada é enviado.',
   screenTimeHint:
       'Mede o tempo de uso ativo de tela por dia, descartando a '
       'inatividade. Os dados ficam só no seu computador.',
@@ -776,6 +796,11 @@ const AppStrings ptStrings = AppStrings(
   onboardingStep4Body:
       '100% local: sem nuvem, sem telemetria e sem cadastro. Gratuito e de '
       'código aberto.',
+  onboardingStep5Title: 'Privacidade em primeiro lugar',
+  onboardingStep5Body:
+      'Não coletamos nem armazenamos seus dados. Tudo — pausas, respostas e '
+      'estatísticas — fica apenas no seu computador e nunca é enviado para '
+      'servidores.',
 );
 
 const AppStrings enStrings = AppStrings(
@@ -803,6 +828,10 @@ const AppStrings enStrings = AppStrings(
       'A 20-20-20 rule reminder for visual rest during prolonged screen '
       'use, helping to ease digital eye strain. It runs locally, without '
       'collecting activity data or sending information off your computer.',
+  aboutPrivacyTitle: 'Privacy',
+  aboutPrivacyBody:
+      'We do not collect or store your data. All processing is local, on your '
+      'computer — nothing is sent to servers.',
   aboutAuthorLabel: 'AUTHOR',
   aboutAuthorRole: 'Ophthalmologist (MD)',
   trayDisable: 'Disable widget',
@@ -975,6 +1004,10 @@ const AppStrings enStrings = AppStrings(
   activityClicks: 'Clicks',
   activityKeys: 'Keystrokes',
   activityTopApps: 'Most used apps',
+  activitySectionTitle: 'Activity',
+  activityPrivacyNote:
+      'We count only amounts (never content). It all stays local on your '
+      'computer — nothing is sent.',
   screenTimeHint:
       'Measures your active screen time per day, discarding inactivity. '
       'The data stays on your computer only.',
@@ -1054,4 +1087,8 @@ const AppStrings enStrings = AppStrings(
   onboardingStep4Title: 'Your data stays yours',
   onboardingStep4Body:
       '100% local: no cloud, no telemetry, no sign-up. Free and open source.',
+  onboardingStep5Title: 'Privacy first',
+  onboardingStep5Body:
+      'We do not collect or store your data. Everything — breaks, answers and '
+      'stats — stays only on your computer and is never sent to any server.',
 );

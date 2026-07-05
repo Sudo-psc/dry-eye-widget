@@ -1045,6 +1045,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
+  /// Liga/desliga o monitoramento de atividade direto no diálogo de tempo de
+  /// tela. Persiste a preferência; o start/stop do serviço é feito por
+  /// [_onSettingsChanged].
+  void _setActivityMonitor(bool enabled) {
+    unawaited(
+      _settings.update(
+        _settings.value.copyWith(activityMonitorEnabled: enabled),
+      ),
+    );
+  }
+
   void _openReport() {
     setState(() {
       _menuOpen = false;
@@ -1189,9 +1200,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
             strings: strings,
             data: screenTime.data,
             trackingEnabled: settings.screenTimeTracking,
-            activity: settings.activityMonitorEnabled
-                ? context.watch<ActivityStatsService>().data
-                : null,
+            activity: context.watch<ActivityStatsService>().data,
+            activityEnabled: settings.activityMonitorEnabled,
+            onToggleActivity: _setActivityMonitor,
             onClose: _closeScreenTime,
             onClear: _clearScreenTime,
           ),
@@ -1307,8 +1318,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
         blinkReminderText: edge == null ? strings.blinkReminderText : '',
       );
       if (edge == null) return Center(child: ball);
-      // Meia-lua: metade da bolinha fica "para fora" da tela (recortada).
-      final dx = (settings.ballSize / 2 + AppSizes.ballPadding) *
+      // Meia-lua: metade da bolinha fica "para fora" da tela (recortada). O
+      // Align já encosta a bolinha na borda da janela; o deslocamento é apenas
+      // metade do diâmetro, deixando exatamente 50% visível e clicável.
+      final dx = (settings.ballSize / 2) *
           (edge == BallDockEdge.left ? -1 : 1);
       return ClipRect(
         child: Align(

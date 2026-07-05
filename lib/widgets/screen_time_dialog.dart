@@ -23,7 +23,9 @@ class ScreenTimeDialog extends StatefulWidget {
     required this.trackingEnabled,
     required this.onClose,
     required this.onClear,
-    this.activity,
+    required this.activity,
+    required this.activityEnabled,
+    required this.onToggleActivity,
   });
 
   final AppStrings strings;
@@ -32,8 +34,14 @@ class ScreenTimeDialog extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onClear;
 
-  /// Estatísticas de atividade do dia (opt-in). `null` = monitor desligado.
-  final ActivityStatsData? activity;
+  /// Estatísticas de atividade acumuladas (cliques, teclas, apps).
+  final ActivityStatsData activity;
+
+  /// Se o monitoramento de atividade está ligado (opt-in).
+  final bool activityEnabled;
+
+  /// Liga/desliga o monitoramento de atividade direto no diálogo.
+  final ValueChanged<bool> onToggleActivity;
 
   @override
   State<ScreenTimeDialog> createState() => _ScreenTimeDialogState();
@@ -62,8 +70,8 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
     final average = nonZero == 0 ? 0 : (total / nonZero).round();
 
     return LiquidGlass(
-      width: 560,
-      constraints: const BoxConstraints(maxHeight: 740),
+      width: 600,
+      constraints: const BoxConstraints(maxHeight: 800),
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -99,10 +107,8 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
           ),
           const SizedBox(height: 16),
           _todayCard(s, formatDuration(data.secondsForDay(now), s)),
-          if (widget.activity != null) ...[
-            const SizedBox(height: 12),
-            _activityCard(s, widget.activity!, now),
-          ],
+          const SizedBox(height: 12),
+          _activitySection(s, widget.activity, now),
           const SizedBox(height: 16),
           if (!widget.trackingEnabled) ...[
             _hint(s.screenTimeDisabledHint),
@@ -179,13 +185,14 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
 
   // --- Componentes --------------------------------------------------------
 
-  Widget _activityCard(AppStrings s, ActivityStatsData a, DateTime now) {
+  Widget _activitySection(AppStrings s, ActivityStatsData a, DateTime now) {
+    final enabled = widget.activityEnabled;
     final clicks = a.clicksForDay(now);
     final keys = a.keysForDay(now);
     final top = a.topApps(now, now, limit: 3);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(14, 8, 8, 14),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(12),
@@ -194,58 +201,96 @@ class _ScreenTimeDialogState extends State<ScreenTimeDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Cabeçalho com o interruptor de ligar/desligar (opt-in).
           Row(
             children: [
+              const Icon(Icons.insights_outlined,
+                  size: 18, color: AppColors.idleBall),
+              const SizedBox(width: 8),
               Expanded(
-                child: _metric(Icons.mouse_outlined, s.activityClicks,
-                    _compactCount(clicks)),
+                child: Text(
+                  s.activitySectionTitle,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _metric(Icons.keyboard_outlined, s.activityKeys,
-                    _compactCount(keys)),
+              Switch(
+                value: enabled,
+                onChanged: widget.onToggleActivity,
+                activeThumbColor: AppColors.idleBall,
               ),
             ],
           ),
-          if (top.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              s.activityTopApps,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+          if (enabled) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Expanded(
+                  child: _metric(Icons.mouse_outlined, s.activityClicks,
+                      _compactCount(clicks)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _metric(Icons.keyboard_outlined, s.activityKeys,
+                      _compactCount(keys)),
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
-            for (final app in top)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        app.appName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      formatDuration(app.seconds, s),
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+            if (top.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                s.activityTopApps,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 6),
+              for (final app in top)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          app.appName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        formatDuration(app.seconds, s),
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ],
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: Text(
+              s.activityPrivacyNote,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+                height: 1.35,
+              ),
+            ),
+          ),
         ],
       ),
     );

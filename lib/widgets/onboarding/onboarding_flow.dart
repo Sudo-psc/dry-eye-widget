@@ -67,6 +67,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       s.onboardingStep4Title,
       s.onboardingStep4Body,
     ),
+    _OnboardingStep(
+      Icons.shield_outlined,
+      const Color(0xFF1ABC9C),
+      s.onboardingStep5Title,
+      s.onboardingStep5Body,
+    ),
   ];
 
   void _next(int lastIndex) {
