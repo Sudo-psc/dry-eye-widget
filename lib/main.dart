@@ -31,6 +31,7 @@ import 'services/tray_service.dart';
 import 'services/update_service.dart';
 import 'ui/app_theme.dart';
 import 'utils/constants.dart';
+import 'utils/edge_snap.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
 import 'widgets/dvrs/dvrs_screen.dart';
@@ -308,6 +309,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _widgetEnabled = true;
 
   Offset _ballPosition = const Offset(100, 100);
+
+  /// Borda em que a bolinha está encaixada (meia-lua); `null` = solta.
+  BallDockEdge? _dockEdge;
   double _lastBallSize = AppDefaults.ballSize;
   bool _lastDockHidden = AppDefaults.hideDockIcon;
   bool _lastHideMenuBar = AppDefaults.hideMenuBarItem;
@@ -319,6 +323,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     super.initState();
     _timer = context.read<TimerProvider>();
     _settings = context.read<SettingsProvider>();
+    _dockEdge = ballDockEdgeFromId(
+      context.read<StorageService>().loadDockEdge(),
+    );
     _audio = context.read<AudioService>();
     _tray = context.read<TrayService>();
     _lastBallSize = _settings.value.ballSize;
@@ -449,7 +456,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
     if (_blinkReminderVisible || !_canShowVisualBlinkReminder) return;
     setState(() => _blinkReminderVisible = true);
-    await _applyLayout(_WindowLayout.blinkReminder);
+    // Encaixada (meia-lua): sem pílula expandida — só o brilho na bolinha.
+    if (_dockEdge == null) {
+      await _applyLayout(_WindowLayout.blinkReminder);
+    }
     _blinkReminderHideTimer?.cancel();
     _blinkReminderHideTimer = Timer(
       const Duration(milliseconds: AppDefaults.blinkReminderVisibleMs),
@@ -826,6 +836,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _onBallTap() {
     if (_timer.state != AppState.idle) return;
+    // Encaixada na borda: o primeiro clique apenas solta a bolinha.
+    if (_dockEdge != null) {
+      unawaited(_undock());
+      return;
+    }
     setState(() => _menuOpen = !_menuOpen);
     _applyLayout(_menuOpen ? _WindowLayout.menu : _WindowLayout.ball);
   }
@@ -844,10 +859,59 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   Future<void> _onBallDragEnd() async {
     try {
-      final pos = await windowManager.getPosition();
+      var pos = await windowManager.getPosition();
+      final winSize = await windowManager.getSize();
+
+      // Encaixe na borda (meia-lua) quando habilitado nas configurações.
+      BallDockEdge? edge;
+      if (_settings.value.edgeSnap) {
+        final display = await screenRetriever.getPrimaryDisplay();
+        final screenSize = display.visibleSize ?? display.size;
+        final origin = display.visiblePosition ?? Offset.zero;
+        final screen = origin & screenSize;
+        edge = dockEdgeFor(
+          windowPos: pos,
+          windowSize: winSize,
+          screen: screen,
+        );
+        if (edge != null) {
+          pos = dockedWindowPosition(
+            edge: edge,
+            windowPos: pos,
+            windowSize: winSize,
+            screen: screen,
+          );
+          await windowManager.setPosition(pos);
+        }
+      }
+      if (mounted && edge != _dockEdge) setState(() => _dockEdge = edge);
+
       _ballPosition = pos;
       if (mounted) {
-        await context.read<StorageService>().saveBallPosition(pos.dx, pos.dy);
+        final storage = context.read<StorageService>();
+        await storage.saveBallPosition(pos.dx, pos.dy);
+        await storage.saveDockEdge(edge?.id);
+      }
+    } catch (_) {
+      /* ignora */
+    }
+  }
+
+  /// Solta a bolinha da borda (clique na meia-lua) e afasta um pouco.
+  Future<void> _undock() async {
+    final edge = _dockEdge;
+    if (edge == null) return;
+    setState(() => _dockEdge = null);
+    try {
+      final pos = await windowManager.getPosition();
+      final delta = edge == BallDockEdge.left ? 16.0 : -16.0;
+      final next = Offset(pos.dx + delta, pos.dy);
+      await windowManager.setPosition(next);
+      _ballPosition = next;
+      if (mounted) {
+        final storage = context.read<StorageService>();
+        await storage.saveBallPosition(next.dx, next.dy);
+        await storage.saveDockEdge(null);
       }
     } catch (_) {
       /* ignora */
@@ -1192,6 +1256,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       orbIntensity: s.orbIntensity,
       blinkReminderVisible: blinkReminderVisible,
       blinkReminderText: blinkReminderText,
+      dockEdge: interactive ? _dockEdge : null,
       semanticLabel: interactive
           ? AppStrings.of(_settings.value.languageCode).ballSemanticLabel
           : null,
@@ -1208,13 +1273,28 @@ class _HomePageState extends State<HomePage> with TrayListener {
     AppStrings strings,
   ) {
     if (!_menuOpen) {
-      return Center(
-        child: _ball(
-          isActive: timer.state.isActive,
-          s: settings,
-          progress: timer.cycleProgress,
-          blinkReminderVisible: _blinkReminderVisible,
-          blinkReminderText: strings.blinkReminderText,
+      final edge = timer.state.isActive ? null : _dockEdge;
+      final ball = _ball(
+        isActive: timer.state.isActive,
+        s: settings,
+        progress: timer.cycleProgress,
+        blinkReminderVisible: _blinkReminderVisible,
+        // Encaixada: sem pílula de texto (não cabe na borda) — só o brilho.
+        blinkReminderText: edge == null ? strings.blinkReminderText : '',
+      );
+      if (edge == null) return Center(child: ball);
+      // Meia-lua: metade da bolinha fica "para fora" da tela (recortada).
+      final dx = (settings.ballSize / 2 + AppSizes.ballPadding) *
+          (edge == BallDockEdge.left ? -1 : 1);
+      return ClipRect(
+        child: Align(
+          alignment: edge == BallDockEdge.left
+              ? Alignment.centerLeft
+              : Alignment.centerRight,
+          child: Transform.translate(
+            offset: Offset(dx, 0),
+            child: ball,
+          ),
         ),
       );
     }

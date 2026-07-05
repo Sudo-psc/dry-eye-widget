@@ -65,6 +65,9 @@ class AppDefaults {
   static const int blinkMs = 500;
   static const bool dynamicOrbEffect = false;
   static const bool hoverReactiveBall = true;
+
+  /// Encostar a bolinha na borda lateral ao arrastá-la até ela (meia-lua).
+  static const bool edgeSnap = true;
   static const double orbIntensity = 0.85;
   static const bool dimBackground = true;
   static const double dimOpacity = 0.2;
@@ -187,6 +190,9 @@ class StorageKeys {
   /// JSON serializado com o histórico de resultados do DVRS — Índice de Risco
   /// Visual Digital (questionário principal).
   static const String dvrsResults = 'dvrs_results_json';
+
+  /// Borda em que a bolinha está encaixada ('left'/'right'), vazio = solta.
+  static const String dockEdge = 'ball_dock_edge';
 }
 
 /// Informações do app usadas na verificação de atualização.

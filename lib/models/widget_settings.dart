@@ -29,6 +29,7 @@ class WidgetSettings {
     required this.blinkMs,
     required this.dynamicOrbEffect,
     required this.hoverReactiveBall,
+    required this.edgeSnap,
     required this.orbIntensity,
     required this.dimBackground,
     required this.dimOpacity,
@@ -84,6 +85,9 @@ class WidgetSettings {
 
   /// Faz a bolinha reagir ao mouse com brilho, movimento e leve ampliação.
   final bool hoverReactiveBall;
+
+  /// Encosta a bolinha na borda lateral ao arrastar até ela (meia-lua).
+  final bool edgeSnap;
 
   /// Intensidade visual do efeito dinâmico (0.0–1.0).
   final double orbIntensity;
@@ -182,6 +186,7 @@ class WidgetSettings {
     blinkMs: AppDefaults.blinkMs,
     dynamicOrbEffect: AppDefaults.dynamicOrbEffect,
     hoverReactiveBall: AppDefaults.hoverReactiveBall,
+    edgeSnap: AppDefaults.edgeSnap,
     orbIntensity: AppDefaults.orbIntensity,
     dimBackground: AppDefaults.dimBackground,
     dimOpacity: AppDefaults.dimOpacity,
@@ -227,6 +232,7 @@ class WidgetSettings {
     int? blinkMs,
     bool? dynamicOrbEffect,
     bool? hoverReactiveBall,
+    bool? edgeSnap,
     double? orbIntensity,
     bool? dimBackground,
     double? dimOpacity,
@@ -271,6 +277,7 @@ class WidgetSettings {
       blinkMs: blinkMs ?? this.blinkMs,
       dynamicOrbEffect: dynamicOrbEffect ?? this.dynamicOrbEffect,
       hoverReactiveBall: hoverReactiveBall ?? this.hoverReactiveBall,
+      edgeSnap: edgeSnap ?? this.edgeSnap,
       orbIntensity: orbIntensity ?? this.orbIntensity,
       dimBackground: dimBackground ?? this.dimBackground,
       dimOpacity: dimOpacity ?? this.dimOpacity,
@@ -326,6 +333,7 @@ class WidgetSettings {
       blinkMs: _clampInt(blinkMs, 200, 1500),
       dynamicOrbEffect: dynamicOrbEffect,
       hoverReactiveBall: hoverReactiveBall,
+      edgeSnap: edgeSnap,
       orbIntensity: _clampDouble(orbIntensity, 0.0, 1.0, d.orbIntensity),
       dimBackground: dimBackground,
       dimOpacity: _clampDouble(dimOpacity, 0.0, 0.6, d.dimOpacity),
@@ -391,6 +399,7 @@ class WidgetSettings {
     'blinkMs': blinkMs,
     'dynamicOrbEffect': dynamicOrbEffect,
     'hoverReactiveBall': hoverReactiveBall,
+    'edgeSnap': edgeSnap,
     'orbIntensity': orbIntensity,
     'dimBackground': dimBackground,
     'dimOpacity': dimOpacity,
@@ -454,6 +463,7 @@ class WidgetSettings {
       dynamicOrbEffect: map['dynamicOrbEffect'] as bool? ?? d.dynamicOrbEffect,
       hoverReactiveBall:
           map['hoverReactiveBall'] as bool? ?? d.hoverReactiveBall,
+      edgeSnap: map['edgeSnap'] as bool? ?? d.edgeSnap,
       orbIntensity: (map['orbIntensity'] as num?)?.toDouble() ?? d.orbIntensity,
       dimBackground: map['dimBackground'] as bool? ?? d.dimBackground,
       dimOpacity: (map['dimOpacity'] as num?)?.toDouble() ?? d.dimOpacity,

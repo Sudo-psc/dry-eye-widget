@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../utils/constants.dart';
+import '../utils/edge_snap.dart';
 
 /// A bolinha flutuante.
 ///
@@ -27,6 +28,7 @@ class FloatingBall extends StatefulWidget {
     this.orbIntensity = AppDefaults.orbIntensity,
     this.blinkReminderVisible = false,
     this.blinkReminderText = '',
+    this.dockEdge,
     this.semanticLabel,
     this.onTap,
     this.onSecondaryTap,
@@ -47,6 +49,10 @@ class FloatingBall extends StatefulWidget {
   final double orbIntensity;
   final bool blinkReminderVisible;
   final String blinkReminderText;
+
+  /// Quando definido, a bolinha está encaixada nessa borda (modo meia-lua):
+  /// mais translúcida e sem anel de progresso (discreta).
+  final BallDockEdge? dockEdge;
   final String? semanticLabel;
   final VoidCallback? onTap;
   final VoidCallback? onSecondaryTap;
@@ -66,6 +72,7 @@ class _FloatingBallState extends State<FloatingBall>
   late final AnimationController _blink;
   late final AnimationController _orb;
   late final AnimationController _reminder;
+  late final AnimationController _reminderBurst;
   late final Animation<double> _opacity;
   bool _hovered = false;
 
@@ -85,9 +92,18 @@ class _FloatingBallState extends State<FloatingBall>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
+    // Burst one-shot disparado quando o aviso de piscada é emitido: a bolinha
+    // brilha/clareia e ganha opacidade por um instante, depois volta ao normal.
+    _reminderBurst = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
     _syncAnimation();
     _syncOrbAnimation();
     _syncReminderAnimation();
+    if (widget.blinkReminderVisible && !widget.isActive) {
+      _reminderBurst.forward(from: 0);
+    }
   }
 
   @override
@@ -108,6 +124,11 @@ class _FloatingBallState extends State<FloatingBall>
     if (oldWidget.blinkReminderVisible != widget.blinkReminderVisible ||
         oldWidget.isActive != widget.isActive) {
       _syncReminderAnimation();
+      if (!oldWidget.blinkReminderVisible &&
+          widget.blinkReminderVisible &&
+          !widget.isActive) {
+        _reminderBurst.forward(from: 0);
+      }
     }
   }
 
@@ -145,6 +166,7 @@ class _FloatingBallState extends State<FloatingBall>
     _blink.dispose();
     _orb.dispose();
     _reminder.dispose();
+    _reminderBurst.dispose();
     super.dispose();
   }
 
@@ -155,10 +177,13 @@ class _FloatingBallState extends State<FloatingBall>
         widget.blinkReminderVisible &&
         !widget.isActive &&
         widget.blinkReminderText.trim().isNotEmpty;
+    final docked = widget.dockEdge != null && !widget.isActive;
     final baseOpacity = widget.isActive
         ? 1.0
-        : widget.idleOpacity.clamp(0.1, 1.0);
-    final ringVisible = widget.showProgress && !widget.isActive;
+        : (docked
+            ? (widget.idleOpacity.clamp(0.1, 1.0) * 0.55).clamp(0.1, 0.6)
+            : widget.idleOpacity.clamp(0.1, 1.0));
+    final ringVisible = widget.showProgress && !widget.isActive && !docked;
 
     final s = widget.size;
     final orbIntensity = widget.orbIntensity.clamp(0.0, 1.0);
@@ -168,14 +193,22 @@ class _FloatingBallState extends State<FloatingBall>
         : 0.0;
 
     Widget circle = AnimatedBuilder(
-      animation: Listenable.merge([_opacity, _orb, _reminder]),
+      animation: Listenable.merge([_opacity, _orb, _reminder, _reminderBurst]),
       builder: (context, _) {
         final reminderPulse = reminderVisible
             ? math.sin(_reminder.value * math.pi)
             : 0.0;
+        // Burst: sobe e desce em ~700ms (sin 0->1->0) no instante do aviso.
+        final burst = widget.blinkReminderVisible && !widget.isActive
+            ? math.sin(_reminderBurst.value * math.pi)
+            : 0.0;
+        final effColor =
+            Color.lerp(color, const Color(0xFF9BE8FF), burst * 0.45)!;
         final hoverScale = widget.hoverReactiveBall && _hovered ? 1.08 : 1.0;
-        final reminderScale = 1.0 + reminderPulse * 0.05;
-        final opacity = widget.isActive ? _opacity.value : baseOpacity;
+        final reminderScale = 1.0 + reminderPulse * 0.10 + burst * 0.15;
+        final opacity = widget.isActive
+            ? _opacity.value
+            : (baseOpacity + (1.0 - baseOpacity) * burst);
         return Transform.scale(
           scale: hoverScale * reminderScale,
           child: Opacity(
@@ -189,9 +222,9 @@ class _FloatingBallState extends State<FloatingBall>
                   center: const Alignment(-0.3, -0.3),
                   radius: 1.0,
                   colors: [
-                    Color.lerp(color, Colors.white, 0.6)!,
-                    color,
-                    Color.lerp(color, Colors.black, 0.4)!,
+                    Color.lerp(effColor, Colors.white, 0.6)!,
+                    effColor,
+                    Color.lerp(effColor, Colors.black, 0.4)!,
                   ],
                   stops: const [0.0, 0.6, 1.0],
                 ),
@@ -220,13 +253,16 @@ class _FloatingBallState extends State<FloatingBall>
                       blurRadius: s * 0.46,
                       spreadRadius: 2.0,
                     ),
-                  if (reminderVisible)
+                  if (reminderVisible || burst > 0)
                     BoxShadow(
-                      color: const Color(
-                        0xFF88F7FF,
-                      ).withValues(alpha: 0.22 + reminderPulse * 0.22),
-                      blurRadius: s * (0.44 + reminderPulse * 0.18),
-                      spreadRadius: 1.5 + reminderPulse * 1.5,
+                      color: const Color(0xFF88F7FF).withValues(
+                        alpha: (0.30 + reminderPulse * 0.30 + burst * 0.35)
+                            .clamp(0.0, 1.0),
+                      ),
+                      blurRadius:
+                          s * (0.44 + reminderPulse * 0.26 + burst * 0.40),
+                      spreadRadius:
+                          2.0 + reminderPulse * 2.5 + burst * 3.0,
                     ),
                   // Brilho colorido quando em alerta.
                   if (widget.isActive)

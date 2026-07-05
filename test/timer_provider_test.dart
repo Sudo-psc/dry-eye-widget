@@ -356,6 +356,16 @@ class _MemoryStorage implements StorageService {
   double? _ballX;
   double? _ballY;
 
+  String? _dockEdge;
+
+  @override
+  String? loadDockEdge() => _dockEdge;
+
+  @override
+  Future<void> saveDockEdge(String? edgeId) async {
+    _dockEdge = edgeId;
+  }
+
   @override
   double? get ballX => _ballX;
 

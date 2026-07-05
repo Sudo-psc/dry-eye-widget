@@ -333,6 +333,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     onChanged: (v) =>
                         _set(_draft.copyWith(hoverReactiveBall: v)),
                   ),
+                  _switchRow(
+                    label: s.edgeSnapLabel,
+                    value: _draft.edgeSnap,
+                    onChanged: (v) => _set(_draft.copyWith(edgeSnap: v)),
+                  ),
 
                   _sectionTitle(s.secDuringBreak),
                   _switchRow(

@@ -58,6 +58,7 @@ class AppStrings {
     required this.progressRing,
     required this.dynamicOrbEffect,
     required this.hoverReactiveBall,
+    required this.edgeSnapLabel,
     required this.orbIntensity,
     required this.gentleMode,
     required this.gentleHint,
@@ -260,6 +261,7 @@ class AppStrings {
   final String progressRing;
   final String dynamicOrbEffect;
   final String hoverReactiveBall;
+  final String edgeSnapLabel;
   final String orbIntensity;
   final String gentleMode;
   final String gentleHint;
@@ -545,6 +547,7 @@ const AppStrings ptStrings = AppStrings(
   progressRing: 'Anel de progresso',
   dynamicOrbEffect: 'Efeito dinâmico na bolinha',
   hoverReactiveBall: 'Reagir ao passar o mouse',
+  edgeSnapLabel: 'Encostar nas bordas (meia-lua discreta)',
   orbIntensity: 'Intensidade do efeito',
   gentleMode: 'Notificações suaves (não bloquear a tela)',
   gentleHint:
@@ -819,6 +822,7 @@ const AppStrings enStrings = AppStrings(
   progressRing: 'Progress ring',
   dynamicOrbEffect: 'Dynamic ball effect',
   hoverReactiveBall: 'React on mouse hover',
+  edgeSnapLabel: 'Snap to screen edges (discreet half-moon)',
   orbIntensity: 'Effect intensity',
   gentleMode: "Gentle notifications (don't block the screen)",
   gentleHint:

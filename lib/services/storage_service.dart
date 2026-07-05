@@ -53,6 +53,22 @@ class StorageService {
   Future<void> saveSettings(WidgetSettings settings) =>
       _prefs.setString(StorageKeys.widgetSettings, settings.toJson());
 
+  // --- Encaixe da bolinha na borda (meia-lua) ------------------------------
+
+  /// Borda encaixada ('left'/'right') ou `null` se a bolinha está solta.
+  String? loadDockEdge() {
+    final v = _prefs.getString(StorageKeys.dockEdge);
+    return (v == null || v.isEmpty) ? null : v;
+  }
+
+  Future<void> saveDockEdge(String? edgeId) async {
+    if (edgeId == null || edgeId.isEmpty) {
+      await _prefs.remove(StorageKeys.dockEdge);
+    } else {
+      await _prefs.setString(StorageKeys.dockEdge, edgeId);
+    }
+  }
+
   // --- Tempo de tela ------------------------------------------------------
 
   ScreenTimeData loadScreenTime() =>
