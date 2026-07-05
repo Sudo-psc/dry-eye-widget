@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://olhossecos.com.br/app/sitemap.xml
+Sitemap: https://app.olhossecos.com.br/sitemap.xml
