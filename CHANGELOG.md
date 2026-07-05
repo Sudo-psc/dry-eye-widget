@@ -4,6 +4,23 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.21.1] - 2026-07-05
+
+### Corrigido
+- **Encaixe meia-lua**: a bolinha sumia ao ser arrastada para a borda e não
+  voltava. Agora fica exatamente metade visível na borda, discreta e clicável —
+  um toque a solta de volta.
+
+### Adicionado
+- **Aviso de privacidade** na primeira execução (passo do onboarding) e no
+  "Sobre": deixamos explícito que não coletamos nem armazenamos seus dados —
+  tudo é processado localmente.
+
+### Modificado
+- **Tempo de tela**: diálogo maior, com a seção de Atividade sempre visível —
+  cliques e teclas do dia, apps mais usados, interruptor para ligar/desligar
+  ali mesmo e uma nota de privacidade.
+
 ## [1.21.0] - 2026-07-05
 
 ### Adicionado
