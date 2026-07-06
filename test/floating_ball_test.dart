@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:dry_eye_widget/utils/edge_snap.dart';
 import 'package:dry_eye_widget/widgets/floating_ball.dart';
 
 void main() {
@@ -90,6 +91,35 @@ void main() {
     );
 
     expect(find.text('Pisque'), findsOneWidget);
+
+    await tester.tap(find.byType(FloatingBall));
+    await tester.pump();
+
+    expect(taps, 1);
+  });
+
+  testWidgets('modo encaixado continua clicavel e sem pill de texto', (
+    tester,
+  ) async {
+    var taps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              dockEdge: BallDockEdge.left,
+              blinkReminderVisible: true,
+              blinkReminderText: 'Pisque',
+              onTap: () => taps++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Pisque'), findsNothing);
 
     await tester.tap(find.byType(FloatingBall));
     await tester.pump();

@@ -71,10 +71,10 @@ class _FloatingBallState extends State<FloatingBall>
     with TickerProviderStateMixin {
   late final AnimationController _blink;
   late final AnimationController _orb;
+  late final AnimationController _hover;
   late final AnimationController _reminder;
   late final AnimationController _reminderBurst;
   late final Animation<double> _opacity;
-  bool _hovered = false;
 
   @override
   void initState() {
@@ -87,6 +87,11 @@ class _FloatingBallState extends State<FloatingBall>
     _orb = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3200),
+    );
+    _hover = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+      reverseDuration: const Duration(milliseconds: 260),
     );
     _reminder = AnimationController(
       vsync: this,
@@ -120,6 +125,9 @@ class _FloatingBallState extends State<FloatingBall>
         oldWidget.orbIntensity != widget.orbIntensity ||
         oldWidget.isActive != widget.isActive) {
       _syncOrbAnimation();
+    }
+    if (!widget.hoverReactiveBall && _hover.value > 0) {
+      _hover.reverse();
     }
     if (oldWidget.blinkReminderVisible != widget.blinkReminderVisible ||
         oldWidget.isActive != widget.isActive) {
@@ -165,6 +173,7 @@ class _FloatingBallState extends State<FloatingBall>
   void dispose() {
     _blink.dispose();
     _orb.dispose();
+    _hover.dispose();
     _reminder.dispose();
     _reminderBurst.dispose();
     super.dispose();
@@ -173,27 +182,34 @@ class _FloatingBallState extends State<FloatingBall>
   @override
   Widget build(BuildContext context) {
     final color = widget.isActive ? widget.alertColor : widget.idleColor;
+    final docked = widget.dockEdge != null && !widget.isActive;
     final reminderVisible =
         widget.blinkReminderVisible &&
         !widget.isActive &&
+        !docked &&
         widget.blinkReminderText.trim().isNotEmpty;
-    final docked = widget.dockEdge != null && !widget.isActive;
     final baseOpacity = widget.isActive
         ? 1.0
         : (docked
-            ? (widget.idleOpacity.clamp(0.1, 1.0) * 0.55).clamp(0.1, 0.6)
-            : widget.idleOpacity.clamp(0.1, 1.0));
+              ? (widget.idleOpacity.clamp(0.2, 1.0) * 0.72).clamp(0.28, 0.76)
+              : widget.idleOpacity.clamp(0.2, 1.0));
     final ringVisible = widget.showProgress && !widget.isActive && !docked;
 
     final s = widget.size;
     final orbIntensity = widget.orbIntensity.clamp(0.0, 1.0);
-    final hoverBoost = widget.hoverReactiveBall && _hovered ? 1.0 : 0.0;
+    final hoverBoost = widget.hoverReactiveBall ? _hover.value : 0.0;
     final effectiveOrbIntensity = widget.dynamicOrbEffect
-        ? (orbIntensity + hoverBoost * 0.25).clamp(0.0, 1.0)
+        ? (orbIntensity + hoverBoost * 0.28).clamp(0.0, 1.0)
         : 0.0;
 
     Widget circle = AnimatedBuilder(
-      animation: Listenable.merge([_opacity, _orb, _reminder, _reminderBurst]),
+      animation: Listenable.merge([
+        _opacity,
+        _orb,
+        _hover,
+        _reminder,
+        _reminderBurst,
+      ]),
       builder: (context, _) {
         final reminderPulse = reminderVisible
             ? math.sin(_reminder.value * math.pi)
@@ -202,15 +218,24 @@ class _FloatingBallState extends State<FloatingBall>
         final burst = widget.blinkReminderVisible && !widget.isActive
             ? math.sin(_reminderBurst.value * math.pi)
             : 0.0;
-        final effColor =
-            Color.lerp(color, const Color(0xFF9BE8FF), burst * 0.45)!;
-        final hoverScale = widget.hoverReactiveBall && _hovered ? 1.08 : 1.0;
-        final reminderScale = 1.0 + reminderPulse * 0.10 + burst * 0.15;
+        final effColor = Color.lerp(
+          color,
+          const Color(0xFF9BE8FF),
+          burst * 0.45,
+        )!;
+        final hovered = widget.hoverReactiveBall && _hover.value > 0.01;
+        final hoverEase = Curves.easeOutCubic.transform(_hover.value);
+        final hoverScale = 1.0 + hoverEase * (docked ? 0.13 : 0.11);
+        final reminderScale = 1.0 + reminderPulse * 0.08 + burst * 0.14;
+        final dockScale = docked ? 0.96 : 1.0;
+        final liveScale = widget.dynamicOrbEffect && !widget.isActive
+            ? 1.0 + math.sin(_orb.value * math.pi * 2) * 0.012
+            : 1.0;
         final opacity = widget.isActive
             ? _opacity.value
             : (baseOpacity + (1.0 - baseOpacity) * burst);
         return Transform.scale(
-          scale: hoverScale * reminderScale,
+          scale: dockScale * liveScale * hoverScale * reminderScale,
           child: Opacity(
             opacity: opacity,
             child: Container(
@@ -235,23 +260,26 @@ class _FloatingBallState extends State<FloatingBall>
                 boxShadow: [
                   // Sombra de profundidade (sempre, para "flutuar").
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    blurRadius: s * 0.22,
-                    offset: Offset(0, s * 0.10),
+                    color: Colors.black.withValues(alpha: docked ? 0.26 : 0.34),
+                    blurRadius: s * (0.22 + hoverEase * 0.08),
+                    offset: Offset(0, s * (0.10 + hoverEase * 0.02)),
                   ),
                   if (widget.dynamicOrbEffect)
                     BoxShadow(
                       color: const Color(
                         0xFF53D8FF,
-                      ).withValues(alpha: 0.18 + effectiveOrbIntensity * 0.18),
-                      blurRadius: s * (0.32 + effectiveOrbIntensity * 0.16),
-                      spreadRadius: effectiveOrbIntensity * 1.5,
+                      ).withValues(alpha: 0.16 + effectiveOrbIntensity * 0.22),
+                      blurRadius: s * (0.32 + effectiveOrbIntensity * 0.22),
+                      spreadRadius:
+                          effectiveOrbIntensity * (docked ? 1.0 : 1.8),
                     ),
-                  if (widget.hoverReactiveBall && _hovered)
+                  if (hovered)
                     BoxShadow(
-                      color: const Color(0xFF79F2D0).withValues(alpha: 0.42),
-                      blurRadius: s * 0.46,
-                      spreadRadius: 2.0,
+                      color: const Color(
+                        0xFF79F2D0,
+                      ).withValues(alpha: 0.26 + hoverEase * 0.22),
+                      blurRadius: s * (0.36 + hoverEase * 0.18),
+                      spreadRadius: 1.0 + hoverEase * 2.0,
                     ),
                   if (reminderVisible || burst > 0)
                     BoxShadow(
@@ -261,8 +289,7 @@ class _FloatingBallState extends State<FloatingBall>
                       ),
                       blurRadius:
                           s * (0.44 + reminderPulse * 0.26 + burst * 0.40),
-                      spreadRadius:
-                          2.0 + reminderPulse * 2.5 + burst * 3.0,
+                      spreadRadius: 2.0 + reminderPulse * 2.5 + burst * 3.0,
                     ),
                   // Brilho colorido quando em alerta.
                   if (widget.isActive)
@@ -283,7 +310,7 @@ class _FloatingBallState extends State<FloatingBall>
                           phase: _orb.value,
                           baseColor: color,
                           intensity: effectiveOrbIntensity,
-                          hovered: widget.hoverReactiveBall && _hovered,
+                          hovered: hovered,
                           isActive: widget.isActive,
                         ),
                       ),
@@ -368,10 +395,10 @@ class _FloatingBallState extends State<FloatingBall>
     return MouseRegion(
       cursor: SystemMouseCursors.grab,
       onEnter: (_) {
-        if (widget.hoverReactiveBall) setState(() => _hovered = true);
+        if (widget.hoverReactiveBall) _hover.forward();
       },
       onExit: (_) {
-        if (widget.hoverReactiveBall) setState(() => _hovered = false);
+        if (widget.hoverReactiveBall) _hover.reverse();
       },
       child: interactive,
     );

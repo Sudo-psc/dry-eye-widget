@@ -26,7 +26,10 @@ BallDockEdge? ballDockEdgeFromId(String? id) {
 }
 
 /// Distância máxima (px) da borda para o encaixe acontecer ao soltar o arrasto.
-const double kDockThreshold = 24;
+const double kDockThreshold = 56;
+
+/// Fração da janela compacta que permanece visível quando encaixada.
+const double kDockVisibleFraction = 0.62;
 
 /// Decide a borda de encaixe para a janela em [windowPos] dentro de [screen],
 /// ou `null` se estiver longe das bordas laterais.
@@ -49,10 +52,12 @@ Offset dockedWindowPosition({
   required Offset windowPos,
   required Size windowSize,
   required Rect screen,
+  double visibleFraction = kDockVisibleFraction,
 }) {
+  final visible = visibleFraction.clamp(0.35, 1.0).toDouble();
   final x = edge == BallDockEdge.left
-      ? screen.left
-      : screen.right - windowSize.width;
+      ? screen.left - windowSize.width * (1 - visible)
+      : screen.right - windowSize.width * visible;
   final y = windowPos.dy.clamp(screen.top, screen.bottom - windowSize.height);
   return Offset(x, y);
 }

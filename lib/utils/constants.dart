@@ -58,17 +58,17 @@ class AppDefaults {
   static const int blinkReminderIntervalMs = 7500;
   static const int blinkReminderVisibleMs = 1800;
 
-  static const double ballSize = 24.0;
+  static const double ballSize = 32.0;
   static const int idleColor = 0xFF4A90E2;
   static const int alertColor = 0xFFFF4444;
-  static const double idleOpacity = 1.0;
+  static const double idleOpacity = 0.82;
   static const int blinkMs = 500;
-  static const bool dynamicOrbEffect = false;
+  static const bool dynamicOrbEffect = true;
   static const bool hoverReactiveBall = true;
 
   /// Encostar a bolinha na borda lateral ao arrastá-la até ela (meia-lua).
   static const bool edgeSnap = true;
-  static const double orbIntensity = 0.85;
+  static const double orbIntensity = 0.72;
   static const bool dimBackground = true;
   static const double dimOpacity = 0.2;
 
@@ -108,8 +108,8 @@ class AppDefaults {
   /// evitar oscilação do estado perto do limite.
   static const int inactivityResumeSeconds = 5;
 
-  static const double minBallSize = 14.0;
-  static const double maxBallSize = 80.0;
+  static const double minBallSize = 18.0;
+  static const double maxBallSize = 96.0;
 
   /// Escala global da interface (acessibilidade). 1.0 = tamanho padrão.
   static const double uiScale = 1.0;

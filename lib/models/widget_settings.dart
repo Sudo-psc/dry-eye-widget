@@ -74,7 +74,7 @@ class WidgetSettings {
   /// Cor da bolinha em alerta/pausa (valor ARGB).
   final int alertColor;
 
-  /// Opacidade da bolinha no IDLE (0.3–1.0) para deixá-la mais discreta.
+  /// Opacidade da bolinha no IDLE (0.2-1.0) para deixá-la mais discreta.
   final double idleOpacity;
 
   /// Intervalo do piscar em milissegundos.
@@ -337,7 +337,7 @@ class WidgetSettings {
       ),
       idleColor: idleColor,
       alertColor: alertColor,
-      idleOpacity: _clampDouble(idleOpacity, 0.3, 1.0, d.idleOpacity),
+      idleOpacity: _clampDouble(idleOpacity, 0.2, 1.0, d.idleOpacity),
       blinkMs: _clampInt(blinkMs, 200, 1500),
       dynamicOrbEffect: dynamicOrbEffect,
       hoverReactiveBall: hoverReactiveBall,

@@ -301,7 +301,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   _slider(
                     label: s.opacityNormal,
                     value: _draft.idleOpacity,
-                    min: 0.3,
+                    min: 0.2,
                     max: 1.0,
                     suffix: '${(_draft.idleOpacity * 100).round()}%',
                     onChanged: (v) => _set(_draft.copyWith(idleOpacity: v)),

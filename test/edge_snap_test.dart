@@ -10,7 +10,11 @@ void main() {
   group('dockEdgeFor', () {
     test('perto da borda esquerda => left', () {
       expect(
-        dockEdgeFor(windowPos: const Offset(10, 300), windowSize: win, screen: screen),
+        dockEdgeFor(
+          windowPos: const Offset(10, 300),
+          windowSize: win,
+          screen: screen,
+        ),
         BallDockEdge.left,
       );
     });
@@ -18,14 +22,21 @@ void main() {
     test('encostado na borda direita => right', () {
       expect(
         dockEdgeFor(
-          windowPos: const Offset(1440 - 48 - 8, 500), windowSize: win, screen: screen),
+          windowPos: const Offset(1440 - 48 - 8, 500),
+          windowSize: win,
+          screen: screen,
+        ),
         BallDockEdge.right,
       );
     });
 
     test('longe das bordas => null', () {
       expect(
-        dockEdgeFor(windowPos: const Offset(600, 300), windowSize: win, screen: screen),
+        dockEdgeFor(
+          windowPos: const Offset(600, 300),
+          windowSize: win,
+          screen: screen,
+        ),
         isNull,
       );
     });
@@ -44,24 +55,26 @@ void main() {
   });
 
   group('dockedWindowPosition', () {
-    test('cola na borda esquerda mantendo o y', () {
+    test('encaixa parcialmente para fora da borda esquerda mantendo o y', () {
       final pos = dockedWindowPosition(
         edge: BallDockEdge.left,
         windowPos: const Offset(10, 300),
         windowSize: win,
         screen: screen,
       );
-      expect(pos, const Offset(0, 300));
+      expect(pos.dx, closeTo(-18.24, 0.001));
+      expect(pos.dy, 300);
     });
 
-    test('cola na borda direita mantendo o y', () {
+    test('encaixa parcialmente para fora da borda direita mantendo o y', () {
       final pos = dockedWindowPosition(
         edge: BallDockEdge.right,
         windowPos: const Offset(1300, 250),
         windowSize: win,
         screen: screen,
       );
-      expect(pos, const Offset(1440 - 48, 250));
+      expect(pos.dx, closeTo(1410.24, 0.001));
+      expect(pos.dy, 250);
     });
 
     test('clampa o y dentro da tela', () {
@@ -72,6 +85,17 @@ void main() {
         screen: screen,
       );
       expect(pos.dy, 0);
+    });
+
+    test('respeita fracao visivel customizada', () {
+      final pos = dockedWindowPosition(
+        edge: BallDockEdge.left,
+        windowPos: const Offset(10, 300),
+        windowSize: win,
+        screen: screen,
+        visibleFraction: 0.5,
+      );
+      expect(pos.dx, -24);
     });
   });
 

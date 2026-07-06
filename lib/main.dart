@@ -57,7 +57,7 @@ const Size _panelWindowSize = Size(700, 790);
 const Size _onboardingWindowSize = Size(480, 560);
 
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
-Size _compactWindowSize(double ballSize) => Size(ballSize + 24, ballSize + 24);
+Size _compactWindowSize(double ballSize) => Size(ballSize + 28, ballSize + 28);
 
 /// Altura do painel de menu (linha compacta de pausas + 11 itens + 3 cabeçalhos
 /// de grupo + 2 divisórias + paddings do vidro), com folga para variações de
@@ -169,7 +169,9 @@ Future<void> main() async {
         Provider<TrayService>.value(value: tray),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
         ChangeNotifierProvider<ScreenTimeService>.value(value: screenTime),
-        ChangeNotifierProvider<ActivityStatsService>.value(value: activityStats),
+        ChangeNotifierProvider<ActivityStatsService>.value(
+          value: activityStats,
+        ),
         ChangeNotifierProvider<TimerProvider>(
           create: (_) => TimerProvider(
             settings: settings,
@@ -365,6 +367,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (savedX == null || savedY == null) {
       _cacheCurrentPosition();
     }
+    if (_dockEdge != null && _widgetEnabled) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_applyLayout(_WindowLayout.ball));
+      });
+    }
     // Aplica o estado inicial de visibilidade da bolinha após o primeiro frame.
     if (!_widgetEnabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) => windowManager.hide());
@@ -382,9 +389,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   /// Conclui (ou pula) o onboarding: persiste a flag e volta ao estado normal.
   Future<void> _finishOnboarding() async {
-    await _settings.update(
-      _settings.value.copyWith(onboardingComplete: true),
-    );
+    await _settings.update(_settings.value.copyWith(onboardingComplete: true));
     if (!mounted) return;
     setState(() => _onboardingOpen = false);
     _restoreAfterPanel();
@@ -531,10 +536,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_aboutOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
-              !_dvrsOpen &&
+          !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-              !_dashboardOpen &&
+          !_dashboardOpen &&
           !_progressOpen &&
           !_onboardingOpen) {
         () async {
@@ -559,10 +564,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_aboutOpen &&
           !_guidanceOpen &&
           !_updateOpen &&
-              !_dvrsOpen &&
+          !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-              !_dashboardOpen &&
+          !_dashboardOpen &&
           !_progressOpen &&
           !_onboardingOpen) {
         () async {
@@ -669,6 +674,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _applyLayout(_WindowLayout.ball);
       }
     }
+    if (!_settings.value.edgeSnap && _dockEdge != null) {
+      unawaited(_undock());
+    }
     final hideDock = _settings.value.hideDockIcon;
     if (hideDock != _lastDockHidden) {
       _lastDockHidden = hideDock;
@@ -720,7 +728,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _settingsOpen = false;
         _aboutOpen = false;
         _reportOpen = false;
-          _dashboardOpen = false;
+        _dashboardOpen = false;
         _progressOpen = false;
       });
     }
@@ -750,10 +758,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
     try {
       switch (layout) {
         case _WindowLayout.ball:
-          await windowManager.setSize(
-            _compactWindowSize(_settings.value.ballSize),
-          );
-          await windowManager.setPosition(_ballPosition);
+          final ballSize = _compactWindowSize(_settings.value.ballSize);
+          await windowManager.setSize(ballSize);
+          final docked = await _dockedPositionForCurrentScreen(ballSize);
+          final pos = docked ?? _ballPosition;
+          await windowManager.setPosition(pos);
+          if (docked != null) _ballPosition = docked;
           break;
         case _WindowLayout.blinkReminder:
           await _cacheCurrentPosition();
@@ -853,6 +863,20 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
   }
 
+  Future<Offset?> _dockedPositionForCurrentScreen(Size windowSize) async {
+    final edge = _dockEdge;
+    if (edge == null) return null;
+    final display = await screenRetriever.getPrimaryDisplay();
+    final screenSize = display.visibleSize ?? display.size;
+    final origin = display.visiblePosition ?? Offset.zero;
+    return dockedWindowPosition(
+      edge: edge,
+      windowPos: _ballPosition,
+      windowSize: windowSize,
+      screen: origin & screenSize,
+    );
+  }
+
   // --- Interações da bolinha ---------------------------------------------
 
   void _onBallTap() {
@@ -894,6 +918,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           windowPos: pos,
           windowSize: winSize,
           screen: screen,
+          threshold: math.max(kDockThreshold, winSize.width * 0.72),
         );
         if (edge != null) {
           pos = dockedWindowPosition(
@@ -925,8 +950,16 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() => _dockEdge = null);
     try {
       final pos = await windowManager.getPosition();
-      final delta = edge == BallDockEdge.left ? 16.0 : -16.0;
-      final next = Offset(pos.dx + delta, pos.dy);
+      final winSize = await windowManager.getSize();
+      final display = await screenRetriever.getPrimaryDisplay();
+      final screenSize = display.visibleSize ?? display.size;
+      final origin = display.visiblePosition ?? Offset.zero;
+      final screen = origin & screenSize;
+      final x = edge == BallDockEdge.left
+          ? screen.left + 18
+          : screen.right - winSize.width - 18;
+      final y = pos.dy.clamp(screen.top, screen.bottom - winSize.height);
+      final next = Offset(x, y);
       await windowManager.setPosition(next);
       _ballPosition = next;
       if (mounted) {
@@ -1181,10 +1214,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     Widget body;
     if (_onboardingOpen) {
       body = Center(
-        child: OnboardingFlow(
-          strings: strings,
-          onFinish: _finishOnboarding,
-        ),
+        child: OnboardingFlow(strings: strings, onFinish: _finishOnboarding),
       );
     } else if (_dvrsOpen) {
       body = Center(
@@ -1219,19 +1249,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
         },
       );
     } else if (_reportOpen) {
-      body = Center(
-        child: ReportDialog(
-          onClose: _closeReport,
-        ),
-      );
+      body = Center(child: ReportDialog(onClose: _closeReport));
     } else if (_dashboardOpen) {
-      body = Center(
-        child: DashboardScreen(onClose: _closeDashboard),
-      );
+      body = Center(child: DashboardScreen(onClose: _closeDashboard));
     } else if (_progressOpen) {
-      body = Center(
-        child: ProgressScreen(onClose: _closeProgress),
-      );
+      body = Center(child: ProgressScreen(onClose: _closeProgress));
     } else if (_settingsOpen) {
       body = _buildSettings();
     } else if (_aboutOpen) {
@@ -1317,23 +1339,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         // Encaixada: sem pílula de texto (não cabe na borda) — só o brilho.
         blinkReminderText: edge == null ? strings.blinkReminderText : '',
       );
-      if (edge == null) return Center(child: ball);
-      // Meia-lua: metade da bolinha fica "para fora" da tela (recortada). O
-      // Align já encosta a bolinha na borda da janela; o deslocamento é apenas
-      // metade do diâmetro, deixando exatamente 50% visível e clicável.
-      final dx = (settings.ballSize / 2) *
-          (edge == BallDockEdge.left ? -1 : 1);
-      return ClipRect(
-        child: Align(
-          alignment: edge == BallDockEdge.left
-              ? Alignment.centerLeft
-              : Alignment.centerRight,
-          child: Transform.translate(
-            offset: Offset(dx, 0),
-            child: ball,
-          ),
-        ),
-      );
+      return Center(child: ball);
     }
     return Stack(
       children: [

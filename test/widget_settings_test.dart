@@ -118,8 +118,8 @@ void main() {
       expect(s.hoverReactiveBall, WidgetSettings.defaults().hoverReactiveBall);
     });
 
-    test('efeito dinamico fica desligado por padrao', () {
-      expect(WidgetSettings.defaults().dynamicOrbEffect, isFalse);
+    test('efeito dinamico fica ligado por padrao', () {
+      expect(WidgetSettings.defaults().dynamicOrbEffect, isTrue);
     });
 
     test('lembretes visuais de piscada ficam ligados por padrao', () {
@@ -172,8 +172,8 @@ void main() {
 
       expect(restored.cycleMinutes, 1);
       expect(restored.phaseSeconds, 120);
-      expect(restored.ballSize, 80);
-      expect(restored.idleOpacity, 0.3);
+      expect(restored.ballSize, 96);
+      expect(restored.idleOpacity, 0.2);
       expect(restored.blinkMs, 200);
       expect(restored.orbIntensity, 1.0);
       expect(restored.dimOpacity, 0.6);
@@ -191,12 +191,12 @@ void main() {
       expect(restored.blinkReminderVolume, 1.0);
     });
 
-    test('permite widget compacto com tamanho minimo de 14 px', () {
+    test('permite widget compacto com tamanho minimo de 18 px', () {
       final restored = WidgetSettings.fromMap(const <String, dynamic>{
         'ballSize': 1,
       });
 
-      expect(restored.ballSize, 14);
+      expect(restored.ballSize, 18);
     });
 
     test('conveniências derivadas', () {
