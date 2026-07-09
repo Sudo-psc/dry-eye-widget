@@ -14,24 +14,24 @@ Future<void> _pumpScreen(
   await tester.pumpWidget(
     Provider<DvrsStorageService>.value(
       value: storage,
-      child: MaterialApp(
-        home: DvrsScreen(onClose: onClose ?? () {}),
-      ),
+      child: MaterialApp(home: DvrsScreen(onClose: onClose ?? () {})),
     ),
   );
   await tester.pumpAndSettle();
 }
 
-/// Responde as 16 perguntas escolhendo a opção [optionIndex] em cada uma e
-/// avançando até a revisão.
+/// Responde as 16 perguntas escolhendo a opção [optionIndex] em cada uma.
 Future<void> _answerAll(WidgetTester tester, {int optionIndex = 0}) async {
-  for (var i = 0; i < kDvrsQuestions.length; i++) {
-    final option = kDvrsQuestions[i].options[optionIndex].label;
-    await tester.tap(find.text(option));
-    await tester.pump();
-    final nextLabel = i == kDvrsQuestions.length - 1 ? 'Revisar' : 'Próxima';
-    await tester.tap(find.text(nextLabel));
+  for (final question in kDvrsQuestions) {
+    final card = find.byKey(ValueKey<String>('dvrs_question_${question.id}'));
+    await tester.scrollUntilVisible(card, 500);
     await tester.pumpAndSettle();
+    final option = find.descendant(
+      of: card,
+      matching: find.text(question.options[optionIndex].label),
+    );
+    await tester.tap(option);
+    await tester.pump();
   }
 }
 
@@ -52,25 +52,41 @@ void main() {
     expect(find.textContaining('não substitui'), findsWidgets);
   });
 
-  testWidgets('inicia o questionário e mostra progresso 1 de 16',
-      (tester) async {
+  testWidgets('inicia o questionário em página única com progresso', (
+    tester,
+  ) async {
     await _pumpScreen(tester, storage);
     await tester.tap(find.text('Iniciar DVRS'));
     await tester.pumpAndSettle();
-    expect(find.text('Pergunta 1 de 16'), findsOneWidget);
+    expect(find.text('0 de 16 respondidas'), findsOneWidget);
+    expect(
+      find.text('Olhos secos, sensação de areia ou corpo estranho'),
+      findsOneWidget,
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey<String>('dvrs_question_q16')),
+      500,
+    );
+    expect(
+      find.text('Sinais que merecem avaliação oftalmológica'),
+      findsOneWidget,
+    );
   });
 
-  testWidgets('não avança enquanto a pergunta não é respondida', (tester) async {
+  testWidgets('não calcula enquanto todas as perguntas não forem respondidas', (
+    tester,
+  ) async {
     await _pumpScreen(tester, storage);
     await tester.tap(find.text('Iniciar DVRS'));
     await tester.pumpAndSettle();
-    final proxima = tester.widget<FilledButton>(
+    final calcular = tester.widget<FilledButton>(
       find.ancestor(
-        of: find.text('Próxima'),
+        of: find.text('Calcular resultado'),
         matching: find.byType(FilledButton),
       ),
     );
-    expect(proxima.onPressed, isNull);
+    expect(calcular.onPressed, isNull);
   });
 
   testWidgets('fluxo completo calcula e exibe resultado', (tester) async {
@@ -80,9 +96,7 @@ void main() {
 
     await _answerAll(tester, optionIndex: 0);
 
-    // Na revisão, calcular.
-    expect(find.text('Revise suas respostas'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Calcular resultado'), 200);
+    expect(find.text('16 de 16 respondidas'), findsOneWidget);
     await tester.tap(find.text('Calcular resultado'));
     await tester.pumpAndSettle();
 
@@ -98,12 +112,16 @@ void main() {
     await tester.tap(find.text('Iniciar DVRS'));
     await tester.pumpAndSettle();
     await _answerAll(tester, optionIndex: 0);
-    await tester.scrollUntilVisible(find.text('Calcular resultado'), 200);
     await tester.tap(find.text('Calcular resultado'));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Salvar resultado'), 200);
-    await tester.tap(find.text('Salvar resultado'));
+    final saveLabel = find.text('Salvar resultado');
+    await tester.scrollUntilVisible(saveLabel, 200);
+    final saveButton = find.ancestor(
+      of: saveLabel,
+      matching: find.byType(FilledButton),
+    );
+    await tester.tapAt(tester.getTopLeft(saveButton) + const Offset(16, 8));
     await tester.pumpAndSettle();
 
     expect(storage.getDvrsHistory(), hasLength(1));

@@ -11,19 +11,15 @@ import 'dvrs_result_view.dart';
 import 'dvrs_ui.dart';
 
 /// Sub-telas do fluxo do DVRS.
-enum _DvrsView { intro, questions, review, result, history }
+enum _DvrsView { intro, questions, result, history }
 
 /// Tela principal do **DVRS — Índice de Risco Visual Digital**.
 ///
-/// Orquestra todo o fluxo: introdução → 16 perguntas (uma por vez) → revisão →
-/// resultado → histórico. É o único questionário principal do app. Linguagem
-/// sempre educativa e de triagem.
+/// Orquestra todo o fluxo: introdução → página única de perguntas → resultado
+/// → histórico. É o único questionário principal do app. Linguagem sempre
+/// educativa e de triagem.
 class DvrsScreen extends StatefulWidget {
-  const DvrsScreen({
-    super.key,
-    required this.onClose,
-    this.onExportPdf,
-  });
+  const DvrsScreen({super.key, required this.onClose, this.onExportPdf});
 
   /// Volta para a tela anterior (fecha o questionário).
   final VoidCallback onClose;
@@ -42,41 +38,16 @@ class _DvrsScreenState extends State<DvrsScreen> {
   /// Índice da opção escolhida por pergunta (`null` = não respondida).
   final Map<String, int> _selected = {};
 
-  /// Índice da pergunta atual (0..15).
-  int _index = 0;
-
-  /// Direção da última navegação (true = avançar, false = voltar).
-  bool _navForward = true;
-
   DvrsResult? _result;
   bool _saved = false;
+
+  int get _answeredCount => _selected.length;
 
   bool get _allAnswered => _selected.length == kDvrsQuestions.length;
 
   // --- Navegação ----------------------------------------------------------
 
-  void _start() => setState(() {
-        _index = 0;
-        _view = _DvrsView.questions;
-      });
-
-  void _next() {
-    _navForward = true;
-    if (_index < kDvrsQuestions.length - 1) {
-      setState(() => _index++);
-    } else {
-      setState(() => _view = _DvrsView.review);
-    }
-  }
-
-  void _back() {
-    _navForward = false;
-    if (_index > 0) {
-      setState(() => _index--);
-    } else {
-      setState(() => _view = _DvrsView.intro);
-    }
-  }
+  void _start() => setState(() => _view = _DvrsView.questions);
 
   void _calculate() {
     if (!_allAnswered) return;
@@ -103,12 +74,11 @@ class _DvrsScreenState extends State<DvrsScreen> {
   }
 
   void _restart() => setState(() {
-        _selected.clear();
-        _index = 0;
-        _result = null;
-        _saved = false;
-        _view = _DvrsView.intro;
-      });
+    _selected.clear();
+    _result = null;
+    _saved = false;
+    _view = _DvrsView.intro;
+  });
 
   Future<void> _save() async {
     final result = _result;
@@ -175,13 +145,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
         widget.onClose();
         break;
       case _DvrsView.questions:
-        _back();
-        break;
-      case _DvrsView.review:
-        setState(() {
-          _index = kDvrsQuestions.length - 1;
-          _view = _DvrsView.questions;
-        });
+        setState(() => _view = _DvrsView.intro);
         break;
       case _DvrsView.result:
       case _DvrsView.history:
@@ -191,36 +155,35 @@ class _DvrsScreenState extends State<DvrsScreen> {
   }
 
   Widget _header(ThemeData theme) => Container(
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.5),
-          border: Border(
-            bottom: BorderSide(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            ),
+    height: 56,
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      color: theme.colorScheme.surface.withValues(alpha: 0.5),
+      border: Border(
+        bottom: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+        ),
+      ),
+    ),
+    child: Row(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _onHeaderBack,
+          tooltip: 'Voltar',
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            _headerTitle,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        child: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: _onHeaderBack,
-              tooltip: 'Voltar',
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                _headerTitle,
-                style:
-                    const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 
   Widget _body(ThemeData theme) {
     switch (_view) {
@@ -228,8 +191,6 @@ class _DvrsScreenState extends State<DvrsScreen> {
         return _introView(theme);
       case _DvrsView.questions:
         return _questionsView(theme);
-      case _DvrsView.review:
-        return _reviewView(theme);
       case _DvrsView.result:
         return _resultScreen(theme);
       case _DvrsView.history:
@@ -240,63 +201,64 @@ class _DvrsScreenState extends State<DvrsScreen> {
   // --- Intro --------------------------------------------------------------
 
   Widget _introView(ThemeData theme) => ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          const Text(
-            'Índice de Risco Visual Digital',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Ferramenta educativa de triagem e acompanhamento · período '
-            'avaliado: $kDvrsPeriodLabel',
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+    padding: const EdgeInsets.all(24),
+    children: [
+      const Text(
+        'Índice de Risco Visual Digital',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        'Ferramenta educativa de triagem e acompanhamento · período '
+        'avaliado: $kDvrsPeriodLabel',
+        style: TextStyle(
+          fontSize: 13,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      ),
+      const SizedBox(height: 16),
+      Text(
+        kDvrsIntroDescription,
+        style: const TextStyle(fontSize: 14, height: 1.4),
+      ),
+      const SizedBox(height: 16),
+      DvrsUi.disclaimerBanner(theme, text: kDvrsIntroDisclaimer),
+      const SizedBox(height: 24),
+      SizedBox(
+        height: 52,
+        child: FilledButton.icon(
+          onPressed: _start,
+          icon: const Icon(Icons.play_arrow),
+          label: const Text('Iniciar DVRS'),
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-          const SizedBox(height: 16),
-          Text(kDvrsIntroDescription,
-              style: const TextStyle(fontSize: 14, height: 1.4)),
-          const SizedBox(height: 16),
-          DvrsUi.disclaimerBanner(theme, text: kDvrsIntroDisclaimer),
-          const SizedBox(height: 24),
-          SizedBox(
-            height: 52,
-            child: FilledButton.icon(
-              onPressed: _start,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Iniciar DVRS'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+        ),
+      ),
+      const SizedBox(height: 12),
+      SizedBox(
+        height: 46,
+        child: OutlinedButton.icon(
+          onPressed: () => setState(() => _view = _DvrsView.history),
+          icon: const Icon(Icons.history, size: 18),
+          label: const Text('Ver histórico'),
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 46,
-            child: OutlinedButton.icon(
-              onPressed: () => setState(() => _view = _DvrsView.history),
-              icon: const Icon(Icons.history, size: 18),
-              label: const Text('Ver histórico'),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
+        ),
+      ),
+    ],
+  );
 
-  // --- Perguntas (uma por vez) -------------------------------------------
+  // --- Perguntas (página única) -------------------------------------------
 
   Widget _questionsView(ThemeData theme) {
-    final q = kDvrsQuestions[_index];
-    final selected = _selected[q.id];
     final total = kDvrsQuestions.length;
+    final answered = _answeredCount;
     return Column(
       children: [
         Padding(
@@ -305,7 +267,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Pergunta ${_index + 1} de $total',
+                '$answered de $total respondidas',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -316,84 +278,121 @@ class _DvrsScreenState extends State<DvrsScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: (_index + 1) / total,
+                  value: answered / total,
                   minHeight: 6,
-                  backgroundColor:
-                      theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                  backgroundColor: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.08,
+                  ),
                 ),
               ),
             ],
           ),
         ),
         Expanded(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: Offset(_navForward ? 0.08 : -0.08, 0),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
+          child: ListView.separated(
+            padding: const EdgeInsets.all(24),
+            itemCount: kDvrsQuestions.length + 1,
+            separatorBuilder: (_, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return Text(
+                  'Responda as 16 perguntas abaixo na mesma página. Role a '
+                  'lista e calcule o resultado quando todas estiverem '
+                  'marcadas.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                  ),
+                );
+              }
+              final questionIndex = index - 1;
+              final question = kDvrsQuestions[questionIndex];
+              return _questionCard(theme, question, questionIndex + 1);
+            },
+          ),
+        ),
+        _questionsFooter(theme, _allAnswered),
+      ],
+    );
+  }
+
+  Widget _questionCard(ThemeData theme, DvrsQuestion q, int questionNumber) {
+    final selected = _selected[q.id];
+    final domainColor = DvrsUi.domainColor(q.domain);
+    return Container(
+      key: ValueKey<String>('dvrs_question_${q.id}'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.36),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                'Pergunta $questionNumber',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
-            ),
-            child: ListView(
-              key: ValueKey(_index),
-              padding: const EdgeInsets.all(24),
-              children: [
-                Row(
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: domainColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: DvrsUi.domainColor(q.domain)
-                            .withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(DvrsUi.domainIcon(q.domain),
-                              size: 14, color: DvrsUi.domainColor(q.domain)),
-                          const SizedBox(width: 6),
-                          Text(
-                            kDvrsDomainLabels[q.domain] ?? '',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: DvrsUi.domainColor(q.domain),
-                            ),
-                          ),
-                        ],
+                    Icon(
+                      DvrsUi.domainIcon(q.domain),
+                      size: 14,
+                      color: domainColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      kDvrsDomainLabels[q.domain] ?? '',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: domainColor,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  q.title,
-                  style:
-                      const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
-                const SizedBox(height: 20),
-                for (var i = 0; i < q.options.length; i++) ...[
-                  _optionTile(theme, q.options[i].label, selected == i, () {
-                    setState(() => _selected[q.id] = i);
-                  }),
-                  const SizedBox(height: 10),
-                ],
-              ],
-            ),
+              ),
+            ],
           ),
-        ),
-        _questionsFooter(theme, selected != null),
-      ],
+          const SizedBox(height: 12),
+          Text(
+            q.title,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
+          const SizedBox(height: 20),
+          for (var i = 0; i < q.options.length; i++) ...[
+            _optionTile(theme, q.options[i].label, selected == i, () {
+              setState(() => _selected[q.id] = i);
+            }),
+            if (i < q.options.length - 1) const SizedBox(height: 10),
+          ],
+        ],
+      ),
     );
   }
 
@@ -445,8 +444,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.3,
-                      fontWeight:
-                          selected ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                 ),
@@ -458,140 +456,35 @@ class _DvrsScreenState extends State<DvrsScreen> {
     );
   }
 
-  Widget _questionsFooter(ThemeData theme, bool canAdvance) => Container(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _back,
-                icon: const Icon(Icons.arrow_back, size: 18),
-                label: const Text('Voltar'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: canAdvance ? _next : null,
-                icon: Icon(
-                  _index == kDvrsQuestions.length - 1
-                      ? Icons.fact_check_outlined
-                      : Icons.arrow_forward,
-                  size: 18,
-                ),
-                label: Text(
-                  _index == kDvrsQuestions.length - 1 ? 'Revisar' : 'Próxima',
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
-  // --- Revisão ------------------------------------------------------------
-
-  Widget _reviewView(ThemeData theme) => ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          const Text(
-            'Revise suas respostas',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Toque em uma resposta para alterá-la antes de calcular.',
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: 16),
-          for (var i = 0; i < kDvrsQuestions.length; i++)
-            _reviewRow(theme, i),
-          const SizedBox(height: 16),
-          if (!_allAnswered)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                'Responda todas as 16 perguntas para calcular o resultado.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: theme.colorScheme.error,
-                ),
-              ),
-            ),
-          SizedBox(
-            height: 52,
-            child: FilledButton.icon(
-              onPressed: _allAnswered ? _calculate : null,
-              icon: const Icon(Icons.calculate_outlined),
-              label: const Text('Calcular resultado'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-
-  Widget _reviewRow(ThemeData theme, int i) {
-    final q = kDvrsQuestions[i];
-    final sel = _selected[q.id];
-    final answerLabel = sel == null ? 'Sem resposta' : q.options[sel].label;
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: () => setState(() {
-        _index = i;
-        _view = _DvrsView.questions;
-      }),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 26,
-              child: Text(
-                '${i + 1}.',
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(q.title, style: const TextStyle(fontSize: 13)),
-                  const SizedBox(height: 2),
-                  Text(
-                    answerLabel,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: sel == null
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.edit_outlined,
-                size: 16,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
-          ],
+  Widget _questionsFooter(ThemeData theme, bool canCalculate) => Container(
+    padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
         ),
       ),
-    );
-  }
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => setState(() => _view = _DvrsView.intro),
+            icon: const Icon(Icons.arrow_back, size: 18),
+            label: const Text('Voltar'),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: canCalculate ? _calculate : null,
+            icon: const Icon(Icons.calculate_outlined, size: 18),
+            label: const Text('Calcular resultado'),
+          ),
+        ),
+      ],
+    ),
+  );
 
   // --- Resultado ----------------------------------------------------------
 
@@ -617,8 +510,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
             ),
             label: Text(_saved ? 'Salvo' : 'Salvar resultado'),
             style: FilledButton.styleFrom(
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),

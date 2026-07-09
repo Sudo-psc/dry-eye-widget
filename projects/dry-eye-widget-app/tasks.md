@@ -9,9 +9,12 @@
 - [x] Improve compact widget size, idle opacity, hover animation, dynamic orb defaults, and edge docking behavior.
 - [x] Add focused tests for the new edge docking and docked widget behavior.
 - [x] Verify with focused Flutter tests, full Flutter tests, analyzer, macOS debug build, and macOS release build.
+- [x] Convert the DVRS questionnaire from one-question-per-step to a single scrollable page.
+- [x] Verify the DVRS single-page flow with focused widget tests and static analysis.
 
 ## next
 
+- [ ] Manually inspect the DVRS single-page questionnaire in the desktop window, especially narrow window widths and long option labels.
 - [ ] Manually inspect left and right edge docking on macOS with real dragging, hover, click-to-undock, and size changes.
 - [ ] Manually inspect left and right edge docking on Windows before the next Windows package.
 - [ ] Manually inspect the micronotification on Windows before packaging a Windows release.
@@ -26,6 +29,7 @@
 
 - Add an integration-level window layout test if a reliable desktop window harness is introduced.
 - Add a small desktop visual QA script or harness for edge docking screenshots after window_manager upgrades.
+- Add a visual regression or golden-style check for the DVRS question list if the project adopts stable desktop widget snapshots.
 
 ## recurring
 

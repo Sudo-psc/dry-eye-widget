@@ -1,8 +1,8 @@
 # Status
 
-Updated: 2026-07-06
+Updated: 2026-07-08
 
-Current phase: compact floating widget visual refresh implemented and verified locally.
+Current phase: DVRS single-page questionnaire implemented and verified locally.
 
 Completed:
 
@@ -14,9 +14,13 @@ Completed:
 - Replaced instant hover scale with a smooth hover animation controller, subtle live breathing, stronger glow on hover, and suppressed text pill while docked.
 - Added focused tests for partial edge docking, docked clickability, docked reminder suppression, and updated settings normalization.
 - Verified with focused tests, full test suite, static analysis, macOS debug build, and macOS release build.
+- Reworked the DVRS questionnaire so all 16 questions appear in one scrollable page, with progress by answered count and a single calculation action after all responses are marked.
+- Updated DVRS widget tests for the single-page flow, disabled calculation before completion, result calculation, and history persistence.
+- Verified the DVRS change with focused widget tests, full Flutter tests, and static analysis.
 
 Risks:
 
 - The new partial off-screen docking should still be manually inspected on Windows because window managers can clamp off-screen positions differently.
 - The dynamic orb effect is now enabled by default; monitor CPU/battery feedback during real use.
 - Local Xcode reports CoreSimulator as out of date, but the macOS debug and release builds still completed successfully.
+- The new DVRS page should still be manually checked in the real desktop window at narrow sizes to confirm the full-question scroll experience feels comfortable.

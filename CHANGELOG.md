@@ -4,6 +4,14 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.21.2] - 2026-07-09
+
+### Modificado
+- **DVRS em página única**: as 16 perguntas agora aparecem em uma lista rolável,
+  com progresso por respostas concluídas e cálculo liberado apenas após todas
+  as alternativas serem marcadas. O usuário não precisa mais avançar pergunta
+  por pergunta.
+
 ## [1.21.1] - 2026-07-05
 
 ### Corrigido
