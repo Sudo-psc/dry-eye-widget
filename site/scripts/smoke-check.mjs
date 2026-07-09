@@ -65,11 +65,11 @@ if (!landingJs.includes('typeof window.dewSetLang === "function"')) {
 const indexHtml = read(join(root, "index.html"));
 if (
   !indexHtml.includes(
-    'rel="canonical" href="https://sudo-psc.github.io/dry-eye-widget/"',
+    'rel="canonical" href="https://olhossecos.com.br/app/"',
   )
 ) {
   fail(
-    "site/index.html must keep sudo-psc.github.io/dry-eye-widget/ as the canonical landing URL.",
+    "site/index.html must keep olhossecos.com.br/app/ as the canonical landing URL.",
   );
 }
 
