@@ -76,7 +76,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: widget.onClose,
-            tooltip: 'Fechar',
+            tooltip: s.close,
           ),
           const SizedBox(width: 4),
           Expanded(

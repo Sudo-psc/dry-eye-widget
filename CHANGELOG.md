@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.22.1] - 2026-07-09
+
+### Adicionado
+- **Resumo do dia na bandeja/menu bar**: acesso direto ao hub sem abrir a bolinha.
+
+### Corrigido
+- Textos da bandeja (Relatórios, GitHub) agora usam o idioma da interface.
+- Tooltips “Fechar” e título do Painel localizados (PT/EN).
+
+### Modificado
+- Após o onboarding, o app abre o Resumo do dia para facilitar a descoberta.
+
 ## [1.22.0] - 2026-07-09
 
 ### Adicionado

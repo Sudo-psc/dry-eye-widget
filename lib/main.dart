@@ -434,12 +434,14 @@ class _HomePageState extends State<HomePage> with TrayListener {
     );
   }
 
-  /// Conclui (ou pula) o onboarding: persiste a flag e volta ao estado normal.
+  /// Conclui (ou pula) o onboarding: persiste a flag e abre o Resumo do dia
+  /// para o usuário descobrir o hub de saúde logo na primeira execução.
   Future<void> _finishOnboarding() async {
     await _settings.update(_settings.value.copyWith(onboardingComplete: true));
     if (!mounted) return;
     setState(() => _onboardingOpen = false);
-    _restoreAfterPanel();
+    // Descoberta do hub: um toque a mais no dia 1 vale mais que o menu denso.
+    _openDaySummary();
   }
 
   Future<void> _cacheCurrentPosition() async {
@@ -653,6 +655,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
       case TrayService.keySettings:
         _openSettingsFromTray();
         break;
+      case TrayService.keyDaySummary:
+        _openDaySummaryFromTray();
+        break;
       case TrayService.keyDvrs:
         _openDvrsFromTray();
         break;
@@ -687,6 +692,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<void> _openSettingsFromTray() async {
     if (!_widgetEnabled) await windowManager.show();
     _openSettings();
+  }
+
+  Future<void> _openDaySummaryFromTray() async {
+    if (!_widgetEnabled) await windowManager.show();
+    _openDaySummary();
   }
 
   Future<void> _openDvrsFromTray() async {

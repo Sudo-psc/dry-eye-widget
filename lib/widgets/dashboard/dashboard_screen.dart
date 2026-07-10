@@ -512,6 +512,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final strings = context.watch<SettingsProvider>().strings;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ClipRRect(
@@ -521,7 +522,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           blur: 20,
           child: Column(
             children: [
-              _header(theme),
+              _header(theme, strings),
               Expanded(
                 child: TabBarView(
                   controller: _tabs,
@@ -539,7 +540,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _header(ThemeData theme) => Container(
+  Widget _header(ThemeData theme, AppStrings strings) => Container(
     decoration: BoxDecoration(
       color: theme.colorScheme.surface.withValues(alpha: 0.5),
       border: Border(
@@ -557,13 +558,13 @@ class _DashboardScreenState extends State<DashboardScreen>
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: widget.onClose,
-                tooltip: 'Fechar',
+                tooltip: strings.close,
               ),
               const SizedBox(width: 4),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Dashboard — Acompanhamento',
-                  style: TextStyle(
+                  strings.menuDashboard,
+                  style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),

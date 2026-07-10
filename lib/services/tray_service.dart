@@ -18,6 +18,7 @@ class TrayService {
   static const String keyToggle = 'toggle_widget';
   static const String keyBreak = 'start_break';
   static const String keySettings = 'open_settings';
+  static const String keyDaySummary = 'open_day_summary';
   static const String keyDvrs = 'open_dvrs';
   static const String keyGithub = 'open_github';
   static const String keyReports = 'open_reports';
@@ -111,10 +112,11 @@ class TrayService {
             ),
             MenuItem(key: keyBreak, label: strings.menuStartBreak),
             MenuItem.separator(),
+            MenuItem(key: keyDaySummary, label: strings.menuDaySummary),
             MenuItem(key: keyDvrs, label: strings.menuDvrs),
-            MenuItem(key: keyReports, label: 'Relatórios'),
+            MenuItem(key: keyReports, label: strings.menuReports),
             MenuItem(key: keySettings, label: strings.menuSettings),
-            MenuItem(key: keyGithub, label: '🐙 GitHub'),
+            MenuItem(key: keyGithub, label: strings.menuGitHub),
             MenuItem(key: keyQuit, label: strings.menuQuit),
           ],
         ),

@@ -2,10 +2,11 @@
 
 Updated: 2026-07-09
 
-Current phase: P0 product loop shipped — day summary hub, proactive insight, DVRS recheck nudge (v1.22.0).
+Current phase: P0 + quick wins 1.22.1 (tray hub, i18n polish, post-onboarding discovery).
 
 Completed:
 
+- Quick wins: Day Summary in tray/menu bar; tray labels localized; Progress/Dashboard close tooltips and dashboard title localized; open Day Summary after onboarding.
 - Added Day Summary hub (today’s breaks, streak, last DVRS, insight, CTAs).
 - Unified local insight engine shared by Day Summary and My Progress.
 - Soft DVRS re-evaluation nudge every 14 days (or after first breaks if never taken), with snooze and opt-out.
