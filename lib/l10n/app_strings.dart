@@ -16,6 +16,7 @@ class AppStrings {
     required this.menuDashboard,
     required this.menuReports,
     required this.ballSemanticLabel,
+    required this.menuSemanticLabel,
     required this.menuCheckUpdates,
     required this.menuSettings,
     required this.menuQuit,
@@ -369,6 +370,7 @@ class AppStrings {
   final String extendCycleActiveHint;
 
   final String ballSemanticLabel;
+  final String menuSemanticLabel;
   final String menuCheckUpdates;
   final String menuSettings;
   final String menuQuit;
@@ -764,6 +766,7 @@ const AppStrings ptStrings = AppStrings(
   extendCycleActiveHint: 'Ciclo alongado por 1 hora — menos interrupções.',
   menuReports: 'Relatórios',
   ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
+  menuSemanticLabel: 'Menu do Dry Eye Widget',
   menuCheckUpdates: 'Verificar atualizações',
   menuSettings: 'Configurações',
   menuQuit: 'Sair',
@@ -1142,6 +1145,7 @@ const AppStrings enStrings = AppStrings(
   extendCycleActiveHint: 'Cycle stretched for 1 hour — fewer interruptions.',
   menuReports: 'Reports',
   ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
+  menuSemanticLabel: 'Dry Eye Widget menu',
   menuCheckUpdates: 'Check for updates',
   menuSettings: 'Settings',
   menuQuit: 'Quit',

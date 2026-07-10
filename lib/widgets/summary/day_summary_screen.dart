@@ -93,7 +93,13 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
               _header(theme, s),
               Expanded(
                 child: snap == null
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(
+                        child: SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        ),
+                      )
                     : _body(theme, s, snap),
               ),
             ],
@@ -105,37 +111,45 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
 
   Widget _header(ThemeData theme, AppStrings s) => Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.5),
+          color: theme.colorScheme.surface.withValues(alpha: 0.55),
           border: Border(
-            bottom: BorderSide(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            ),
+            bottom: BorderSide(color: AppColors.divider),
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
+          padding: const EdgeInsets.fromLTRB(4, 6, 14, 6),
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.close_rounded),
                 onPressed: widget.onClose,
                 tooltip: s.close,
+                style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 2),
               Expanded(
                 child: Text(
                   s.daySummaryTitle,
                   style: const TextStyle(
                     fontSize: 17,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(
-                Icons.wb_sunny_outlined,
-                color: AppColors.idleBall,
-                size: 22,
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.idleBall.withValues(alpha: 0.16),
+                ),
+                child: const Icon(
+                  Icons.wb_sunny_outlined,
+                  color: AppColors.idleBall,
+                  size: 20,
+                ),
               ),
             ],
           ),
@@ -467,6 +481,10 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
         Expanded(
           child: FilledButton.icon(
             onPressed: widget.onStartBreak,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(0, 46),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
             icon: const Icon(Icons.play_circle_outline, size: 18),
             label: Text(s.daySummaryCtaBreak),
           ),
@@ -475,6 +493,10 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
         Expanded(
           child: FilledButton.tonalIcon(
             onPressed: widget.onDvrs,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(0, 46),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
             icon: const Icon(Icons.assignment, size: 18),
             label: Text(s.daySummaryCtaDvrs),
           ),

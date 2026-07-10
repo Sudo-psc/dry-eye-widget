@@ -21,8 +21,19 @@ class AppColors {
   static const Color textPrimary = Colors.white;
   static const Color textSecondary = Color(0xCCFFFFFF);
 
+  /// Rótulos terciários (headers de seção, meta).
+  static const Color textMuted = Color(0x8CFFFFFF);
+
   /// Fundo escuro de diálogos (Sobre, configurações).
   static const Color surface = Color(0xFF2A2A2A);
+
+  /// Realce de hover sobre vidro (menu, botões compactos).
+  static const Color hoverFillTop = Color(0x33FFFFFF);
+  static const Color hoverFillBottom = Color(0x0FFFFFFF);
+  static const Color hoverBorder = Color(0x33FFFFFF);
+
+  /// Divisores e traços sutis.
+  static const Color divider = Color(0x1FFFFFFF);
 }
 
 /// Paleta de cores sugeridas no seletor de cor das configurações.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
+import '../ui/app_theme.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
 
@@ -34,67 +35,79 @@ class GentleBreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = strings.stateTitle(state);
+    final subtitle =
+        state == AppState.conclusao && completionInsight.isNotEmpty
+            ? completionInsight
+            : strings.stateSubtitle(state);
     return Align(
       alignment: Alignment.topRight,
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: LiquidGlass(
-          width: 404,
-          borderRadius: 24,
-          blur: 26,
-          fillOpacity: 0.82,
-          padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _BreakLabel(),
-                    const SizedBox(height: 8),
-                    Text(
-                      strings.stateTitle(state),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        color: AppColors.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        height: 1.08,
+        child: Semantics(
+          container: true,
+          liveRegion: true,
+          label: state.showsCountdown
+              ? '$title. $_timeText. $subtitle'
+              : '$title. $subtitle',
+          child: LiquidGlass(
+            width: 404,
+            borderRadius: AppRadii.xl,
+            blur: 26,
+            fillOpacity: 0.82,
+            padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _BreakLabel(),
+                      const SizedBox(height: 6),
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: AppColors.textPrimary,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          height: 1.12,
+                          letterSpacing: -0.2,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      state == AppState.conclusao && completionInsight.isNotEmpty
-                          ? completionInsight
-                          : strings.stateSubtitle(state),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        color: AppColors.textSecondary,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
-                        height: 1.22,
+                      const SizedBox(height: 5),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: AppColors.textSecondary,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              if (state.showsCountdown)
-                _CountdownDial(
-                  timeText: _timeText,
-                  secondsRemaining: secondsRemaining,
-                  totalSeconds: totalSeconds,
-                )
-              else
-                _StateBadge(state: state),
-            ],
+                const SizedBox(width: 14),
+                if (state.showsCountdown)
+                  _CountdownDial(
+                    timeText: _timeText,
+                    secondsRemaining: secondsRemaining,
+                    totalSeconds: totalSeconds,
+                  )
+                else
+                  _StateBadge(state: state),
+              ],
+            ),
           ),
         ),
       ),

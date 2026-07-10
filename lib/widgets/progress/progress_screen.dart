@@ -62,34 +62,45 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   Widget _header(ThemeData theme, AppStrings s) => Container(
     decoration: BoxDecoration(
-      color: theme.colorScheme.surface.withValues(alpha: 0.5),
-      border: Border(
-        bottom: BorderSide(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-        ),
+      color: theme.colorScheme.surface.withValues(alpha: 0.55),
+      border: const Border(
+        bottom: BorderSide(color: AppColors.divider),
       ),
     ),
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(4, 6, 14, 6),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.close),
+            icon: const Icon(Icons.close_rounded),
             onPressed: widget.onClose,
             tooltip: s.close,
+            style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 2),
           Expanded(
             child: Text(
               s.progressTitle,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const Icon(
-            Icons.local_florist_outlined,
-            color: AppColors.idleBall,
-            size: 22,
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.idleBall.withValues(alpha: 0.16),
+            ),
+            child: const Icon(
+              Icons.local_florist_outlined,
+              color: AppColors.idleBall,
+              size: 20,
+            ),
           ),
         ],
       ),

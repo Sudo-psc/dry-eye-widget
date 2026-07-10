@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../models/widget_settings.dart';
+import '../ui/app_theme.dart';
 import '../utils/constants.dart';
 import 'flag_icons.dart';
 import 'liquid_glass.dart';
@@ -108,6 +109,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
     return LiquidGlass(
       width: 400,
+      borderRadius: AppRadii.xl,
       constraints: const BoxConstraints(maxHeight: 640),
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       child: Column(

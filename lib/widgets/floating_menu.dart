@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../l10n/app_strings.dart';
+import '../ui/app_theme.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
 
@@ -120,18 +122,22 @@ class FloatingMenu extends StatelessWidget {
       ...systemItems.map(rowFor),
     ];
 
-    return LiquidGlass(
-      width: 280,
-      borderRadius: 20,
-      // Mais translúcido que o padrão (vidro de verdade), compensado com blur e
-      // saturação maiores para manter a vibrância e a profundidade.
-      fillOpacity: 0.58,
-      blur: 32,
-      saturation: 1.6,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
+    return Semantics(
+      container: true,
+      label: s.menuSemanticLabel,
+      child: LiquidGlass(
+        width: 280,
+        borderRadius: AppRadii.lg,
+        // Mais translúcido que o padrão (vidro de verdade), compensado com blur e
+        // saturação maiores para manter a vibrância e a profundidade.
+        fillOpacity: 0.58,
+        blur: 32,
+        saturation: 1.6,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: children,
+        ),
       ),
     );
   }
@@ -202,33 +208,31 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
             behavior: HitTestBehavior.opaque,
             onTap: widget.onTap,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              curve: Curves.easeOut,
+              duration: AppMotion.fast,
+              curve: AppMotion.standard,
               height: 44,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadii.sm),
                 gradient: _hover
-                    ? LinearGradient(
+                    ? const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.white.withValues(alpha: 0.20),
-                          Colors.white.withValues(alpha: 0.06),
+                          AppColors.hoverFillTop,
+                          AppColors.hoverFillBottom,
                         ],
                       )
                     : null,
                 border: Border.all(
-                  color: _hover
-                      ? Colors.white.withValues(alpha: 0.20)
-                      : Colors.transparent,
+                  color: _hover ? AppColors.hoverBorder : Colors.transparent,
                   width: 0.5,
                 ),
               ),
               child: AnimatedScale(
-                scale: _hover ? 1.12 : 1.0,
-                duration: const Duration(milliseconds: 160),
-                curve: Curves.easeOut,
+                scale: _hover ? AppMotion.hoverScale : 1.0,
+                duration: AppMotion.fast,
+                curve: AppMotion.standard,
                 child: Icon(
                   widget.icon,
                   size: 22,
@@ -256,17 +260,17 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 4),
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 4),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
           title.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
+          style: const TextStyle(
+            fontSize: 10.5,
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.8,
-            color: AppColors.textPrimary.withValues(alpha: 0.55),
-            shadows: const [
+            letterSpacing: 1.0,
+            color: AppColors.textMuted,
+            shadows: [
               Shadow(color: Colors.black54, blurRadius: 4),
             ],
           ),
@@ -285,7 +289,7 @@ class _MenuDivider extends StatelessWidget {
     return Container(
       height: 0.5,
       margin: const EdgeInsets.fromLTRB(14, 6, 14, 2),
-      color: Colors.white.withValues(alpha: 0.12),
+      color: AppColors.divider,
     );
   }
 }
@@ -312,82 +316,104 @@ class _MenuRowState extends State<_MenuRow> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hover = true),
-      onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          curve: Curves.easeOut,
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-          // Pequeno "deslize" para a direita ao passar o mouse.
-          padding: EdgeInsets.only(
-            left: _hover ? 14 : 10,
-            right: 12,
-            top: 10,
-            bottom: 10,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            // Realce em gradiente translúcido no hover (pílula arredondada).
-            gradient: _hover
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.20),
-                      Colors.white.withValues(alpha: 0.06),
-                    ],
-                  )
-                : null,
-            border: Border.all(
-              color: _hover
-                  ? Colors.white.withValues(alpha: 0.20)
-                  : Colors.transparent,
-              width: 0.5,
+    final accent = widget.emphasized || _hover;
+    return Semantics(
+      button: true,
+      label: widget.label,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hover = true),
+        onExit: (_) => setState(() => _hover = false),
+        child: FocusableActionDetector(
+          actions: <Type, Action<Intent>>{
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (_) {
+                widget.onTap();
+                return null;
+              },
             ),
-          ),
-          child: Row(
-            children: [
-              AnimatedScale(
-                scale: _hover ? 1.12 : 1.0,
-                duration: const Duration(milliseconds: 160),
-                curve: Curves.easeOut,
-                child: Icon(
-                  widget.icon,
-                  size: 18,
-                  color: _hover
-                      ? AppColors.idleBall
-                      : AppColors.textPrimary,
-                  // Sombra mantém o ícone legível sobre o vidro translúcido.
-                  shadows: const [
-                    Shadow(color: Colors.black54, blurRadius: 4),
-                  ],
+          },
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              widget.onTap();
+            },
+            child: AnimatedContainer(
+              duration: AppMotion.fast,
+              curve: AppMotion.standard,
+              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+              // Pequeno "deslize" para a direita ao passar o mouse.
+              padding: EdgeInsets.only(
+                left: _hover ? 14 : 10,
+                right: 12,
+                top: 10,
+                bottom: 10,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppRadii.sm),
+                gradient: _hover
+                    ? const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.hoverFillTop,
+                          AppColors.hoverFillBottom,
+                        ],
+                      )
+                    : null,
+                border: Border.all(
+                  color: widget.emphasized && !_hover
+                      ? AppColors.idleBall.withValues(alpha: 0.35)
+                      : (_hover ? AppColors.hoverBorder : Colors.transparent),
+                  width: 0.5,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  widget.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                    fontWeight: widget.emphasized
-                        ? FontWeight.w600
-                        : (_hover ? FontWeight.w600 : FontWeight.w400),
-                    // Sombra sutil = contraste garantido em fundos claros.
-                    shadows: const [
-                      Shadow(color: Colors.black54, blurRadius: 4),
-                    ],
+              child: Row(
+                children: [
+                  AnimatedScale(
+                    scale: _hover ? AppMotion.hoverScale : 1.0,
+                    duration: AppMotion.fast,
+                    curve: AppMotion.standard,
+                    child: Icon(
+                      widget.icon,
+                      size: 18,
+                      color: accent
+                          ? AppColors.idleBall
+                          : AppColors.textPrimary,
+                      shadows: const [
+                        Shadow(color: Colors.black54, blurRadius: 4),
+                      ],
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.2,
+                        color: AppColors.textPrimary,
+                        fontWeight: widget.emphasized || _hover
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        shadows: const [
+                          Shadow(color: Colors.black54, blurRadius: 4),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (widget.emphasized)
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: AppColors.idleBall.withValues(alpha: 0.75),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
+import '../ui/app_theme.dart';
 import '../ui/breathing_circle.dart';
 import '../ui/progress_ring.dart';
 import '../utils/constants.dart';
@@ -58,13 +59,19 @@ class GlassOverlay extends StatelessWidget {
               maxWidth: AppSizes.overlayMaxWidth,
               minWidth: 240,
             ),
-            child: LiquidGlass(
-              dark: false,
-              blur: blur,
-              fillOpacity: fillOpacity,
-              borderRadius: 24,
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-              child: _buildContent(),
+            child: Semantics(
+              container: true,
+              liveRegion: true,
+              label: strings.stateTitle(state),
+              child: LiquidGlass(
+                dark: false,
+                blur: blur,
+                fillOpacity: fillOpacity,
+                borderRadius: AppRadii.xl,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                child: _buildContent(),
+              ),
             ),
           ),
         ),
