@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/dvrs_assessment.dart';
 import '../models/environment_checklist.dart';
 import '../models/report_options.dart';
+import '../providers/settings_provider.dart';
 import '../services/dvrs_storage_service.dart';
 import '../services/pdf_report_service.dart';
 import '../services/report_builder.dart';
@@ -214,6 +216,7 @@ class _ReportDialogState extends State<ReportDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final strings = context.watch<SettingsProvider>().strings;
     // Prévia recalculada a cada rebuild (dados locais em memória).
     final preview = _buildReportData();
 
@@ -226,12 +229,12 @@ class _ReportDialogState extends State<ReportDialog> {
           blur: 20,
           child: Column(
             children: [
-              _header(theme),
+              _header(theme, strings),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.all(24),
                   children: [
-                    _personalCard(theme),
+                    _personalCard(theme, strings),
                     const SizedBox(height: 24),
                     _periodSelector(theme),
                     const SizedBox(height: 24),
@@ -254,7 +257,7 @@ class _ReportDialogState extends State<ReportDialog> {
     );
   }
 
-  Widget _header(ThemeData theme) => Container(
+  Widget _header(ThemeData theme, AppStrings strings) => Container(
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
@@ -270,20 +273,23 @@ class _ReportDialogState extends State<ReportDialog> {
             IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: widget.onClose,
-              tooltip: 'Voltar',
+              tooltip: strings.back,
             ),
             const SizedBox(width: 8),
-            const Expanded(
+            Expanded(
               child: Text(
-                'Relatórios',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                strings.menuReports,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
         ),
       );
 
-  Widget _personalCard(ThemeData theme) => Container(
+  Widget _personalCard(ThemeData theme, AppStrings strings) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
@@ -299,18 +305,21 @@ class _ReportDialogState extends State<ReportDialog> {
               children: [
                 Icon(Icons.picture_as_pdf, color: theme.colorScheme.primary),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Relatório pessoal',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    strings.reportsPersonalTitle,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Exporte seu DVRS, tempo de tela e pausas em PDF.',
-              style: TextStyle(fontSize: 14),
+            Text(
+              strings.reportsPersonalSubtitle,
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),

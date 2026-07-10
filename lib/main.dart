@@ -313,6 +313,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _onboardingOpen = false;
   bool _wasActive = false;
   int _currentStreak = 0;
+  String _completionInsight = '';
   bool _wasDrops = false;
   bool _wasInactive = false;
   bool _blinkReminderVisible = false;
@@ -562,12 +563,29 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _timer.state == AppState.idle;
 
   void _onStateChanged() {
-    // Streak para a tela de conclusão (calculado só na transição, não a cada tick).
+    // Streak + insight na conclusão (só na transição, não a cada tick).
     if (_timer.state == AppState.conclusao && _wasActive) {
-      _currentStreak = context
-          .read<StorageService>()
-          .loadBreakStats()
-          .currentStreak(DateTime.now());
+      final storage = context.read<StorageService>();
+      final stats = storage.loadBreakStats();
+      final now = DateTime.now();
+      _currentStreak = stats.currentStreak(now);
+      final lastDvrs =
+          context.read<DvrsStorageService>().getLatestDvrsResult();
+      final nudge = DailyInsightEngine.isDvrsNudgeDue(
+        now: now,
+        enabled: _settings.value.dvrsReminderEnabled,
+        lastDvrsAt: lastDvrs?.createdAt,
+        snoozedUntil: storage.loadDvrsNudgeSnoozedUntil(),
+        intervalDays: AppDefaults.dvrsReminderDays,
+        totalCompletedBreaks: stats.totalCompleted,
+      );
+      _completionInsight = DailyInsightEngine.buildInsight(
+        strings: _settings.strings,
+        stats: stats,
+        now: now,
+        lastDvrsAt: lastDvrs?.createdAt,
+        dvrsNudgeDue: nudge,
+      ).message;
     }
     // Mantém o ícone da barra de menu em sincronia com o progresso do ciclo.
     _tray.updateProgress(_timer.cycleProgress);
@@ -1399,6 +1417,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
               strings: strings,
               secondsRemaining: timer.phaseRemaining,
               totalSeconds: timer.phaseSeconds,
+              completionInsight: _completionInsight,
             );
     } else if (timer.inactivityAlert) {
       body = InactivityPauseCard(
@@ -1528,6 +1547,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
             secondsRemaining: timer.phaseRemaining,
             phaseTotalSeconds: timer.phaseSeconds,
             currentStreak: _currentStreak,
+            completionInsight: _completionInsight,
             fillOpacity: settings.overlayOpacity,
             blur: settings.overlayBlur,
           ),

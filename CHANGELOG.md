@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.22.2] - 2026-07-10
+
+### Adicionado
+- **Insight na conclusão da pausa**: overlay em tela cheia e cartão suave
+  mostram o mesmo insight proativo local (adesão, sequência ou DVRS).
+
+### Corrigido
+- Abas do Painel (Resumo/Tela/DVRS) e cabeçalho dos Relatórios (título,
+  Voltar, cartão pessoal) respeitam o idioma da interface.
+
 ## [1.22.1] - 2026-07-09
 
 ### Adicionado

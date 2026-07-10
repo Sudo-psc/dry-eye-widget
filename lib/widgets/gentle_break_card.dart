@@ -15,12 +15,16 @@ class GentleBreakCard extends StatelessWidget {
     required this.strings,
     required this.secondsRemaining,
     required this.totalSeconds,
+    this.completionInsight = '',
   });
 
   final AppState state;
   final AppStrings strings;
   final int secondsRemaining;
   final int totalSeconds;
+
+  /// Insight local na conclusão (substitui o subtítulo quando não vazio).
+  final String completionInsight;
 
   String get _timeText {
     final m = (secondsRemaining ~/ 60).toString().padLeft(2, '0');
@@ -65,7 +69,9 @@ class GentleBreakCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      strings.stateSubtitle(state),
+                      state == AppState.conclusao && completionInsight.isNotEmpty
+                          ? completionInsight
+                          : strings.stateSubtitle(state),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

@@ -205,6 +205,12 @@ class AppStrings {
     required this.notifyDvrsNudgeBody,
     required this.dvrsReminderEnable,
     required this.dvrsReminderHint,
+    required this.dashboardTabOverview,
+    required this.dashboardTabScreen,
+    required this.dashboardTabDvrs,
+    required this.back,
+    required this.reportsPersonalTitle,
+    required this.reportsPersonalSubtitle,
     required this.progressTitle,
     required this.progressStreakCurrentLabel,
     required this.progressStreakBestLabel,
@@ -279,6 +285,12 @@ class AppStrings {
   final String notifyDvrsNudgeBody;
   final String dvrsReminderEnable;
   final String dvrsReminderHint;
+  final String dashboardTabOverview;
+  final String dashboardTabScreen;
+  final String dashboardTabDvrs;
+  final String back;
+  final String reportsPersonalTitle;
+  final String reportsPersonalSubtitle;
 
   final String ballSemanticLabel;
   final String menuCheckUpdates;
@@ -616,6 +628,13 @@ const AppStrings ptStrings = AppStrings(
   dvrsReminderEnable: 'Lembrar reavaliação do DVRS',
   dvrsReminderHint:
       'Sugere gentilmente uma nova triagem a cada 14 dias (ou após as primeiras pausas, se ainda não fez). Pode adiar.',
+  dashboardTabOverview: 'Resumo',
+  dashboardTabScreen: 'Tela',
+  dashboardTabDvrs: 'DVRS',
+  back: 'Voltar',
+  reportsPersonalTitle: 'Relatório pessoal',
+  reportsPersonalSubtitle:
+      'Exporte seu DVRS, tempo de tela e pausas em PDF.',
   menuReports: 'Relatórios',
   ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
   menuCheckUpdates: 'Verificar atualizações',
@@ -948,6 +967,13 @@ const AppStrings enStrings = AppStrings(
   dvrsReminderEnable: 'Remind me to recheck DVRS',
   dvrsReminderHint:
       'Gently suggests a new screening every 14 days (or after your first breaks if you haven’t taken it). You can snooze.',
+  dashboardTabOverview: 'Overview',
+  dashboardTabScreen: 'Screen',
+  dashboardTabDvrs: 'DVRS',
+  back: 'Back',
+  reportsPersonalTitle: 'Personal report',
+  reportsPersonalSubtitle:
+      'Export your DVRS, screen time and breaks as a PDF.',
   menuReports: 'Reports',
   ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
   menuCheckUpdates: 'Check for updates',

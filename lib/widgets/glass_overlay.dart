@@ -21,6 +21,7 @@ class GlassOverlay extends StatelessWidget {
     required this.secondsRemaining,
     required this.phaseTotalSeconds,
     this.currentStreak = 0,
+    this.completionInsight = '',
     this.fillOpacity = 0.15,
     this.blur = 20.0,
   });
@@ -30,6 +31,9 @@ class GlassOverlay extends StatelessWidget {
   final int secondsRemaining;
   final int phaseTotalSeconds;
   final int currentStreak;
+
+  /// Insight proativo local exibido na conclusão da pausa (pode ser vazio).
+  final String completionInsight;
 
   /// Opacidade do preenchimento branco do vidro.
   final double fillOpacity;
@@ -129,6 +133,19 @@ class GlassOverlay extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+            if (completionInsight.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                completionInsight,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.35,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary.withValues(alpha: 0.9),
                 ),
               ),
             ],

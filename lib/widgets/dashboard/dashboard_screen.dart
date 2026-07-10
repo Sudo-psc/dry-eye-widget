@@ -585,21 +585,21 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           indicatorSize: TabBarIndicatorSize.tab,
-          tabs: const [
+          tabs: [
             Tab(
-              iconMargin: EdgeInsets.only(bottom: 2),
-              icon: Icon(Icons.space_dashboard_outlined, size: 18),
-              text: 'Resumo',
+              iconMargin: const EdgeInsets.only(bottom: 2),
+              icon: const Icon(Icons.space_dashboard_outlined, size: 18),
+              text: strings.dashboardTabOverview,
             ),
             Tab(
-              iconMargin: EdgeInsets.only(bottom: 2),
-              icon: Icon(Icons.monitor_outlined, size: 18),
-              text: 'Tela',
+              iconMargin: const EdgeInsets.only(bottom: 2),
+              icon: const Icon(Icons.monitor_outlined, size: 18),
+              text: strings.dashboardTabScreen,
             ),
             Tab(
-              iconMargin: EdgeInsets.only(bottom: 2),
-              icon: Icon(Icons.assignment_outlined, size: 18),
-              text: 'DVRS',
+              iconMargin: const EdgeInsets.only(bottom: 2),
+              icon: const Icon(Icons.assignment_outlined, size: 18),
+              text: strings.dashboardTabDvrs,
             ),
           ],
         ),
