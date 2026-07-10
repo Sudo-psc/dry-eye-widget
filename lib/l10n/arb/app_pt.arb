@@ -1,0 +1,15 @@
+{
+  "@@locale": "pt",
+  "menuHealthHub": "Saúde visual",
+  "@menuHealthHub": {
+    "description": "Item do menu flutuante: hub unificado de saúde"
+  },
+  "menuMyData": "Meus dados",
+  "@menuMyData": {
+    "description": "Painel de exportação/exclusão de dados de saúde"
+  },
+  "healthHubTitle": "Saúde visual",
+  "myDataTitle": "Meus dados",
+  "narrativeSectionTitle": "Narrativa para o oftalmologista",
+  "dvrsInstrumentVersion": "Versão do instrumento"
+}

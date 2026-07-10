@@ -2,6 +2,11 @@
 
 Updated: 2026-07-10
 
+## 1.23.0 five improvements panel
+
+Shipped: health hub, narrative PDF, My Data, DVRS 1.1, window_layout + ARB scaffold + signing readiness script.
+
+
 Current phase: five quick-win cycles shipped through 1.22.7 (15 improvements).
 
 Completed:

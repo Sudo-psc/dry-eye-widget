@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "menuHealthHub": "Visual health",
+  "menuMyData": "My data",
+  "healthHubTitle": "Visual health",
+  "myDataTitle": "My data",
+  "narrativeSectionTitle": "Narrative for the ophthalmologist",
+  "dvrsInstrumentVersion": "Instrument version"
+}

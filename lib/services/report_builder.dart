@@ -4,6 +4,7 @@ import '../models/environment_checklist.dart';
 import '../models/report_options.dart';
 import '../models/screen_time_data.dart';
 import 'dvrs_engine.dart';
+import 'narrative_summary.dart';
 
 /// Constrói o [ReportData] a partir dos dados brutos do app.
 ///
@@ -41,7 +42,7 @@ class ReportBuilder {
       breaks: breaks,
     );
 
-    return ReportData(
+    final data = ReportData(
       profile: profile,
       options: options,
       screenTime: screen,
@@ -51,6 +52,19 @@ class ReportBuilder {
       generatedAt: generatedAt,
       dvrs: dvrs,
       environment: options.includeEnvironment ? environment : null,
+    );
+    // Segunda passagem só para a narrativa (usa o ReportData já calculado).
+    return ReportData(
+      profile: profile,
+      options: options,
+      screenTime: screen,
+      breaks: breaks,
+      indication: indication,
+      alerts: alerts,
+      generatedAt: generatedAt,
+      dvrs: dvrs,
+      environment: data.environment,
+      narrative: NarrativeSummary.buildPt(data),
     );
   }
 

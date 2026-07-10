@@ -88,4 +88,37 @@ class DvrsStorageService {
 
   /// Apaga todo o histórico do DVRS.
   Future<void> clearAll() => _prefs.remove(StorageKeys.dvrsResults);
+
+  // --- Rascunho parcial (DVRS 1.1) ----------------------------------------
+
+  /// Mapa perguntaId → índice da opção (0–4), ou vazio se não houver rascunho.
+  Map<String, int> loadDraft() {
+    final raw = _prefs.getString(StorageKeys.dvrsDraft);
+    if (raw == null || raw.isEmpty) return const {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return const {};
+      final out = <String, int>{};
+      decoded.forEach((key, value) {
+        if (key is String && value is num) {
+          out[key] = value.toInt().clamp(0, 4);
+        }
+      });
+      return out;
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  Future<void> saveDraft(Map<String, int> selected) async {
+    if (selected.isEmpty) {
+      await clearDraft();
+      return;
+    }
+    await _prefs.setString(StorageKeys.dvrsDraft, jsonEncode(selected));
+  }
+
+  Future<void> clearDraft() => _prefs.remove(StorageKeys.dvrsDraft);
+
+  bool get hasDraft => loadDraft().isNotEmpty;
 }

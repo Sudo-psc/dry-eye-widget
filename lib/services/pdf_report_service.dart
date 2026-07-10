@@ -92,6 +92,10 @@ class PdfReportService {
           _buildHeader(data),
           pw.SizedBox(height: 16),
           _buildExecutiveSummary(data),
+          if (data.narrative != null && data.narrative!.trim().isNotEmpty) ...[
+            pw.SizedBox(height: 16),
+            _buildNarrativeSection(data.narrative!),
+          ],
           pw.SizedBox(height: 20),
           if (data.options.includeDvrs && data.dvrs != null) ...[
             _buildDvrsSection(context, data.dvrs!),
@@ -160,6 +164,33 @@ class PdfReportService {
         ],
         pw.SizedBox(height: 8),
         pw.Divider(color: PdfColors.blueGrey200),
+      ],
+    );
+  }
+
+  // --- Narrativa para o oftalmologista ------------------------------------
+
+  pw.Widget _buildNarrativeSection(String narrative) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('Narrativa para o oftalmologista', style: _headerStyle),
+        pw.SizedBox(height: 6),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(12),
+          decoration: pw.BoxDecoration(
+            color: PdfColors.blueGrey50,
+            border: pw.Border.all(color: PdfColors.blueGrey100),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+          ),
+          child: pw.Text(narrative, style: _textStyle.copyWith(height: 1.35)),
+        ),
+        pw.SizedBox(height: 4),
+        pw.Text(
+          'Texto educativo gerado a partir de dados autorreferidos. '
+          'Não constitui diagnóstico.',
+          style: _italicStyle,
+        ),
       ],
     );
   }

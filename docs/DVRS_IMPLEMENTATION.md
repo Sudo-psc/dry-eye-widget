@@ -68,18 +68,19 @@ sem respostas), inclusão no relatório/PDF, ausência de linguagem diagnóstica
 
 ## 6. Limitações atuais
 
-- Gráficos de evolução são custom-painters simples (sem tooltips/interação).
-- A tela de perguntas é uma-por-vez; não há "salvar rascunho" parcial entre sessões.
+- Gráficos de evolução usam CustomPaint; tooltips são chips clicáveis sob o gráfico (1.23).
+- Rascunho parcial entre sessões: **implementado em 1.23** (`StorageKeys.dvrsDraft`).
 - O botão "Exportar no PDF" do DVRS leva à tela de Relatórios (que gera o PDF com a seção
   DVRS); não há export de PDF em um único toque dentro da tela do resultado.
-- O dashboard reusa `DvrsHistoryView` na aba DVRS (sem KPIs adicionais).
+- O hub de saúde (1.23) reusa `DvrsHistoryView` na aba Painel.
 
 ## 7. Sugestões para a próxima versão
 
-- "DVRS v1.1": tooltips nos gráficos e comparação lado a lado de domínios entre datas.
-- Lembrete agendado para refazer o DVRS (semanal/mensal) integrado às notificações.
+- ~~"DVRS v1.1": tooltips e comparação de domínios~~ **feito em 1.23** (`DVRS_v1.1`).
 - Export direto do resultado em PDF/imagem a partir da própria tela do resultado.
+- Validação psicométrica / whitepaper do instrumento.
 - Modo corporativo **apenas agregado/anonimizado** (sem risco individual), se desejado.
+- Migração completa de strings para ARB (`lib/l10n/arb/`).
 
 ## 8. Privacidade e uso não diagnóstico
 

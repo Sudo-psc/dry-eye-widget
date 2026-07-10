@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>Lembrete gentil da regra 20-20-20 para fadiga visual digital e olho seco.</em><br>
-  <strong>Versão 1.22.7</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Versão 1.23.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@ A intervenção de primeira linha recomendada é a **regra 20-20-20**. A barreir
 
 ---
 
-## Recursos (1.22)
+## Recursos (1.23)
 
 - **Widget flutuante** com anel de progresso, always-on-top, bandeja do sistema  
 - **Ciclos e aparência** configuráveis (intervalo, cores, opacidade, vidro)  
@@ -76,6 +76,7 @@ A intervenção de primeira linha recomendada é a **regra 20-20-20**. A barreir
 - **Resumo do dia** e insights locais  
 - **Relatório em PDF** para levar ao oftalmologista (gerado localmente)  
 - **Tempo de tela** e atividade (opt-in)  
+- **Hub de saúde** (hoje, progresso, tela/DVRS) e **Meus dados** (exportar/apagar local)  
 - **i18n** PT / EN  
 
 Landing com capturas macOS e Windows: [olhossecos.com.br/app](https://olhossecos.com.br/app/)

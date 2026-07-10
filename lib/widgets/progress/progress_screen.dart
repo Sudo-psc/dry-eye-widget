@@ -17,9 +17,10 @@ import '../liquid_glass.dart';
 /// taxa de adesão recente, total de pausas e um insight proativo. Todos os
 /// dados são locais — lidos diretamente do [StorageService].
 class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key, required this.onClose});
+  const ProgressScreen({super.key, required this.onClose, this.embedded = false});
 
   final VoidCallback onClose;
+  final bool embedded;
 
   @override
   State<ProgressScreen> createState() => _ProgressScreenState();
@@ -42,6 +43,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final s = context.read<SettingsProvider>().strings;
+    final content = Column(
+      children: [
+        if (!widget.embedded) _header(theme, s),
+        Expanded(child: _body(theme, s)),
+      ],
+    );
+    if (widget.embedded) return content;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ClipRRect(
@@ -49,12 +57,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: Column(
-            children: [
-              _header(theme, s),
-              Expanded(child: _body(theme, s)),
-            ],
-          ),
+          child: content,
         ),
       ),
     );

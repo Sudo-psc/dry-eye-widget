@@ -2,7 +2,7 @@
 
 Landing estática (HTML/CSS/JS, sem bundler) servida em **[olhossecos.com.br/app/](https://olhossecos.com.br/app/)** e espelhada no GitHub Pages do repositório.
 
-Alinhada ao app **1.22.7** e ao README raiz do projeto.
+Alinhada ao app **1.23.0** e ao README raiz do projeto.
 
 | | |
 |---|---|

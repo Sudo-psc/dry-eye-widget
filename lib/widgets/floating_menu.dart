@@ -21,18 +21,18 @@ class FloatingMenu extends StatelessWidget {
   const FloatingMenu({
     super.key,
     required this.strings,
+    required this.healthHubLabel,
+    required this.myDataLabel,
     required this.isPaused,
     required this.onStartNow,
     required this.onReset,
     required this.onTogglePause,
     required this.onExtendCycle,
     required this.onGuidance,
-    required this.onDaySummary,
+    required this.onHealthHub,
     required this.onDvrs,
-    required this.onScreenTime,
-    required this.onDashboard,
-    required this.onProgress,
     required this.onReports,
+    required this.onMyData,
     required this.onCheckUpdates,
     required this.onAbout,
     required this.onSettings,
@@ -41,18 +41,18 @@ class FloatingMenu extends StatelessWidget {
   });
 
   final AppStrings strings;
+  final String healthHubLabel;
+  final String myDataLabel;
   final bool isPaused;
   final VoidCallback onStartNow;
   final VoidCallback onReset;
   final VoidCallback onTogglePause;
   final VoidCallback onExtendCycle;
   final VoidCallback onGuidance;
-  final VoidCallback onDaySummary;
+  final VoidCallback onHealthHub;
   final VoidCallback onDvrs;
-  final VoidCallback onScreenTime;
-  final VoidCallback onDashboard;
-  final VoidCallback onProgress;
   final VoidCallback onReports;
+  final VoidCallback onMyData;
   final VoidCallback onCheckUpdates;
   final VoidCallback onAbout;
   final VoidCallback onSettings;
@@ -76,25 +76,23 @@ class FloatingMenu extends StatelessWidget {
       _MenuItem(Icons.schedule, s.menuExtendCycle, onExtendCycle),
     ];
 
-    // Saúde visual: hub do dia primeiro; demais destinos de acompanhamento.
+    // Saúde visual: hub unificado + DVRS + relatório.
     final healthItems = <_MenuItem>[
       _MenuItem(
-        Icons.wb_sunny_outlined,
-        s.menuDaySummary,
-        onDaySummary,
+        Icons.favorite_outline,
+        healthHubLabel,
+        onHealthHub,
         emphasized: true,
       ),
       _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
       _MenuItem(Icons.assignment, s.menuDvrs, onDvrs),
-      _MenuItem(Icons.bar_chart_outlined, s.menuScreenTime, onScreenTime),
-      _MenuItem(Icons.dashboard_outlined, s.menuDashboard, onDashboard),
-      _MenuItem(Icons.trending_up, s.menuProgress, onProgress),
       _MenuItem(Icons.picture_as_pdf_outlined, s.menuReports, onReports),
     ];
 
     // Sistema: manutenção do app. "Sobre" (com link do GitHub dentro) fica logo
     // acima de "Sair".
     final systemItems = <_MenuItem>[
+      _MenuItem(Icons.shield_outlined, myDataLabel, onMyData),
       _MenuItem(Icons.system_update_alt, s.menuCheckUpdates, onCheckUpdates),
       _MenuItem(Icons.settings_outlined, s.menuSettings, onSettings),
       _MenuItem(Icons.info_outline, s.menuAbout, onAbout),

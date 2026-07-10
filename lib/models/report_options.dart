@@ -138,6 +138,7 @@ class ReportData {
     required this.generatedAt,
     this.dvrs,
     this.environment,
+    this.narrative,
   });
 
   /// Dados do DVRS (questionário principal). `null` se não houver resultados.
@@ -158,4 +159,7 @@ class ReportData {
   final List<String> alerts;
 
   final DateTime generatedAt;
+
+  /// Narrativa curta (5–8 linhas) para o oftalmologista; educativa.
+  final String? narrative;
 }

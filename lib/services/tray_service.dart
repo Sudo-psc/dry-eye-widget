@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../l10n/app_strings.dart';
+import '../l10n/feature_strings.dart';
 import '../utils/eye_icon.dart';
 
 /// Gerencia o ícone na barra de menu (macOS) / bandeja do sistema (Windows).
@@ -112,7 +113,10 @@ class TrayService {
             ),
             MenuItem(key: keyBreak, label: strings.menuStartBreak),
             MenuItem.separator(),
-            MenuItem(key: keyDaySummary, label: strings.menuDaySummary),
+            MenuItem(
+              key: keyDaySummary,
+              label: FeatureStrings.of(strings.languageCode).menuHealthHub,
+            ),
             MenuItem(key: keyDvrs, label: strings.menuDvrs),
             MenuItem(key: keyReports, label: strings.menuReports),
             MenuItem(key: keySettings, label: strings.menuSettings),

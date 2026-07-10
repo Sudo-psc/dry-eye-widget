@@ -1,3 +1,5 @@
+> **Atualização 2026-07-10:** OSDI e checklists foram removidos do app. O questionário exclusivo é o **DVRS**. Referências a OSDI abaixo são histórico desta análise (v1.16) e devem ser lidas como DVRS/hub de saúde.
+
 # Análise de UI/UX e Engajamento — Dry Eye Widget
 
 > Versão analisada: **1.16.0+50** · Plataformas: macOS + Windows (desktop-only)

@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>A gentle 20-20-20 reminder for digital eye strain and dry eye.</em><br>
-  <strong>Version 1.22.7</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Version 1.23.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@ First-line prevention is the **20-20-20 rule**. The real barrier is **adherence*
 
 ---
 
-## Features (1.22)
+## Features (1.23)
 
 - **Floating widget** with progress ring, always-on-top, system tray  
 - **Configurable cycles and look** (interval, colors, opacity, glass)  
@@ -76,6 +76,7 @@ First-line prevention is the **20-20-20 rule**. The real barrier is **adherence*
 - **Day summary** and local insights  
 - **PDF report** for your ophthalmologist (generated locally)  
 - **Screen time** and activity (opt-in)  
+- **Visual health hub** (today, progress, screen/DVRS) and **My data** (local export/erase)
 - **i18n** PT / EN  
 
 Landing with macOS and Windows captures: [olhossecos.com.br/app](https://olhossecos.com.br/app/)

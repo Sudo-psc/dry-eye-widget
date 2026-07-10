@@ -211,6 +211,9 @@ class StorageKeys {
   /// Visual Digital (questionário principal).
   static const String dvrsResults = 'dvrs_results_json';
 
+  /// Rascunho parcial do DVRS (respostas incompletas entre sessões).
+  static const String dvrsDraft = 'dvrs_draft_json';
+
   /// Borda em que a bolinha está encaixada ('left'/'right'), vazio = solta.
   static const String dockEdge = 'ball_dock_edge';
 
@@ -230,7 +233,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.22.7';
+  static const String version = '1.23.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/feature_strings.dart';
 import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
 import '../../providers/settings_provider.dart';
@@ -73,6 +74,10 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
       padding: const EdgeInsets.all(24),
       children: [
         _latestCard(theme, latest, trend, delta),
+        if (previous != null) ...[
+          const SizedBox(height: 16),
+          _domainCompareCard(theme, previous, latest),
+        ],
         const SizedBox(height: 16),
         _chartCard(
           title: context.read<SettingsProvider>().strings.dvrsHistoryEvolution,
@@ -181,6 +186,9 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     required String title,
     required List<(DateTime, double)> points,
   }) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +199,109 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
             minY: 0,
             maxY: 100,
             height: 160,
+          ),
+          if (points.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final p in points)
+                  Tooltip(
+                    message: f.dvrsTooltipScore
+                        .replaceAll('{score}', p.$2.round().toString())
+                        .replaceAll('{date}', DvrsUi.formatDate(p.$1)),
+                    child: Chip(
+                      visualDensity: VisualDensity.compact,
+                      label: Text(
+                        '${p.$2.round()} · ${DvrsUi.formatDate(p.$1)}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _domainCompareCard(
+    ThemeData theme,
+    DvrsResult previous,
+    DvrsResult latest,
+  ) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(f.dvrsDomainCompare),
+          const SizedBox(height: 8),
+          for (final d in DvrsDomain.values)
+            _domainDeltaRow(
+              theme,
+              label: kDvrsDomainLabels[d] ?? d.id,
+              prev: previous.domainScores.valueFor(d),
+              next: latest.domainScores.valueFor(d),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _domainDeltaRow(
+    ThemeData theme, {
+    required String label,
+    required double prev,
+    required double next,
+  }) {
+    final delta = next - prev;
+    final color = delta > 1
+        ? const Color(0xFFE57373)
+        : delta < -1
+            ? const Color(0xFF81C784)
+            : theme.colorScheme.onSurface.withValues(alpha: 0.55);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(label, style: const TextStyle(fontSize: 12)),
+          ),
+          Expanded(
+            child: Text(
+              prev.round().toString(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+              ),
+            ),
+          ),
+          const Icon(Icons.arrow_forward, size: 14),
+          Expanded(
+            child: Text(
+              next.round().toString(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+          ),
+          SizedBox(
+            width: 48,
+            child: Text(
+              '${delta >= 0 ? '+' : ''}${delta.round()}',
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
           ),
         ],
       ),

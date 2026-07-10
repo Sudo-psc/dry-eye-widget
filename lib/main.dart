@@ -9,7 +9,9 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'app/window_layout.dart';
 import 'l10n/app_strings.dart';
+import 'l10n/feature_strings.dart';
 import 'models/app_state.dart';
 import 'models/break_stats_data.dart';
 import 'models/widget_settings.dart';
@@ -36,10 +38,7 @@ import 'ui/app_theme.dart';
 import 'utils/constants.dart';
 import 'utils/edge_snap.dart';
 import 'widgets/about_panel.dart';
-import 'widgets/dashboard/dashboard_screen.dart';
 import 'widgets/dvrs/dvrs_screen.dart';
-import 'widgets/progress/progress_screen.dart';
-import 'widgets/summary/day_summary_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
 import 'services/daily_insight.dart';
 import 'widgets/floating_ball.dart';
@@ -47,31 +46,14 @@ import 'widgets/floating_menu.dart';
 import 'widgets/gentle_break_card.dart';
 import 'widgets/glass_overlay.dart';
 import 'widgets/guidance_dialog.dart';
+import 'widgets/health/health_hub_screen.dart';
 import 'widgets/inactivity_pause_card.dart';
 import 'widgets/onboarding/onboarding_flow.dart';
+import 'widgets/privacy/my_data_panel.dart';
 import 'widgets/report_dialog.dart';
 import 'widgets/screen_time_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/update_dialog.dart';
-
-/// Tamanhos das janelas de configurações (a compacta e a do menu são dinâmicas).
-const Size _settingsWindowSize = Size(460, 700);
-const Size _panelWindowSize = Size(700, 790);
-const Size _onboardingWindowSize = Size(480, 560);
-
-/// Tamanho da janela compacta em função do diâmetro da bolinha.
-Size _compactWindowSize(double ballSize) => Size(ballSize + 28, ballSize + 28);
-
-/// Altura do painel de menu (linha compacta de pausas + 12 itens + 3 cabeçalhos
-/// de grupo + 2 divisórias + paddings do vidro), com folga para variações de
-/// fonte entre plataformas.
-const double _menuPanelHeight = 720;
-
-/// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
-/// A altura acompanha a bolinha + o painel completo para que o último item
-/// ("Sair") nunca seja cortado pela borda da janela (Windows e macOS).
-Size _menuWindowSize(double ballSize) =>
-    Size(300, ballSize + 24 + _menuPanelHeight + 8);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -124,7 +106,7 @@ Future<void> main() async {
     );
   }
 
-  final initialSize = _compactWindowSize(settings.value.ballSize);
+  final initialSize = WindowSizes.compact(settings.value.ballSize);
   final windowOptions = WindowOptions(
     size: initialSize,
     backgroundColor: Colors.transparent,
@@ -257,34 +239,6 @@ class DryEyeApp extends StatelessWidget {
   }
 }
 
-enum _WindowLayout {
-  ball,
-  blinkReminder,
-  menu,
-  settings,
-  dvrs,
-  report,
-  dashboard,
-  progress,
-  daySummary,
-  onboarding,
-  breakOverlay,
-  gentleBreak,
-  inactivity,
-}
-
-/// Tamanho do cartão de pausa no modo suave (canto superior direito).
-const Size _gentleWindowSize = Size(430, 164);
-
-/// Tamanho do cartão de aviso de pausa por inatividade (canto superior direito).
-const Size _inactivityWindowSize = Size(320, 120);
-
-/// Tamanho da micronotificação de piscada em função do diâmetro da bolinha.
-Size _blinkReminderWindowSize(double ballSize) => Size(
-  math.max(ballSize + 156, 176.0).toDouble(),
-  math.max(ballSize + 24, 52.0).toDouble(),
-);
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -307,9 +261,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _dvrsOpen = false;
   bool _screenTimeOpen = false;
   bool _reportOpen = false;
-  bool _dashboardOpen = false;
-  bool _progressOpen = false;
-  bool _daySummaryOpen = false;
+  bool _healthHubOpen = false;
+  bool _myDataOpen = false;
   bool _onboardingOpen = false;
   bool _wasActive = false;
   int _currentStreak = 0;
@@ -380,7 +333,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
     if (_dockEdge != null && _widgetEnabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) unawaited(_applyLayout(_WindowLayout.ball));
+        if (mounted) unawaited(_applyLayout(WindowLayout.ball));
       });
     }
     // Aplica o estado inicial de visibilidade da bolinha após o primeiro frame.
@@ -393,7 +346,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
         await windowManager.show();
-        await _applyLayout(_WindowLayout.onboarding);
+        await _applyLayout(WindowLayout.onboarding);
       });
     } else {
       // Após o onboarding: no máximo um nudge suave de reavaliação do DVRS/dia.
@@ -498,9 +451,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_dvrsOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
-      !_dashboardOpen &&
-      !_progressOpen &&
-      !_daySummaryOpen &&
+      !_healthHubOpen &&
+      !_myDataOpen &&
       !_onboardingOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
@@ -528,7 +480,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() => _blinkReminderVisible = true);
     // Encaixada (meia-lua): sem pílula expandida — só o brilho na bolinha.
     if (_dockEdge == null) {
-      await _applyLayout(_WindowLayout.blinkReminder);
+      await _applyLayout(WindowLayout.blinkReminder);
     }
     _blinkReminderHideTimer?.cancel();
     _blinkReminderHideTimer = Timer(
@@ -543,7 +495,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (!_blinkReminderVisible) return;
     if (mounted) setState(() => _blinkReminderVisible = false);
     if (restoreLayout && _isCompactLayoutFree) {
-      unawaited(_applyLayout(_WindowLayout.ball));
+      unawaited(_applyLayout(WindowLayout.ball));
     }
   }
 
@@ -557,9 +509,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_dvrsOpen &&
       !_screenTimeOpen &&
       !_reportOpen &&
-      !_dashboardOpen &&
-      !_progressOpen &&
-      !_daySummaryOpen &&
+      !_healthHubOpen &&
+      !_myDataOpen &&
       !_onboardingOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
@@ -611,14 +562,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-          !_dashboardOpen &&
-          !_progressOpen &&
-          !_daySummaryOpen &&
+          !_healthHubOpen &&
+          !_myDataOpen &&
           !_onboardingOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           if (!mounted) return;
-          await _applyLayout(_WindowLayout.settings);
+          await _applyLayout(WindowLayout.settings);
         }();
       }
     } else if (!drops && _wasDrops) {
@@ -640,14 +590,13 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_dvrsOpen &&
           !_screenTimeOpen &&
           !_reportOpen &&
-          !_dashboardOpen &&
-          !_progressOpen &&
-          !_daySummaryOpen &&
+          !_healthHubOpen &&
+          !_myDataOpen &&
           !_onboardingOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
           if (!mounted) return;
-          await _applyLayout(_WindowLayout.inactivity);
+          await _applyLayout(WindowLayout.inactivity);
         }();
       }
     } else if (!inactive && _wasInactive) {
@@ -700,7 +649,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _widgetEnabled = enabled;
     if (enabled) {
       await windowManager.show();
-      await _applyLayout(_WindowLayout.ball);
+      await _applyLayout(WindowLayout.ball);
     } else if (!_timer.state.isActive) {
       await windowManager.hide();
     }
@@ -753,7 +702,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _lastBallSize = newSize;
       _timer.clampElapsedToCycle();
       if (!_menuOpen && !_settingsOpen && !_timer.state.isActive) {
-        _applyLayout(_WindowLayout.ball);
+        _applyLayout(WindowLayout.ball);
       }
     }
     if (!_settings.value.edgeSnap && _dockEdge != null) {
@@ -815,9 +764,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _settingsOpen = false;
         _aboutOpen = false;
         _reportOpen = false;
-        _dashboardOpen = false;
-        _progressOpen = false;
-        _daySummaryOpen = false;
+        _healthHubOpen = false;
+      _myDataOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -826,8 +774,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     await _cacheCurrentPosition();
     await _applyLayout(
       _settings.value.usesFullScreenBreak
-          ? _WindowLayout.breakOverlay
-          : _WindowLayout.gentleBreak,
+          ? WindowLayout.breakOverlay
+          : WindowLayout.gentleBreak,
     );
   }
 
@@ -838,81 +786,83 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Future<void> _applyLayout(_WindowLayout layout) async {
-    if (layout != _WindowLayout.blinkReminder && _blinkReminderVisible) {
+    if (layout != WindowLayout.blinkReminder && _blinkReminderVisible) {
       _blinkReminderHideTimer?.cancel();
       _blinkReminderHideTimer = null;
       if (mounted) setState(() => _blinkReminderVisible = false);
     }
     try {
       switch (layout) {
-        case _WindowLayout.ball:
-          final ballSize = _compactWindowSize(_settings.value.ballSize);
+        case WindowLayout.ball:
+          final ballSize = WindowSizes.compact(_settings.value.ballSize);
           await windowManager.setSize(ballSize);
           final docked = await _dockedPositionForCurrentScreen(ballSize);
           final pos = docked ?? _ballPosition;
           await windowManager.setPosition(pos);
           if (docked != null) _ballPosition = docked;
           break;
-        case _WindowLayout.blinkReminder:
+        case WindowLayout.blinkReminder:
           await _cacheCurrentPosition();
-          final reminderSize = _blinkReminderWindowSize(
+          final reminderSize = WindowSizes.blinkReminder(
             _settings.value.ballSize,
           );
           await windowManager.setSize(reminderSize);
           await windowManager.setPosition(_ballPosition);
           await _nudgeIntoScreen(reminderSize);
           break;
-        case _WindowLayout.menu:
+        case WindowLayout.menu:
           await _cacheCurrentPosition();
-          final menuSize = _menuWindowSize(_settings.value.ballSize);
+          final menuSize = WindowSizes.menu(_settings.value.ballSize);
           await windowManager.setSize(menuSize);
           await windowManager.setPosition(_ballPosition);
           await _nudgeIntoScreen(menuSize);
           break;
-        case _WindowLayout.settings:
-          await windowManager.setSize(_settingsWindowSize);
+        case WindowLayout.settings:
+          await windowManager.setSize(WindowSizes.settings);
           await windowManager.center();
           break;
-        case _WindowLayout.dvrs:
-        case _WindowLayout.report:
-        case _WindowLayout.dashboard:
-        case _WindowLayout.progress:
-        case _WindowLayout.daySummary:
-          await windowManager.setSize(_panelWindowSize);
+        case WindowLayout.dvrs:
+        case WindowLayout.report:
+        case WindowLayout.dashboard:
+        case WindowLayout.progress:
+        case WindowLayout.daySummary:
+        case WindowLayout.healthHub:
+        case WindowLayout.myData:
+          await windowManager.setSize(WindowSizes.panel);
           await windowManager.center();
           break;
-        case _WindowLayout.onboarding:
-          await windowManager.setSize(_onboardingWindowSize);
+        case WindowLayout.onboarding:
+          await windowManager.setSize(WindowSizes.onboarding);
           await windowManager.center();
           break;
-        case _WindowLayout.breakOverlay:
+        case WindowLayout.breakOverlay:
           final display = await screenRetriever.getPrimaryDisplay();
           final size = display.visibleSize ?? display.size;
           final pos = display.visiblePosition ?? Offset.zero;
           await windowManager.setBounds(pos & size);
           break;
-        case _WindowLayout.gentleBreak:
+        case WindowLayout.gentleBreak:
           // Cartão pequeno no canto superior direito, sem cobrir a tela.
           final display = await screenRetriever.getPrimaryDisplay();
           final screen = display.visibleSize ?? display.size;
           final origin = display.visiblePosition ?? Offset.zero;
-          await windowManager.setSize(_gentleWindowSize);
+          await windowManager.setSize(WindowSizes.gentleBreak);
           await windowManager.setPosition(
             Offset(
-              origin.dx + screen.width - _gentleWindowSize.width - 16,
+              origin.dx + screen.width - WindowSizes.gentleBreak.width - 16,
               origin.dy + 16,
             ),
           );
           break;
-        case _WindowLayout.inactivity:
+        case WindowLayout.inactivity:
           // Aviso compacto no canto superior direito, sem cobrir a tela.
           final display = await screenRetriever.getPrimaryDisplay();
           final screen = display.visibleSize ?? display.size;
           final origin = display.visiblePosition ?? Offset.zero;
-          await windowManager.setSize(_inactivityWindowSize);
+          await windowManager.setSize(WindowSizes.inactivity);
           await windowManager.setPosition(
             Offset(
-              origin.dx + screen.width - _inactivityWindowSize.width - 16,
+              origin.dx + screen.width - WindowSizes.inactivity.width - 16,
               origin.dy + 16,
             ),
           );
@@ -976,7 +926,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       return;
     }
     setState(() => _menuOpen = !_menuOpen);
-    _applyLayout(_menuOpen ? _WindowLayout.menu : _WindowLayout.ball);
+    _applyLayout(_menuOpen ? WindowLayout.menu : WindowLayout.ball);
   }
 
   /// Botão direito: atalho para o Resumo do dia (descoberta do hub de saúde).
@@ -1064,7 +1014,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   void _closeMenu() {
     if (!_menuOpen) return;
     setState(() => _menuOpen = false);
-    _applyLayout(_WindowLayout.ball);
+    _applyLayout(WindowLayout.ball);
   }
 
   void _openSettings() {
@@ -1077,11 +1027,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
     });
-    _applyLayout(_WindowLayout.settings);
+    _applyLayout(WindowLayout.settings);
   }
 
   void _openAbout() {
@@ -1094,11 +1043,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
     });
-    _applyLayout(_WindowLayout.settings);
+    _applyLayout(WindowLayout.settings);
   }
 
   void _closeAbout() {
@@ -1121,11 +1069,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
     });
-    _applyLayout(_WindowLayout.settings);
+    _applyLayout(WindowLayout.settings);
   }
 
   void _closeGuidance() {
@@ -1143,11 +1090,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = true;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
     });
-    _applyLayout(_WindowLayout.dvrs);
+    _applyLayout(WindowLayout.dvrs);
   }
 
   void _closeDvrs() {
@@ -1165,11 +1111,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = false;
       _screenTimeOpen = true;
       _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
     });
-    _applyLayout(_WindowLayout.dvrs);
+    _applyLayout(WindowLayout.dvrs);
   }
 
   void _closeScreenTime() {
@@ -1198,11 +1143,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = true;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
     });
-    _applyLayout(_WindowLayout.report);
+    _applyLayout(WindowLayout.report);
   }
 
   void _closeReport() {
@@ -1210,77 +1154,47 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
-  void _openDashboard() {
-    setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _aboutOpen = false;
-      _guidanceOpen = false;
-      _updateOpen = false;
-      _dvrsOpen = false;
-      _screenTimeOpen = false;
-      _reportOpen = false;
-      _dashboardOpen = true;
-      _progressOpen = false;
-      _daySummaryOpen = false;
-    });
-    _applyLayout(_WindowLayout.dashboard);
+  void _closeAllPanelsFlags() {
+    _menuOpen = false;
+    _settingsOpen = false;
+    _aboutOpen = false;
+    _guidanceOpen = false;
+    _updateOpen = false;
+    _dvrsOpen = false;
+    _screenTimeOpen = false;
+    _reportOpen = false;
+    _healthHubOpen = false;
+    _myDataOpen = false;
   }
 
-  void _closeDashboard() {
-    setState(() => _dashboardOpen = false);
+  void _openHealthHub() {
+    setState(() {
+      _closeAllPanelsFlags();
+      _healthHubOpen = true;
+    });
+    _applyLayout(WindowLayout.healthHub);
+  }
+
+  void _closeHealthHub() {
+    setState(() => _healthHubOpen = false);
     _restoreAfterPanel();
   }
 
-  void _openProgress() {
+  void _openMyData() {
     setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _aboutOpen = false;
-      _guidanceOpen = false;
-      _updateOpen = false;
-      _dvrsOpen = false;
-      _screenTimeOpen = false;
-      _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = true;
-      _daySummaryOpen = false;
+      _closeAllPanelsFlags();
+      _myDataOpen = true;
     });
-    _applyLayout(_WindowLayout.progress);
+    _applyLayout(WindowLayout.myData);
   }
 
-  void _closeProgress() {
-    setState(() => _progressOpen = false);
+  void _closeMyData() {
+    setState(() => _myDataOpen = false);
     _restoreAfterPanel();
   }
 
-  void _openDaySummary() {
-    setState(() {
-      _menuOpen = false;
-      _settingsOpen = false;
-      _aboutOpen = false;
-      _guidanceOpen = false;
-      _updateOpen = false;
-      _dvrsOpen = false;
-      _screenTimeOpen = false;
-      _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = true;
-    });
-    _applyLayout(_WindowLayout.daySummary);
-  }
-
-  void _closeDaySummary() {
-    setState(() => _daySummaryOpen = false);
-    _restoreAfterPanel();
-  }
-
-  /// Fecha o resumo e abre outro destino do hub sem restaurar a bolinha no meio.
-  void _fromDaySummary(VoidCallback open) {
-    setState(() => _daySummaryOpen = false);
-    open();
-  }
+  /// Compat: resumo do dia / bandeja / onboarding abrem o hub unificado.
+  void _openDaySummary() => _openHealthHub();
 
   Future<void> _clearScreenTime() async {
     await context.read<ScreenTimeService>().clear();
@@ -1298,12 +1212,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _dvrsOpen = false;
       _screenTimeOpen = false;
       _reportOpen = false;
-      _dashboardOpen = false;
-      _progressOpen = false;
-      _daySummaryOpen = false;
+      _healthHubOpen = false;
+      _myDataOpen = false;
       _updateResult = null;
     });
-    await _applyLayout(_WindowLayout.settings);
+    await _applyLayout(WindowLayout.settings);
     final result = await _updater.check();
     if (mounted && _updateOpen) {
       setState(() => _updateResult = result);
@@ -1319,17 +1232,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
   /// widget desabilitado e um eventual aviso de colírio ainda ativo.
   void _restoreAfterPanel() {
     if (_timer.eyeDropsAlert) {
-      _applyLayout(_WindowLayout.settings);
+      _applyLayout(WindowLayout.settings);
       return;
     }
     if (_timer.inactivityAlert && !_timer.state.isActive) {
-      _applyLayout(_WindowLayout.inactivity);
+      _applyLayout(WindowLayout.inactivity);
       return;
     }
     if (!_widgetEnabled && !_timer.state.isActive) {
       windowManager.hide();
     } else {
-      _applyLayout(_WindowLayout.ball);
+      _applyLayout(WindowLayout.ball);
     }
   }
 
@@ -1383,24 +1296,27 @@ class _HomePageState extends State<HomePage> with TrayListener {
       );
     } else if (_reportOpen) {
       body = Center(child: ReportDialog(onClose: _closeReport));
-    } else if (_dashboardOpen) {
-      body = Center(child: DashboardScreen(onClose: _closeDashboard));
-    } else if (_progressOpen) {
-      body = Center(child: ProgressScreen(onClose: _closeProgress));
-    } else if (_daySummaryOpen) {
+    } else if (_healthHubOpen) {
       body = Center(
-        child: DaySummaryScreen(
-          onClose: _closeDaySummary,
+        child: HealthHubScreen(
+          onClose: _closeHealthHub,
           onStartBreak: () {
-            setState(() => _daySummaryOpen = false);
+            setState(() => _healthHubOpen = false);
             _timer.startBreakNow();
           },
-          onDvrs: () => _fromDaySummary(_openDvrs),
-          onProgress: () => _fromDaySummary(_openProgress),
-          onDashboard: () => _fromDaySummary(_openDashboard),
+          onDvrs: () {
+            setState(() => _healthHubOpen = false);
+            _openDvrs();
+          },
+          onReports: () {
+            setState(() => _healthHubOpen = false);
+            _openReport();
+          },
           onSnoozeDvrsNudge: _snoozeDvrsNudge,
         ),
       );
+    } else if (_myDataOpen) {
+      body = Center(child: MyDataPanel(onClose: _closeMyData));
     } else if (_settingsOpen) {
       body = _buildSettings();
     } else if (_aboutOpen) {
@@ -1506,18 +1422,20 @@ class _HomePageState extends State<HomePage> with TrayListener {
               const SizedBox(height: 8),
               FloatingMenu(
                 strings: strings,
+                healthHubLabel:
+                    FeatureStrings.of(settings.languageCode).menuHealthHub,
+                myDataLabel:
+                    FeatureStrings.of(settings.languageCode).menuMyData,
                 isPaused: timer.isPaused,
                 onStartNow: timer.startBreakNow,
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
                 onExtendCycle: timer.stretchCycleOneHour,
                 onGuidance: _openGuidance,
-                onDaySummary: _openDaySummary,
+                onHealthHub: _openHealthHub,
                 onDvrs: _openDvrs,
-                onScreenTime: _openScreenTime,
-                onDashboard: _openDashboard,
-                onProgress: _openProgress,
                 onReports: _openReport,
+                onMyData: _openMyData,
                 onCheckUpdates: _openCheckUpdates,
                 onAbout: _openAbout,
                 onSettings: _openSettings,

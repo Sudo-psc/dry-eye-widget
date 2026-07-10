@@ -1,6 +1,6 @@
 # Roadmap — Dry Eye Widget
 
-Atualizado: 2026-07-10 · Versão atual: **1.22.7**
+Atualizado: 2026-07-10 · Versão atual: **1.23.0**
 
 Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que ainda importa.
 
@@ -40,11 +40,13 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 
 | # | Item | Área | Notas |
 |---|------|------|--------|
-| 6 | PDF narrativo para o oftalmologista | App | Bloco 5–8 linhas a partir de dados locais |
-| 7 | Unificar Painel + Progresso + Tempo de tela | App | Reduz densidade do menu |
-| 8 | i18n ARB (Flutter gen-l10n) | App | Substituir app_strings manual |
-| 9 | Fatiar `main.dart` (layouts de janela) | App | Manutenibilidade |
+| 6 | ~~PDF narrativo~~ **feito em 1.23** | App | `NarrativeSummary` no PDF |
+| 7 | ~~Unificar hub~~ **feito em 1.23** | App | `HealthHubScreen` |
+| 8 | i18n ARB (Flutter gen-l10n) | App | Scaffold ARB em `lib/l10n/arb/` — migração gradual |
+| 9 | ~~Fatiar layouts~~ **parcial em 1.23** | App | `lib/app/window_layout.dart` |
 | 10 | Decidir se landing fica neste repo ou repo próprio | Site | Bloqueado por decisão |
+| 11 | Ativar secrets de assinatura (contas) | Distribuição | Script `check_signing_readiness.sh` |
+| 12 | QA-WINDOWS humano em hardware real | App | Checklist em `docs/QA-WINDOWS.md` |
 
 ## Later
 

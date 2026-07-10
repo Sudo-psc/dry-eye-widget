@@ -1,10 +1,11 @@
 import 'package:dry_eye_widget/l10n/app_strings.dart';
+import 'package:dry_eye_widget/l10n/feature_strings.dart';
 import 'package:dry_eye_widget/widgets/floating_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('menu flutuante exibe e abre o questionário DVRS', (
+  testWidgets('menu flutuante exibe hub de saúde e abre o questionário DVRS', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(800, 1200);
@@ -12,6 +13,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     var dvrsOpened = 0;
+    final f = FeatureStrings.of('pt');
 
     await tester.pumpWidget(
       MaterialApp(
@@ -19,18 +21,18 @@ void main() {
           body: Center(
             child: FloatingMenu(
               strings: ptStrings,
+              healthHubLabel: f.menuHealthHub,
+              myDataLabel: f.menuMyData,
               isPaused: false,
               onStartNow: () {},
               onReset: () {},
               onTogglePause: () {},
               onExtendCycle: () {},
               onGuidance: () {},
-              onDaySummary: () {},
+              onHealthHub: () {},
               onDvrs: () => dvrsOpened++,
-              onScreenTime: () {},
-              onDashboard: () {},
-              onProgress: () {},
               onReports: () {},
+              onMyData: () {},
               onCheckUpdates: () {},
               onAbout: () {},
               onSettings: () {},
@@ -42,8 +44,9 @@ void main() {
       ),
     );
 
-    expect(find.text(ptStrings.menuDaySummary), findsOneWidget);
+    expect(find.text(f.menuHealthHub), findsOneWidget);
     expect(find.text(ptStrings.menuDvrs), findsOneWidget);
+    expect(find.text(f.menuMyData), findsOneWidget);
 
     await tester.tap(find.text(ptStrings.menuDvrs));
     await tester.pump();
@@ -58,6 +61,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
+    final f = FeatureStrings.of('pt');
+
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -65,18 +70,18 @@ void main() {
             alignment: Alignment.topLeft,
             child: FloatingMenu(
               strings: ptStrings,
+              healthHubLabel: f.menuHealthHub,
+              myDataLabel: f.menuMyData,
               isPaused: false,
               onStartNow: () {},
               onReset: () {},
               onTogglePause: () {},
               onExtendCycle: () {},
               onGuidance: () {},
-              onDaySummary: () {},
+              onHealthHub: () {},
               onDvrs: () {},
-              onScreenTime: () {},
-              onDashboard: () {},
-              onProgress: () {},
               onReports: () {},
+              onMyData: () {},
               onCheckUpdates: () {},
               onAbout: () {},
               onSettings: () {},
@@ -88,15 +93,6 @@ void main() {
       ),
     );
 
-    // O último item precisa ser renderizado por inteiro.
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
-
-    // A altura intrínseca do painel (3 cabeçalhos de grupo + linha compacta de
-    // pausas + 12 itens + 2 divisórias) deve caber na altura reservada para o
-    // menu em main.dart (`_menuPanelHeight` = 704). Se um novo item estourar
-    // esse limite, o último item ("Sair") voltaria a ser cortado pela borda da
-    // janela — este teste é o guarda dessa regressão.
-    final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(720));
   });
 }

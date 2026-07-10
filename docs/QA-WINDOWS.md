@@ -125,3 +125,12 @@ Bugs encontrados:
 3. **Assinatura** — fora do escopo deste QA (ROADMAP #1).
 
 Referência de implementação: `lib/utils/edge_snap.dart`, `lib/main.dart` (`_onBallDragEnd`, `_triggerBlinkReminder`), `lib/widgets/floating_ball.dart`.
+
+
+## 1.23 — Hub de saúde e Meus dados (checklist extra)
+
+- [ ] Menu abre **Saúde visual** (hub) e não lista Painel/Progresso/Tela separados
+- [ ] Abas Hoje / Progresso / Tela navegam sem fechar a janela
+- [ ] **Meus dados** exporta JSON e apaga histórico sem crash
+- [ ] DVRS rascunho: responder 2 perguntas, fechar, reabrir e continuar
+- [ ] PDF inclui seção "Narrativa para o oftalmologista"

@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-/// Modelo de dados do **DVRS — Índice de Risco Visual Digital** (v1.0).
+/// Modelo de dados do **DVRS — Índice de Risco Visual Digital** (v1.1).
 ///
 /// Instrumento EDUCATIVO de triagem e acompanhamento. Nunca diagnóstico: os
 /// tipos abaixo carregam `isDiagnostic = false` e toda a linguagem produzida é
 /// de triagem. Construtores são puros (não chamam `DateTime.now()`/`Random`);
 /// `id` e `createdAt` são fornecidos por quem cria o resultado.
+///
+/// v1.1: versionamento explícito do instrumento, rascunho local e comparação
+/// de domínios no histórico (sem mudança na fórmula de score).
 
 /// Os cinco domínios do DVRS.
 enum DvrsDomain { symptoms, functional, exposure, environment, warning }
@@ -230,8 +233,9 @@ class DvrsResult {
     this.includeInPdf = false,
   });
 
-  /// Versão do instrumento.
-  static const String dvrsVersion = 'DVRS_v1.0';
+  /// Versão do instrumento (semântica de conteúdo das 16 perguntas + pesos).
+  /// Resultados antigos (DVRS_v1.0) continuam legíveis; novos gravam 1.1.
+  static const String dvrsVersion = 'DVRS_v1.1';
 
   final String id;
   final String? userId;

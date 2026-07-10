@@ -485,9 +485,10 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
 /// Digital). Todos os dados são locais — lidos diretamente dos serviços já
 /// instanciados no Provider tree. Linguagem educativa, nunca diagnóstica.
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.onClose});
+  const DashboardScreen({super.key, required this.onClose, this.embedded = false});
 
   final VoidCallback onClose;
+  final bool embedded;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -513,6 +514,38 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = context.watch<SettingsProvider>().strings;
+    final content = Column(
+      children: [
+        if (!widget.embedded) _header(theme, strings),
+        if (widget.embedded)
+          Material(
+            color: theme.colorScheme.surface.withValues(alpha: 0.2),
+            child: TabBar(
+              controller: _tabs,
+              labelColor: AppColors.idleBall,
+              unselectedLabelColor:
+                  theme.colorScheme.onSurface.withValues(alpha: 0.65),
+              indicatorColor: AppColors.idleBall,
+              tabs: [
+                Tab(text: strings.dashboardTabOverview),
+                Tab(text: strings.dashboardTabScreen),
+                Tab(text: strings.dashboardTabDvrs),
+              ],
+            ),
+          ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabs,
+            children: const [
+              _OverviewTab(),
+              _ScreenTimeTab(),
+              DvrsHistoryView(),
+            ],
+          ),
+        ),
+      ],
+    );
+    if (widget.embedded) return content;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ClipRRect(
@@ -520,21 +553,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: Column(
-            children: [
-              _header(theme, strings),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabs,
-                  children: const [
-                    _OverviewTab(),
-                    _ScreenTimeTab(),
-                    DvrsHistoryView(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          child: content,
         ),
       ),
     );

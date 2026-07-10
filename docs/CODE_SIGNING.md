@@ -14,6 +14,25 @@ CI** e o que falta **somente de credenciais/contas** (não de código).
 | Windows | MSIX Store | Store assina | Partner Center | `windows-msix.yml` |
 | macOS | `DryEyeWidget.dmg` | codesign + notarytool | certificado + Apple ID/API | este arquivo |
 
+
+
+## Checklist de ativação (conta / secrets)
+
+Pipeline de código: **pronto**. Ativação depende só de credenciais.
+
+```bash
+./scripts/check_signing_readiness.sh
+```
+
+1. Apple Developer Program + certificado **Developer ID Application** (`.p12`)
+2. Secrets GitHub: `MACOS_CERTIFICATE_BASE64`, `MACOS_CERTIFICATE_PASSWORD`
+3. Notarização: API Key **ou** App-specific password
+4. SignPath OSS: `SIGNPATH_API_TOKEN` + variables do projeto
+5. Rodar release tag `v*` e confirmar artefato assinado no job summary
+
+Enquanto secrets não existirem, o CI continua publicando builds **unsigned**
+com orientação `xattr`/SmartScreen (comportamento esperado).
+
 > Builds **sempre** geram artefatos mesmo sem secrets — a assinatura é
 > **condicional**. Releases sem secrets continuam funcionando; o usuário usa
 > o fluxo `xattr`/SmartScreen documentado na landing e no DMG.

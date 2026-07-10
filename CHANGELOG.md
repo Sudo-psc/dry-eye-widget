@@ -34,6 +34,30 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - Template de issue de roadmap
 - `docs/ROADMAP.md`
 
+## [1.23.0] - 2026-07-10
+
+### Adicionado
+- **Hub unificado de saúde visual**: Resumo do dia, Progresso e Painel (tela/DVRS)
+  em uma única janela com abas; menu flutuante mais enxuto.
+- **PDF narrativo** para o oftalmologista (5–8 linhas educativas a partir de
+  DVRS, pausas e tempo de tela) — sem linguagem diagnóstica.
+- **Meus dados** (LGPD): exportar JSON local (envelope OVPP-ready) e apagar
+  histórico de saúde mantendo preferências.
+- **DVRS 1.1**: versão de instrumento `DVRS_v1.1`, rascunho parcial entre
+  sessões, comparação de domínios (atual vs anterior) e tooltips de pontos
+  no histórico.
+- **Scaffold i18n ARB** em `lib/l10n/arb/` (migração gradual documentada).
+- **Window layout** extraído para `lib/app/window_layout.dart`.
+- Script `scripts/check_signing_readiness.sh` para ativação de assinatura.
+
+### Modificado
+- Menu: hub de saúde + DVRS + relatórios; “Meus dados” em Sistema.
+- Documentação legal e mídia: OSDI → DVRS (dívida técnica sanada).
+- Versão 1.23.0 (app, constants, landing, MSIX).
+
+### Corrigido
+- Termos e política de privacidade alinhados ao DVRS exclusivo.
+
 ## [1.22.7] - 2026-07-10
 
 ### Adicionado

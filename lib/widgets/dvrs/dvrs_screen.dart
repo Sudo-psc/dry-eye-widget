@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/feature_strings.dart';
 import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
 import '../../providers/settings_provider.dart';
@@ -41,10 +44,35 @@ class _DvrsScreenState extends State<DvrsScreen> {
 
   DvrsResult? _result;
   bool _saved = false;
+  bool _draftLoaded = false;
 
   int get _answeredCount => _selected.length;
 
   bool get _allAnswered => _selected.length == kDvrsQuestions.length;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _offerDraft());
+  }
+
+  void _offerDraft() {
+    if (!mounted || _draftLoaded) return;
+    final draft = context.read<DvrsStorageService>().loadDraft();
+    if (draft.isEmpty) return;
+    setState(() {
+      _selected
+        ..clear()
+        ..addAll(draft);
+      _draftLoaded = true;
+    });
+  }
+
+  Future<void> _persistDraft() async {
+    await context.read<DvrsStorageService>().saveDraft(
+          Map<String, int>.from(_selected),
+        );
+  }
 
   // --- Navegação ----------------------------------------------------------
 
@@ -67,6 +95,8 @@ class _DvrsScreenState extends State<DvrsScreen> {
       id: now.millisecondsSinceEpoch.toString(),
       now: now,
     );
+    // Resultado completo: descarta rascunho parcial.
+    unawaited(context.read<DvrsStorageService>().clearDraft());
     setState(() {
       _result = result;
       _saved = false;
@@ -74,12 +104,16 @@ class _DvrsScreenState extends State<DvrsScreen> {
     });
   }
 
-  void _restart() => setState(() {
-    _selected.clear();
-    _result = null;
-    _saved = false;
-    _view = _DvrsView.intro;
-  });
+  void _restart() {
+    unawaited(context.read<DvrsStorageService>().clearDraft());
+    setState(() {
+      _selected.clear();
+      _result = null;
+      _saved = false;
+      _draftLoaded = false;
+      _view = _DvrsView.intro;
+    });
+  }
 
   Future<void> _save() async {
     final result = _result;
@@ -87,6 +121,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
     final storage = context.read<DvrsStorageService>();
     final messenger = ScaffoldMessenger.of(context);
     await storage.saveDvrsResult(result);
+    await storage.clearDraft();
     if (!mounted) return;
     setState(() => _saved = true);
     messenger.showSnackBar(
@@ -230,7 +265,19 @@ class _DvrsScreenState extends State<DvrsScreen> {
       ),
       const SizedBox(height: 16),
       DvrsUi.disclaimerBanner(theme, text: kDvrsIntroDisclaimer),
-      const SizedBox(height: 24),
+      if (_selected.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        _draftBanner(theme),
+      ],
+      const SizedBox(height: 12),
+      Text(
+        '${FeatureStrings.of(context.read<SettingsProvider>().value.languageCode).dvrsVersionLabel}: ${DvrsResult.dvrsVersion}',
+        style: TextStyle(
+          fontSize: 12,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+        ),
+      ),
+      const SizedBox(height: 16),
       SizedBox(
         height: 52,
         child: FilledButton.icon(
@@ -260,6 +307,51 @@ class _DvrsScreenState extends State<DvrsScreen> {
       ),
     ],
   );
+
+  Widget _draftBanner(ThemeData theme) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF4A90E2).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF4A90E2).withValues(alpha: 0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.edit_note, color: Color(0xFF4A90E2), size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              f.dvrsDraftBanner,
+              style: TextStyle(
+                fontSize: 13,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              unawaited(context.read<DvrsStorageService>().clearDraft());
+              setState(() {
+                _selected.clear();
+                _draftLoaded = false;
+              });
+            },
+            child: Text(f.dvrsDraftDiscard),
+          ),
+          FilledButton(
+            onPressed: _start,
+            child: Text(f.dvrsDraftResume),
+          ),
+        ],
+      ),
+    );
+  }
 
   // --- Perguntas (página única) -------------------------------------------
 
@@ -395,6 +487,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           for (var i = 0; i < q.options.length; i++) ...[
             _optionTile(theme, q.options[i].label, selected == i, () {
               setState(() => _selected[q.id] = i);
+              unawaited(_persistDraft());
             }),
             if (i < q.options.length - 1) const SizedBox(height: 10),
           ],

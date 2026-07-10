@@ -46,7 +46,7 @@ void main() {
       expect(history, hasLength(1));
       expect(history.first.id, 'a');
       expect(history.first.totalScore, r.totalScore);
-      expect(history.first.version, 'DVRS_v1.0');
+      expect(history.first.version, 'DVRS_v1.1');
     });
 
     test('histórico ordenado por data (mais antigo → mais recente)', () async {

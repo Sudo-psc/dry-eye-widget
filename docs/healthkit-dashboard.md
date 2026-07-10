@@ -16,7 +16,7 @@ Dados importaveis do HealthKit no MVP:
 Fora do HealthKit no MVP:
 
 - Tempo de tela: vem do proprio Dry Eye Widget, porque a coleta atual ja mede tempo ativo de tela e descarta inatividade. O modelo nao trata tempo de tela como tipo HealthKit.
-- OSDI: vem do historico local do app.
+- DVRS: vem do historico local do app.
 - Colirios, pausas e piscadas sugeridas: vem do app quando houver eventos persistidos.
 - Medicacoes e sintomas livres: inicialmente user-reported, ate existir uma fonte autorizada e bem definida.
 - Cliques e teclas: metricas futuras, apenas agregadas e opt-in; nunca devem registrar conteudo, coordenadas, sequencia de teclas ou trajetoria do cursor.
@@ -34,7 +34,7 @@ Grao padrao: dia local.
 
 Janelas de visualizacao:
 
-- Diario: correlacao de tela, pausas, OSDI, sono e frequencia cardiaca media por data.
+- Diario: correlacao de tela, pausas, DVRS, sono e frequencia cardiaca media por data.
 - Semanal: tendencia de exposicao, aderencia e sintomas.
 - Mensal: acompanhamento clinico longitudinal.
 
@@ -59,12 +59,12 @@ Estados de disponibilidade:
 | Metrica | Fonte primaria | Fonte alternativa | Unidade | Grao | Observacao |
 | --- | --- | --- | --- | --- | --- |
 | Tempo de tela | App | nenhuma no MVP | segundos | dia | Tempo ativo local, sem inatividade. |
-| OSDI | App | nenhuma | escore 0-100 | data de preenchimento | Historico local do questionario. |
+| DVRS | App | nenhuma | escore 0-100 | data de preenchimento | Historico local do questionario. |
 | Uso de colirios | App | user-reported | contagem | dia | Futuro: persistir confirmacoes de uso. |
 | Medicacoes | user-reported | nenhuma no MVP | texto | dia | Nao importar do HealthKit no MVP. |
 | Sono | HealthKit | nenhuma | segundos | dia | Somar amostras autorizadas de sono. |
 | Frequencia cardiaca media | HealthKit | nenhuma | bpm | dia | Media ponderada/aritmetica conforme amostras disponiveis. |
-| Sintomas | user-reported | App/OSDI | categorico/texto | dia | Sintomas livres ou resumo OSDI. |
+| Sintomas | user-reported | App/DVRS | categorico/texto | dia | Sintomas livres ou resumo DVRS. |
 | Frequencia de pausas | App/derivada | nenhuma | contagem | dia | Pausas sugeridas ou realizadas. |
 | Aderencia 20-20-20 | Derivada | nenhuma | percentual | dia | pausas realizadas / pausas esperadas. |
 | Numero de cliques | App futuro | nenhuma | contagem | dia | Apenas agregado, opt-in, sem coordenadas. |
@@ -76,11 +76,11 @@ Estados de disponibilidade:
 
 O dashboard deve permitir comparar:
 
-- tempo de tela versus OSDI;
+- tempo de tela versus DVRS;
 - tempo de tela versus sintomas;
 - pausas esperadas versus pausas realizadas;
-- aderencia 20-20-20 versus OSDI;
-- sono versus sintomas e OSDI;
+- aderencia 20-20-20 versus DVRS;
+- sono versus sintomas e DVRS;
 - frequencia cardiaca media versus dias de maior desconforto, apenas como contexto geral;
 - colirios e medicacoes versus variacao de sintomas.
 

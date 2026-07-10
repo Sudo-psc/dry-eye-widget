@@ -22,6 +22,7 @@ class DaySummaryScreen extends StatefulWidget {
     required this.onProgress,
     required this.onDashboard,
     required this.onSnoozeDvrsNudge,
+    this.embedded = false,
   });
 
   final VoidCallback onClose;
@@ -30,6 +31,9 @@ class DaySummaryScreen extends StatefulWidget {
   final VoidCallback onProgress;
   final VoidCallback onDashboard;
   final Future<void> Function() onSnoozeDvrsNudge;
+
+  /// Quando true, renderiza só o corpo (sem Scaffold/vidro/header) para o hub.
+  final bool embedded;
 
   @override
   State<DaySummaryScreen> createState() => _DaySummaryScreenState();
@@ -81,6 +85,27 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
     final s = context.watch<SettingsProvider>().strings;
     final snap = _snap;
 
+    final content = Column(
+      children: [
+        if (!widget.embedded) _header(theme, s),
+        Expanded(
+          child: snap == null
+              ? const Center(
+                  child: SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
+                )
+              : _body(theme, s, snap),
+        ),
+      ],
+    );
+
+    if (widget.embedded) {
+      return content;
+    }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ClipRRect(
@@ -88,22 +113,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: Column(
-            children: [
-              _header(theme, s),
-              Expanded(
-                child: snap == null
-                    ? const Center(
-                        child: SizedBox(
-                          width: 28,
-                          height: 28,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        ),
-                      )
-                    : _body(theme, s, snap),
-              ),
-            ],
-          ),
+          child: content,
         ),
       ),
     );

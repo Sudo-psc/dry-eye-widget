@@ -55,7 +55,7 @@ void main() {
       expect(restored!.id, 'abc');
       expect(restored.userId, 'user-1');
       expect(restored.createdAt, now);
-      expect(restored.version, 'DVRS_v1.0');
+      expect(restored.version, 'DVRS_v1.1');
       expect(restored.totalScore, original.totalScore);
       expect(restored.classification, original.classification);
       expect(restored.classificationLabel, original.classificationLabel);

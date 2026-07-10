@@ -1,6 +1,6 @@
 # Política de Privacidade do Dry Eye Widget
 
-Última atualização: 19 de junho de 2026
+Última atualização: 10 de julho de 2026
 
 Esta Política de Privacidade explica como o Dry Eye Widget trata informações durante o uso do aplicativo para Windows e macOS. O princípio central é simples: o aplicativo foi projetado para funcionar localmente e não enviar dados de atividade do usuário para fora da máquina.
 
@@ -18,7 +18,7 @@ O Dry Eye Widget não possui telemetria de atividade, analytics de uso, monitora
 | Câmera (presença) | **Opcional e desligada por padrão.** Quando ativada, tira **uma única foto local**, verifica se há um rosto e **descarta a imagem na hora** — sem gravar nem enviar. |
 | Aprendizado de inatividade | Estado agregado guardado **cifrado** no próprio dispositivo (Keychain/DPAPI), sem histórico de eventos e sem acesso remoto. |
 | Configurações | Salvas localmente para manter preferências do usuário. |
-| Questionário OSDI | Quando usado, respostas, pontuação, gravidade e data ficam salvas localmente para histórico do próprio usuário. |
+| Questionário DVRS | Quando usado, respostas, score, classificação e data ficam salvas localmente para histórico do próprio usuário. |
 | Tempo de tela | Quando ativado, salva histórico diário agregado de tempo ativo de tela, descartando períodos de inatividade. |
 | Atualizações | A checagem opcional consulta o GitHub Releases e não inclui dados de atividade. |
 
@@ -84,7 +84,7 @@ Para funcionar de forma conveniente, o aplicativo pode salvar preferências e es
 - posição do widget na tela;
 - progresso de timers para retomada após reiniciar o app;
 - preferência de iniciar ou não com o sistema;
-- histórico local do questionário OSDI, quando o usuário usa esse recurso;
+- histórico local do questionário DVRS (Índice de Risco Visual Digital), quando o usuário usa esse recurso;
 - histórico diário agregado de tempo de tela, quando o usuário ativa essa coleta.
 
 Esses dados são usados apenas para manter a configuração do usuário, a continuidade da experiência e a visualização local do próprio histórico. Eles ficam armazenados localmente pelo mecanismo de preferências do aplicativo ou do sistema operacional.

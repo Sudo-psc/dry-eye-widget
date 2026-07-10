@@ -1,6 +1,6 @@
 # Termos de Uso do Dry Eye Widget
 
-Última atualização: 19 de junho de 2026
+Última atualização: 10 de julho de 2026
 
 Estes Termos de Uso regulam o uso do Dry Eye Widget, um aplicativo de lembretes visuais para pausas, piscadas, descanso ocular e colírios. Ao instalar ou usar o aplicativo, você concorda com estes termos.
 
@@ -32,13 +32,13 @@ Em especial, o aplicativo não coleta, armazena nem transmite:
 
 A detecção de inatividade usa apenas uma consulta local ao sistema operacional para saber há quantos segundos ocorreu a última entrada do usuário, como movimento do mouse, clique ou tecla. Esse valor é usado somente para pausar ou retomar o timer dentro do próprio aplicativo. Ele não identifica o que o usuário fez, não cria histórico de atividade e não é enviado para servidores externos.
 
-O questionário OSDI e a visualização de tempo de tela, quando usados, podem salvar histórico local no próprio dispositivo para que o usuário acompanhe sua rotina. Esses dados não são enviados pelo Dry Eye Widget para servidores externos.
+O questionário DVRS (Índice de Risco Visual Digital) e a visualização de tempo de tela, quando usados, podem salvar histórico local no próprio dispositivo para que o usuário acompanhe sua rotina. Esses dados não são enviados pelo Dry Eye Widget para servidores externos.
 
 A Política de Privacidade explica com mais detalhes como o aplicativo trata dados locais, preferências e atualizações.
 
 ## 3. Funcionamento local
 
-O aplicativo pode salvar configurações no próprio computador, como preferências de notificação, aparência, tempos dos lembretes, posição do widget, progresso de timers, histórico OSDI e histórico diário agregado de tempo de tela. Essas informações existem para preservar a experiência do usuário entre sessões.
+O aplicativo pode salvar configurações no próprio computador, como preferências de notificação, aparência, tempos dos lembretes, posição do widget, progresso de timers, histórico DVRS e histórico diário agregado de tempo de tela. Essas informações existem para preservar a experiência do usuário entre sessões.
 
 Essas configurações permanecem na máquina local, salvo se o próprio usuário fizer backup, sincronizar a pasta de dados do sistema, copiar arquivos manualmente ou usar ferramentas externas de sincronização.
 
