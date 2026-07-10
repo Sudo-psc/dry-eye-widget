@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  window_manager: ^0.5.1
+  window_manager: ^0.5.2
   screen_retriever: ^0.2.0
   flutter_acrylic: ^1.1.4
   audioplayers: ^6.7.1
