@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/feature_strings.dart';
 import '../../providers/settings_provider.dart';
-import '../../ui/app_theme.dart';
+import '../../utils/constants.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../progress/progress_screen.dart';
 import '../summary/day_summary_screen.dart';
@@ -151,7 +151,7 @@ class _HealthHubScreenState extends State<HealthHubScreen>
                 shape: BoxShape.circle,
                 color: AppColors.idleBall.withValues(alpha: 0.16),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.favorite_outline,
                 color: AppColors.idleBall,
                 size: 20,

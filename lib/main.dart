@@ -785,7 +785,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
-  Future<void> _applyLayout(_WindowLayout layout) async {
+  Future<void> _applyLayout(WindowLayout layout) async {
     if (layout != WindowLayout.blinkReminder && _blinkReminderVisible) {
       _blinkReminderHideTimer?.cancel();
       _blinkReminderHideTimer = null;
