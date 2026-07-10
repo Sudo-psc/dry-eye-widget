@@ -14,33 +14,63 @@
   }
   initTheme();
 
-  /* ---------- Responsive demo video ----------
-     Em telas pequenas ou conexões com economia de dados, troca o vídeo de
-     demonstração pela versão comprimida (~460 KB vs ~2,4 MB). Idempotente:
-     roda imediatamente (antes do download do vídeo cheio) e de novo no
-     DOMContentLoaded, quando o viewport já está estável. */
-  function pickDemoVideo() {
-    var v = document.getElementById("demo-video");
-    if (!v) return;
+  /* ---------- Demo video (lazy) ----------
+     Não há <source> no HTML e não há autoplay: o poster basta no LCP.
+     Carrega o MP4 só quando o bloco entra na viewport (ou no play).
+     Em mobile / save-data / 2G usa a versão comprimida (~460 KB vs ~2,3 MB). */
+  function resolveDemoSrc(v) {
     var conn = navigator.connection || {};
     var lite = window.matchMedia("(max-width: 640px)").matches ||
       conn.saveData === true ||
       /(^|-)2g$/.test(conn.effectiveType || "");
-    if (!lite) return;
-    var want = v.getAttribute("data-src-mobile");
+    var mobile = v.getAttribute("data-src-mobile");
+    var full = v.getAttribute("data-src");
+    return lite && mobile ? mobile : full;
+  }
+
+  function attachDemoSource(v) {
+    if (!v || v.getAttribute("data-loaded") === "1") return;
+    var want = resolveDemoSrc(v);
+    if (!want) return;
     var srcEl = v.querySelector("source");
-    if (srcEl && want && srcEl.getAttribute("src") !== want) {
+    if (!srcEl) {
+      srcEl = document.createElement("source");
+      srcEl.type = "video/mp4";
+      v.appendChild(srcEl);
+    }
+    if (srcEl.getAttribute("src") !== want) {
       srcEl.setAttribute("src", want);
       v.load();
     }
+    v.setAttribute("data-loaded", "1");
   }
-  pickDemoVideo();
-  // Cobre rotação de tela / mudança de breakpoint após o carregamento.
-  try { window.matchMedia("(max-width: 640px)").addEventListener("change", pickDemoVideo); } catch (e) {}
+
+  function setupDemoVideo() {
+    var v = document.getElementById("demo-video");
+    if (!v) return;
+    // Usuário pediu play antes do observer: carrega na hora.
+    v.addEventListener("play", function () { attachDemoSource(v); }, { once: true });
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            attachDemoSource(v);
+            io.disconnect();
+          }
+        });
+      }, { rootMargin: "200px 0px" });
+      io.observe(v);
+    } else {
+      // Fallback antigo: carrega no idle / timeout curto.
+      var run = function () { attachDemoSource(v); };
+      if (window.requestIdleCallback) window.requestIdleCallback(run, { timeout: 2500 });
+      else setTimeout(run, 1200);
+    }
+  }
 
   document.addEventListener("DOMContentLoaded", function () {
     if (typeof window.dewInitLang === "function") window.dewInitLang();
-    pickDemoVideo();
+    setupDemoVideo();
 
     const themeBtn = document.getElementById("theme-toggle");
     if (themeBtn) themeBtn.addEventListener("click", function () {

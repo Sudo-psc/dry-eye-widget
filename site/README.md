@@ -95,15 +95,16 @@ Não use mais o fluxo antigo de repositório separado `dry-eye-widget-landing` c
 
 ---
 
-## Performance e SEO (já aplicados)
+## Performance e segurança (já aplicados)
 
-- CSS/JS enxutos; `preload` do CSS principal; `loading="lazy"` no carrossel  
-- `preconnect` + `display=swap` (Google Fonts)  
-- Animações em `transform`/`opacity`, respeitam `prefers-reduced-motion`  
-- Canonical, hreflang, Open Graph, Twitter Card  
-- JSON-LD: SoftwareApplication, FAQPage, Physician, HowTo, VideoObject, BreadcrumbList  
-- Skip link + `:focus-visible`  
-- `site.webmanifest` + apple-touch-icon  
+- **Fontes:** só Hanken Grotesk + Roboto Mono (sem famílias não usadas no CSS)  
+- **Vídeo:** sem `autoplay`/`source` no HTML — carrega sob demanda (IntersectionObserver)  
+- **CSS:** `preload` do critical; `widget-screens.css` não-bloqueante  
+- **JS:** `defer` em i18n + landing  
+- **CSP** + `referrer-policy` no `<head>`; links externos `noopener noreferrer`  
+- Animações em `transform`/`opacity`, `prefers-reduced-motion`  
+- Canonical, hreflang, Open Graph, JSON-LD, skip link, manifest  
+
 
 ---
 

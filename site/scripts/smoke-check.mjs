@@ -156,6 +156,22 @@ if (!indexHtml.includes('rel="apple-touch-icon"')) {
 if (!indexHtml.includes("og:locale")) {
   fail("site/index.html must declare og:locale for social SEO.");
 }
+if (!indexHtml.includes('name="referrer"') || !indexHtml.includes("Content-Security-Policy")) {
+  fail("site/index.html must declare referrer-policy and Content-Security-Policy.");
+}
+// Vídeo não deve puxar 2MB+ no first paint (sem autoplay + sem source estático).
+if (/id="demo-video"[\s\S]*?\bautoplay\b/i.test(indexHtml)) {
+  fail("demo-video must not use autoplay (perf: defers multi-MB download).");
+}
+if (/id="demo-video"[\s\S]*?<source\s+src=/i.test(indexHtml)) {
+  fail("demo-video must not embed <source src> in HTML; load lazily via JS.");
+}
+if (
+  indexHtml.includes("Schibsted+Grotesk") ||
+  indexHtml.includes("family=Sora:")
+) {
+  fail("Unused Google Font families (Schibsted/Sora) must not be loaded.");
+}
 
 if (failures.length) {
   console.error(failures.join("\n"));
