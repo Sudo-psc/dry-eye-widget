@@ -111,6 +111,7 @@ class _ReportDialogState extends State<ReportDialog> {
 
   Future<void> _savePdf(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
+    final strings = context.read<SettingsProvider>().strings;
     final data = _buildReportData();
     setState(() => _isBusy = true);
     try {
@@ -118,7 +119,7 @@ class _ReportDialogState extends State<ReportDialog> {
       final file = await _pdfService.savePdfToDevice(bytes, _fileName());
       if (mounted) setState(() => _lastSavedFile = file);
       messenger.showSnackBar(
-        SnackBar(content: Text(context.read<SettingsProvider>().strings.reportsPdfSavedText(file.path))),
+        SnackBar(content: Text(strings.reportsPdfSavedText(file.path))),
       );
     } catch (e) {
       _showError(messenger, e);
@@ -129,13 +130,14 @@ class _ReportDialogState extends State<ReportDialog> {
 
   Future<void> _deleteLastPdf(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
+    final strings = context.read<SettingsProvider>().strings;
     final file = _lastSavedFile;
     if (file == null) return;
     try {
       if (await file.exists()) await file.delete();
       if (mounted) setState(() => _lastSavedFile = null);
       messenger.showSnackBar(
-        SnackBar(content: Text(context.read<SettingsProvider>().strings.reportsPdfDeleted)),
+        SnackBar(content: Text(strings.reportsPdfDeleted)),
       );
     } catch (e) {
       _showError(messenger, e);

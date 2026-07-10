@@ -5,6 +5,7 @@
 - [x] P0 product: Day Summary hub + proactive insight + DVRS recheck nudge (v1.22.0).
 - [x] Quick wins 1.22.1: tray Day Summary + tray i18n; localize close tooltips/dashboard title; open Day Summary after onboarding.
 - [x] Quick wins 1.22.2: completion insight; dashboard tab i18n; reports header i18n.
+- [x] Five quick-win cycles 1.22.3–1.22.7 (15 items) released as v1.22.7.
 - [x] Implement blink micronotification in the Flutter widget.
 - [x] Add settings toggle to disable visual blink reminders.
 - [x] Add opt-in blink sound reminder with 4 tone choices and volume control.
