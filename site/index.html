@@ -244,16 +244,6 @@ document.documentElement.setAttribute("data-theme",t);})();
         <br>
         <code style="display:inline-block;margin-top:4px;padding:2px 7px;border-radius:5px;background:rgba(127,127,127,.18);font-size:.82em;user-select:all">xattr -cr ~/Downloads/DryEyeWidget*.dmg</code>
       </p>
-      <aside class="whats-new glass" aria-labelledby="whats-new-title">
-        <p class="whats-new-kicker" id="whats-new-title" data-i18n="news.kicker">Novidades 1.22</p>
-        <ul class="whats-new-list">
-          <li data-i18n="news.1">Resumo do dia e insights locais</li>
-          <li data-i18n="news.2">Lembrete de reavaliação do DVRS</li>
-          <li data-i18n="news.3">Frequência de piscada e alongamento de ciclo (1 h)</li>
-          <li data-i18n="news.4">Builds macOS DMG + Windows EXE/MSIX</li>
-        </ul>
-        <a class="whats-new-link" href="https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.22.7" target="_blank" rel="noopener noreferrer" data-i18n="news.link">Notas da versão no GitHub</a>
-      </aside>
       <div class="trust-row">
         <span class="trust-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6.5v5c0 4.5 3.4 8 8 9.5 4.6-1.5 8-5 8-9.5v-5L12 3Z"></path><path d="M9 12l2 2 4-4.5"></path></svg>
@@ -373,12 +363,13 @@ document.documentElement.setAttribute("data-theme",t);})();
     <div class="section-head reveal">
       <span class="kicker" data-i18n="ev.kicker">Evidências científicas</span>
       <h2 data-i18n="ev.title">O problema é real — e mensurável</h2>
-      <p data-i18n="ev.sub">Números de meta-análises e estudos clínicos revisados por pares.</p>
+      <p data-i18n="ev.sub">Números de meta-análises, revisões sistemáticas e estudos clínicos revisados por pares sobre olho seco, uso de telas e produtividade.</p>
     </div>
+
     <div class="stat-grid">
       <div class="stat-card glass reveal">
         <div class="stat-value">~50%<sup>[1]</sup></div>
-        <p data-i18n="ev.1">dos usuários de telas apresentam Doença do Olho Seco, segundo meta-análise de prevalência global.</p>
+        <p data-i18n="ev.1">dos trabalhadores de terminal de vídeo (VDT) apresentam Doença do Olho Seco em meta-análise global de prevalência.</p>
       </div>
       <div class="stat-card glass reveal">
         <div class="stat-value">~30%<sup>[2]</sup></div>
@@ -388,8 +379,47 @@ document.documentElement.setAttribute("data-theme",t);})();
         <div class="stat-value">14%<sup>[3,4]</sup></div>
         <p data-i18n="ev.3">de perda na velocidade e fluência de leitura prolongada induzida por alterações da superfície ocular.</p>
       </div>
+      <div class="stat-card glass reveal">
+        <div class="stat-value">22→7<sup>[5]</sup></div>
+        <p data-i18n="ev.4">piscadas por minuto: da fixação primária ao uso de tela — o reflexo do piscar colapsa diante do monitor.</p>
+      </div>
+      <div class="stat-card glass reveal">
+        <div class="stat-value">30&nbsp;min<sup>[6]</sup></div>
+        <p data-i18n="ev.5">de leitura sustentada bastam para queda mensurável da função visual em pacientes com olho seco.</p>
+      </div>
+      <div class="stat-card glass reveal">
+        <div class="stat-value">~8&nbsp;min<sup>[7]</sup></div>
+        <p data-i18n="ev.6">por jornada de 8&nbsp;h é o custo total da regra 20-20-20 — investimento mínimo frente à perda de desempenho.</p>
+      </div>
     </div>
-    <p class="evidence-note reveal" data-i18n="ev.note">Referências completas com DOI ao final da página. Arquivo de metadados RIS disponível no repositório.</p>
+
+    <div class="evidence-pillars">
+      <article class="evidence-pillar glass reveal">
+        <h3 data-i18n="ev.p1.title">Mecanismo: piscar e filme lacrimal</h3>
+        <p data-i18n="ev.p1.body">Na fixação primária piscamos cerca de 15–22 vezes por minuto. Em telas, a frequência cai e muitas piscadas ficam incompletas: o filme lacrimal evapora sem reposição, a superfície ocular resseca e surgem ardência, visão turva e cansaço ao fim do dia. [5,8]</p>
+      </article>
+      <article class="evidence-pillar glass reveal">
+        <h3 data-i18n="ev.p2.title">Impacto funcional e ocupacional</h3>
+        <p data-i18n="ev.p2.body">A doença do olho seco não é só desconforto: reduz velocidade de leitura, eleva presenteísmo e concentra risco exatamente onde o trabalho de alto valor acontece — em frentes de tela. Em revisões de fadiga visual digital, sintomas acometem grande parte dos usuários intensivos de computador. [1–4,8]</p>
+      </article>
+      <article class="evidence-pillar glass reveal">
+        <h3 data-i18n="ev.p3.title">Prevenção: pausas estruturadas</h3>
+        <p data-i18n="ev.p3.body">A regra 20-20-20 (a cada 20 minutos, olhar para ~6 m por 20 segundos) atua nos dois eixos do desconforto digital: relaxa acomodação/convergência e restaura piscadas completas que recompõem o filme lacrimal. O desafio clínico não é o conhecimento — é a adesão no meio da tarefa. [7,9]</p>
+      </article>
+    </div>
+
+    <div class="evidence-takeaways glass reveal">
+      <h3 data-i18n="ev.take.title">O que a literatura sustenta, em resumo</h3>
+      <ul>
+        <li data-i18n="ev.take.1">Prevalência de olho seco em trabalhadores de tela é alta (~metade em meta-análises de VDT). [1]</li>
+        <li data-i18n="ev.take.2">O prejuízo principal no trabalho é o presenteísmo, não o absenteísmo. [2]</li>
+        <li data-i18n="ev.take.3">Leitura e função visual degradam com tempo contínuo de exposição e superfície ocular instável. [3,4,6]</li>
+        <li data-i18n="ev.take.4">Redução do piscar (e piscadas incompletas) é o elo mecânico entre tela e ressecamento. [5,8]</li>
+        <li data-i18n="ev.take.5">Pausas curtas e regulares são a intervenção de melhor custo-benefício comportamental; o widget existe para fechar a lacuna entre saber e fazer. [7,9]</li>
+      </ul>
+    </div>
+
+    <p class="evidence-note reveal" data-i18n="ev.note">Referências completas com DOI na seção Bibliografia abaixo. Metadados RIS no repositório (<code>docs/referencias.ris</code>). Conteúdo educativo — não substitui avaliação oftalmológica.</p>
   </div>
 </section>
 
@@ -707,7 +737,7 @@ document.documentElement.setAttribute("data-theme",t);})();
   <div class="wrap">
     <div class="section-head reveal">
       <span class="kicker" data-i18n="refs.kicker">Referências</span>
-      <h2 data-i18n="refs.title">Bibliografia selecionada</h2>
+      <h2 data-i18n="refs.title">Bibliografia selecionada e ampliada</h2>
     </div>
     <div class="ref-list reveal">
       <div class="ref-item glass">
@@ -725,6 +755,34 @@ document.documentElement.setAttribute("data-theme",t);})();
       <div class="ref-item glass">
         <p><strong>Karakus S, et al.</strong> Impact of Dry Eye on Prolonged Reading. <em>Optom Vis Sci.</em> 2018;95(12):1105-13.</p>
         <a class="doi" href="https://doi.org/10.1097/OPX.0000000000001303" target="_blank" rel="noopener noreferrer">DOI</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>Tsubota K, Nakamori K.</strong> Dry eyes and video display terminals. <em>N Engl J Med.</em> 1993;328(8):584.</p>
+        <a class="doi" href="https://doi.org/10.1056/NEJM199302253280817" target="_blank" rel="noopener noreferrer">DOI</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>Akpek EK, et al.</strong> Sustained Gazing Causes Measurable Decline in Visual Function of Patients with Dry Eye. <em>Am J Ophthalmol.</em> 2019;210:107-15.</p>
+        <a class="doi" href="https://doi.org/10.1016/j.ajo.2019.10.009" target="_blank" rel="noopener noreferrer">DOI</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>American Optometric Association.</strong> Computer Vision Syndrome (Digital Eye Strain) — clinical guidance including the 20-20-20 rule. Accessed 2026.</p>
+        <a class="doi" href="https://www.aoa.org/healthy-eyes/eye-and-vision-conditions/computer-vision-syndrome" target="_blank" rel="noopener noreferrer">AOA</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>Sheppard AL, Wolffsohn JS.</strong> Digital eye strain: prevalence, measurement and amelioration. <em>BMJ Open Ophthalmol.</em> 2018;3(1):e000146.</p>
+        <a class="doi" href="https://doi.org/10.1136/bmjophth-2018-000146" target="_blank" rel="noopener noreferrer">DOI</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>Coles-Brennan C, Sulley A, Young G.</strong> Management of digital eye strain. <em>Clin Exp Optom.</em> 2019;102(1):18-29.</p>
+        <a class="doi" href="https://doi.org/10.1111/cxo.12798" target="_blank" rel="noopener noreferrer">DOI</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>Stapleton F, et al.</strong> TFOS DEWS II Epidemiology Report. <em>Ocul Surf.</em> 2017;15(3):334-65.</p>
+        <a class="doi" href="https://doi.org/10.1016/j.jtos.2017.05.003" target="_blank" rel="noopener noreferrer">DOI</a>
+      </div>
+      <div class="ref-item glass">
+        <p><strong>Craig JP, et al.</strong> TFOS DEWS II Definition and Classification Report. <em>Ocul Surf.</em> 2017;15(3):276-83.</p>
+        <a class="doi" href="https://doi.org/10.1016/j.jtos.2017.05.008" target="_blank" rel="noopener noreferrer">DOI</a>
       </div>
     </div>
     <div class="clinical-note glass reveal">
