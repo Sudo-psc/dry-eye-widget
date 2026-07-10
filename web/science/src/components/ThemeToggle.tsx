@@ -1,5 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type Theme = "light" | "dark";
 
@@ -11,6 +12,7 @@ function currentTheme(): Theme {
 }
 
 export function ThemeToggle() {
+  const { t } = useLanguage();
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => setTheme(currentTheme()), []);
@@ -21,7 +23,7 @@ export function ThemeToggle() {
     setTheme(next);
     try {
       localStorage.setItem("dew-theme", next);
-    } catch (_) {
+    } catch {
       // Theme persistence is optional; the control still works without storage.
     }
   }
@@ -30,7 +32,7 @@ export function ThemeToggle() {
     <button
       type="button"
       className="icon-button"
-      aria-label={theme === "dark" ? "Use light theme" : "Use dark theme"}
+      aria-label={theme === "dark" ? t.themeLight : t.themeDark}
       onClick={toggleTheme}
     >
       {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}

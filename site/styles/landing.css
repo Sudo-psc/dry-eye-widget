@@ -182,16 +182,33 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
   border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap; }
-.brand img { width: 30px; height: 30px; border-radius: 8px; }
-.main-nav { display: flex; gap: 4px; margin-left: auto; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: -0.01em; white-space: nowrap; }
+.brand img { width: 28px; height: 28px; border-radius: 8px; }
+.main-nav {
+  display: flex; align-items: center; gap: 2px;
+  margin-left: auto;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface-strong) 70%, transparent);
+  border: 1px solid var(--line);
+}
 .main-nav a {
-  font-size: 14px; font-weight: 600; color: var(--text-2);
-  padding: 8px 14px; border-radius: 999px;
-  transition: color 160ms ease, background-color 160ms ease;
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+  padding: 7px 12px; border-radius: 999px;
+  transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  white-space: nowrap;
 }
 .main-nav a:hover { color: var(--text); background: var(--accent-soft); }
-.header-actions { display: flex; align-items: center; gap: 10px; }
+.main-nav a.nav-cta {
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 6px 14px -6px color-mix(in oklab, var(--accent) 55%, transparent);
+}
+.main-nav a.nav-cta:hover {
+  color: #fff;
+  background: var(--accent-strong);
+}
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .science-mobile-link { display: none; }
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -609,6 +626,42 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
 /* O infográfico está em português; oculta na versão em inglês. */
 html[lang="en"] .cost-info { display: none; }
 
+/* ---------- Science CTA ---------- */
+.science-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+  gap: 28px 40px;
+  align-items: center;
+  padding: 28px 32px;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--accent-soft) 80%, var(--surface-strong)),
+    var(--surface-strong)
+  );
+}
+.science-cta-copy { display: grid; gap: 12px; justify-items: start; }
+.science-cta-copy h2 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -0.02em; }
+.science-cta-copy p { color: var(--text-2); font-size: 16px; max-width: 48ch; text-wrap: pretty; margin: 0; }
+.science-cta-btn { margin-top: 6px; }
+.science-cta-points {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 10px;
+}
+.science-cta-points li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; color: var(--text-2);
+  padding: 11px 14px; border-radius: 12px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+}
+.science-cta-points li::before {
+  content: "";
+  width: 8px; height: 8px; border-radius: 999px; flex: none;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cost-bars.in .bar-fill { animation: none; }
 }
@@ -620,6 +673,7 @@ html[lang="en"] .cost-info { display: none; }
   .rule-grid, .stat-grid, .feature-grid, .cost-highlights, .evidence-pillars { grid-template-columns: 1fr 1fr; }
   .main-nav { display: none; }
   .science-mobile-link { display: inline-flex; }
+  .science-cta { grid-template-columns: 1fr; padding: 22px 20px; }
 }
 @media (max-width: 640px) {
   .site-header .bar { gap: 12px; padding-inline: 16px; }

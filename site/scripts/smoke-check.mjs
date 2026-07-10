@@ -200,8 +200,15 @@ if (!indexHtml.includes('href="science/"') || !indexHtml.includes('data-i18n="na
 
 // Science page: prerendered semantic content, medical SEO and portable assets.
 const scienceHtml = read(join(root, "science", "index.html"));
-if (!scienceHtml.includes('<h1 id="hero-title">The Science Behind')) {
+// Prerender default is PT; EN is client-switched. Accept either hero form.
+if (
+  !scienceHtml.includes('<h1 id="hero-title">A ciência por trás') &&
+  !scienceHtml.includes('<h1 id="hero-title">The Science Behind')
+) {
   fail("site/science/index.html must contain prerendered hero content, not an empty React root.");
+}
+if (!scienceHtml.includes("lang-switch") || !scienceHtml.includes('data-lang="en"')) {
+  fail("Science page must expose a PT/EN language switcher.");
 }
 if (!scienceHtml.includes('rel="canonical" href="https://olhossecos.com.br/app/science/"')) {
   fail("Science page must keep /app/science/ as its canonical URL.");

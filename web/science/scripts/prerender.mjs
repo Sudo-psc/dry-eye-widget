@@ -20,7 +20,11 @@ if (!originalTemplate.includes(marker)) {
 // uses a relative base. Normalize them so the same artifact works both at
 // /science/ (GitHub Pages) and /app/science/ (canonical domain).
 const appHtml = render().replaceAll('="/assets/', '="./assets/');
-if (!appHtml.includes("The Science Behind")) {
+// Default SSR language is Portuguese; accept either heading after i18n.
+if (
+  !appHtml.includes("A ciência por trás") &&
+  !appHtml.includes("The Science Behind")
+) {
   throw new Error("SSR output is missing the expected science-page heading.");
 }
 

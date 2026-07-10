@@ -13,6 +13,15 @@
       "nav.faq": "FAQ",
       "nav.science": "Ciência",
       "nav.blog": "Blog",
+      "sci.kicker": "Base científica",
+      "sci.title": "A ciência por trás do widget",
+      "sci.body": "Mecanismos do filme lacrimal, monitoramento longitudinal e o protocolo aberto OVPP — com referências revisadas por pares e limites de evidência claros.",
+      "sci.cta": "Explorar a página Ciência",
+      "sci.cta.small": "PT · EN · evidências e OVPP",
+      "sci.p1": "Fisiologia e mecanismo",
+      "sci.p2": "Monitoramento longitudinal",
+      "sci.p3": "Protocolo aberto OVPP",
+      "sci.p4": "Referências científicas",
       "hero.badge": "Open source · MIT · macOS & Windows",
       "hero.title": "Sua tela não avisa quando seus olhos <em>precisam de pausa</em>. Este widget avisa.",
       "hero.sub": "Um lembrete gentil e flutuante que aplica a regra oftalmológica 20-20-20 — desenvolvido por um médico oftalmologista para prevenir a fadiga visual digital e o olho seco.",
@@ -213,6 +222,15 @@
       "nav.faq": "FAQ",
       "nav.science": "Science",
       "nav.blog": "Blog",
+      "sci.kicker": "Scientific foundation",
+      "sci.title": "The science behind the widget",
+      "sci.body": "Tear-film mechanisms, longitudinal monitoring and the open OVPP protocol — with peer-reviewed references and clear evidence boundaries.",
+      "sci.cta": "Explore the Science page",
+      "sci.cta.small": "PT · EN · evidence & OVPP",
+      "sci.p1": "Physiology & mechanism",
+      "sci.p2": "Longitudinal monitoring",
+      "sci.p3": "Open OVPP protocol",
+      "sci.p4": "Scientific references",
       "hero.badge": "Open source · MIT · macOS & Windows",
       "hero.title": "Your screen won't tell you when your eyes <em>need a break</em>. This widget will.",
       "hero.sub": "A gentle floating reminder that applies the ophthalmological 20-20-20 rule — built by an eye doctor to prevent digital eye strain and dry eye.",
@@ -415,6 +433,16 @@
       if (val == null) return;
       if (HTML_KEYS.has(key)) el.innerHTML = val;
       else el.textContent = val;
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-aria");
+      const val = dict[key];
+      if (val != null) el.setAttribute("aria-label", val);
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-title");
+      const val = dict[key];
+      if (val != null) el.setAttribute("title", val);
     });
     document.querySelectorAll(".lang-switch button").forEach((b) => {
       b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
