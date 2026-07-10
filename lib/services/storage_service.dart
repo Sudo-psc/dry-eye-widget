@@ -97,6 +97,33 @@ class StorageService {
   Future<void> saveBreakStats(BreakStatsData data) =>
       _prefs.setString(StorageKeys.breakStats, data.toJson());
 
+  // --- Lembrete de reavaliação do DVRS ------------------------------------
+
+  /// Data até a qual o lembrete de DVRS fica silenciado, ou `null`.
+  DateTime? loadDvrsNudgeSnoozedUntil() {
+    final raw = _prefs.getString(StorageKeys.dvrsNudgeSnoozedUntil);
+    if (raw == null || raw.isEmpty) return null;
+    return DateTime.tryParse(raw);
+  }
+
+  Future<void> saveDvrsNudgeSnoozedUntil(DateTime? until) async {
+    if (until == null) {
+      await _prefs.remove(StorageKeys.dvrsNudgeSnoozedUntil);
+    } else {
+      await _prefs.setString(
+        StorageKeys.dvrsNudgeSnoozedUntil,
+        until.toIso8601String(),
+      );
+    }
+  }
+
+  /// Dia em que a notificação de reavaliação já foi enviada (`AAAA-MM-DD`).
+  String? loadDvrsNudgeNotifiedDay() =>
+      _prefs.getString(StorageKeys.dvrsNudgeNotifiedDay);
+
+  Future<void> saveDvrsNudgeNotifiedDay(String dayKey) =>
+      _prefs.setString(StorageKeys.dvrsNudgeNotifiedDay, dayKey);
+
   /// Registra a emissão de um aviso de pausa para o dia [now].
   Future<void> recordBreakReminder([DateTime? now]) async {
     final moment = now ?? DateTime.now();

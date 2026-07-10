@@ -24,6 +24,7 @@ void main() {
               onReset: () {},
               onTogglePause: () {},
               onGuidance: () {},
+              onDaySummary: () {},
               onDvrs: () => dvrsOpened++,
               onScreenTime: () {},
               onDashboard: () {},
@@ -40,6 +41,7 @@ void main() {
       ),
     );
 
+    expect(find.text(ptStrings.menuDaySummary), findsOneWidget);
     expect(find.text(ptStrings.menuDvrs), findsOneWidget);
 
     await tester.tap(find.text(ptStrings.menuDvrs));
@@ -67,6 +69,7 @@ void main() {
               onReset: () {},
               onTogglePause: () {},
               onGuidance: () {},
+              onDaySummary: () {},
               onDvrs: () {},
               onScreenTime: () {},
               onDashboard: () {},
@@ -87,11 +90,11 @@ void main() {
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
 
     // A altura intrínseca do painel (3 cabeçalhos de grupo + linha compacta de
-    // pausas + 11 itens + 2 divisórias) deve caber na altura reservada para o
-    // menu em main.dart (`_menuPanelHeight` = 660). Se um novo item estourar
+    // pausas + 12 itens + 2 divisórias) deve caber na altura reservada para o
+    // menu em main.dart (`_menuPanelHeight` = 704). Se um novo item estourar
     // esse limite, o último item ("Sair") voltaria a ser cortado pela borda da
     // janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(660));
+    expect(height, lessThanOrEqualTo(704));
   });
 }

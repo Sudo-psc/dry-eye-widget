@@ -118,6 +118,12 @@ class AppDefaults {
 
   /// Indica se o usuário já concluiu o onboarding de primeira execução.
   static const bool onboardingComplete = false;
+
+  /// Lembrete suave de reavaliação do DVRS (educativo, opt-out nas configs).
+  static const bool dvrsReminderEnabled = true;
+
+  /// Intervalo em dias entre lembretes de reavaliação do DVRS.
+  static const int dvrsReminderDays = 14;
 }
 
 /// Durações fixas (não configuráveis) usadas em animações.
@@ -199,6 +205,13 @@ class StorageKeys {
 
   /// JSON com estatísticas de atividade por dia (cliques, teclas, tempo/app).
   static const String activityStats = 'activity_stats_json';
+
+  /// ISO-8601 da data até a qual o lembrete de reavaliação do DVRS fica adiado.
+  static const String dvrsNudgeSnoozedUntil = 'dvrs_nudge_snoozed_until';
+
+  /// Dia (`AAAA-MM-DD`) em que a notificação de reavaliação do DVRS já foi
+  /// enviada — no máximo uma por dia.
+  static const String dvrsNudgeNotifiedDay = 'dvrs_nudge_notified_day';
 }
 
 /// Informações do app usadas na verificação de atualização.
@@ -206,7 +219,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.21.2';
+  static const String version = '1.22.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

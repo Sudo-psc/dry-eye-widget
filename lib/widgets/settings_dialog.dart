@@ -474,6 +474,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
                   _sectionTitle(s.secGeneral),
                   _switchRow(
+                    label: s.dvrsReminderEnable,
+                    value: _draft.dvrsReminderEnabled,
+                    onChanged: (v) =>
+                        _set(_draft.copyWith(dvrsReminderEnabled: v)),
+                  ),
+                  _hint(s.dvrsReminderHint),
+                  _switchRow(
                     label: s.enableSound,
                     value: _draft.soundEnabled,
                     onChanged: (v) => _set(_draft.copyWith(soundEnabled: v)),

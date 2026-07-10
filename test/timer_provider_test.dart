@@ -428,6 +428,25 @@ class _MemoryStorage implements StorageService {
     _breakStats = data;
   }
 
+  DateTime? _dvrsNudgeSnoozedUntil;
+  String? _dvrsNudgeNotifiedDay;
+
+  @override
+  DateTime? loadDvrsNudgeSnoozedUntil() => _dvrsNudgeSnoozedUntil;
+
+  @override
+  Future<void> saveDvrsNudgeSnoozedUntil(DateTime? until) async {
+    _dvrsNudgeSnoozedUntil = until;
+  }
+
+  @override
+  String? loadDvrsNudgeNotifiedDay() => _dvrsNudgeNotifiedDay;
+
+  @override
+  Future<void> saveDvrsNudgeNotifiedDay(String dayKey) async {
+    _dvrsNudgeNotifiedDay = dayKey;
+  }
+
   @override
   Future<void> recordBreakReminder([DateTime? now]) async {
     _breakStats = _breakStats.incremented(now ?? DateTime.now(), reminders: 1);

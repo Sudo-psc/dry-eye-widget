@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_strings.dart';
 import '../../models/break_stats_data.dart';
 import '../../providers/settings_provider.dart';
+import '../../services/daily_insight.dart';
+import '../../services/dvrs_storage_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/constants.dart';
 import '../liquid_glass.dart';
@@ -150,7 +152,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        _insightCard(theme, s, streak, adh7, has7, total),
+        _insightCard(theme, s),
         const SizedBox(height: 20),
         Text(
           s.progressDisclaimer,
@@ -276,24 +278,25 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _insightCard(
-    ThemeData theme,
-    AppStrings s,
-    int streak,
-    double adh7,
-    bool has7,
-    int total,
-  ) {
-    final String text;
-    if (streak >= 2) {
-      text = s.progressInsightStreakText(streak);
-    } else if (has7) {
-      text = s.progressInsightAdherenceText((adh7 * 100).round());
-    } else if (total > 0) {
-      text = s.progressInsightConsistencyText(total);
-    } else {
-      text = s.progressInsightStart;
-    }
+  Widget _insightCard(ThemeData theme, AppStrings s) {
+    final storage = context.read<StorageService>();
+    final lastDvrs = context.read<DvrsStorageService>().getLatestDvrsResult();
+    final now = DateTime.now();
+    final nudge = DailyInsightEngine.isDvrsNudgeDue(
+      now: now,
+      enabled: context.read<SettingsProvider>().value.dvrsReminderEnabled,
+      lastDvrsAt: lastDvrs?.createdAt,
+      snoozedUntil: storage.loadDvrsNudgeSnoozedUntil(),
+      intervalDays: AppDefaults.dvrsReminderDays,
+      totalCompletedBreaks: _stats.totalCompleted,
+    );
+    final text = DailyInsightEngine.buildInsight(
+      strings: s,
+      stats: _stats,
+      now: now,
+      lastDvrsAt: lastDvrs?.createdAt,
+      dvrsNudgeDue: nudge,
+    ).message;
 
     return Container(
       padding: const EdgeInsets.all(16),

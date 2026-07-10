@@ -2,6 +2,7 @@
 
 ## now
 
+- [x] P0 product: Day Summary hub + proactive insight + DVRS recheck nudge (v1.22.0).
 - [x] Implement blink micronotification in the Flutter widget.
 - [x] Add settings toggle to disable visual blink reminders.
 - [x] Add opt-in blink sound reminder with 4 tone choices and volume control.
@@ -14,6 +15,7 @@
 
 ## next
 
+- [ ] Manually inspect Day Summary, DVRS nudge banner/snooze, and optional system notification on macOS.
 - [ ] Manually inspect the DVRS single-page questionnaire in the desktop window, especially narrow window widths and long option labels.
 - [ ] Manually inspect left and right edge docking on macOS with real dragging, hover, click-to-undock, and size changes.
 - [ ] Manually inspect left and right edge docking on Windows before the next Windows package.

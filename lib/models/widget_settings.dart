@@ -51,6 +51,7 @@ class WidgetSettings {
     required this.cameraPresence,
     required this.uiScale,
     required this.onboardingComplete,
+    required this.dvrsReminderEnabled,
   });
 
   // --- Temporização / som -------------------------------------------------
@@ -172,6 +173,9 @@ class WidgetSettings {
   /// Marca que o onboarding de primeira execução já foi concluído.
   final bool onboardingComplete;
 
+  /// Lembrete suave de reavaliação do DVRS (notificação + banner no resumo).
+  final bool dvrsReminderEnabled;
+
   /// Valores de fábrica.
   factory WidgetSettings.defaults() => const WidgetSettings(
     cycleMinutes: AppDefaults.cycleMinutes,
@@ -212,6 +216,7 @@ class WidgetSettings {
     cameraPresence: AppDefaults.cameraPresence,
     uiScale: AppDefaults.uiScale,
     onboardingComplete: AppDefaults.onboardingComplete,
+    dvrsReminderEnabled: AppDefaults.dvrsReminderEnabled,
   );
 
   // --- Conveniências ------------------------------------------------------
@@ -259,6 +264,7 @@ class WidgetSettings {
     bool? cameraPresence,
     double? uiScale,
     bool? onboardingComplete,
+    bool? dvrsReminderEnabled,
   }) {
     final nextHideMenuBarItem = hideMenuBarItem ?? this.hideMenuBarItem;
     final nextHideFloatingWidget =
@@ -307,6 +313,7 @@ class WidgetSettings {
       cameraPresence: cameraPresence ?? this.cameraPresence,
       uiScale: uiScale ?? this.uiScale,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
+      dvrsReminderEnabled: dvrsReminderEnabled ?? this.dvrsReminderEnabled,
     ).normalized();
   }
 
@@ -375,6 +382,7 @@ class WidgetSettings {
         d.uiScale,
       ),
       onboardingComplete: onboardingComplete,
+      dvrsReminderEnabled: dvrsReminderEnabled,
     );
   }
 
@@ -430,6 +438,7 @@ class WidgetSettings {
     'cameraPresence': cameraPresence,
     'uiScale': uiScale,
     'onboardingComplete': onboardingComplete,
+    'dvrsReminderEnabled': dvrsReminderEnabled,
   };
 
   /// Reconstrói a partir de um mapa, caindo para os defaults em campos
@@ -504,6 +513,8 @@ class WidgetSettings {
       uiScale: (map['uiScale'] as num?)?.toDouble() ?? d.uiScale,
       onboardingComplete:
           map['onboardingComplete'] as bool? ?? d.onboardingComplete,
+      dvrsReminderEnabled:
+          map['dvrsReminderEnabled'] as bool? ?? d.dvrsReminderEnabled,
     ).normalized();
   }
 

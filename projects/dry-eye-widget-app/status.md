@@ -1,10 +1,17 @@
 # Status
 
-Updated: 2026-07-08
+Updated: 2026-07-09
 
-Current phase: DVRS single-page questionnaire implemented and verified locally.
+Current phase: P0 product loop shipped — day summary hub, proactive insight, DVRS recheck nudge (v1.22.0).
 
 Completed:
+
+- Added Day Summary hub (today’s breaks, streak, last DVRS, insight, CTAs).
+- Unified local insight engine shared by Day Summary and My Progress.
+- Soft DVRS re-evaluation nudge every 14 days (or after first breaks if never taken), with snooze and opt-out.
+- Menu health section now leads with Day Summary; analyzer and focused/full tests verified on 2026-07-09.
+
+Previously completed:
 
 - Increased the default floating widget size from 24 px to 32 px and widened the allowed size range to 18-96 px.
 - Lowered the default idle opacity to 82% and allowed user opacity down to 20%.

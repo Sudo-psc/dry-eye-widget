@@ -178,9 +178,33 @@ class AppStrings {
     required this.weekdayShort,
     required this.monthShort,
     required this.menuProgress,
+    required this.menuDaySummary,
     required this.menuGroupActions,
     required this.menuGroupHealth,
     required this.menuGroupSystem,
+    required this.daySummaryTitle,
+    required this.daySummaryTodayLabel,
+    required this.daySummaryTodayHint,
+    required this.daySummaryDvrsLabel,
+    required this.daySummaryDvrsNever,
+    required this.daySummaryDvrsLast,
+    required this.daySummaryNudgeTitle,
+    required this.daySummaryNudgeBodyNever,
+    required this.daySummaryNudgeBodyDue,
+    required this.daySummaryNudgeDismiss,
+    required this.daySummaryNudgeDo,
+    required this.daySummaryCtaBreak,
+    required this.daySummaryCtaDvrs,
+    required this.daySummaryCtaProgress,
+    required this.daySummaryCtaDashboard,
+    required this.daySummaryDisclaimer,
+    required this.insightDvrsNever,
+    required this.insightDvrsDue,
+    required this.insightToday,
+    required this.notifyDvrsNudgeTitle,
+    required this.notifyDvrsNudgeBody,
+    required this.dvrsReminderEnable,
+    required this.dvrsReminderHint,
     required this.progressTitle,
     required this.progressStreakCurrentLabel,
     required this.progressStreakBestLabel,
@@ -223,12 +247,39 @@ class AppStrings {
   final String menuScreenTime;
   final String menuDashboard;
   final String menuProgress;
+  final String menuDaySummary;
   final String menuReports;
 
   /// Títulos dos grupos do menu flutuante.
   final String menuGroupActions;
   final String menuGroupHealth;
   final String menuGroupSystem;
+
+  // --- Resumo do dia (hub) ----------------------------------------------
+  final String daySummaryTitle;
+  final String daySummaryTodayLabel;
+  final String daySummaryTodayHint;
+  final String daySummaryDvrsLabel;
+  final String daySummaryDvrsNever;
+  final String daySummaryDvrsLast;
+  final String daySummaryNudgeTitle;
+  final String daySummaryNudgeBodyNever;
+  final String daySummaryNudgeBodyDue;
+  final String daySummaryNudgeDismiss;
+  final String daySummaryNudgeDo;
+  final String daySummaryCtaBreak;
+  final String daySummaryCtaDvrs;
+  final String daySummaryCtaProgress;
+  final String daySummaryCtaDashboard;
+  final String daySummaryDisclaimer;
+  final String insightDvrsNever;
+  final String insightDvrsDue;
+  final String insightToday;
+  final String notifyDvrsNudgeTitle;
+  final String notifyDvrsNudgeBody;
+  final String dvrsReminderEnable;
+  final String dvrsReminderHint;
+
   final String ballSemanticLabel;
   final String menuCheckUpdates;
   final String menuSettings;
@@ -502,6 +553,19 @@ class AppStrings {
   String progressInsightConsistencyText(int total) =>
       progressInsightConsistency.replaceAll('{n}', '$total');
 
+  String insightDvrsDueText(int days) =>
+      insightDvrsDue.replaceAll('{n}', '$days');
+
+  String insightTodayText(int completed, int reminders) => insightToday
+      .replaceAll('{c}', '$completed')
+      .replaceAll('{r}', '$reminders');
+
+  String daySummaryDvrsLastText(int score, String label, int days) =>
+      daySummaryDvrsLast
+          .replaceAll('{score}', '$score')
+          .replaceAll('{label}', label)
+          .replaceAll('{n}', '$days');
+
   static AppStrings of(String code) => code == 'en' ? enStrings : ptStrings;
 }
 
@@ -516,9 +580,42 @@ const AppStrings ptStrings = AppStrings(
   menuScreenTime: 'Tempo de tela',
   menuDashboard: 'Painel',
   menuProgress: 'Meu progresso',
+  menuDaySummary: 'Resumo do dia',
   menuGroupActions: 'Pausas',
   menuGroupHealth: 'Saúde visual',
   menuGroupSystem: 'Sistema',
+  daySummaryTitle: 'Resumo do dia',
+  daySummaryTodayLabel: 'Hoje',
+  daySummaryTodayHint: 'concluídas / avisos',
+  daySummaryDvrsLabel: 'DVRS',
+  daySummaryDvrsNever: 'Ainda não há avaliação. O DVRS é educativo e leva poucos minutos.',
+  daySummaryDvrsLast:
+      'Último score {score} · {label} · há {n} dias',
+  daySummaryNudgeTitle: 'Hora de reavaliar',
+  daySummaryNudgeBodyNever:
+      'Depois de algumas pausas, vale fazer o DVRS para entender seu risco visual digital.',
+  daySummaryNudgeBodyDue:
+      'Já se passaram cerca de duas semanas desde a última avaliação. Uma reavaliação ajuda a acompanhar tendências.',
+  daySummaryNudgeDismiss: 'Lembrar depois',
+  daySummaryNudgeDo: 'Fazer DVRS',
+  daySummaryCtaBreak: 'Iniciar pausa',
+  daySummaryCtaDvrs: 'DVRS',
+  daySummaryCtaProgress: 'Progresso',
+  daySummaryCtaDashboard: 'Painel',
+  daySummaryDisclaimer:
+      'Triagem educativa e reforço de hábito — não substitui consulta oftalmológica.',
+  insightDvrsNever:
+      'Que tal conhecer o DVRS? É uma triagem educativa do seu risco visual digital.',
+  insightDvrsDue:
+      'Faz {n} dias desde o último DVRS. Uma reavaliação rápida ajuda a acompanhar mudanças.',
+  insightToday:
+      'Hoje você concluiu {c} de {r} pausas sugeridas. Cada ciclo conta.',
+  notifyDvrsNudgeTitle: 'Reavaliar risco visual digital',
+  notifyDvrsNudgeBody:
+      'Um DVRS rápido ajuda a acompanhar tendências. Abra o Resumo do dia no widget.',
+  dvrsReminderEnable: 'Lembrar reavaliação do DVRS',
+  dvrsReminderHint:
+      'Sugere gentilmente uma nova triagem a cada 14 dias (ou após as primeiras pausas, se ainda não fez). Pode adiar.',
   menuReports: 'Relatórios',
   ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
   menuCheckUpdates: 'Verificar atualizações',
@@ -814,9 +911,43 @@ const AppStrings enStrings = AppStrings(
   menuScreenTime: 'Screen time',
   menuDashboard: 'Dashboard',
   menuProgress: 'My progress',
+  menuDaySummary: 'Today’s summary',
   menuGroupActions: 'Breaks',
   menuGroupHealth: 'Eye health',
   menuGroupSystem: 'System',
+  daySummaryTitle: 'Today’s summary',
+  daySummaryTodayLabel: 'Today',
+  daySummaryTodayHint: 'done / prompts',
+  daySummaryDvrsLabel: 'DVRS',
+  daySummaryDvrsNever:
+      'No assessment yet. DVRS is educational and takes a few minutes.',
+  daySummaryDvrsLast:
+      'Last score {score} · {label} · {n} days ago',
+  daySummaryNudgeTitle: 'Time to recheck',
+  daySummaryNudgeBodyNever:
+      'After a few breaks, try the DVRS to understand your digital visual risk.',
+  daySummaryNudgeBodyDue:
+      'About two weeks have passed since your last assessment. A recheck helps track trends.',
+  daySummaryNudgeDismiss: 'Remind me later',
+  daySummaryNudgeDo: 'Take DVRS',
+  daySummaryCtaBreak: 'Start break',
+  daySummaryCtaDvrs: 'DVRS',
+  daySummaryCtaProgress: 'Progress',
+  daySummaryCtaDashboard: 'Dashboard',
+  daySummaryDisclaimer:
+      'Educational screening and habit support — not a substitute for eye care.',
+  insightDvrsNever:
+      'Curious about DVRS? It’s a short educational check of digital visual risk.',
+  insightDvrsDue:
+      'It’s been {n} days since your last DVRS. A quick recheck helps track changes.',
+  insightToday:
+      'Today you completed {c} of {r} suggested breaks. Every cycle counts.',
+  notifyDvrsNudgeTitle: 'Recheck digital visual risk',
+  notifyDvrsNudgeBody:
+      'A short DVRS helps track trends. Open Today’s summary in the widget.',
+  dvrsReminderEnable: 'Remind me to recheck DVRS',
+  dvrsReminderHint:
+      'Gently suggests a new screening every 14 days (or after your first breaks if you haven’t taken it). You can snooze.',
   menuReports: 'Reports',
   ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
   menuCheckUpdates: 'Check for updates',

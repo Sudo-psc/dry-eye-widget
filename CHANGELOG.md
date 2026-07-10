@@ -4,6 +4,20 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.22.0] - 2026-07-09
+
+### Adicionado
+- **Resumo do dia**: hub de saúde no menu com pausas de hoje, sequência,
+  último DVRS, insight proativo e atalhos para pausa, DVRS, progresso e painel.
+- **Insight proativo unificado**: motor local que prioriza reavaliação do DVRS,
+  sequência, adesão da semana e consistência (também no Meu Progresso).
+- **Lembrete de reavaliação do DVRS**: a cada 14 dias (ou após as primeiras
+  pausas se ainda não fez), com banner no resumo, notificação opt-in no máximo
+  1×/dia e opção “Lembrar depois” (7 dias). Desligável em Configurações.
+
+### Modificado
+- Menu de saúde visual destaca o Resumo do dia como entrada principal.
+
 ## [1.21.2] - 2026-07-09
 
 ### Modificado

@@ -24,6 +24,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onReset,
     required this.onTogglePause,
     required this.onGuidance,
+    required this.onDaySummary,
     required this.onDvrs,
     required this.onScreenTime,
     required this.onDashboard,
@@ -42,6 +43,7 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onReset;
   final VoidCallback onTogglePause;
   final VoidCallback onGuidance;
+  final VoidCallback onDaySummary;
   final VoidCallback onDvrs;
   final VoidCallback onScreenTime;
   final VoidCallback onDashboard;
@@ -69,10 +71,16 @@ class FloatingMenu extends StatelessWidget {
       ),
     ];
 
-    // Saúde visual: avaliação e acompanhamento (linhas completas, são destinos).
+    // Saúde visual: hub do dia primeiro; demais destinos de acompanhamento.
     final healthItems = <_MenuItem>[
+      _MenuItem(
+        Icons.wb_sunny_outlined,
+        s.menuDaySummary,
+        onDaySummary,
+        emphasized: true,
+      ),
       _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
-      _MenuItem(Icons.assignment, s.menuDvrs, onDvrs, emphasized: true),
+      _MenuItem(Icons.assignment, s.menuDvrs, onDvrs),
       _MenuItem(Icons.bar_chart_outlined, s.menuScreenTime, onScreenTime),
       _MenuItem(Icons.dashboard_outlined, s.menuDashboard, onDashboard),
       _MenuItem(Icons.trending_up, s.menuProgress, onProgress),

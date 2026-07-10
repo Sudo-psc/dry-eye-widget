@@ -11,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'l10n/app_strings.dart';
 import 'models/app_state.dart';
+import 'models/break_stats_data.dart';
 import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
@@ -38,7 +39,9 @@ import 'widgets/about_panel.dart';
 import 'widgets/dashboard/dashboard_screen.dart';
 import 'widgets/dvrs/dvrs_screen.dart';
 import 'widgets/progress/progress_screen.dart';
+import 'widgets/summary/day_summary_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
+import 'services/daily_insight.dart';
 import 'widgets/floating_ball.dart';
 import 'widgets/floating_menu.dart';
 import 'widgets/gentle_break_card.dart';
@@ -59,10 +62,10 @@ const Size _onboardingWindowSize = Size(480, 560);
 /// Tamanho da janela compacta em função do diâmetro da bolinha.
 Size _compactWindowSize(double ballSize) => Size(ballSize + 28, ballSize + 28);
 
-/// Altura do painel de menu (linha compacta de pausas + 11 itens + 3 cabeçalhos
+/// Altura do painel de menu (linha compacta de pausas + 12 itens + 3 cabeçalhos
 /// de grupo + 2 divisórias + paddings do vidro), com folga para variações de
 /// fonte entre plataformas.
-const double _menuPanelHeight = 660;
+const double _menuPanelHeight = 704;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -165,6 +168,7 @@ Future<void> main() async {
         Provider<StorageService>.value(value: storage),
         Provider<DvrsStorageService>.value(value: dvrsStorage),
         Provider<AudioService>.value(value: audio),
+        Provider<NotificationService>.value(value: notifications),
         Provider<StartupService>.value(value: startup),
         Provider<TrayService>.value(value: tray),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
@@ -262,6 +266,7 @@ enum _WindowLayout {
   report,
   dashboard,
   progress,
+  daySummary,
   onboarding,
   breakOverlay,
   gentleBreak,
@@ -292,6 +297,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   late final SettingsProvider _settings;
   late final AudioService _audio;
   late final TrayService _tray;
+  late final NotificationService _notifications;
 
   bool _menuOpen = false;
   bool _settingsOpen = false;
@@ -303,6 +309,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _reportOpen = false;
   bool _dashboardOpen = false;
   bool _progressOpen = false;
+  bool _daySummaryOpen = false;
   bool _onboardingOpen = false;
   bool _wasActive = false;
   int _currentStreak = 0;
@@ -340,6 +347,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       context.read<StorageService>().loadDockEdge(),
     );
     _audio = context.read<AudioService>();
+    _notifications = context.read<NotificationService>();
     _tray = context.read<TrayService>();
     _lastBallSize = _settings.value.ballSize;
     _lastDockHidden = _settings.value.hideDockIcon;
@@ -384,7 +392,46 @@ class _HomePageState extends State<HomePage> with TrayListener {
         await windowManager.show();
         await _applyLayout(_WindowLayout.onboarding);
       });
+    } else {
+      // Após o onboarding: no máximo um nudge suave de reavaliação do DVRS/dia.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_maybeNotifyDvrsNudge());
+      });
     }
+  }
+
+  /// Notificação local opt-in se o DVRS estiver vencido (1x por dia).
+  Future<void> _maybeNotifyDvrsNudge() async {
+    final settings = _settings.value;
+    if (!settings.dvrsReminderEnabled || !settings.notificationsEnabled) {
+      return;
+    }
+    final storage = context.read<StorageService>();
+    final dvrs = context.read<DvrsStorageService>();
+    final now = DateTime.now();
+    final dayKey = BreakStatsData.dayKey(now);
+    if (storage.loadDvrsNudgeNotifiedDay() == dayKey) return;
+
+    final due = DailyInsightEngine.isDvrsNudgeDue(
+      now: now,
+      enabled: settings.dvrsReminderEnabled,
+      lastDvrsAt: dvrs.getLatestDvrsResult()?.createdAt,
+      snoozedUntil: storage.loadDvrsNudgeSnoozedUntil(),
+      intervalDays: AppDefaults.dvrsReminderDays,
+      totalCompletedBreaks: storage.loadBreakStats().totalCompleted,
+    );
+    if (!due) return;
+
+    final s = _settings.strings;
+    await _notifications.show(s.notifyDvrsNudgeTitle, s.notifyDvrsNudgeBody);
+    await storage.saveDvrsNudgeNotifiedDay(dayKey);
+  }
+
+  Future<void> _snoozeDvrsNudge() async {
+    final storage = context.read<StorageService>();
+    await storage.saveDvrsNudgeSnoozedUntil(
+      DailyInsightEngine.snoozeUntil(DateTime.now()),
+    );
   }
 
   /// Conclui (ou pula) o onboarding: persiste a flag e volta ao estado normal.
@@ -447,6 +494,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_reportOpen &&
       !_dashboardOpen &&
       !_progressOpen &&
+      !_daySummaryOpen &&
       !_onboardingOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
@@ -505,6 +553,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       !_reportOpen &&
       !_dashboardOpen &&
       !_progressOpen &&
+      !_daySummaryOpen &&
       !_onboardingOpen &&
       !_timer.eyeDropsAlert &&
       !_timer.inactivityAlert &&
@@ -541,6 +590,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_reportOpen &&
           !_dashboardOpen &&
           !_progressOpen &&
+          !_daySummaryOpen &&
           !_onboardingOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
@@ -569,6 +619,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
           !_reportOpen &&
           !_dashboardOpen &&
           !_progressOpen &&
+          !_daySummaryOpen &&
           !_onboardingOpen) {
         () async {
           if (!_widgetEnabled) await windowManager.show();
@@ -730,6 +781,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _reportOpen = false;
         _dashboardOpen = false;
         _progressOpen = false;
+        _daySummaryOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -789,6 +841,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         case _WindowLayout.report:
         case _WindowLayout.dashboard:
         case _WindowLayout.progress:
+        case _WindowLayout.daySummary:
           await windowManager.setSize(_panelWindowSize);
           await windowManager.center();
           break;
@@ -989,6 +1042,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -1004,6 +1059,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -1029,6 +1086,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.settings);
   }
@@ -1049,6 +1108,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.dvrs);
   }
@@ -1069,6 +1130,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = true;
       _reportOpen = false;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.dvrs);
   }
@@ -1100,6 +1163,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = true;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.report);
   }
@@ -1121,6 +1186,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _reportOpen = false;
       _dashboardOpen = true;
       _progressOpen = false;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.dashboard);
   }
@@ -1142,6 +1208,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _reportOpen = false;
       _dashboardOpen = false;
       _progressOpen = true;
+      _daySummaryOpen = false;
     });
     _applyLayout(_WindowLayout.progress);
   }
@@ -1149,6 +1216,34 @@ class _HomePageState extends State<HomePage> with TrayListener {
   void _closeProgress() {
     setState(() => _progressOpen = false);
     _restoreAfterPanel();
+  }
+
+  void _openDaySummary() {
+    setState(() {
+      _menuOpen = false;
+      _settingsOpen = false;
+      _aboutOpen = false;
+      _guidanceOpen = false;
+      _updateOpen = false;
+      _dvrsOpen = false;
+      _screenTimeOpen = false;
+      _reportOpen = false;
+      _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = true;
+    });
+    _applyLayout(_WindowLayout.daySummary);
+  }
+
+  void _closeDaySummary() {
+    setState(() => _daySummaryOpen = false);
+    _restoreAfterPanel();
+  }
+
+  /// Fecha o resumo e abre outro destino do hub sem restaurar a bolinha no meio.
+  void _fromDaySummary(VoidCallback open) {
+    setState(() => _daySummaryOpen = false);
+    open();
   }
 
   Future<void> _clearScreenTime() async {
@@ -1168,6 +1263,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _screenTimeOpen = false;
       _reportOpen = false;
       _dashboardOpen = false;
+      _progressOpen = false;
+      _daySummaryOpen = false;
       _updateResult = null;
     });
     await _applyLayout(_WindowLayout.settings);
@@ -1254,6 +1351,20 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = Center(child: DashboardScreen(onClose: _closeDashboard));
     } else if (_progressOpen) {
       body = Center(child: ProgressScreen(onClose: _closeProgress));
+    } else if (_daySummaryOpen) {
+      body = Center(
+        child: DaySummaryScreen(
+          onClose: _closeDaySummary,
+          onStartBreak: () {
+            setState(() => _daySummaryOpen = false);
+            _timer.startBreakNow();
+          },
+          onDvrs: () => _fromDaySummary(_openDvrs),
+          onProgress: () => _fromDaySummary(_openProgress),
+          onDashboard: () => _fromDaySummary(_openDashboard),
+          onSnoozeDvrsNudge: _snoozeDvrsNudge,
+        ),
+      );
     } else if (_settingsOpen) {
       body = _buildSettings();
     } else if (_aboutOpen) {
@@ -1363,6 +1474,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
                 onGuidance: _openGuidance,
+                onDaySummary: _openDaySummary,
                 onDvrs: _openDvrs,
                 onScreenTime: _openScreenTime,
                 onDashboard: _openDashboard,
