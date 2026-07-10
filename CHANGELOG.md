@@ -13,6 +13,13 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - App: UpdateService só HTTPS em hosts GitHub (sem redirects)
 - `SECURITY.md` + `site/.well-known/security.txt`
 
+### Melhorado (UI/UX app — 3×5 quick wins)
+- Tokens: `AppMotion`, `AppRadii` ampliado, cores hover/divider/`textMuted`
+- Tema M3: tooltips, progress, IconButton 44px, paleta semântica DVRS
+- Menu: Semantics, teclado, hover sutil, Resumo do dia destacado
+- Pausa suave e overlay: live region; inatividade com CTA Filled e ícone em chip
+- Resumo do dia / Progresso: headers unificados, CTAs mais altos, loading compacto
+
 ### Landing (`site/`) — rodadas anteriores
 - Badge de versão 1.22.7 e JSON-LD `softwareVersion` alinhado ao pubspec
 - Skip link + `:focus-visible` (a11y)
