@@ -1,6 +1,6 @@
 # Dry Eye Widget — Landing (`site/`)
 
-Landing estática (HTML/CSS/JS, sem bundler) servida em **[olhossecos.com.br/app/](https://olhossecos.com.br/app/)** e espelhada no GitHub Pages do repositório.
+Landing com artefato estático servida em **[olhossecos.com.br/app/](https://olhossecos.com.br/app/)** e espelhada no GitHub Pages do repositório. A página principal continua em HTML/CSS/JS sem bundler; a subpágina Science é pré-renderizada a partir de React/TypeScript.
 
 Alinhada ao app **1.23.0** e ao README raiz do projeto.
 
@@ -8,7 +8,7 @@ Alinhada ao app **1.23.0** e ao README raiz do projeto.
 |---|---|
 | **URL canônica** | `https://olhossecos.com.br/app/` |
 | **Código** | pasta `site/` neste monorepo (`Sudo-psc/dry-eye-widget`) |
-| **Deploy** | workflow `Deploy Pages (site)` em push de `site/**` |
+| **Deploy** | workflow `Deploy Pages (site)` em push de `site/**` ou `web/science/**` |
 | **Produto** | [README do app](../README.md) · [Releases](https://github.com/Sudo-psc/dry-eye-widget/releases) |
 
 ---
@@ -21,6 +21,7 @@ Alinhada ao app **1.23.0** e ao README raiz do projeto.
 - Carrossel de capturas com filtro **Todas / macOS / Windows**
 - FAQ (incl. instalação Gatekeeper/SmartScreen) + schema FAQPage
 - Autoria médica, evidências, blog bilíngue, dark/light, PT/EN
+- Subpágina científica em `/app/science/` com OVPP, livro, mecanismos, monitoramento longitudinal e referências DOI
 
 **Compliance:** linguagem educativa — triagem/prevenção, **sem diagnóstico** nem promessa de cura.
 
@@ -31,6 +32,7 @@ Alinhada ao app **1.23.0** e ao README raiz do projeto.
 ```
 site/
 ├── index.html              # Landing principal
+├── science/                # Build estático e pré-renderizado da página Science
 ├── site.webmanifest        # PWA-lite / ícone
 ├── robots.txt
 ├── sitemap.xml
@@ -48,6 +50,17 @@ site/
 └── README.md               # este arquivo
 ```
 
+Fonte da página Science:
+
+```
+web/science/
+├── src/                    # React + TypeScript + Tailwind + Framer + Lucide
+├── public/                 # favicon + social preview 1200×630
+├── scripts/prerender.mjs   # SSR -> HTML estático em site/science/
+├── package.json
+└── vite.config.ts
+```
+
 ---
 
 ## Verificar localmente
@@ -55,6 +68,8 @@ site/
 Na raiz do repositório:
 
 ```bash
+npm ci --prefix web/science
+npm run build --prefix web/science
 node site/scripts/smoke-check.mjs
 ```
 
@@ -64,6 +79,7 @@ O smoke confere, entre outros:
 - canonical `olhossecos.com.br/app/`
 - versão `pubspec` = badge `#app-version` = JSON-LD `softwareVersion`
 - assets críticos (ícone, OG, doctor, shots Windows, manifest)
+- prerender Science, MedicalWebPage, DOI mínimo, assets relativos, social preview e orçamento JS
 - `robots.txt` e link do manifest
 
 Preview estático (qualquer servidor local na pasta `site/`):
@@ -87,8 +103,8 @@ Resumo recente: [`docs/lighthouse/LATEST.md`](../docs/lighthouse/LATEST.md).
 
 ## Deploy
 
-1. Commit em `main` alterando `site/**` (ou o workflow Pages).  
-2. GitHub Actions: **Deploy Pages (site)** → smoke + `upload-pages-artifact` + deploy.  
+1. Commit em `main` alterando `site/**`, `web/science/**` ou o workflow Pages.
+2. GitHub Actions: **Deploy Pages (site)** → build Science + smoke + `upload-pages-artifact` + deploy.
 3. Produção canônica: reverse-proxy / host apontando `olhossecos.com.br/app/` para o artefato publicado (ou espelho do Pages).
 
 Não use mais o fluxo antigo de repositório separado `dry-eye-widget-landing` como fonte da verdade — a landing vive **neste** repo.
@@ -104,6 +120,7 @@ Não use mais o fluxo antigo de repositório separado `dry-eye-widget-landing` c
 - **CSP** + `referrer-policy` no `<head>`; links externos `noopener noreferrer`  
 - Animações em `transform`/`opacity`, `prefers-reduced-motion`  
 - Canonical, hreflang, Open Graph, JSON-LD, skip link, manifest  
+- Science: HTML pré-renderizado, CSS Tailwind inline, hidratação React/Framer no idle e Lighthouse local 100/100/100/100
 
 
 ---

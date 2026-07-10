@@ -1,4 +1,4 @@
-# Atualizações automáticas de Actions e dependências Dart/Flutter.
+# Atualizações automáticas de Actions, Dart/Flutter e da página Science.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -20,3 +20,13 @@ updates:
     labels:
       - dependencies
       - flutter
+
+  - package-ecosystem: npm
+    directory: "/web/science"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - site

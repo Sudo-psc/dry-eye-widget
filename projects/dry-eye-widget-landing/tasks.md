@@ -18,6 +18,11 @@
 - [x] Add menu and tray access to the Health dashboard.
 - [x] Add widget tests for Health dashboard permission/data states.
 - [x] Fix widget positioning bug: random position jumps when switching layouts (menu, blink reminder, ball).
+- [x] Create the premium scientific foundation page at `/app/science/`.
+- [x] Add React/TypeScript/Tailwind/Framer/Lucide source with static prerender output.
+- [x] Integrate Science into main navigation, SEO, sitemap, CI and Pages deployment.
+- [x] Validate scientific claims and expose at least 10 DOI-linked references.
+- [x] Verify responsive light/dark UI and Lighthouse scores of at least 95.
 
 ## next
 
@@ -25,10 +30,11 @@
 - [ ] Add a manual QA script for signed HealthKit states: unavailable, denied, authorized and no samples.
 - [ ] Expand the dashboard with local app metrics beyond HealthKit.
 - [x] Capture or replace carousel with real app screenshots when available.
-- [ ] Add Windows-specific installer/tray screenshots when available.
+- [x] Add Windows-specific installer/tray screenshots when available.
 - [ ] Run production-like Lighthouse after deployment.
+- [ ] Verify `/app/science/` on the production custom domain after Pages deploy.
 - [ ] Prepare VPS deploy notes.
-- [ ] Decide whether landing should live in this repo or a separate GitHub repo.
+- [x] Decide that the landing remains in this repository under `site/`.
 
 ## blocked
 
@@ -43,6 +49,8 @@
 - [x] Add CI coverage for the static site smoke check.
 - [x] 2026-07-10: five landing quick-win cycles (version badge, a11y, features, FAQ, sitemap/smoke version sync).
 - [x] 2026-07-10: five workflow/roadmap cycles (ci.yml, dependabot, scheduled smoke, issue template, ROADMAP.md).
+- [x] Add Science-specific smoke checks for prerendering, MedicalWebPage, DOI count, relative assets, social preview and bundle budget.
+- Add an annual scientific-reference freshness review for TFOS/AAO updates.
 - Add signed-runtime QA evidence for HealthKit permission states: unavailable, denied, authorized and no samples.
 - Track Flutter macOS Swift Package Manager warnings for `screen_retriever_macos`, `tray_manager`, and `local_notifier`.
 - Add real app screenshots from macOS and Windows release runs.

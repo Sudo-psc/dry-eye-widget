@@ -2,7 +2,17 @@
 
 Updated: 2026-07-10
 
-Current phase: ROADMAP Now items 4–5 done — Windows screenshots on landing + Lighthouse production baseline.
+Current phase: Science subpage implemented and locally verified.
+
+Science page (2026-07-10):
+
+- Canonical route: `/app/science/`; navigation added to the main landing header and footer.
+- React + TypeScript + Tailwind CSS + Framer Motion + Lucide source in `web/science/`.
+- Static prerender output in `site/science/`; CI and Pages rebuild it before smoke/deploy.
+- TFOS DEWS III, AAO PPP and ten additional DOI-linked references.
+- OVPP and related-book positioning with explicit current-versus-future boundaries.
+- MedicalWebPage JSON-LD, Open Graph and 1200×630 science social preview.
+- Local Lighthouse mobile and desktop: 100/100/100/100.
 
 Roadmap 4–5 (2026-07-10):
 
@@ -28,7 +38,7 @@ Landing cycles round 1 (2026-07-10):
 - FAQ + schema for DVRS and v1.22 news
 - Sitemap lastmod + smoke-check version sync with pubspec
 
-Previous phase note: HealthKit dashboard branch in progress for macOS-only native integration.
+Previous phase note: the macOS-only HealthKit integration is implemented; signed runtime validation remains pending.
 
 Completed:
 
@@ -48,6 +58,7 @@ Completed:
 - Optional HealthKit permission flow added to the app panel.
 - Health dashboard added to the floating menu and system tray/menu bar.
 - Fixed widget positioning bug: `_ballPosition` now syncs with saved storage on startup, `_nudgeIntoScreen` updates the cached position, and `blinkReminder` layout caches position before applying.
+- Scientific foundation page completed with responsive light/dark design, accessible flow diagrams and evidence-safe copy.
 
 In progress:
 
@@ -56,7 +67,7 @@ In progress:
 
 Risks:
 
-- Windows-specific screenshots are still useful for final launch polish.
+- Production Lighthouse for `/app/science/` should be re-run after deployment to verify hosting headers and compression.
 - Production deployment and DNS require external credentials if moving away from GitHub Pages.
 - Signed macOS release build now requires a development/distribution certificate with HealthKit entitlement.
 - Runtime HealthKit availability still needs validation on a signed Mac build with user permission granted.

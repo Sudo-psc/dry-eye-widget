@@ -6,6 +6,15 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado — Science page (2026-07-10)
+- Nova subpágina científica em `site/science/`, acessível pelo header e rodapé da landing.
+- Fonte modular React + TypeScript + Tailwind CSS + Framer Motion + Lucide em `web/science/`.
+- Pré-renderização HTML para SEO, dark/light mode, fluxogramas acessíveis e social preview 1200×630.
+- Seções sobre fisiologia do filme lacrimal, trabalho digital, monitoramento longitudinal, OVPP, livro e visão de pesquisa.
+- Doze referências rastreáveis com DOI, incluindo TFOS DEWS III e AAO Preferred Practice Pattern.
+- Schema.org `MedicalWebPage`, Open Graph, sitemap e guardrails científicos sem promessa diagnóstica ou terapêutica.
+- Build da Science integrado ao CI e ao deploy do GitHub Pages.
+
 ### Melhorado (quick wins 2026-07-10)
 - Landing: CSP, referrer-policy, Permissions-Policy, color-scheme, cookies Secure
 - Landing: fontes reduzidas; vídeo lazy; `<main>` + skip-link; sem AggregateRating fictício

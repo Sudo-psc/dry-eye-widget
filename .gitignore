@@ -32,6 +32,10 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+**/node_modules/
+**/.vite/
+web/science/.ssr/
+*.tsbuildinfo
 
 # Symbolication related
 app.*.symbols

@@ -77,6 +77,9 @@ const sitemap = read(join(root, "sitemap.xml"));
 if (/\/app\/(?:pt|en)(?:\/|<)/.test(sitemap)) {
   fail("site/sitemap.xml must not publish /app/pt or /app/en as official landing routes.");
 }
+if (!sitemap.includes("https://olhossecos.com.br/app/science/")) {
+  fail("site/sitemap.xml must publish the canonical /app/science/ route.");
+}
 
 const activeContractFiles = [
   ".agent/operating-summary.md",
@@ -127,6 +130,8 @@ const requiredAssets = [
   "assets/shots/windows-settings.jpg",
   "assets/shots/windows-dashboard.jpg",
   "assets/shots/windows-store-poster.jpg",
+  "science/index.html",
+  "science/og-science.png",
 ];
 for (const rel of requiredAssets) {
   if (!existsSync(join(root, rel))) {
@@ -188,6 +193,69 @@ if (!indexHtml.includes('id="main"') || !indexHtml.includes('href="#main"')) {
 }
 if (/aggregateRating/i.test(indexHtml)) {
   fail("Do not publish AggregateRating without a verified review corpus.");
+}
+if (!indexHtml.includes('href="science/"') || !indexHtml.includes('data-i18n="nav.science"')) {
+  fail("site/index.html must expose the Science page in the primary navigation.");
+}
+
+// Science page: prerendered semantic content, medical SEO and portable assets.
+const scienceHtml = read(join(root, "science", "index.html"));
+if (!scienceHtml.includes('<h1 id="hero-title">The Science Behind')) {
+  fail("site/science/index.html must contain prerendered hero content, not an empty React root.");
+}
+if (!scienceHtml.includes('rel="canonical" href="https://olhossecos.com.br/app/science/"')) {
+  fail("Science page must keep /app/science/ as its canonical URL.");
+}
+if (!scienceHtml.includes('"@type": "MedicalWebPage"')) {
+  fail("Science page must declare MedicalWebPage structured data.");
+}
+const scienceLdMatch = scienceHtml.match(
+  /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+);
+if (!scienceLdMatch) {
+  fail("Science page is missing JSON-LD content.");
+} else {
+  try {
+    JSON.parse(scienceLdMatch[1]);
+  } catch (error) {
+    fail(`Science JSON-LD is invalid: ${error.message}`);
+  }
+}
+for (const marker of ["og:title", "og:description", "og:image", 'name="keywords"']) {
+  if (!scienceHtml.includes(marker)) fail(`Science SEO is missing ${marker}.`);
+}
+if (!scienceHtml.includes("TFOS DEWS III") || !scienceHtml.includes("AAO PPP")) {
+  fail("Science page must retain current TFOS DEWS III and AAO guideline references.");
+}
+const doiLinks = [...scienceHtml.matchAll(/href="https:\/\/doi\.org\//g)].length;
+if (doiLinks < 10) {
+  fail(`Science page must expose at least 10 DOI links; found ${doiLinks}.`);
+}
+if (scienceHtml.includes('src="/assets/') || scienceHtml.includes('href="/assets/')) {
+  fail("Science prerender must use portable relative asset URLs, not root-absolute /assets paths.");
+}
+if (/\b(?:diagnoses|prevents|treats) dry eye\b/i.test(scienceHtml)) {
+  fail("Science page contains an unqualified diagnosis/prevention/treatment claim.");
+}
+const scienceBlank = [...scienceHtml.matchAll(/target="_blank"/g)].length;
+const scienceSafeBlank = [...scienceHtml.matchAll(/rel="noopener noreferrer"/g)].length;
+if (scienceSafeBlank < scienceBlank) {
+  fail("Science page external new-tab links must use noopener noreferrer.");
+}
+
+const scienceScripts = walk(join(root, "science", "assets"), (p) => p.endsWith(".js"));
+for (const path of scienceScripts) {
+  if (statSync(path).size > 400_000) {
+    fail(`Science JavaScript bundle exceeds 400 KB performance budget: ${relative(root, path)}.`);
+  }
+}
+const socialPng = readFileSync(join(root, "science", "og-science.png"));
+if (
+  socialPng.toString("ascii", 1, 4) !== "PNG" ||
+  socialPng.readUInt32BE(16) !== 1200 ||
+  socialPng.readUInt32BE(20) !== 630
+) {
+  fail("Science social preview must be a 1200x630 PNG.");
 }
 
 // Blog: links externos com target=_blank precisam de noreferrer (tabnabbing).

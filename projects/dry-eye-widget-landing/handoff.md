@@ -2,9 +2,13 @@
 
 ## Current State
 
-The official landing page lives in `site/` and is deployed as the single `/app/` route. Priority review fixes were applied and verified on 2026-06-19.
+The official landing output lives in `site/`. The main product page remains `/app/`; the new scientific foundation is published at `/app/science/` and is linked from the main header and footer.
 
-The active branch is `codex/healthkit-dashboard`. The macOS-only HealthKit foundation is now implemented: dashboard data model, Dart service, native Swift method channel, permission request, daily sleep import, daily average heart-rate import, Info.plist privacy text and HealthKit entitlement.
+Science source lives in `web/science/` and uses React, TypeScript, Tailwind CSS, Framer Motion and Lucide. `npm run build --prefix web/science` type-checks, builds and prerenders the page into `site/science/`. The Pages and CI workflows run that build before the site smoke test.
+
+The Science page covers dry-eye relevance, tear-film physiology, longitudinal monitoring, app principles, OVPP, selected scientific references, the related book and the research roadmap. It distinguishes available capabilities from future research directions and does not claim diagnosis, prevention or treatment.
+
+The current branch is `main`. The macOS-only HealthKit foundation remains implemented: dashboard data model, Dart service, native Swift method channel, permission request, daily sleep import, daily average heart-rate import, Info.plist privacy text and HealthKit entitlement.
 
 The Health dashboard UI is connected to `HealthKitDashboardService`. It is available from the floating menu and the system tray/menu bar, requests optional HealthKit permission, and renders the last 7 days of sleep and average heart-rate values with explicit missing-data states.
 
@@ -12,12 +16,11 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 
 ## Next Actions
 
-1. Validate a signed macOS build with HealthKit entitlement enabled.
-2. Capture runtime QA for HealthKit states: unavailable, denied, authorized, no samples and samples available.
-3. Expand the dashboard with local app metrics beyond HealthKit.
-4. Add Windows-specific installer/tray screenshots when available.
-5. Decide whether the landing stays in this repo or moves to a separate GitHub repository.
-6. Run production PageSpeed and fix any production-only issues.
+1. Deploy and verify `/app/science/` on the custom domain.
+2. Re-run production Lighthouse and confirm canonical/OG rendering.
+3. Add a recurring scientific-reference freshness review.
+4. Validate a signed macOS build with HealthKit entitlement enabled.
+5. Capture runtime QA for HealthKit states: unavailable, denied, authorized, no samples and samples available.
 
 ## Blockers
 
@@ -33,3 +36,8 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 - `flutter build macos --release`: blocked locally by signing requirement after enabling HealthKit entitlement.
 - `flutter analyze`: passed on 2026-06-21.
 - `flutter test`: passed on 2026-06-21.
+- `npm run build --prefix web/science`: passed on 2026-07-10.
+- `node site/scripts/smoke-check.mjs`: passed on 2026-07-10.
+- Local Lighthouse Science mobile: 100 performance / 100 accessibility / 100 best practices / 100 SEO.
+- Local Lighthouse Science desktop: 100 performance / 100 accessibility / 100 best practices / 100 SEO.
+- Browser QA: responsive desktop/mobile, dark-mode toggle, 12 DOI links and lazy book-cover loading passed.

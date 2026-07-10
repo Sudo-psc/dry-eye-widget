@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - "site/**"
+      - "web/science/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -30,6 +31,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/science/package-lock.json
+
+      - name: Gerar página Science
+        run: npm ci --prefix web/science && npm run build --prefix web/science
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5

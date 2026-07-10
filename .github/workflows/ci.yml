@@ -37,10 +37,20 @@ jobs:
         run: flutter test --reporter expanded
 
   site:
-    name: Landing smoke
+    name: Landing build & smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/science/package-lock.json
+
+      - name: Gerar página Science
+        run: npm ci --prefix web/science && npm run build --prefix web/science
 
       - name: Smoke test da landing
         run: node site/scripts/smoke-check.mjs

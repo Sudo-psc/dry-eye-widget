@@ -4,6 +4,7 @@ site:
   - changed-files:
       - any-glob-to-any-file:
           - "site/**"
+          - "web/science/**"
 
 flutter:
   - changed-files:

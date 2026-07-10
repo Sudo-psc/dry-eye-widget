@@ -29,3 +29,11 @@
 1. Expand blog with authored articles.
 2. Add article schema and medical disclaimers.
 3. Add release notes and FAQ pages.
+
+## Milestone 5 - Scientific Ecosystem
+
+1. [x] Add a dedicated `/app/science/` scientific foundation page.
+2. [x] Connect Dry Eye Widget, OVPP and the related book without overclaiming current capability.
+3. [x] Add current consensus, clinical guideline and primary-study references with DOI provenance.
+4. [x] Integrate build, prerender, SEO, smoke checks and Lighthouse budgets.
+5. [ ] Validate production delivery and establish an annual evidence-freshness review.
