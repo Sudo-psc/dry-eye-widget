@@ -60,3 +60,8 @@ inpi/
 AGENTS.md
 .agent
 Revisões semanais/
+.superpowers/
+
+# Lighthouse HTML reports (large; keep summary+JSON)
+docs/lighthouse/*.html
+docs/lighthouse/*.report.json

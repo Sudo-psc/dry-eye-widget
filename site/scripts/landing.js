@@ -76,26 +76,64 @@
       if (!reduced) setInterval(tick, 1000);
     }
 
-    /* ---------- Carousel ---------- */
+    /* ---------- Carousel + platform filter ---------- */
     const track = document.getElementById("shots-track");
     if (track) {
-      const slides = Array.from(track.children);
       const dotsBox = document.getElementById("shots-dots");
-      const dots = slides.map(function (_, i) {
-        const d = document.createElement("button");
-        d.type = "button";
-        d.setAttribute("aria-label", "Slide " + (i + 1));
-        d.addEventListener("click", function () { goTo(i); });
-        dotsBox.appendChild(d);
-        return d;
-      });
       let cur = 0;
+      let platform = "all";
+
+      function visibleSlides() {
+        return Array.from(track.children).filter(function (s) {
+          if (s.hidden) return false;
+          if (platform === "all") return true;
+          return s.getAttribute("data-platform") === platform;
+        });
+      }
+
+      function rebuildDots() {
+        if (!dotsBox) return;
+        dotsBox.innerHTML = "";
+        visibleSlides().forEach(function (_, i) {
+          const d = document.createElement("button");
+          d.type = "button";
+          d.setAttribute("aria-label", "Slide " + (i + 1));
+          d.addEventListener("click", function () { goTo(i); });
+          dotsBox.appendChild(d);
+        });
+        syncDots();
+      }
+
+      function applyPlatform(next) {
+        platform = next;
+        Array.from(track.children).forEach(function (s) {
+          const p = s.getAttribute("data-platform") || "macos";
+          s.hidden = platform !== "all" && p !== platform;
+        });
+        const plat = document.getElementById("shots-platform");
+        if (plat) {
+          plat.querySelectorAll("button[data-platform]").forEach(function (btn) {
+            btn.setAttribute("aria-pressed", String(btn.getAttribute("data-platform") === platform));
+          });
+        }
+        rebuildDots();
+        goTo(0);
+      }
+
       function goTo(i) {
+        const slides = visibleSlides();
+        if (!slides.length) return;
         cur = Math.max(0, Math.min(slides.length - 1, i));
         const s = slides[cur];
         track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.clientWidth) / 2, behavior: "smooth" });
+        syncDots();
       }
+
       function syncDots() {
+        if (!dotsBox) return;
+        const slides = visibleSlides();
+        const dots = Array.from(dotsBox.children);
+        if (!slides.length) return;
         const center = track.scrollLeft + track.clientWidth / 2;
         let best = 0, bestD = Infinity;
         slides.forEach(function (s, i) {
@@ -105,10 +143,22 @@
         cur = best;
         dots.forEach(function (d, i) { d.setAttribute("aria-current", String(i === cur)); });
       }
+
       track.addEventListener("scroll", function () { requestAnimationFrame(syncDots); }, { passive: true });
-      document.getElementById("shots-prev").addEventListener("click", function () { goTo(cur - 1); });
-      document.getElementById("shots-next").addEventListener("click", function () { goTo(cur + 1); });
-      syncDots();
+      const prev = document.getElementById("shots-prev");
+      const next = document.getElementById("shots-next");
+      if (prev) prev.addEventListener("click", function () { goTo(cur - 1); });
+      if (next) next.addEventListener("click", function () { goTo(cur + 1); });
+
+      const plat = document.getElementById("shots-platform");
+      if (plat) {
+        plat.addEventListener("click", function (e) {
+          const btn = e.target.closest("button[data-platform]");
+          if (!btn) return;
+          applyPlatform(btn.getAttribute("data-platform"));
+        });
+      }
+      rebuildDots();
     }
 
     /* ---------- Reveal on scroll ----------

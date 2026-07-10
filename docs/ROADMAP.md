@@ -19,8 +19,13 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 | 1 | Assinatura de código macOS/Windows (Gatekeeper/SmartScreen) | Distribuição | Alto | Grande |
 | 2 | QA manual Windows: docking meia-lua + micronotificação | App | Alto | Médio |
 | 3 | Validação HealthKit em build assinado | App | Médio | Médio |
-| 4 | Screenshots Windows na landing | Site | Médio | Quick win |
-| 5 | Lighthouse produção pós-deploy | Site | Médio | Quick win |
+
+### Concluído recentemente (Now)
+
+| # | Item | Evidência |
+|---|------|-----------|
+| 4 | Screenshots Windows na landing | Filtro macOS/Windows + 5 slides Win em `site/assets/shots/windows-*.jpg` |
+| 5 | Lighthouse produção pós-deploy | `docs/lighthouse/LATEST.md` — mobile Perf 93 / a11y 90 / BP 100 / SEO 100 |
 
 ## Next (1–2 meses)
 

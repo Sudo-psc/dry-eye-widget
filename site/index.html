@@ -530,7 +530,12 @@ document.documentElement.setAttribute("data-theme",t);})();
     <div class="section-head reveal">
       <span class="kicker" data-i18n="shots.kicker">O app em funcionamento</span>
       <h2 data-i18n="shots.title">Discreto até o momento certo</h2>
-      <p data-i18n="shots.sub">Telas do widget no macOS e Windows — interface em vidro translúcido que acompanha, avisa e some.</p>
+      <p data-i18n="shots.sub">Telas reais do widget — a mesma UI Flutter no macOS e no Windows, com capturas dedicadas por plataforma.</p>
+      <div class="platform-switch" role="group" aria-label="Plataforma das capturas" id="shots-platform">
+        <button type="button" data-platform="all" aria-pressed="true" data-i18n="shots.plat.all">Todas</button>
+        <button type="button" data-platform="macos" aria-pressed="false" data-i18n="shots.plat.mac">macOS</button>
+        <button type="button" data-platform="windows" aria-pressed="false" data-i18n="shots.plat.win">Windows</button>
+      </div>
     </div>
     <div class="carousel reveal">
       <button class="carousel-nav prev" id="shots-prev" type="button" aria-label="Anterior">
@@ -541,50 +546,86 @@ document.documentElement.setAttribute("data-theme",t);})();
       </button>
       <div class="carousel-track" id="shots-track">
 
-        <figure class="shot">
-          <div class="shot-frame"><img src="assets/shots/ball-menu.jpg" alt="Bolinha flutuante com menu de controles agrupado por cores" loading="lazy"></div>
+        <figure class="shot" data-platform="macos">
+          <div class="shot-frame"><img src="assets/shots/ball-menu.jpg" alt="Bolinha flutuante com menu de controles no macOS" loading="lazy" width="760" height="1640"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.1.t">Bolinha + menu flutuante</strong>
             <span data-i18n="shot.1.s">O anel de progresso mostra o ciclo; um clique abre o menu de controles.</span>
           </figcaption>
         </figure>
 
-        <figure class="shot">
-          <div class="shot-frame"><img class="wide" src="assets/shots/break-card.jpg" alt="Aviso de pausa com anel de progresso e cronômetro" loading="lazy"></div>
+        <figure class="shot" data-platform="macos">
+          <div class="shot-frame"><img class="wide" src="assets/shots/break-card.jpg" alt="Aviso de pausa com anel de progresso e cronômetro no macOS" loading="lazy" width="1040" height="480"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.2.t">Aviso gentil</strong>
             <span data-i18n="shot.2.s">Notificação suave no canto da tela — sem bloquear, sem alarmismo.</span>
           </figcaption>
         </figure>
 
-        <figure class="shot">
-          <div class="shot-frame"><img src="assets/shots/settings.png" alt="Janela de configurações do widget" loading="lazy"></div>
+        <figure class="shot" data-platform="macos">
+          <div class="shot-frame"><img src="assets/shots/settings.png" alt="Janela de configurações do widget no macOS" loading="lazy" width="557" height="900"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.3.t">Configurações</strong>
             <span data-i18n="shot.3.s">Idioma, ciclos, tamanho e cores da bolinha — tudo ajustável.</span>
           </figcaption>
         </figure>
 
-        <figure class="shot">
-          <div class="shot-frame"><img src="assets/shots/guidance.png" alt="Orientações de saúde ocular digital" loading="lazy"></div>
+        <figure class="shot" data-platform="macos">
+          <div class="shot-frame"><img src="assets/shots/guidance.png" alt="Orientações de saúde ocular digital no macOS" loading="lazy" width="639" height="900"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.4.t">Orientações clínicas</strong>
             <span data-i18n="shot.4.s">Conteúdo educativo sobre saúde ocular digital, dentro do app.</span>
           </figcaption>
         </figure>
 
-        <figure class="shot">
-          <div class="shot-frame"><img src="assets/shots/dvrs.jpg" alt="Resultado do DVRS com medidor de score e domínios" loading="lazy"></div>
+        <figure class="shot" data-platform="macos">
+          <div class="shot-frame"><img src="assets/shots/dvrs.jpg" alt="Resultado do DVRS com medidor de score e domínios no macOS" loading="lazy" width="1440" height="1720"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.5.t">DVRS — Risco Visual Digital</strong>
             <span data-i18n="shot.5.s">Acompanhe os sintomas de olho seco ao longo do tempo, com histórico.</span>
           </figcaption>
         </figure>
-        <figure class="shot glass reveal">
-          <div class="shot-frame"><img src="assets/shots/dashboard.jpg" alt="Painel com adesão às pausas, tempo de tela e DVRS" loading="lazy"></div>
-          <figcaption>
+        <figure class="shot" data-platform="macos">
+          <div class="shot-frame"><img src="assets/shots/dashboard.jpg" alt="Painel com adesão às pausas, tempo de tela e DVRS no macOS" loading="lazy" width="1440" height="1300"></div>
+          <figcaption class="shot-caption">
             <strong data-i18n="shot.6.t">Painel de acompanhamento</strong>
             <span data-i18n="shot.6.s">Adesão às pausas, tempo de tela e seu DVRS — tudo em um só lugar.</span>
+          </figcaption>
+        </figure>
+
+        <figure class="shot" data-platform="windows">
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-ball-menu.jpg" alt="Widget e menu flutuante no desktop Windows" loading="lazy" width="1280" height="800"></div>
+          <figcaption class="shot-caption">
+            <strong data-i18n="shot.w1.t">Windows — bolinha + menu</strong>
+            <span data-i18n="shot.w1.s">Mesma UI Flutter do app, enquadrada no desktop Windows 10/11.</span>
+          </figcaption>
+        </figure>
+        <figure class="shot" data-platform="windows">
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-break-card.jpg" alt="Aviso de pausa do widget no desktop Windows" loading="lazy" width="1280" height="800"></div>
+          <figcaption class="shot-caption">
+            <strong data-i18n="shot.w2.t">Windows — aviso de pausa</strong>
+            <span data-i18n="shot.w2.s">Micronotificação de pausa sobre o desktop Windows, sem bloquear o fluxo.</span>
+          </figcaption>
+        </figure>
+        <figure class="shot" data-platform="windows">
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-settings.jpg" alt="Configurações do widget em janela no Windows" loading="lazy" width="1280" height="800"></div>
+          <figcaption class="shot-caption">
+            <strong data-i18n="shot.w3.t">Windows — configurações</strong>
+            <span data-i18n="shot.w3.s">Janela de preferências com chrome de janela Windows.</span>
+          </figcaption>
+        </figure>
+        <figure class="shot" data-platform="windows">
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-dashboard.jpg" alt="Painel de acompanhamento no Windows" loading="lazy" width="1280" height="800"></div>
+          <figcaption class="shot-caption">
+            <strong data-i18n="shot.w4.t">Windows — painel</strong>
+            <span data-i18n="shot.w4.s">Adesão, tempo de tela e DVRS no desktop Windows.</span>
+          </figcaption>
+        </figure>
+        <figure class="shot" data-platform="windows">
+          <div class="shot-frame"><img src="assets/shots/windows-store-poster.jpg" alt="Arte da Microsoft Store do Dry Eye Widget para Windows" loading="lazy" width="1000" height="1280"></div>
+          <figcaption class="shot-caption">
+            <strong data-i18n="shot.w5.t">Microsoft Store</strong>
+            <span data-i18n="shot.w5.s">Disponível na Microsoft Store para Windows 10 e 11.</span>
           </figcaption>
         </figure>
 

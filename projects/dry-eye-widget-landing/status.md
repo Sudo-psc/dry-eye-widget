@@ -2,7 +2,15 @@
 
 Updated: 2026-07-10
 
-Current phase: Landing round 2 (manifest, SEO, what's-new, FAQ install, smoke assets) + GitHub automation round 2 (PR template, labeler, stale, changelog guard, CI summary).
+Current phase: ROADMAP Now items 4–5 done — Windows screenshots on landing + Lighthouse production baseline.
+
+Roadmap 4–5 (2026-07-10):
+
+- Platform filter (All / macOS / Windows) on #capturas
+- Five Windows slides (UI composites + store poster)
+- Lighthouse script + docs/lighthouse/LATEST.md (Pages: mobile 93/90/100/100)
+
+Previous phase: Landing round 2 (manifest, SEO, what's-new, FAQ install, smoke assets) + GitHub automation round 2.
 
 Landing cycles round 2 (2026-07-10):
 

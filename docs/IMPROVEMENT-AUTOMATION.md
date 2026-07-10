@@ -30,9 +30,21 @@ Este documento descreve o que roda sozinho no GitHub e como alimentar o roadmap.
 3. Se for landing: rode `node site/scripts/smoke-check.mjs` antes do push.
 4. Se for app: `flutter analyze` + `flutter test`.
 
+## Lighthouse em produção
+
+```bash
+# GitHub Pages (deploy do site/)
+node site/scripts/lighthouse-prod.mjs https://sudo-psc.github.io/dry-eye-widget/
+
+# Domínio canônico (quando o reverse-proxy estiver no artefato mais recente)
+node site/scripts/lighthouse-prod.mjs https://olhossecos.com.br/app/
+```
+
+Saída em `docs/lighthouse/` (`LATEST.md` + JSON/HTML datados).
+
 ## Próximas automações (candidatas)
 
 - Code signing macOS/Windows no pipeline de release
-- Lighthouse CI pós-deploy (Pages)
-- Screenshot Windows na landing via job dedicado
+- Lighthouse CI agendado (reusa `lighthouse-prod.mjs`)
+- Capturas nativas Windows em runner Windows (substituir composite)
 - SBOM / dependency review em PRs de Dependabot

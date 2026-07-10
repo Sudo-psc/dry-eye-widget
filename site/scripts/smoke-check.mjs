@@ -121,11 +121,20 @@ const requiredAssets = [
   "assets/icon-256.png",
   "assets/og-hero.jpg",
   "assets/doctor.png",
+  "assets/shots/windows-ball-menu.jpg",
+  "assets/shots/windows-break-card.jpg",
+  "assets/shots/windows-settings.jpg",
+  "assets/shots/windows-dashboard.jpg",
+  "assets/shots/windows-store-poster.jpg",
 ];
 for (const rel of requiredAssets) {
   if (!existsSync(join(root, rel))) {
     fail(`Missing required site asset: ${rel}`);
   }
+}
+
+if (!indexHtml.includes('id="shots-platform"') || !indexHtml.includes('data-platform="windows"')) {
+  fail("site/index.html must expose Windows screenshot slides and platform filter.");
 }
 
 const manifest = read(join(root, "site.webmanifest"));

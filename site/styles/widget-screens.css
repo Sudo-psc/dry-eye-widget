@@ -5,6 +5,36 @@
    ============================================================ */
 
 /* ---------- Carousel shell ---------- */
+/* Filtro macOS / Windows nas capturas */
+.platform-switch {
+  display: inline-flex;
+  gap: 6px;
+  margin: 14px auto 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-2, color-mix(in oklab, var(--text-1) 6%, transparent));
+  border: 1px solid var(--line);
+}
+.platform-switch button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font: 600 13px/1.2 var(--font-ui, inherit);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.platform-switch button[aria-pressed="true"] {
+  background: var(--accent, #4A90E2);
+  color: #fff;
+}
+.platform-switch button:hover:not([aria-pressed="true"]) {
+  color: var(--text-1);
+}
+.shot[hidden] { display: none !important; }
+
 .carousel { position: relative; }
 .carousel-track {
   display: flex; gap: 20px; overflow-x: auto;
