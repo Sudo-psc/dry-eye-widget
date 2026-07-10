@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
+import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../liquid_glass.dart';
@@ -88,7 +89,13 @@ class _DvrsScreenState extends State<DvrsScreen> {
     await storage.saveDvrsResult(result);
     if (!mounted) return;
     setState(() => _saved = true);
-    messenger.showSnackBar(const SnackBar(content: Text('Resultado salvo.')));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          context.read<SettingsProvider>().strings.dvrsResultSavedSnack,
+        ),
+      ),
+    );
   }
 
   Future<void> _exportPdf() async {
@@ -170,7 +177,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
         IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: _onHeaderBack,
-          tooltip: 'Voltar',
+          tooltip: context.read<SettingsProvider>().strings.back,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -229,7 +236,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
         child: FilledButton.icon(
           onPressed: _start,
           icon: const Icon(Icons.play_arrow),
-          label: const Text('Iniciar DVRS'),
+          label: Text(context.read<SettingsProvider>().strings.dvrsStart),
           style: FilledButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -243,7 +250,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
         child: OutlinedButton.icon(
           onPressed: () => setState(() => _view = _DvrsView.history),
           icon: const Icon(Icons.history, size: 18),
-          label: const Text('Ver histórico'),
+          label: Text(context.read<SettingsProvider>().strings.dvrsViewHistory),
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -471,7 +478,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           child: OutlinedButton.icon(
             onPressed: () => setState(() => _view = _DvrsView.intro),
             icon: const Icon(Icons.arrow_back, size: 18),
-            label: const Text('Voltar'),
+            label: Text(context.read<SettingsProvider>().strings.back),
           ),
         ),
         const SizedBox(width: 12),
@@ -479,7 +486,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           child: FilledButton.icon(
             onPressed: canCalculate ? _calculate : null,
             icon: const Icon(Icons.calculate_outlined, size: 18),
-            label: const Text('Calcular resultado'),
+            label: Text(context.read<SettingsProvider>().strings.dvrsCalculate),
           ),
         ),
       ],
@@ -508,7 +515,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
                 key: ValueKey(_saved),
               ),
             ),
-            label: Text(_saved ? 'Salvo' : 'Salvar resultado'),
+            label: Text(_saved ? context.read<SettingsProvider>().strings.dvrsSaved : context.read<SettingsProvider>().strings.dvrsSaveResult),
             style: FilledButton.styleFrom(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -522,7 +529,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           child: OutlinedButton.icon(
             onPressed: () => setState(() => _view = _DvrsView.history),
             icon: const Icon(Icons.history, size: 18),
-            label: const Text('Ver histórico'),
+            label: Text(context.read<SettingsProvider>().strings.dvrsViewHistory),
           ),
         ),
         if (widget.onExportPdf != null) ...[
@@ -532,7 +539,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
             child: OutlinedButton.icon(
               onPressed: _exportPdf,
               icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-              label: const Text('Exportar no PDF'),
+              label: Text(context.read<SettingsProvider>().strings.dvrsExportPdf),
             ),
           ),
         ],
@@ -542,7 +549,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           child: OutlinedButton.icon(
             onPressed: _restart,
             icon: const Icon(Icons.refresh, size: 18),
-            label: const Text('Refazer'),
+            label: Text(context.read<SettingsProvider>().strings.dvrsRedo),
           ),
         ),
         const SizedBox(height: 8),
@@ -550,7 +557,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           height: 44,
           child: TextButton(
             onPressed: widget.onClose,
-            child: const Text('Refazer depois'),
+            child: Text(context.read<SettingsProvider>().strings.dvrsRedoLater),
           ),
         ),
       ],

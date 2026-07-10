@@ -118,7 +118,7 @@ class _ReportDialogState extends State<ReportDialog> {
       final file = await _pdfService.savePdfToDevice(bytes, _fileName());
       if (mounted) setState(() => _lastSavedFile = file);
       messenger.showSnackBar(
-        SnackBar(content: Text('PDF salvo em: ${file.path}')),
+        SnackBar(content: Text(context.read<SettingsProvider>().strings.reportsPdfSavedText(file.path))),
       );
     } catch (e) {
       _showError(messenger, e);
@@ -135,7 +135,7 @@ class _ReportDialogState extends State<ReportDialog> {
       if (await file.exists()) await file.delete();
       if (mounted) setState(() => _lastSavedFile = null);
       messenger.showSnackBar(
-        const SnackBar(content: Text('PDF excluído do dispositivo.')),
+        SnackBar(content: Text(context.read<SettingsProvider>().strings.reportsPdfDeleted)),
       );
     } catch (e) {
       _showError(messenger, e);
@@ -171,16 +171,16 @@ class _ReportDialogState extends State<ReportDialog> {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Antes de compartilhar'),
+        title: Text(context.read<SettingsProvider>().strings.reportsBeforeShare),
         content: const Text(PdfReportService.privacyNotice),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(context.read<SettingsProvider>().strings.reportsCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Compartilhar'),
+            child: Text(context.read<SettingsProvider>().strings.reportsShare),
           ),
         ],
       ),
@@ -190,7 +190,7 @@ class _ReportDialogState extends State<ReportDialog> {
   void _showError(ScaffoldMessengerState messenger, Object e) {
     debugPrint('Erro ao gerar relatório: $e');
     messenger.showSnackBar(
-      SnackBar(content: Text('Erro ao gerar relatório: $e')),
+      SnackBar(content: Text(context.read<SettingsProvider>().strings.reportsErrorText(e))),
     );
   }
 
@@ -328,17 +328,34 @@ class _ReportDialogState extends State<ReportDialog> {
   Widget _periodSelector(ThemeData theme) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Período', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(context.read<SettingsProvider>().strings.reportsPeriod, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           SegmentedButton<ReportPeriod>(
-            segments: const [
-              ButtonSegment(value: ReportPeriod.last7, label: Text('7 dias')),
-              ButtonSegment(value: ReportPeriod.last30, label: Text('30 dias')),
-              ButtonSegment(value: ReportPeriod.last90, label: Text('90 dias')),
+            segments: [
+              ButtonSegment(
+                value: ReportPeriod.last7,
+                label: Text(
+                  context.read<SettingsProvider>().strings.reportsDays7,
+                ),
+              ),
+              ButtonSegment(
+                value: ReportPeriod.last30,
+                label: Text(
+                  context.read<SettingsProvider>().strings.reportsDays30,
+                ),
+              ),
+              ButtonSegment(
+                value: ReportPeriod.last90,
+                label: Text(
+                  context.read<SettingsProvider>().strings.reportsDays90,
+                ),
+              ),
               ButtonSegment(
                 value: ReportPeriod.custom,
-                label: Text('Personalizado'),
-                icon: Icon(Icons.event),
+                label: Text(
+                  context.read<SettingsProvider>().strings.reportsCustom,
+                ),
+                icon: const Icon(Icons.event),
               ),
             ],
             selected: {_period},
@@ -365,7 +382,7 @@ class _ReportDialogState extends State<ReportDialog> {
                 const Spacer(),
                 TextButton(
                   onPressed: () => _pickCustomRange(context),
-                  child: const Text('Alterar'),
+                  child: Text(context.read<SettingsProvider>().strings.reportsChange),
                 ),
               ],
             ),
@@ -376,20 +393,20 @@ class _ReportDialogState extends State<ReportDialog> {
   Widget _identificationFields(ThemeData theme) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Identificação (opcional)',
+          Text(context.read<SettingsProvider>().strings.reportsIdentification,
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           TextField(
             controller: _nameController,
             onChanged: (_) => setState(() {}),
-            decoration: _fieldDecoration(theme, 'Seu nome'),
+            decoration: _fieldDecoration(theme, context.read<SettingsProvider>().strings.reportsNameHint),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _obsController,
             maxLines: 3,
             onChanged: (_) => setState(() {}),
-            decoration: _fieldDecoration(theme, 'Observações pessoais',
+            decoration: _fieldDecoration(theme, context.read<SettingsProvider>().strings.reportsNotesHint,
                 alignHint: true),
           ),
         ],
@@ -450,7 +467,7 @@ class _ReportDialogState extends State<ReportDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Prévia do relatório',
+          Text(context.read<SettingsProvider>().strings.reportsPreview,
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text(
@@ -654,7 +671,7 @@ class _ReportDialogState extends State<ReportDialog> {
                             height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2))
                         : const Icon(Icons.save_alt),
-                    label: const Text('Salvar PDF'),
+                    label: Text(context.read<SettingsProvider>().strings.reportsSavePdf),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
@@ -669,7 +686,7 @@ class _ReportDialogState extends State<ReportDialog> {
                   child: FilledButton.tonalIcon(
                     onPressed: _isBusy ? null : () => _sharePdf(context),
                     icon: const Icon(Icons.share),
-                    label: const Text('Compartilhar'),
+                    label: Text(context.read<SettingsProvider>().strings.reportsShare),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
@@ -686,7 +703,7 @@ class _ReportDialogState extends State<ReportDialog> {
               child: TextButton.icon(
                 onPressed: _isBusy ? null : () => _deleteLastPdf(context),
                 icon: const Icon(Icons.delete_outline, size: 18),
-                label: const Text('Excluir PDF salvo'),
+                label: Text(context.read<SettingsProvider>().strings.reportsDeleteSavedPdf),
               ),
             ),
           ],
@@ -700,7 +717,7 @@ class _ReportDialogState extends State<ReportDialog> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Cancelar'),
+              child: Text(context.read<SettingsProvider>().strings.reportsCancel),
             ),
           ),
         ],

@@ -169,7 +169,7 @@ class _OverviewTab extends StatelessWidget {
           children: [
             Expanded(
               child: StatTile(
-                label: 'Adesão às pausas · 7 dias',
+                label: context.read<SettingsProvider>().strings.progressAdherence7Label,
                 value: adherence7 == null
                     ? '—'
                     : '${(adherence7 * 100).round()}%',
@@ -181,7 +181,7 @@ class _OverviewTab extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: StatTile(
-                label: 'Tela hoje',
+                label: context.read<SettingsProvider>().strings.dashboardScreenToday,
                 value: screenTodayLabel,
                 icon: Icons.desktop_windows_outlined,
                 footer: last7.length >= 2

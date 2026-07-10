@@ -65,7 +65,7 @@ Size _compactWindowSize(double ballSize) => Size(ballSize + 28, ballSize + 28);
 /// Altura do painel de menu (linha compacta de pausas + 12 itens + 3 cabeçalhos
 /// de grupo + 2 divisórias + paddings do vidro), com folga para variações de
 /// fonte entre plataformas.
-const double _menuPanelHeight = 704;
+const double _menuPanelHeight = 720;
 
 /// Tamanho da janela do menu em função do diâmetro da bolinha-cabeçalho.
 /// A altura acompanha a bolinha + o painel completo para que o último item
@@ -338,6 +338,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _lastHideFloating = AppDefaults.hideFloatingWidget;
   bool _lastActivityMonitor = AppDefaults.activityMonitorEnabled;
   String _lastLanguage = AppDefaults.languageCode;
+  BlinkReminderFrequency _lastBlinkFrequency = BlinkReminderFrequency.normal;
 
   @override
   void initState() {
@@ -355,6 +356,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _lastHideMenuBar = _settings.value.hideMenuBarItem;
     _lastHideFloating = _settings.value.hideFloatingWidget;
     _lastLanguage = _settings.value.languageCode;
+    _lastBlinkFrequency = _settings.value.blinkReminderFrequency;
     _widgetEnabled = !_settings.value.hideFloatingWidget;
 
     // Inicializa a posicao com o valor salvo para evitar salto para (100, 100).
@@ -468,8 +470,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _startBlinkReminderLoop() {
     _blinkReminderTicker?.cancel();
+    final intervalMs = _settings.value.blinkReminderFrequency.intervalMs;
     _blinkReminderTicker = Timer.periodic(
-      const Duration(milliseconds: AppDefaults.blinkReminderIntervalMs),
+      Duration(milliseconds: intervalMs),
       (_) {
         if (_canTriggerBlinkReminder) {
           unawaited(_triggerBlinkReminder());
@@ -786,6 +789,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     if (!_settings.value.visualBlinkRemindersEnabled && _blinkReminderVisible) {
       _hideBlinkReminder(restoreLayout: true);
     }
+    final blinkFreq = _settings.value.blinkReminderFrequency;
+    if (blinkFreq != _lastBlinkFrequency) {
+      _lastBlinkFrequency = blinkFreq;
+      _startBlinkReminderLoop();
+    }
     final activityOn = _settings.value.activityMonitorEnabled;
     if (activityOn != _lastActivityMonitor) {
       _lastActivityMonitor = activityOn;
@@ -971,11 +979,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _applyLayout(_menuOpen ? _WindowLayout.menu : _WindowLayout.ball);
   }
 
-  /// Botão direito: abre o menu de opções (não alterna — sempre abre).
+  /// Botão direito: atalho para o Resumo do dia (descoberta do hub de saúde).
   void _onBallSecondaryTap() {
-    if (_timer.state != AppState.idle || _menuOpen) return;
-    setState(() => _menuOpen = true);
-    _applyLayout(_WindowLayout.menu);
+    if (_timer.state != AppState.idle) return;
+    if (_menuOpen) setState(() => _menuOpen = false);
+    _openDaySummary();
   }
 
   Future<void> _onBallDragStart() async {
@@ -1502,6 +1510,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onStartNow: timer.startBreakNow,
                 onReset: timer.reset,
                 onTogglePause: timer.togglePause,
+                onExtendCycle: timer.stretchCycleOneHour,
                 onGuidance: _openGuidance,
                 onDaySummary: _openDaySummary,
                 onDvrs: _openDvrs,

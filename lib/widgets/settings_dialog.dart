@@ -185,6 +185,40 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         _set(_draft.copyWith(visualBlinkRemindersEnabled: v)),
                   ),
                   _hint(s.visualBlinkRemindersHint),
+                  if (_draft.visualBlinkRemindersEnabled) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      s.blinkReminderFrequency,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        for (final freq in BlinkReminderFrequency.values) ...[
+                          if (freq != BlinkReminderFrequency.values.first)
+                            const SizedBox(width: 8),
+                          _choiceButton(
+                            label: switch (freq) {
+                              BlinkReminderFrequency.discreet =>
+                                s.blinkFreqDiscreet,
+                              BlinkReminderFrequency.normal =>
+                                s.blinkFreqNormal,
+                              BlinkReminderFrequency.frequent =>
+                                s.blinkFreqFrequent,
+                            },
+                            selected: _draft.blinkReminderFrequency == freq,
+                            onTap: () => _set(
+                              _draft.copyWith(blinkReminderFrequency: freq),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    _hint(s.blinkReminderFrequencyHint),
+                  ],
                   _switchRow(
                     label: s.blinkReminderSound,
                     value: _draft.blinkReminderSoundEnabled,

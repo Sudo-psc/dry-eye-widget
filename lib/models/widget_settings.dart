@@ -21,6 +21,7 @@ class WidgetSettings {
     required this.blinkReminderSoundEnabled,
     required this.blinkReminderSound,
     required this.blinkReminderVolume,
+    required this.blinkReminderFrequency,
     required this.defaultCorner,
     required this.ballSize,
     required this.idleColor,
@@ -63,6 +64,7 @@ class WidgetSettings {
   final bool blinkReminderSoundEnabled;
   final BlinkReminderSound blinkReminderSound;
   final double blinkReminderVolume;
+  final BlinkReminderFrequency blinkReminderFrequency;
   final BallCorner defaultCorner;
 
   // --- Aparência ----------------------------------------------------------
@@ -186,6 +188,7 @@ class WidgetSettings {
     blinkReminderSoundEnabled: AppDefaults.blinkReminderSoundEnabled,
     blinkReminderSound: BlinkReminderSound.softPulse,
     blinkReminderVolume: AppDefaults.blinkReminderVolume,
+    blinkReminderFrequency: BlinkReminderFrequency.normal,
     defaultCorner: BallCorner.topRight,
     ballSize: AppDefaults.ballSize,
     idleColor: AppDefaults.idleColor,
@@ -234,6 +237,7 @@ class WidgetSettings {
     bool? blinkReminderSoundEnabled,
     BlinkReminderSound? blinkReminderSound,
     double? blinkReminderVolume,
+    BlinkReminderFrequency? blinkReminderFrequency,
     BallCorner? defaultCorner,
     double? ballSize,
     int? idleColor,
@@ -281,6 +285,7 @@ class WidgetSettings {
           blinkReminderSoundEnabled ?? this.blinkReminderSoundEnabled,
       blinkReminderSound: blinkReminderSound ?? this.blinkReminderSound,
       blinkReminderVolume: blinkReminderVolume ?? this.blinkReminderVolume,
+      blinkReminderFrequency: blinkReminderFrequency ?? this.blinkReminderFrequency,
       defaultCorner: defaultCorner ?? this.defaultCorner,
       ballSize: ballSize ?? this.ballSize,
       idleColor: idleColor ?? this.idleColor,
@@ -335,6 +340,7 @@ class WidgetSettings {
         1.0,
         d.blinkReminderVolume,
       ),
+      blinkReminderFrequency: blinkReminderFrequency,
       defaultCorner: defaultCorner,
       ballSize: _clampDouble(
         ballSize,
@@ -408,6 +414,7 @@ class WidgetSettings {
     'blinkReminderSoundEnabled': blinkReminderSoundEnabled,
     'blinkReminderSound': blinkReminderSound.index,
     'blinkReminderVolume': blinkReminderVolume,
+    'blinkReminderFrequency': blinkReminderFrequency.index,
     'defaultCorner': defaultCorner.index,
     'ballSize': ballSize,
     'idleColor': idleColor,
@@ -473,6 +480,14 @@ class WidgetSettings {
       blinkReminderVolume:
           (map['blinkReminderVolume'] as num?)?.toDouble() ??
           d.blinkReminderVolume,
+      blinkReminderFrequency: () {
+        var i = (map['blinkReminderFrequency'] as num?)?.toInt() ??
+            d.blinkReminderFrequency.index;
+        if (i < 0 || i >= BlinkReminderFrequency.values.length) {
+          i = d.blinkReminderFrequency.index;
+        }
+        return BlinkReminderFrequency.values[i];
+      }(),
       defaultCorner: BallCorner.values[cornerIndex],
       ballSize: (map['ballSize'] as num?)?.toDouble() ?? d.ballSize,
       idleColor: (map['idleColor'] as num?)?.toInt() ?? d.idleColor,

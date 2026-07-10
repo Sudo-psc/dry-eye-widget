@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
+import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../ui/glass_card.dart';
@@ -74,7 +75,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
         _latestCard(theme, latest, trend, delta),
         const SizedBox(height: 16),
         _chartCard(
-          title: 'Evolução do score',
+          title: context.read<SettingsProvider>().strings.dvrsHistoryEvolution,
           points: [
             for (final r in _history) (r.createdAt, r.totalScore.toDouble()),
           ],
@@ -276,7 +277,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline, size: 20),
-                    tooltip: 'Excluir resultado',
+                    tooltip: context.read<SettingsProvider>().strings.dvrsHistoryDelete,
                     onPressed: () => _delete(r.id),
                   ),
                 ],

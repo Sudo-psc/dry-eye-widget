@@ -1,5 +1,7 @@
 import 'package:dry_eye_widget/models/dvrs_definitions.dart';
+import 'package:dry_eye_widget/providers/settings_provider.dart';
 import 'package:dry_eye_widget/services/dvrs_storage_service.dart';
+import 'package:dry_eye_widget/services/storage_service.dart';
 import 'package:dry_eye_widget/widgets/dvrs/dvrs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,9 +13,15 @@ Future<void> _pumpScreen(
   DvrsStorageService storage, {
   VoidCallback? onClose,
 }) async {
+  final appStorage = await StorageService.init();
+  final settings = SettingsProvider(storage: appStorage);
   await tester.pumpWidget(
-    Provider<DvrsStorageService>.value(
-      value: storage,
+    MultiProvider(
+      providers: [
+        Provider<DvrsStorageService>.value(value: storage),
+        Provider<StorageService>.value(value: appStorage),
+        ChangeNotifierProvider<SettingsProvider>.value(value: settings),
+      ],
       child: MaterialApp(home: DvrsScreen(onClose: onClose ?? () {})),
     ),
   );

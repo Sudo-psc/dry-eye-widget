@@ -1,11 +1,12 @@
 # Status
 
-Updated: 2026-07-09
+Updated: 2026-07-10
 
-Current phase: P0 + quick wins through 1.22.2 (completion insight, more i18n).
+Current phase: five quick-win cycles shipped through 1.22.7 (15 improvements).
 
 Completed:
 
+- Cycles 1.22.3–1.22.7: DVRS/report i18n, done notification with day count, blink frequency, RMB → day summary, stretch cycle 1h, tests.
 - Quick wins 1.22.2: proactive insight on break completion (full + gentle); dashboard tabs and reports header localized.
 - Quick wins: Day Summary in tray/menu bar; tray labels localized; Progress/Dashboard close tooltips and dashboard title localized; open Day Summary after onboarding.
 - Added Day Summary hub (today’s breaks, streak, last DVRS, insight, CTAs).

@@ -20,7 +20,7 @@ void main() {
         body: Center(
           child: SizedBox(
             width: 460,
-            height: 700,
+            height: 900,
             child: SettingsDialog(
               initial: initial,
               onSave: onSave,
@@ -38,6 +38,10 @@ void main() {
   testWidgets('renderiza dentro da janela de configuracoes sem overflow', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(900, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(
       host(initial: WidgetSettings.defaults(), onSave: (_) {}),
     );
@@ -45,6 +49,7 @@ void main() {
     expect(find.text(ptStrings.settingsTitle), findsOneWidget);
     expect(find.text(ptStrings.blinkSpeed), findsNothing);
     expect(find.text(ptStrings.save), findsOneWidget);
+    expect(find.text(ptStrings.blinkReminderFrequency), findsOneWidget);
   });
 
   testWidgets('aguarda salvar antes de fechar o menu de configuracoes', (
@@ -114,22 +119,31 @@ void main() {
   testWidgets('permite ativar aviso sonoro de piscada e escolher toque', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(900, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     WidgetSettings? saved;
 
     await tester.pumpWidget(
       host(initial: WidgetSettings.defaults(), onSave: (s) => saved = s),
     );
 
+    final soundLabel = find.text(ptStrings.blinkReminderSound);
+    await tester.ensureVisible(soundLabel);
+    await tester.pump();
+
     final soundRow = find.ancestor(
-      of: find.text(ptStrings.blinkReminderSound),
+      of: soundLabel,
       matching: find.byType(Row),
     );
     final soundSwitch = find.descendant(
       of: soundRow,
       matching: find.byType(Switch),
     );
+    await tester.ensureVisible(soundSwitch);
     await tester.tap(soundSwitch);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text(ptStrings.blinkReminderToneSoftPulse), findsOneWidget);
     expect(find.text(ptStrings.blinkReminderToneWarmBell), findsOneWidget);

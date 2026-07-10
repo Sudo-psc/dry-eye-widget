@@ -97,10 +97,30 @@ class TimerProvider extends ChangeNotifier {
 
   // --- Configurações derivadas (lidas do SettingsProvider) ----------------
 
-  int get cycleSeconds => _settings.value.cycleSeconds;
+  /// Alongamento temporário do ciclo (ex.: 60 min por 1 h de “modo reunião”).
+  int? _stretchMinutes;
+  DateTime? _stretchUntil;
+
+  bool get isCycleStretched =>
+      _stretchUntil != null && DateTime.now().isBefore(_stretchUntil!);
+
+  int get cycleSeconds {
+    if (isCycleStretched && _stretchMinutes != null) {
+      return _stretchMinutes! * 60;
+    }
+    return _settings.value.cycleSeconds;
+  }
+
   int get phaseSeconds => _settings.value.phaseSeconds;
   bool get _soundOn => _settings.value.soundEnabled;
   bool get _notifyOn => _settings.value.notificationsEnabled;
+
+  /// Alongar o ciclo de trabalho para 60 minutos durante 1 hora real.
+  void stretchCycleOneHour() {
+    _stretchMinutes = 60;
+    _stretchUntil = DateTime.now().add(const Duration(hours: 1));
+    notifyListeners();
+  }
 
   double get cycleProgress =>
       cycleSeconds == 0 ? 0 : (_cycleElapsed / cycleSeconds).clamp(0.0, 1.0);
@@ -289,7 +309,11 @@ class TimerProvider extends ChangeNotifier {
     unawaited(_storage.recordBreakCompleted());
     if (_soundOn) _audio.playSuccess();
     final s = _settings.strings;
-    unawaited(_notifyBreak(s.notifyDoneTitle, s.notifyDoneBody));
+    final today = _storage.loadBreakStats().forDay(DateTime.now());
+    final body = today.reminders > 0
+        ? s.notifyDoneBodyTodayText(today.completed, today.reminders)
+        : s.notifyDoneBody;
+    unawaited(_notifyBreak(s.notifyDoneTitle, body));
     notifyListeners();
 
     _completionTimer?.cancel();

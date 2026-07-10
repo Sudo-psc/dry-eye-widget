@@ -345,6 +345,30 @@ void main() {
         expect(timer.isPaused, isTrue);
       });
     });
+
+    test('stretchCycleOneHour alonga o ciclo para 60 minutos', () {
+      final storage = _MemoryStorage(
+        WidgetSettings.defaults().copyWith(cycleMinutes: 20),
+      );
+      final settings = SettingsProvider(storage: storage);
+      final timer = TimerProvider(
+        settings: settings,
+        storage: storage,
+        audio: _FakeAudioService(),
+        notifications: _FakeNotificationService(),
+        presence: PresenceController(
+          model: AdaptiveThresholdModel(),
+          idleSource: _FakeIdleService().idleSeconds,
+        ),
+      );
+      addTearDown(timer.dispose);
+
+      expect(timer.cycleSeconds, 20 * 60);
+      expect(timer.isCycleStretched, isFalse);
+      timer.stretchCycleOneHour();
+      expect(timer.isCycleStretched, isTrue);
+      expect(timer.cycleSeconds, 60 * 60);
+    });
   });
 }
 

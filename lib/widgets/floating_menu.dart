@@ -23,6 +23,7 @@ class FloatingMenu extends StatelessWidget {
     required this.onStartNow,
     required this.onReset,
     required this.onTogglePause,
+    required this.onExtendCycle,
     required this.onGuidance,
     required this.onDaySummary,
     required this.onDvrs,
@@ -42,6 +43,7 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onStartNow;
   final VoidCallback onReset;
   final VoidCallback onTogglePause;
+  final VoidCallback onExtendCycle;
   final VoidCallback onGuidance;
   final VoidCallback onDaySummary;
   final VoidCallback onDvrs;
@@ -69,6 +71,7 @@ class FloatingMenu extends StatelessWidget {
         isPaused ? s.menuResume : s.menuPause,
         onTogglePause,
       ),
+      _MenuItem(Icons.schedule, s.menuExtendCycle, onExtendCycle),
     ];
 
     // Saúde visual: hub do dia primeiro; demais destinos de acompanhamento.

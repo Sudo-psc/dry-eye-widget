@@ -77,6 +77,23 @@ extension BallCornerX on BallCorner {
 /// Toques curtos usados no lembrete sonoro de piscada.
 enum BlinkReminderSound { softPulse, clearDrop, warmBell, lightTick }
 
+/// Frequência do lembrete visual de piscada.
+enum BlinkReminderFrequency { discreet, normal, frequent }
+
+extension BlinkReminderFrequencyX on BlinkReminderFrequency {
+  /// Intervalo entre avisos, em milissegundos.
+  int get intervalMs {
+    switch (this) {
+      case BlinkReminderFrequency.discreet:
+        return 12000;
+      case BlinkReminderFrequency.normal:
+        return 7500;
+      case BlinkReminderFrequency.frequent:
+        return 4500;
+    }
+  }
+}
+
 extension BlinkReminderSoundX on BlinkReminderSound {
   String get assetName {
     switch (this) {

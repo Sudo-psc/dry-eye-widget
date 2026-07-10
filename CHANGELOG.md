@@ -4,6 +4,40 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.22.7] - 2026-07-10
+
+### Adicionado
+- Testes de frequência de piscada e alongamento de ciclo (1 h).
+
+## [1.22.6] - 2026-07-10
+
+### Adicionado
+- **Alongar ciclo (1 h)** no menu de pausas — modo reunião com menos interrupções.
+- i18n de identificação, prévia e campos do diálogo de Relatórios.
+
+## [1.22.5] - 2026-07-10
+
+### Adicionado
+- **Frequência do lembrete de piscada** (Discreto / Normal / Frequente) nas configurações.
+- Botão direito na bolinha abre o **Resumo do dia**.
+- i18n do histórico DVRS (evolução / excluir).
+
+## [1.22.4] - 2026-07-10
+
+### Corrigido
+- i18n completa do fluxo DVRS (iniciar, calcular, salvar, histórico, PDF, refazer).
+- i18n de ações e snackbars dos Relatórios (salvar/compartilhar/excluir PDF).
+- Labels do resumo do Painel (adesão 7 dias, tela hoje).
+
+## [1.22.3] - 2026-07-10
+
+### Adicionado
+- Notificação de pausa concluída com contagem do dia (`hoje: c/r`).
+- i18n de períodos do relatório (7/30/90 dias, personalizado).
+
+### Corrigido
+- Voltar e textos principais do DVRS em PT/EN.
+
 ## [1.22.2] - 2026-07-10
 
 ### Adicionado

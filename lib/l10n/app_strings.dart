@@ -211,6 +211,44 @@ class AppStrings {
     required this.back,
     required this.reportsPersonalTitle,
     required this.reportsPersonalSubtitle,
+    required this.dvrsStart,
+    required this.dvrsViewHistory,
+    required this.dvrsCalculate,
+    required this.dvrsSaveResult,
+    required this.dvrsSaved,
+    required this.dvrsExportPdf,
+    required this.dvrsRedo,
+    required this.dvrsRedoLater,
+    required this.dvrsResultSavedSnack,
+    required this.reportsPeriod,
+    required this.reportsDays7,
+    required this.reportsDays30,
+    required this.reportsDays90,
+    required this.reportsCustom,
+    required this.reportsChange,
+    required this.reportsBeforeShare,
+    required this.reportsCancel,
+    required this.reportsShare,
+    required this.reportsSavePdf,
+    required this.reportsDeleteSavedPdf,
+    required this.reportsPdfSaved,
+    required this.reportsPdfDeleted,
+    required this.reportsError,
+    required this.reportsIdentification,
+    required this.reportsNameHint,
+    required this.reportsNotesHint,
+    required this.reportsPreview,
+    required this.dashboardScreenToday,
+    required this.dvrsHistoryDelete,
+    required this.dvrsHistoryEvolution,
+    required this.notifyDoneBodyToday,
+    required this.blinkReminderFrequency,
+    required this.blinkReminderFrequencyHint,
+    required this.blinkFreqDiscreet,
+    required this.blinkFreqNormal,
+    required this.blinkFreqFrequent,
+    required this.menuExtendCycle,
+    required this.extendCycleActiveHint,
     required this.progressTitle,
     required this.progressStreakCurrentLabel,
     required this.progressStreakBestLabel,
@@ -291,6 +329,44 @@ class AppStrings {
   final String back;
   final String reportsPersonalTitle;
   final String reportsPersonalSubtitle;
+  final String dvrsStart;
+  final String dvrsViewHistory;
+  final String dvrsCalculate;
+  final String dvrsSaveResult;
+  final String dvrsSaved;
+  final String dvrsExportPdf;
+  final String dvrsRedo;
+  final String dvrsRedoLater;
+  final String dvrsResultSavedSnack;
+  final String reportsPeriod;
+  final String reportsDays7;
+  final String reportsDays30;
+  final String reportsDays90;
+  final String reportsCustom;
+  final String reportsChange;
+  final String reportsBeforeShare;
+  final String reportsCancel;
+  final String reportsShare;
+  final String reportsSavePdf;
+  final String reportsDeleteSavedPdf;
+  final String reportsPdfSaved;
+  final String reportsPdfDeleted;
+  final String reportsError;
+  final String reportsIdentification;
+  final String reportsNameHint;
+  final String reportsNotesHint;
+  final String reportsPreview;
+  final String dashboardScreenToday;
+  final String dvrsHistoryDelete;
+  final String dvrsHistoryEvolution;
+  final String notifyDoneBodyToday;
+  final String blinkReminderFrequency;
+  final String blinkReminderFrequencyHint;
+  final String blinkFreqDiscreet;
+  final String blinkFreqNormal;
+  final String blinkFreqFrequent;
+  final String menuExtendCycle;
+  final String extendCycleActiveHint;
 
   final String ballSemanticLabel;
   final String menuCheckUpdates;
@@ -578,6 +654,18 @@ class AppStrings {
           .replaceAll('{label}', label)
           .replaceAll('{n}', '$days');
 
+
+  String reportsPdfSavedText(String path) =>
+      reportsPdfSaved.replaceAll('{path}', path);
+
+  String reportsErrorText(Object error) =>
+      reportsError.replaceAll('{error}', '$error');
+
+  String notifyDoneBodyTodayText(int completed, int reminders) =>
+      notifyDoneBodyToday
+          .replaceAll('{c}', '$completed')
+          .replaceAll('{r}', '$reminders');
+
   static AppStrings of(String code) => code == 'en' ? enStrings : ptStrings;
 }
 
@@ -635,6 +723,45 @@ const AppStrings ptStrings = AppStrings(
   reportsPersonalTitle: 'Relatório pessoal',
   reportsPersonalSubtitle:
       'Exporte seu DVRS, tempo de tela e pausas em PDF.',
+  dvrsStart: 'Iniciar DVRS',
+  dvrsViewHistory: 'Ver histórico',
+  dvrsCalculate: 'Calcular resultado',
+  dvrsSaveResult: 'Salvar resultado',
+  dvrsSaved: 'Salvo',
+  dvrsExportPdf: 'Exportar no PDF',
+  dvrsRedo: 'Refazer',
+  dvrsRedoLater: 'Refazer depois',
+  dvrsResultSavedSnack: 'Resultado salvo.',
+  reportsPeriod: 'Período',
+  reportsDays7: '7 dias',
+  reportsDays30: '30 dias',
+  reportsDays90: '90 dias',
+  reportsCustom: 'Personalizado',
+  reportsChange: 'Alterar',
+  reportsBeforeShare: 'Antes de compartilhar',
+  reportsCancel: 'Cancelar',
+  reportsShare: 'Compartilhar',
+  reportsSavePdf: 'Salvar PDF',
+  reportsDeleteSavedPdf: 'Excluir PDF salvo',
+  reportsPdfSaved: 'PDF salvo em: {path}',
+  reportsPdfDeleted: 'PDF excluído do dispositivo.',
+  reportsError: 'Erro ao gerar relatório: {error}',
+  reportsIdentification: 'Identificação (opcional)',
+  reportsNameHint: 'Seu nome',
+  reportsNotesHint: 'Observações pessoais',
+  reportsPreview: 'Prévia do relatório',
+  dashboardScreenToday: 'Tela hoje',
+  dvrsHistoryDelete: 'Excluir resultado',
+  dvrsHistoryEvolution: 'Evolução do score',
+  notifyDoneBodyToday: 'Hoje: {c}/{r} pausas. Lágrimas renovadas!',
+  blinkReminderFrequency: 'Frequência do lembrete de piscada',
+  blinkReminderFrequencyHint:
+      'Controla o intervalo entre avisos visuais de piscada. Discreto = menos frequente.',
+  blinkFreqDiscreet: 'Discreto',
+  blinkFreqNormal: 'Normal',
+  blinkFreqFrequent: 'Frequente',
+  menuExtendCycle: 'Alongar ciclo (1 h)',
+  extendCycleActiveHint: 'Ciclo alongado por 1 hora — menos interrupções.',
   menuReports: 'Relatórios',
   ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
   menuCheckUpdates: 'Verificar atualizações',
@@ -974,6 +1101,45 @@ const AppStrings enStrings = AppStrings(
   reportsPersonalTitle: 'Personal report',
   reportsPersonalSubtitle:
       'Export your DVRS, screen time and breaks as a PDF.',
+  dvrsStart: 'Start DVRS',
+  dvrsViewHistory: 'View history',
+  dvrsCalculate: 'Calculate result',
+  dvrsSaveResult: 'Save result',
+  dvrsSaved: 'Saved',
+  dvrsExportPdf: 'Export to PDF',
+  dvrsRedo: 'Retake',
+  dvrsRedoLater: 'Later',
+  dvrsResultSavedSnack: 'Result saved.',
+  reportsPeriod: 'Period',
+  reportsDays7: '7 days',
+  reportsDays30: '30 days',
+  reportsDays90: '90 days',
+  reportsCustom: 'Custom',
+  reportsChange: 'Change',
+  reportsBeforeShare: 'Before sharing',
+  reportsCancel: 'Cancel',
+  reportsShare: 'Share',
+  reportsSavePdf: 'Save PDF',
+  reportsDeleteSavedPdf: 'Delete saved PDF',
+  reportsPdfSaved: 'PDF saved to: {path}',
+  reportsPdfDeleted: 'PDF deleted from this device.',
+  reportsError: 'Error generating report: {error}',
+  reportsIdentification: 'Identification (optional)',
+  reportsNameHint: 'Your name',
+  reportsNotesHint: 'Personal notes',
+  reportsPreview: 'Report preview',
+  dashboardScreenToday: 'Screen today',
+  dvrsHistoryDelete: 'Delete result',
+  dvrsHistoryEvolution: 'Score trend',
+  notifyDoneBodyToday: 'Today: {c}/{r} breaks. Tears refreshed!',
+  blinkReminderFrequency: 'Blink reminder frequency',
+  blinkReminderFrequencyHint:
+      'Controls how often visual blink cues appear. Discreet = less often.',
+  blinkFreqDiscreet: 'Discreet',
+  blinkFreqNormal: 'Normal',
+  blinkFreqFrequent: 'Frequent',
+  menuExtendCycle: 'Stretch cycle (1 h)',
+  extendCycleActiveHint: 'Cycle stretched for 1 hour — fewer interruptions.',
   menuReports: 'Reports',
   ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
   menuCheckUpdates: 'Check for updates',

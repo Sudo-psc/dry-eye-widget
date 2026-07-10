@@ -23,6 +23,7 @@ void main() {
               onStartNow: () {},
               onReset: () {},
               onTogglePause: () {},
+              onExtendCycle: () {},
               onGuidance: () {},
               onDaySummary: () {},
               onDvrs: () => dvrsOpened++,
@@ -68,6 +69,7 @@ void main() {
               onStartNow: () {},
               onReset: () {},
               onTogglePause: () {},
+              onExtendCycle: () {},
               onGuidance: () {},
               onDaySummary: () {},
               onDvrs: () {},
@@ -95,6 +97,6 @@ void main() {
     // esse limite, o último item ("Sair") voltaria a ser cortado pela borda da
     // janela — este teste é o guarda dessa regressão.
     final height = tester.getSize(find.byType(FloatingMenu)).height;
-    expect(height, lessThanOrEqualTo(704));
+    expect(height, lessThanOrEqualTo(720));
   });
 }
