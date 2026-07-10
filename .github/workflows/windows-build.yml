@@ -138,6 +138,30 @@ jobs:
             Write-Warning "Instalador assinado não encontrado — mantendo o não assinado."
           }
 
+      - name: Status da assinatura Windows
+        shell: pwsh
+        run: |
+          $installer = "dist\DryEyeWidget-Setup-x64.exe"
+          $status = "unsigned"
+          if (Test-Path $installer) {
+            $sig = Get-AuthenticodeSignature $installer
+            Write-Host "Authenticode: $($sig.Status) — $($sig.SignerCertificate.Subject)"
+            if ($sig.Status -eq "Valid") { $status = "signed" }
+          }
+          if ($env:SIGN_SIGNPATH -eq "true") {
+            "SIGNPATH configurado: sim"
+          } else {
+            "SIGNPATH configurado: nao (secret ausente)"
+          }
+          @"
+          ## Windows release artifacts
+          | Campo | Valor |
+          |-------|-------|
+          | SignPath token | ``$($env:SIGN_SIGNPATH)`` |
+          | Instalador Authenticode | ``$status`` |
+          | Artefatos | Setup + ZIP portátil |
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
       - name: Upload de artefatos (toda execução)
         uses: actions/upload-artifact@v4
         with:

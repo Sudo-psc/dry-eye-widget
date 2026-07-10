@@ -16,7 +16,7 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 
 | # | Item | Área | Impacto | Esforço |
 |---|------|------|---------|---------|
-| 1 | Assinatura de código macOS/Windows (Gatekeeper/SmartScreen) | Distribuição | Alto | Grande |
+| 1 | **Ativar** assinatura com secrets (Apple Developer ID + SignPath) | Distribuição | Alto | Conta/custo |
 | 2 | QA manual Windows: docking meia-lua + micronotificação | App | Alto | Médio |
 | 3 | Validação HealthKit em build assinado | App | Médio | Médio |
 
@@ -24,8 +24,13 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 
 | # | Item | Evidência |
 |---|------|-----------|
+| 1a | Pipeline de assinatura macOS + Windows no CI | `docs/CODE_SIGNING.md`, `scripts/macos_*.sh`, workflows condicionais |
 | 4 | Screenshots Windows na landing | Filtro macOS/Windows + 5 slides Win em `site/assets/shots/windows-*.jpg` |
 | 5 | Lighthouse produção pós-deploy | `docs/lighthouse/LATEST.md` — mobile Perf 93 / a11y 90 / BP 100 / SEO 100 |
+
+> **#1a vs #1:** o código e o CI estão prontos; falta cadastrar certificado Apple
+> e aprovação SignPath (checklist em `docs/CODE_SIGNING.md`). Sem isso as
+> releases seguem unsigned com orientação xattr/SmartScreen.
 
 ## Next (1–2 meses)
 

@@ -42,9 +42,16 @@ node site/scripts/lighthouse-prod.mjs https://olhossecos.com.br/app/
 
 Saída em `docs/lighthouse/` (`LATEST.md` + JSON/HTML datados).
 
+## Code signing (condicional)
+
+- Doc mestre: `docs/CODE_SIGNING.md`
+- Windows (SignPath): `win_version/CODE_SIGNING.md` + `windows-build.yml`
+- macOS: `scripts/macos_import_cert.sh` + `scripts/macos_sign_and_notarize.sh` + `macos-build.yml`
+- Sem secrets o build não falha — só publica unsigned
+
 ## Próximas automações (candidatas)
 
-- Code signing macOS/Windows no pipeline de release
 - Lighthouse CI agendado (reusa `lighthouse-prod.mjs`)
 - Capturas nativas Windows em runner Windows (substituir composite)
 - SBOM / dependency review em PRs de Dependabot
+- Após secrets Apple: staple + validar em máquina limpa (checklist CODE_SIGNING)

@@ -1,5 +1,7 @@
 # Assinatura de código (Windows) — SmartScreen, Defender e bloqueios
 
+> Visão unificada macOS + Windows: **[`docs/CODE_SIGNING.md`](../docs/CODE_SIGNING.md)**.
+
 Este documento explica **por que** o instalador do Dry Eye Widget pode disparar
 alertas de segurança no Windows e **o que** já foi feito para reduzi-los — além
 do que **só** um certificado de assinatura de código resolve.
