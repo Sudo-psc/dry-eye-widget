@@ -88,6 +88,16 @@
       "ft.8.body": "Exporte seu DVRS, tempo de tela e pausas em um PDF claro para levar ao oftalmologista. Gerado localmente, com aviso de privacidade antes de compartilhar.",
       "ft.9.title": "Acompanhamento ao longo do tempo",
       "ft.9.body": "Tempo de tela, adesão às pausas e evolução do DVRS registrados localmente, com tendências para você perceber padrões semana a semana.",
+      "a11y.skip": "Pular para o conteúdo",
+      "hero.version": "Versão",
+      "ft.10.title": "Resumo do dia e insights",
+      "ft.10.body": "Hub diário com pausas de hoje, sequência, último DVRS e um insight proativo — tudo processado localmente, sem nuvem.",
+      "ft.11.title": "Modo reunião e piscada ajustável",
+      "ft.11.body": "Alongue o ciclo por 1 hora quando estiver em calls e escolha a frequência do lembrete de piscada: discreto, normal ou frequente.",
+      "faq.5.q": "O que é o DVRS?",
+      "faq.5.a": "O DVRS (Índice de Risco Visual Digital) é um questionário educativo de triagem com 16 perguntas. Gera score e mensagens educativas — nunca um diagnóstico médico.",
+      "faq.6.q": "O que há de novo na versão 1.22?",
+      "faq.6.a": "Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e builds multiplataforma atualizados.",
       "shots.kicker": "O app em funcionamento",
       "shots.title": "Discreto até o momento certo",
       "shots.sub": "Telas do widget no macOS e Windows — interface em vidro translúcido que acompanha, avisa e some.",
@@ -152,7 +162,8 @@
       "foot.gh": "GitHub",
       "foot.terms": "Termos de Uso",
       "foot.privacy": "Privacidade",
-      "foot.releases": "Releases"
+      "foot.releases": "Releases",
+    
     },
     en: {
       "nav.about": "About",
@@ -240,6 +251,16 @@
       "ft.8.body": "Export your DVRS, screen time and breaks into a clear PDF to bring to your ophthalmologist. Generated locally, with a privacy notice before sharing.",
       "ft.9.title": "Longitudinal tracking",
       "ft.9.body": "Screen time, break adherence and DVRS evolution stored locally, with trends so you can spot patterns week over week.",
+      "a11y.skip": "Skip to content",
+      "hero.version": "Version",
+      "ft.10.title": "Day summary and insights",
+      "ft.10.body": "Daily hub with today's breaks, streak, latest DVRS and a proactive insight — all processed locally, no cloud.",
+      "ft.11.title": "Meeting mode and adjustable blink cues",
+      "ft.11.body": "Stretch the cycle for 1 hour during calls and choose blink-reminder frequency: discreet, normal or frequent.",
+      "faq.5.q": "What is DVRS?",
+      "faq.5.a": "DVRS (Digital Visual Risk Index) is a 16-question educational screening questionnaire. It produces a score and educational messages — never a medical diagnosis.",
+      "faq.6.q": "What's new in version 1.22?",
+      "faq.6.a": "Day summary, proactive insights, DVRS recheck reminder, configurable blink frequency, 1-hour cycle stretch and updated multiplatform builds.",
       "shots.kicker": "The app in action",
       "shots.title": "Discreet until the right moment",
       "shots.sub": "Widget screens on macOS and Windows — translucent glass UI that tracks, signals and gets out of the way.",
@@ -304,7 +325,8 @@
       "foot.gh": "GitHub",
       "foot.terms": "Terms of Use",
       "foot.privacy": "Privacy",
-      "foot.releases": "Releases"
+      "foot.releases": "Releases",
+    
     }
   };
 

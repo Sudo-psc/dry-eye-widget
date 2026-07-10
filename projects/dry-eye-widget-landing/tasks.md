@@ -41,6 +41,8 @@
 
 - [x] Add an automated landing smoke test that checks canonical route, script safety, and i18n coverage.
 - [x] Add CI coverage for the static site smoke check.
+- [x] 2026-07-10: five landing quick-win cycles (version badge, a11y, features, FAQ, sitemap/smoke version sync).
+- [x] 2026-07-10: five workflow/roadmap cycles (ci.yml, dependabot, scheduled smoke, issue template, ROADMAP.md).
 - Add signed-runtime QA evidence for HealthKit permission states: unavailable, denied, authorized and no samples.
 - Track Flutter macOS Swift Package Manager warnings for `screen_retriever_macos`, `tray_manager`, and `local_notifier`.
 - Add real app screenshots from macOS and Windows release runs.

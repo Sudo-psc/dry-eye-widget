@@ -1,0 +1,27 @@
+# Smoke da landing em horário fixo — pega regressões de i18n/versão
+# mesmo sem push em site/**.
+
+name: Site scheduled smoke
+
+on:
+  schedule:
+    # Segundas 12:00 UTC (~09:00 America/Sao_Paulo)
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Smoke test da landing
+        run: node site/scripts/smoke-check.mjs
+
+      - name: Versão app ↔ landing
+        run: |
+          set -euo pipefail
+          PUB=$(grep -E '^version:' pubspec.yaml | head -1 | sed -E 's/version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          SCHEMA=$(grep -oE '"softwareVersion":[[:space:]]*"[0-9]+\.[0-9]+\.[0-9]+"' site/index.html | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          BADGE=$(grep -oE 'id="app-version">[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+' site/index.html | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          test "$PUB" = "$SCHEMA" && test "$PUB" = "$BADGE"

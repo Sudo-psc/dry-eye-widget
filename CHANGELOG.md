@@ -4,6 +4,22 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+### Landing (`site/`)
+- Badge de versão 1.22.7 e JSON-LD `softwareVersion` alinhado ao pubspec
+- Skip link + `:focus-visible` (a11y)
+- Cards de recursos: Resumo do dia e modo reunião / piscada
+- FAQ + schema.org: DVRS e novidades 1.22
+- Sitemap `lastmod` 2026-07-10 e smoke-check de sync de versão
+
+### Automação / roadmap
+- Workflow `CI` (Flutter + landing smoke + version sync)
+- Dependabot (Actions + pub)
+- Smoke semanal da landing
+- Template de issue de roadmap
+- `docs/ROADMAP.md`
+
 ## [1.22.7] - 2026-07-10
 
 ### Adicionado

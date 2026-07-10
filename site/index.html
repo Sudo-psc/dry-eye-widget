@@ -42,8 +42,8 @@ document.documentElement.setAttribute("data-theme",t);})();
     "url": "https://olhossecos.com.br/app/",
     "downloadUrl": "https://github.com/Sudo-psc/dry-eye-widget/releases/latest",
     "screenshot": "https://olhossecos.com.br/app/assets/twitter-card.jpg",
-    "softwareVersion": "latest",
-    "fileSize": "5MB",
+    "softwareVersion": "1.22.7",
+    "fileSize": "28MB",
     "author": {
       "@type": "Physician",
       "name": "Dr. Philipe Saraiva Cruz",
@@ -102,6 +102,22 @@ document.documentElement.setAttribute("data-theme",t);})();
           "@type": "Answer",
           "text": "Não. Ele é uma ferramenta preventiva de mudança comportamental. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e prescrição de colírios adequados."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "O que é o DVRS?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "O DVRS (Índice de Risco Visual Digital) é um questionário educativo de triagem com 16 perguntas. Ele gera um score e mensagens educativas — nunca um diagnóstico médico."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "O que há de novo na versão 1.22?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e melhor suporte multiplataforma."
+        }
       }
     ]
   },
@@ -142,6 +158,8 @@ document.documentElement.setAttribute("data-theme",t);})();
 </head>
 <body>
 
+<a class="skip-link" href="#sobre" data-i18n="a11y.skip">Pular para o conteúdo</a>
+
 <!-- ====================== HEADER ====================== -->
 <header class="site-header">
   <div class="bar">
@@ -179,6 +197,7 @@ document.documentElement.setAttribute("data-theme",t);})();
   <div class="wrap">
     <div class="hero-copy">
       <span class="hero-badge glass"><span class="dot"></span><span data-i18n="hero.badge">Open source · MIT · macOS &amp; Windows</span></span>
+      <p class="version-pill" aria-label="Versão atual"><span data-i18n="hero.version">Versão</span> <strong id="app-version">1.22.7</strong></p>
       <h1 data-i18n="hero.title">Sua tela não avisa quando seus olhos <em>precisam de pausa</em>. Este widget avisa.</h1>
       <p class="hero-sub" data-i18n="hero.sub">Um lembrete gentil e flutuante que aplica a regra oftalmológica 20-20-20 — desenvolvido por um médico oftalmologista para prevenir a fadiga visual digital e o olho seco.</p>
       <div class="dl-row">
@@ -462,6 +481,16 @@ document.documentElement.setAttribute("data-theme",t);})();
         <h3 data-i18n="ft.9.title">Acompanhamento ao longo do tempo</h3>
         <p data-i18n="ft.9.body">Tempo de tela, adesão às pausas e evolução do DVRS registrados localmente, com tendências para você perceber padrões semana a semana.</p>
       </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"></path></svg></div>
+        <h3 data-i18n="ft.10.title">Resumo do dia e insights</h3>
+        <p data-i18n="ft.10.body">Hub diário com pausas de hoje, sequência, último DVRS e um insight proativo — tudo processado localmente, sem nuvem.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></div>
+        <h3 data-i18n="ft.11.title">Modo reunião e piscada ajustável</h3>
+        <p data-i18n="ft.11.body">Alongue o ciclo por 1 hora quando estiver em calls e escolha a frequência do lembrete de piscada: discreto, normal ou frequente.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -559,6 +588,14 @@ document.documentElement.setAttribute("data-theme",t);})();
       <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
         <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.4.q">O app substitui o tratamento médico?</summary>
         <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.4.a">Não. Ele é uma ferramenta preventiva de apoio a hábitos. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e orientação individual.</p>
+      </details>
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.5.q">O que é o DVRS?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.5.a">O DVRS (Índice de Risco Visual Digital) é um questionário educativo de triagem com 16 perguntas. Gera score e mensagens educativas — nunca um diagnóstico médico.</p>
+      </details>
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.6.q">O que há de novo na versão 1.22?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.6.a">Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e builds multiplataforma atualizados.</p>
       </details>
     </div>
   </div>

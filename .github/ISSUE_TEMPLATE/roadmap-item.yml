@@ -1,0 +1,51 @@
+name: Item de roadmap
+description: Proposta de melhoria priorizada (produto, site, CI ou distribuição)
+title: "[roadmap] "
+labels: ["roadmap"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - App Flutter (macOS/Windows)
+        - Landing (site/)
+        - CI / GitHub Actions
+        - Distribuição / assinatura
+        - Documentação / compliance
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impacto esperado
+      options:
+        - Alto
+        - Médio
+        - Baixo
+    validations:
+      required: true
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Esforço estimado
+      options:
+        - Quick win (< 1 dia)
+        - Médio (2–5 dias)
+        - Grande (> 1 semana)
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema ou oportunidade
+      description: O que dói hoje ou o que falta.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Como resolver, critérios de pronto e riscos.
+    validations:
+      required: true

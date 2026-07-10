@@ -98,6 +98,21 @@ for (const file of activeContractFiles) {
   }
 }
 
+
+// Version on landing must track pubspec (major.minor.patch).
+const pubspec = read(join(repoRoot, "pubspec.yaml"));
+const pubVer = pubspec.match(/^version:\s*([0-9]+\.[0-9]+\.[0-9]+)/m);
+const indexVer = indexHtml.match(/"softwareVersion":\s*"([0-9]+\.[0-9]+\.[0-9]+)"/);
+const badgeVer = indexHtml.match(/id="app-version">\s*([0-9]+\.[0-9]+\.[0-9]+)\s*</);
+if (!pubVer) fail("pubspec.yaml: missing version line.");
+if (!indexVer) fail('site/index.html: missing JSON-LD softwareVersion (x.y.z).');
+if (!badgeVer) fail('site/index.html: missing #app-version badge (x.y.z).');
+if (pubVer[1] !== indexVer[1] || pubVer[1] !== badgeVer[1]) {
+  fail(
+    `Version mismatch: pubspec=${pubVer[1]} schema=${indexVer?.[1]} badge=${badgeVer?.[1]}`,
+  );
+}
+
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);

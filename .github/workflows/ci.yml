@@ -1,0 +1,63 @@
+# Checks de PR e push em main: Flutter + smoke da landing.
+# Não publica artefatos — só qualidade.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter analyze & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.44.1"
+          cache: true
+
+      - name: Dependências
+        run: flutter pub get
+
+      - name: Análise estática
+        run: flutter analyze
+
+      - name: Testes
+        run: flutter test
+
+  site:
+    name: Landing smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Smoke test da landing
+        run: node site/scripts/smoke-check.mjs
+
+  version-sync:
+    name: Versão app ↔ landing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir softwareVersion e badge
+        run: |
+          set -euo pipefail
+          PUB=$(grep -E '^version:' pubspec.yaml | head -1 | sed -E 's/version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          SCHEMA=$(grep -oE '"softwareVersion":[[:space:]]*"[0-9]+\.[0-9]+\.[0-9]+"' site/index.html | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          BADGE=$(grep -oE 'id="app-version">[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+' site/index.html | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          CONST=$(grep -E "static const String version = '" lib/utils/constants.dart | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "pubspec=$PUB schema=$SCHEMA badge=$BADGE constants=$CONST"
+          test "$PUB" = "$SCHEMA"
+          test "$PUB" = "$BADGE"
+          test "$PUB" = "$CONST"

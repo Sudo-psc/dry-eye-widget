@@ -1,8 +1,18 @@
 # Status
 
-Updated: 2026-06-21
+Updated: 2026-07-10
 
-Current phase: HealthKit dashboard branch in progress for macOS-only native integration.
+Current phase: Landing refreshed for app 1.22.7 (version badge, a11y, features, FAQ) + CI/smoke automation.
+
+Landing cycles (2026-07-10):
+
+- Version badge + JSON-LD softwareVersion 1.22.7
+- Skip link and focus-visible styles
+- Feature cards: day summary + meeting/blink controls
+- FAQ + schema for DVRS and v1.22 news
+- Sitemap lastmod + smoke-check version sync with pubspec
+
+Previous phase note: HealthKit dashboard branch in progress for macOS-only native integration.
 
 Completed:
 

@@ -4,6 +4,51 @@
    docs/design-system-windows.md (#4A90E2 idle, glass fills)
    ============================================================ */
 
+/* Skip link — acessibilidade teclado */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 1000;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--accent, #4A90E2);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 12px;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent, #4A90E2);
+  outline-offset: 3px;
+}
+
+.version-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+}
+.version-pill strong {
+  font-family: var(--font-mono);
+  color: var(--accent-strong, #2F6FC4);
+  font-weight: 700;
+}
+
 :root {
   /* Accent (tweakable) */
   --accent: #4A90E2;

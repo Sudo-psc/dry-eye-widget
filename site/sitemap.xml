@@ -4,7 +4,7 @@
 
   <url>
     <loc>https://olhossecos.com.br/app/</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -12,7 +12,7 @@
   <!-- Blog index -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/"/>
@@ -20,7 +20,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/"/>
@@ -30,7 +30,7 @@
   <!-- Article 1 -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/olho-seco-trabalhadores-terminais-digitais.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/olho-seco-trabalhadores-terminais-digitais.html"/>
@@ -38,7 +38,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/dry-eye-vdt-workers.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/olho-seco-trabalhadores-terminais-digitais.html"/>
@@ -48,7 +48,7 @@
   <!-- Article 2 -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html"/>
@@ -56,7 +56,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/productivity-and-dry-eye.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/produtividade-e-olho-seco.html"/>
@@ -66,7 +66,7 @@
   <!-- Article 3 -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/presenteismo-olho-seco-empresas.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/presenteismo-olho-seco-empresas.html"/>
@@ -74,7 +74,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/presenteeism-dry-eye-companies.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/presenteismo-olho-seco-empresas.html"/>
@@ -84,7 +84,7 @@
   <!-- Article 4 -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/sindrome-visao-computador.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/sindrome-visao-computador.html"/>
@@ -92,7 +92,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/computer-vision-syndrome.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/sindrome-visao-computador.html"/>
@@ -102,7 +102,7 @@
   <!-- Article 5 -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/regra-20-20-20-guia-pratico.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/regra-20-20-20-guia-pratico.html"/>
@@ -110,7 +110,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/20-20-20-rule-practical-guide.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/regra-20-20-20-guia-pratico.html"/>
@@ -120,7 +120,7 @@
   <!-- Article 6 -->
   <url>
     <loc>https://olhossecos.com.br/app/blog/home-office-olho-seco.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/home-office-olho-seco.html"/>
@@ -128,7 +128,7 @@
   </url>
   <url>
     <loc>https://olhossecos.com.br/app/blog/en/remote-work-dry-eye.html</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/blog/home-office-olho-seco.html"/>
