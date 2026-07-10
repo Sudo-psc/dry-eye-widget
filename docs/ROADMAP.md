@@ -17,7 +17,7 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 | # | Item | Área | Impacto | Esforço |
 |---|------|------|---------|---------|
 | 1 | **Ativar** assinatura com secrets (Apple Developer ID + SignPath) | Distribuição | Alto | Conta/custo |
-| 2 | QA manual Windows: docking meia-lua + micronotificação | App | Alto | Médio |
+| 2b | Executar checklist QA-WINDOWS em máquina Win10/11 (humano) | App | Alto | 30–60 min |
 | 3 | Validação HealthKit em build assinado | App | Médio | Médio |
 
 ### Concluído recentemente (Now)
@@ -25,8 +25,12 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 | # | Item | Evidência |
 |---|------|-----------|
 | 1a | Pipeline de assinatura macOS + Windows no CI | `docs/CODE_SIGNING.md`, `scripts/macos_*.sh`, workflows condicionais |
+| 2a | Protocolo + testes Windows docking/micronotificação | `docs/QA-WINDOWS.md`, `test/edge_snap_test.dart` (cenários Win), run 2026-07-10 |
 | 4 | Screenshots Windows na landing | Filtro macOS/Windows + 5 slides Win em `site/assets/shots/windows-*.jpg` |
 | 5 | Lighthouse produção pós-deploy | `docs/lighthouse/LATEST.md` — mobile Perf 93 / a11y 90 / BP 100 / SEO 100 |
+
+> **#2a vs #2b:** lógica e checklist prontos; falta carimbo humano em hardware
+> Windows real (este ambiente é macOS).
 
 > **#1a vs #1:** o código e o CI estão prontos; falta cadastrar certificado Apple
 > e aprovação SignPath (checklist em `docs/CODE_SIGNING.md`). Sem isso as

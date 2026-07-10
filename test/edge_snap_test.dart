@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:dry_eye_widget/utils/edge_snap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -106,6 +108,94 @@ void main() {
       }
       expect(ballDockEdgeFromId('nope'), isNull);
       expect(ballDockEdgeFromId(null), isNull);
+    });
+  });
+
+  // Cenários típicos de Windows (taskbar, DPI/monitor secundário).
+  group('Windows-like display geometry', () {
+    test('taskbar inferior: área visível reduzida ainda encaixa na direita', () {
+      // Work area 1920x1040 (taskbar ~40px) em (0,0).
+      const work = Rect.fromLTWH(0, 0, 1920, 1040);
+      const ball = Size(56, 56);
+      final edge = dockEdgeFor(
+        windowPos: const Offset(1920 - 56 - 12, 800),
+        windowSize: ball,
+        screen: work,
+      );
+      expect(edge, BallDockEdge.right);
+      final pos = dockedWindowPosition(
+        edge: BallDockEdge.right,
+        windowPos: const Offset(1850, 800),
+        windowSize: ball,
+        screen: work,
+      );
+      expect(pos.dx, closeTo(1920 - 56 * kDockVisibleFraction, 0.01));
+      expect(pos.dy, 800);
+      // Não deve empurrar abaixo da work area.
+      expect(pos.dy + ball.height, lessThanOrEqualTo(work.bottom));
+    });
+
+    test('monitor secundário com origem negativa (esquerda do primário)', () {
+      // Monitor à esquerda: work area em x=-1920.
+      const work = Rect.fromLTWH(-1920, 0, 1920, 1080);
+      const ball = Size(48, 48);
+      final edge = dockEdgeFor(
+        windowPos: const Offset(-1920 + 8, 400),
+        windowSize: ball,
+        screen: work,
+      );
+      expect(edge, BallDockEdge.left);
+      final pos = dockedWindowPosition(
+        edge: BallDockEdge.left,
+        windowPos: const Offset(-1910, 400),
+        windowSize: ball,
+        screen: work,
+      );
+      expect(pos.dx, lessThan(work.left));
+      expect(pos.dx, closeTo(work.left - ball.width * (1 - kDockVisibleFraction), 0.01));
+      expect(pos.dy, 400);
+    });
+
+    test('threshold com bola grande (scale Windows 150%) ainda detecta borda', () {
+      // Bolinha 72px; threshold efetivo no main é max(56, width*0.72).
+      const work = Rect.fromLTWH(0, 0, 2560, 1440);
+      const ball = Size(72, 72);
+      final threshold = math.max(kDockThreshold, ball.width * 0.72);
+      expect(threshold, closeTo(56, 0.01)); // 72*0.72=51.84 < 56
+      final edge = dockEdgeFor(
+        windowPos: Offset(work.right - ball.width - 40, 200),
+        windowSize: ball,
+        screen: work,
+        threshold: threshold,
+      );
+      expect(edge, BallDockEdge.right);
+    });
+
+    test('bolinha 96px usa threshold ampliado (width*0.72)', () {
+      const work = Rect.fromLTWH(0, 0, 1920, 1080);
+      const ball = Size(96, 96);
+      final threshold = math.max(kDockThreshold, ball.width * 0.72);
+      expect(threshold, closeTo(69.12, 0.01));
+      // 60px da borda: abaixo do threshold ampliado, acima do default 56.
+      final edge = dockEdgeFor(
+        windowPos: Offset(work.right - ball.width - 60, 300),
+        windowSize: ball,
+        screen: work,
+        threshold: threshold,
+      );
+      expect(edge, BallDockEdge.right);
+    });
+
+    test('Y no limite inferior da taskbar é clampado ao encaixar', () {
+      const work = Rect.fromLTWH(0, 0, 1920, 1040);
+      const ball = Size(48, 48);
+      final pos = dockedWindowPosition(
+        edge: BallDockEdge.left,
+        windowPos: const Offset(10, 2000),
+        windowSize: ball,
+        screen: work,
+      );
+      expect(pos.dy, work.bottom - ball.height);
     });
   });
 }
