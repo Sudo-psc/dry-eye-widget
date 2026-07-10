@@ -57,6 +57,9 @@ void main() {
     expect(data.narrative!.contains('DVRS'), isTrue);
 
     final pure = NarrativeSummary.buildPt(data);
-    expect(pure, contains('oftalmolog'));
+    // "oftalmológico" tem acento em "ó" — não use o substring "oftalmolog".
+    expect(pure.toLowerCase(), contains('oftalm'));
+    expect(pure, contains('clínica'));
+    expect(data.narrative!.toLowerCase(), contains('oftalm'));
   });
 }
