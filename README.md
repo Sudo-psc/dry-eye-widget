@@ -180,7 +180,7 @@ Pré-requisitos: **Xcode** (macOS) · **Visual Studio 2022** com C++ (Windows). 
 ## Privacidade e legal
 
 - Processamento **local**; sem coleta de dados de uso enviada a servidores pelo app.  
-- [Termos de Uso](docs/legal/termos-de-uso.md) · [Política de Privacidade](docs/legal/politica-de-privacidade.md) · [docs/PRIVACY.md](docs/PRIVACY.md)
+- [Termos de Uso](docs/legal/termos-de-uso.md) · [Política de Privacidade](docs/legal/politica-de-privacidade.md) · [docs/PRIVACY.md](docs/PRIVACY.md) · [SECURITY.md](SECURITY.md)
 
 ---
 

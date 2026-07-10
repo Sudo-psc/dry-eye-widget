@@ -4,6 +4,11 @@
   function setTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
     try { localStorage.setItem("dew-theme", t); } catch (e) {}
+    try {
+      var secure = location.protocol === "https:" ? "; Secure" : "";
+      document.cookie =
+        "dew-theme=" + t + "; path=/; max-age=31536000; SameSite=Lax" + secure;
+    } catch (e) {}
   }
   window.dewSetTheme = setTheme;
   function initTheme() {
@@ -71,6 +76,8 @@
   document.addEventListener("DOMContentLoaded", function () {
     if (typeof window.dewInitLang === "function") window.dewInitLang();
     setupDemoVideo();
+    var yearEl = document.getElementById("foot-year");
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
     const themeBtn = document.getElementById("theme-toggle");
     if (themeBtn) themeBtn.addEventListener("click", function () {

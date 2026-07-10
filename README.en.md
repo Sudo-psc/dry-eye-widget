@@ -180,7 +180,7 @@ Requirements: **Xcode** (macOS) · **Visual Studio 2022** with C++ (Windows). Fl
 ## Privacy and legal
 
 - **Local** processing; the app does not ship usage data to servers.  
-- [Terms of Use](docs/legal/termos-de-uso.md) · [Privacy Policy](docs/legal/politica-de-privacidade.md) · [docs/PRIVACY.md](docs/PRIVACY.md)
+- [Terms of Use](docs/legal/termos-de-uso.md) · [Privacy Policy](docs/legal/politica-de-privacidade.md) · [docs/PRIVACY.md](docs/PRIVACY.md) · [SECURITY.md](SECURITY.md)
 
 ---
 

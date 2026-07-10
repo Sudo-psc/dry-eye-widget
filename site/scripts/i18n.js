@@ -187,6 +187,7 @@
       "foot.privacy": "Privacidade",
       "foot.releases": "Releases",
       "foot.roadmap": "Roadmap",
+      "foot.security": "Segurança",
       "foot.faq": "FAQ",
     
     },
@@ -368,6 +369,7 @@
       "faq.4.q": "Does the app replace medical treatment?",
       "faq.4.a": "No. It is a preventive habit-support tool. If you have persistent dry eye symptoms, see an ophthalmologist for diagnosis and individual guidance.",
       "foot.roadmap": "Roadmap",
+      "foot.security": "Security",
       "foot.faq": "FAQ",
       "note.body": "Dry Eye Widget is a preventive support tool — it does not replace medical evaluation. If you experience persistent eye discomfort, blurry vision or chronic dry eyes, see an ophthalmologist.",
       "foot.author": "Developed by Philipe Saraiva Cruz, MD · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903",
@@ -397,8 +399,23 @@
     });
     try { localStorage.setItem("dew-lang", lang); } catch (e) {}
     try {
-      document.cookie = "dew-lang=" + lang + "; path=/; max-age=31536000; SameSite=Lax";
+      // Secure em HTTPS; SameSite=Lax reduz CSRF de cookie de preferência.
+      var secure = location.protocol === "https:" ? "; Secure" : "";
+      document.cookie =
+        "dew-lang=" + lang + "; path=/; max-age=31536000; SameSite=Lax" + secure;
     } catch (e) {}
+    // Atualiza aria-label do seletor de idioma e do tema (se presentes).
+    var group = document.querySelector(".lang-switch");
+    if (group) {
+      group.setAttribute("aria-label", lang === "en" ? "Language" : "Idioma");
+    }
+    var themeBtn = document.getElementById("theme-toggle");
+    if (themeBtn) {
+      themeBtn.setAttribute(
+        "aria-label",
+        lang === "en" ? "Toggle theme" : "Alternar tema",
+      );
+    }
   }
 
   function readCookieLang() {

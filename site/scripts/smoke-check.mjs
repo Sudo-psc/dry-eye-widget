@@ -118,6 +118,7 @@ const requiredAssets = [
   "site.webmanifest",
   "robots.txt",
   "sitemap.xml",
+  ".well-known/security.txt",
   "assets/icon-256.png",
   "assets/og-hero.jpg",
   "assets/doctor.png",
@@ -159,6 +160,13 @@ if (!indexHtml.includes("og:locale")) {
 if (!indexHtml.includes('name="referrer"') || !indexHtml.includes("Content-Security-Policy")) {
   fail("site/index.html must declare referrer-policy and Content-Security-Policy.");
 }
+if (!indexHtml.includes("Permissions-Policy")) {
+  fail("site/index.html must declare Permissions-Policy (camera/mic/geo disabled).");
+}
+const securityTxt = read(join(root, ".well-known/security.txt"));
+if (!securityTxt.includes("Contact:") || !securityTxt.includes("SECURITY.md")) {
+  fail(".well-known/security.txt must declare Contact and Policy.");
+}
 // Vídeo não deve puxar 2MB+ no first paint (sem autoplay + sem source estático).
 if (/id="demo-video"[\s\S]*?\bautoplay\b/i.test(indexHtml)) {
   fail("demo-video must not use autoplay (perf: defers multi-MB download).");
@@ -171,6 +179,32 @@ if (
   indexHtml.includes("family=Sora:")
 ) {
   fail("Unused Google Font families (Schibsted/Sora) must not be loaded.");
+}
+if (!indexHtml.includes('name="color-scheme"')) {
+  fail("site/index.html must declare color-scheme for light/dark UI.");
+}
+if (!indexHtml.includes('id="main"') || !indexHtml.includes('href="#main"')) {
+  fail("site/index.html must expose <main id=\"main\"> and skip-link to #main.");
+}
+if (/aggregateRating/i.test(indexHtml)) {
+  fail("Do not publish AggregateRating without a verified review corpus.");
+}
+
+// Blog: links externos com target=_blank precisam de noreferrer (tabnabbing).
+for (const path of walk(root, (p) => p.endsWith(".html"))) {
+  const rel = relative(root, path);
+  if (!rel.startsWith("blog")) continue;
+  const html = read(path);
+  const blank = [...html.matchAll(/target="_blank"/g)].length;
+  const noref = [...html.matchAll(/rel="noopener noreferrer"/g)].length;
+  if (blank > 0 && noref < blank) {
+    fail(
+      `${rel}: ${blank} target=_blank but only ${noref} rel="noopener noreferrer"`,
+    );
+  }
+  if (html.includes("Schibsted+Grotesk") || html.includes("family=Sora:")) {
+    fail(`${rel}: unused Google Font families must not be loaded.`);
+  }
 }
 
 if (failures.length) {

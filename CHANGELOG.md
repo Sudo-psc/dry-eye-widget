@@ -6,7 +6,14 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-### Landing (`site/`)
+### Melhorado (quick wins 2026-07-10)
+- Landing: CSP, referrer-policy, Permissions-Policy, color-scheme, cookies Secure
+- Landing: fontes reduzidas; vídeo lazy; `<main>` + skip-link; sem AggregateRating fictício
+- Blog: `noopener noreferrer`, fontes alinhadas, metas de segurança
+- App: UpdateService só HTTPS em hosts GitHub (sem redirects)
+- `SECURITY.md` + `site/.well-known/security.txt`
+
+### Landing (`site/`) — rodadas anteriores
 - Badge de versão 1.22.7 e JSON-LD `softwareVersion` alinhado ao pubspec
 - Skip link + `:focus-visible` (a11y)
 - Cards de recursos: Resumo do dia e modo reunião / piscada
