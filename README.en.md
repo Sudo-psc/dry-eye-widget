@@ -2,183 +2,203 @@
   <img src="banner.png" alt="Dry Eye Widget — the 20-20-20 rule as a gentle reminder on your screen" width="820">
 </p>
 
-<h1 align="center">Dry Eye Widget 👁️💧</h1>
-
-<p align="center"><em>Prevention of Digital Eye Strain through Ocular Micro-Breaks.</em></p>
-
-<p align="center"><a href="README.md">🇧🇷 Português</a> · <b>🇺🇸 English</b></p>
+<h1 align="center">Dry Eye Widget</h1>
 
 <p align="center">
-  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Download-macOS%20.dmg-0A84FF?style=flat-square&logo=apple&logoColor=white" alt="Download for macOS"></a>
-  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe"><img src="https://img.shields.io/badge/Download-Windows%20.exe-0078D6?style=flat-square&logo=windows&logoColor=white" alt="Download for Windows"></a>
-  <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows-555?style=flat-square" alt="Platforms">
-  <img src="https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter">
-  <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-22c55e?style=flat-square" alt="MIT License"></a>
+  <em>A gentle 20-20-20 reminder for digital eye strain and dry eye.</em><br>
+  <strong>Version 1.22.7</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
-A prophylactic intervention tool that implements the 20-20-20 ophthalmological rule, aiming to mitigate Computer Vision Syndrome (CVS) and Dry Eye Disease (DED) associated with prolonged screen exposure.
+  <a href="README.md">🇧🇷 Português</a> · <b>🇺🇸 English</b>
 </p>
 
 <p align="center">
-  <img src="docs/media/app-demo.gif" alt="Dry Eye Widget in action: the ball tracks the cycle, triggers the 20-20-20 break with guided blinking and resumes" width="760">
+  <a href="https://olhossecos.com.br/app/"><img src="https://img.shields.io/badge/Landing-olhossecos.com.br%2Fapp-0A84FF?style=flat-square" alt="Landing page"></a>
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest"><img src="https://img.shields.io/github/v/release/Sudo-psc/dry-eye-widget?style=flat-square&label=Release" alt="Latest release"></a>
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Sudo-psc/dry-eye-widget/ci.yml?branch=main&style=flat-square&label=CI" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Flutter-3.44-02569B?style=flat-square&logo=flutter&logoColor=white" alt="Flutter">
+  <a href="#license"><img src="https://img.shields.io/badge/License-MIT-22c55e?style=flat-square" alt="MIT License"></a>
 </p>
 
-<p align="center"><sub>🎬 App simulation — the work cycle, the <b>20·20·20</b> reminder with guided blinking, and the resume · <a href="docs/media/app-demo.mp4">video version (MP4)</a></sub></p>
+<p align="center">
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg"><img src="https://img.shields.io/badge/Download-macOS%20.dmg-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS"></a>
+  <a href="https://apps.microsoft.com/detail/9nnk9spjz3qv"><img src="https://img.shields.io/badge/Microsoft%20Store-Windows-0078D6?style=for-the-badge&logo=microsoft&logoColor=white" alt="Microsoft Store"></a>
+  <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe"><img src="https://img.shields.io/badge/Download-Windows%20.exe-555?style=for-the-badge&logo=windows&logoColor=white" alt="Windows installer"></a>
+</p>
+
+<p align="center">
+  <img src="docs/media/landing-demo.gif" alt="Dry Eye Widget demo" width="820">
+</p>
+
+<p align="center"><sub>Demo · <a href="docs/media/landing-demo.mp4">MP4</a> · site: <a href="https://olhossecos.com.br/app/">olhossecos.com.br/app</a></sub></p>
 
 ---
 
-## Pathophysiology and Rationale
+## What it is
 
-The continuous and prolonged use of Video Display Terminals (VDTs) induces significant physiological alterations in the ocular surface and the eye's intrinsic musculature. During cognitively demanding tasks on screens, the **spontaneous blink rate is reduced by up to 60%**, while the blink amplitude frequently becomes incomplete. This dysfunction in blink dynamics leads to mechanical instability of the tear film, an increased evaporation rate, and hyperosmolarity, resulting in the desiccation of the ocular surface (Evaporative Dry Eye Disease). Concurrently, uninterrupted near-focusing leads to accommodative spasm of the ciliary muscle and convergence stress, clinically manifesting as asthenopia (visual fatigue) and transient blurred vision.
+An always-on-top floating ball that applies the **20-20-20 rule** to your workday: every 20 minutes, it reminds you to look about 6 meters away for 20 seconds. Built by an **ophthalmologist** to support preventive habits — **it does not diagnose and does not replace a clinical visit**.
 
-The clinical presentation of these symptoms is collectively defined as **Computer Vision Syndrome (CVS)** or **Digital Eye Strain (DES)**. From an occupational standpoint, symptomatic DED and visual fatigue have a substantial impact on work performance, resulting in significant drops in productivity (presenteeism) that can reach approximately 30% [²], alongside a documented decline in prolonged reading speed and fluency of up to 14% [³ ⁴].
-
-### 📊 Scientific Evidence
-
-| | |
-|---:|:---|
-| **~50%** | Global prevalence of Dry Eye Disease (DED) among workers using video display terminals, according to meta-analyses [¹] |
-| **~30%** | Documented reduction in performance and productivity (*presenteeism*) in individuals with symptomatic dry eye [²] |
-| **up to 14%** | Impairment of prolonged reading fluency and speed induced by ocular surface alterations [³ ⁴] |
-
-The first-line prophylactic intervention, advocated by international ophthalmology and ergonomics societies, is the adherence to standardized regular visual breaks:
-
-## The 20-20-20 Rule ⏱️
-
-> **For every 20 minutes of screen use, the individual must shift their visual focus to an object situated at least 20 feet (approximately 6 meters) away, for a minimum duration of 20 seconds.**
-
-**Mechanism of action:**
-1. **Accommodative Relaxation:** Shifting the gaze to optical infinity (≥ 6 meters) interrupts the sustained contraction of the ciliary muscle and the convergence of extraocular muscles, alleviating biomechanical stress and asthenopia.
-2. **Tear Film Restoration:** The 20-second pause actively encourages the reestablishment of the normal and complete blink rate, promoting the mechanical expression of the Meibomian glands and the subsequent lipid and aqueous redistribution over the cornea.
-
-The primary clinical barrier to this intervention is poor behavioral adherence, largely driven by deep cognitive engagement (digital immersion). The *Dry Eye Widget* addresses this limitation directly, serving as a continuous *biofeedback* mechanism that automates and signals these therapeutic micro-breaks.
+Runs **offline**, with no usage telemetry by default. Breaks, DVRS scores and screen-time data stay on your machine.
 
 ---
 
-## 👨‍⚕️ Specialized Development
+## Why it exists
 
-The application was conceptualized and developed by **Dr. Philipe Saraiva Cruz**, Ophthalmologist, in response to the growing incidence of DES in daily clinical practice. The software aims to translate evidence-based preventive recommendations from the clinical setting into a seamless digital solution, perfectly aligned with the modern user's workflow.
+On screens, the **spontaneous blink rate can drop by up to ~60%** and the tear film evaporates faster — burning, blurred vision and end-of-day fatigue. That overlaps with **Computer Vision Syndrome (CVS)** and evaporative **Dry Eye Disease (DED)** linked to VDTs.
 
----
+| Evidence | Source |
+|----------|--------|
+| **~50%** DED prevalence among VDT workers | Meta-analysis [¹] |
+| **~30%** productivity loss (presenteeism) with symptomatic dry eye | [²] |
+| **Up to 14%** impairment in prolonged reading | [³ ⁴] |
 
-## 📥 Deployment and Execution
+First-line prevention is the **20-20-20 rule**. The real barrier is **adherence** — this widget exists to remind you without getting in the way.
 
-### 🍎 macOS
+### The 20-20-20 rule
 
-**➡️ [Download DMG package (DryEyeWidget.dmg)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg)** — Universal binary (Apple Silicon + Intel)
+> Every **20 minutes** of screen time → look **20 feet (~6 m)** away → for **20 seconds**.
 
-1. Mount the `.dmg` file and **move** the application to the **Applications** directory (`/Applications`).
-2. On the initial execution, bypass the Gatekeeper quarantine restrictions by selecting the file and using the **Right-click → Open** function (the application is freely distributed and currently lacks a paid Apple digital certificate).
-3. Upon initialization, a non-intrusive *widget* will be rendered in a persistent window layer (always-on-top), operating autonomously.
-
-### 🪟 Windows
-
-**➡️ [Download executable installer (DryEyeWidget-Setup-x64.exe)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe)** &nbsp;·&nbsp; or the **[portable compressed archive (.zip)](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip)** (64-bit Architecture)
-
-1. Execute the installer. Should the **Windows SmartScreen** filter intercept execution due to the absence of a code signature, select **More info → Run anyway**.
-2. Initialize the application via the shortcut in the **Start Menu**. The *widget* will dock to the screen and register a background process in the **system tray**.
-
-> **Portable version notice:** Extract the `.zip` contents and execute via `dry_eye_widget.exe`. Ensure the structural integrity of the directory is preserved by keeping the `.dll` files and the `data\` subfolder in the same root directory as the executable.
-
-> All release binaries are archived in **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
+1. **Relaxes** accommodation and convergence (less asthenopia).  
+2. **Encourages** complete blinks and tear-film redistribution.
 
 ---
 
-## 📸 App Screenshots
+## Features (1.22)
+
+- **Floating widget** with progress ring, always-on-top, system tray  
+- **Configurable cycles and look** (interval, colors, opacity, glass)  
+- **Half-moon edge snap** (discreet; one click undocks)  
+- **Guided break** (full overlay or gentle corner card)  
+- **Blink reminder** (visual and/or sound; adjustable frequency)  
+- **Meeting mode** — stretch the cycle for 1 hour  
+- **DVRS** — Digital Visual Risk Index (16-question educational screen, **not a diagnosis**)  
+- **Day summary** and local insights  
+- **PDF report** for your ophthalmologist (generated locally)  
+- **Screen time** and activity (opt-in)  
+- **i18n** PT / EN  
+
+Landing with macOS and Windows captures: [olhossecos.com.br/app](https://olhossecos.com.br/app/)
+
+---
+
+## Download and install
+
+### macOS
+
+1. Download [**DryEyeWidget.dmg**](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg) (universal Apple Silicon + Intel).  
+2. Open the `.dmg` and drag to **Applications**.  
+3. **Gatekeeper (app not yet paid-Apple notarized):** if macOS says the file “is damaged”, in Terminal:
+
+```bash
+xattr -cr ~/Downloads/DryEyeWidget*.dmg
+# if already in Applications:
+xattr -cr "/Applications/Dry Eye Widget.app"
+```
+
+The same instructions ship inside the DMG volume. Signing pipeline: [`docs/CODE_SIGNING.md`](docs/CODE_SIGNING.md).
+
+### Windows
+
+| Channel | Link |
+|---------|------|
+| **Microsoft Store** (recommended) | [Dry Eye Widget on the Store](https://apps.microsoft.com/detail/9nnk9spjz3qv) |
+| x64 installer | [DryEyeWidget-Setup-x64.exe](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe) |
+| Portable ZIP | [DryEyeWidget-windows-x64.zip](https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip) |
+
+On the GitHub installer, if **SmartScreen** warns: *More info → Run anyway* (until Authenticode signing is active). Details: [`win_version/CODE_SIGNING.md`](win_version/CODE_SIGNING.md).
+
+For the portable ZIP, keep `dry_eye_widget.exe`, DLLs and the `data\` folder together.
+
+All builds: **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
+
+---
+
+## Screenshots
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/media/carousel-dark.gif">
     <source media="(prefers-color-scheme: light)" srcset="docs/media/carousel-light.gif">
-    <img src="docs/media/carousel-dark.gif" alt="Carousel of real Dry Eye Widget screens" width="820">
+    <img src="docs/media/carousel-dark.gif" alt="Dry Eye Widget screen carousel" width="820">
   </picture>
 </p>
 
-<p align="center"><sub>🎞️ Real screens carousel — light/dark follows your GitHub theme · video: <a href="docs/media/carousel-dark.mp4">dark</a> · <a href="docs/media/carousel-light.mp4">light</a></sub></p>
-
-<p align="center">
-  <img src="docs/media/app-break-timer.jpg" width="400" alt="Silent Alert and Break Reminder">
-  <img src="docs/media/app-symptoms.jpg" width="400" alt="Symptom Tracker Questionnaire">
-  <br>
-  <img src="docs/media/app-settings.jpg" width="400" alt="Settings and Customization">
-  <img src="docs/media/app-guidance.jpg" width="400" alt="Guidelines and Scientific Evidence">
-  <br>
-  <img src="docs/media/app-menu.jpg" width="400" alt="Widget Control Menu">
-</p>
+<p align="center"><sub>Light/dark follows GitHub · <a href="docs/media/carousel-dark.mp4">dark video</a> · <a href="docs/media/carousel-light.mp4">light video</a></sub></p>
 
 ---
 
-## ✨ Operational Dynamics
+## Clinical note
 
-- 🔵 **Persistent Interface:** The *widget* operates in an *overlay* mode with a transparent background, ensuring continuous status visibility without blocking underlying OS events.
-- ⏰ **Alert Cycles:** Every **20 minutes** (customizable parameter), the visual signaling of the *widget* transitions to an alert state, actively prompting a visual micro-break and the performance of voluntary blinks.
-- 🧘 **Integrated Timer:** A countdown chronometer guides the physiological resting process for 20 seconds. Upon completion, the underlying cycles are automatically rearmed.
-- 👁️ **Tray Control:** An integrated node in the menu bar/system tray provides real-time monitoring of metabolic progress and global overlay control options (pause, reset, etc.).
+This is a **preventive habit-support tool** — **not** a diagnostic device or treatment. For persistent eye discomfort, blurred vision or suspected dry eye, **see an ophthalmologist**.
 
-### Configurable Parameters ⚙️
-
-The *widget* engine offers a flexible configuration architecture: modulation of the cycle timing, adjustment of the *overlay* radius, state color matrix (idle/alert), rendering settings (translucent *liquid glass* mode vs. darkened background), boot initialization coupling, and inactivity control, ensuring optimal adherence to varied workflows.
+Authorship: **Philipe Saraiva Cruz, MD** — ophthalmologist · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903
 
 ---
 
-## 💚 Clinical Consideration
+## Development
 
-This application is strictly a **prophylactic support tool**, functioning to modulate occupational habits and does not constitute a medical device intended for diagnostic or curative purposes. In cases of chronic asthenopia, sustained hyperemia, or symptomatic tear film instability, it is imperative to **seek a specialized ophthalmological evaluation**.
-
----
-
-## 🛠️ Technical Specifications (Developers)
-
-The infrastructure is built upon **Flutter** (*desktop-first*), natively supporting macOS and Windows.
+Stack: **Flutter desktop** (macOS / Windows), `provider`, `window_manager`, `flutter_acrylic`, `tray_manager`, `local_notifier`, `audioplayers`.
 
 ```bash
 flutter pub get
-flutter run -d macos      # or -d windows
+flutter analyze
+flutter test
+flutter run -d macos    # or -d windows
 ```
 
-Build Pipeline:
+### Release builds
 
 ```bash
-flutter build macos --release         # Compiles universal binary (arm64 + x86_64)
-./scripts/make_dmg.sh                  # Packages the structural dist/DryEyeWidget.dmg
-flutter build windows --release        # Produces x64 standalone binary
+# macOS
+flutter build macos --release
+./scripts/make_dmg.sh                 # → dist/DryEyeWidget.dmg
+# with Developer ID configured (optional):
+# MACOS_SIGNING_ENABLED=true MACOS_IDENTITY="..." ./scripts/macos_sign_and_notarize.sh
+
+# Windows (on a Windows host + VS 2022 “Desktop development with C++”)
+flutter build windows --release
+# Installer: Inno Setup with win_version/templates/dry-eye-widget.iss
 ```
 
-Architecture and Dependencies: The project complies with `flutter analyze` without warnings. It employs reactive dependency injection via `provider`. Advanced OS window control utilizes `window_manager` interfaced with `flutter_acrylic` (for transparent *liquid glass* effects). Tray communication is handled by `tray_manager`, audio events by `audioplayers`, notification bus by the `local_notifier` package, and inactivity observability via cross-platform native channels.
+### CI and useful docs
 
-> **Prerequisites:** Compiling for Windows requires **Visual Studio 2022** with the "Desktop development with C++" workload operating under a Windows OS. Compiling for macOS requires **Xcode** via an Apple host infrastructure.
+| Doc | Content |
+|-----|---------|
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Now / Next / Later priorities |
+| [`docs/CODE_SIGNING.md`](docs/CODE_SIGNING.md) | macOS + Windows signing in CI |
+| [`docs/QA-WINDOWS.md`](docs/QA-WINDOWS.md) | Docking & blink micro-notification checklist |
+| [`docs/IMPROVEMENT-AUTOMATION.md`](docs/IMPROVEMENT-AUTOMATION.md) | Workflows and automation |
+| [`docs/lighthouse/LATEST.md`](docs/lighthouse/LATEST.md) | Landing Lighthouse baseline |
+| [`CHANGELOG.md`](CHANGELOG.md) | Version history |
+| [`site/`](site/) | Static landing (GitHub Pages) |
+
+Requirements: **Xcode** (macOS) · **Visual Studio 2022** with C++ (Windows). Flutter **≥ 3.44**.
 
 ---
 
-## 📚 Bibliographic References
+## Privacy and legal
 
-1. Courtin R, et al. **Prevalence of dry eye disease in visual display terminal
-   workers: a systematic review and meta-analysis.** *BMJ Open.* 2016;6(1):e009675.
-   [doi:10.1136/bmjopen-2015-009675](https://doi.org/10.1136/bmjopen-2015-009675)
-2. Nichols KK, et al. **Impact of Dry Eye Disease on Work Productivity, and
-   Patients' Satisfaction With Over-the-Counter Dry Eye Treatments.** *Invest
-   Ophthalmol Vis Sci.* 2016;57(7):2975-82.
-   [doi:10.1167/iovs.16-19419](https://doi.org/10.1167/iovs.16-19419)
-3. Mathews PM, et al. **Functional impairment of reading in patients with dry
-   eye.** *Br J Ophthalmol.* 2016;101(4):481-6.
-   [doi:10.1136/bjophthalmol-2015-308237](https://doi.org/10.1136/bjophthalmol-2015-308237)
-4. Karakus S, et al. **Impact of Dry Eye on Prolonged Reading.** *Optom Vis Sci.*
-   2018;95(12):1105-13.
-   [doi:10.1097/OPX.0000000000001303](https://doi.org/10.1097/OPX.0000000000001303)
+- **Local** processing; the app does not ship usage data to servers.  
+- [Terms of Use](docs/legal/termos-de-uso.md) · [Privacy Policy](docs/legal/politica-de-privacidade.md) · [docs/PRIVACY.md](docs/PRIVACY.md)
 
-<sub>Reference metadata file in RIS format available at:
-[`docs/referencias.ris`](docs/referencias.ris).</sub>
+---
 
-## ⚖️ Legal
+## References
 
-- [Terms of Use](docs/legal/termos-de-uso.md) (Portuguese)
-- [Privacy Policy](docs/PRIVACY.md)
+1. Courtin R, et al. Prevalence of dry eye disease in visual display terminal workers: a systematic review and meta-analysis. *BMJ Open.* 2016;6(1):e009675. [doi:10.1136/bmjopen-2015-009675](https://doi.org/10.1136/bmjopen-2015-009675)  
+2. Nichols KK, et al. Impact of Dry Eye Disease on Work Productivity… *Invest Ophthalmol Vis Sci.* 2016;57(7):2975-82. [doi:10.1167/iovs.16-19419](https://doi.org/10.1167/iovs.16-19419)  
+3. Mathews PM, et al. Functional impairment of reading in patients with dry eye. *Br J Ophthalmol.* 2016;101(4):481-6. [doi:10.1136/bjophthalmol-2015-308237](https://doi.org/10.1136/bjophthalmol-2015-308237)  
+4. Karakus S, et al. Impact of Dry Eye on Prolonged Reading. *Optom Vis Sci.* 2018;95(12):1105-13. [doi:10.1097/OPX.0000000000001303](https://doi.org/10.1097/OPX.0000000000001303)  
+5. Talens-Estarelles C, et al. The effects of breaks on digital eye strain… Testing the 20-20-20 rule. *Cont Lens Anterior Eye.* 2023;46(2):101744. [doi:10.1016/j.clae.2022.101744](https://doi.org/10.1016/j.clae.2022.101744)  
+6. Alabdulkader B. Effect of digital device use during COVID-19 on digital eye strain. *Clin Exp Optom.* 2021;104(6):698-704. [doi:10.1080/08164622.2021.1878843](https://doi.org/10.1080/08164622.2021.1878843)
 
-## 🆓 Licensing
+RIS metadata: [`docs/referencias.ris`](docs/referencias.ris).
 
-**Open Distribution Code.** Open-source architecture governed under the **MIT** License — guaranteeing unrestricted prerogatives for use, replication, code auditing, and commercial or non-commercial derivation. The fundamental goal of this tool is to universalize ergonomic care. 💙
+---
 
-## 👨‍⚕️ Scientific Authorship
+## License
 
-Conceptualized and clinically documented by **Dr. Philipe Saraiva Cruz** — Ophthalmologist · CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903
+**MIT** — free to use, study, modify and redistribute. The goal is to make visual ergonomics care more accessible.
+
+Conceived and clinically documented by **Philipe Saraiva Cruz, MD**.
