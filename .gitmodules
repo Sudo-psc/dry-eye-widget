@@ -1,0 +1,3 @@
+[submodule "claude-code-glm-setup"]
+	path = claude-code-glm-setup
+	url = https://github.com/ankurkakroo2/claude-code-glm-setup.git
