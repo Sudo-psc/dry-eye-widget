@@ -39,17 +39,21 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 - Exportação agregada de métricas locais (opt-in)
 - Monitoramento de SPM warnings dos plugins macOS
 
-## Automação CI (implementada 2026-07-10)
+## Automação CI
 
-- `ci.yml` — Flutter analyze/test + smoke da landing + sync de versão em todo push/PR
+- `ci.yml` — Flutter analyze/test + smoke + version sync + job summary
 - `pages.yml` — deploy GitHub Pages + smoke
 - `site-scheduled-smoke.yml` — smoke semanal
+- `changelog-guard.yml` — bump de versão exige menção no CHANGELOG
+- `label-paths.yml` + `labeler.yml` — labels por pasta tocada
+- `stale.yml` — higiene de issues/PRs inativos
 - `dependabot.yml` — Actions e pub semanalmente
-- `ISSUE_TEMPLATE/roadmap-item.yml` — captura estruturada de ideias
+- `ISSUE_TEMPLATE/roadmap-item.yml` + `PULL_REQUEST_TEMPLATE.md`
+- Detalhes: `docs/IMPROVEMENT-AUTOMATION.md`
 
-## Ciclos recentes (landing + workflows)
+## Ciclos recentes
 
-### Landing (5 ciclos)
+### Landing round 1 (2026-07-10)
 
 1. Badge de versão 1.22.7 + JSON-LD `softwareVersion`
 2. Skip link e `:focus-visible` (a11y)
@@ -57,13 +61,29 @@ Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que a
 4. FAQ DVRS + novidades 1.22 (HTML + schema)
 5. Sitemap `lastmod` + smoke de sync com `pubspec.yaml`
 
-### Workflows / roadmap (5 ciclos)
+### Workflows round 1 (2026-07-10)
 
 1. Workflow unificado `CI`
 2. Dependabot (Actions + pub)
 3. Smoke agendado da landing
 4. Template de issue de roadmap
-5. `docs/ROADMAP.md` + contratos de projeto atualizados
+5. `docs/ROADMAP.md` + contratos de projeto
+
+### Landing round 2 (2026-07-10)
+
+1. `site.webmanifest` + apple-touch-icon + preload CSS
+2. SEO: `og:locale`, hreflang, meta robots
+3. Faixa “Novidades 1.22” no hero + CSS
+4. FAQ #7 instalação macOS/Windows + schema FAQPage
+5. Nav Recursos/FAQ, footer Roadmap, smoke de assets críticos
+
+### Workflows round 2 (2026-07-10)
+
+1. PR template com checklist de qualidade
+2. Labeler por path (`site` / `flutter` / `ci` / `docs`)
+3. Stale hygiene semanal
+4. Changelog guard em bump de versão
+5. CI summary job + `docs/IMPROVEMENT-AUTOMATION.md`
 
 ## Como contribuir com o roadmap
 

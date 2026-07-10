@@ -1,5 +1,6 @@
 # Checks de PR e push em main: Flutter + smoke da landing.
 # Não publica artefatos — só qualidade.
+# Jobs em paralelo; summary no final para leitura rápida no GitHub.
 
 name: CI
 
@@ -33,7 +34,7 @@ jobs:
         run: flutter analyze
 
       - name: Testes
-        run: flutter test
+        run: flutter test --reporter expanded
 
   site:
     name: Landing smoke
@@ -61,3 +62,38 @@ jobs:
           test "$PUB" = "$SCHEMA"
           test "$PUB" = "$BADGE"
           test "$PUB" = "$CONST"
+          {
+            echo "## Version sync"
+            echo "| Fonte | Valor |"
+            echo "|-------|-------|"
+            echo "| pubspec | \`$PUB\` |"
+            echo "| JSON-LD | \`$SCHEMA\` |"
+            echo "| badge | \`$BADGE\` |"
+            echo "| constants | \`$CONST\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  ci-summary:
+    name: CI summary
+    runs-on: ubuntu-latest
+    needs: [flutter, site, version-sync]
+    if: always()
+    steps:
+      - name: Agregar resultado
+        run: |
+          set -euo pipefail
+          F="${{ needs.flutter.result }}"
+          S="${{ needs.site.result }}"
+          V="${{ needs.version-sync.result }}"
+          {
+            echo "## CI jobs"
+            echo "| Job | Resultado |"
+            echo "|-----|----------|"
+            echo "| Flutter | \`$F\` |"
+            echo "| Landing smoke | \`$S\` |"
+            echo "| Version sync | \`$V\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$F" != "success" ] || [ "$S" != "success" ] || [ "$V" != "success" ]; then
+            echo "Um ou mais jobs falharam."
+            exit 1
+          fi
+          echo "Todos os jobs de qualidade passaram."

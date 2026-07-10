@@ -13,12 +13,21 @@ document.documentElement.setAttribute("data-theme",t);})();
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="styles/landing.css" as="style">
 <link rel="stylesheet" href="styles/landing.css">
 <link rel="stylesheet" href="styles/widget-screens.css">
-<link rel="icon" href="assets/icon-256.png">
+<link rel="icon" href="assets/icon-256.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-256.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="canonical" href="https://olhossecos.com.br/app/">
+<link rel="alternate" hreflang="pt-BR" href="https://olhossecos.com.br/app/">
+<link rel="alternate" hreflang="en" href="https://olhossecos.com.br/app/">
+<link rel="alternate" hreflang="x-default" href="https://olhossecos.com.br/app/">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dry Eye Widget">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:title" content="Dry Eye Widget — A regra 20-20-20 na sua tela">
 <meta property="og:description" content="Lembrete gentil da regra 20-20-20 para prevenir fadiga visual digital e olho seco. Com o DVRS — Índice de Risco Visual Digital — e relatório em PDF. Desenvolvido por médico oftalmologista. Gratuito, open source, macOS e Windows.">
 <meta property="og:url" content="https://olhossecos.com.br/app/">
@@ -118,6 +127,14 @@ document.documentElement.setAttribute("data-theme",t);})();
           "@type": "Answer",
           "text": "Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e melhor suporte multiplataforma."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "O Windows ou o macOS bloqueiam a instalação?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pode acontecer enquanto não houver assinatura paga de código. No macOS use xattr -cr no .dmg se o sistema disser que o arquivo está danificado. No Windows, se o SmartScreen avisar, escolha Mais informações e Executar mesmo assim — o binário vem do GitHub Releases open source."
+        }
       }
     ]
   },
@@ -173,7 +190,9 @@ document.documentElement.setAttribute("data-theme",t);})();
       <a href="#regra" data-i18n="nav.rule">A regra</a>
       <a href="#evidencias" data-i18n="nav.evidence">Evidências</a>
       <a href="#custo" data-i18n="nav.cost">Impacto</a>
+      <a href="#recursos" data-i18n="nav.features">Recursos</a>
       <a href="#capturas" data-i18n="nav.shots">Capturas</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
       <a href="blog/" data-i18n="nav.blog">Blog</a>
     </nav>
     <div class="header-actions">
@@ -221,6 +240,16 @@ document.documentElement.setAttribute("data-theme",t);})();
         <br>
         <code style="display:inline-block;margin-top:4px;padding:2px 7px;border-radius:5px;background:rgba(127,127,127,.18);font-size:.82em;user-select:all">xattr -cr ~/Downloads/DryEyeWidget*.dmg</code>
       </p>
+      <aside class="whats-new glass" aria-labelledby="whats-new-title">
+        <p class="whats-new-kicker" id="whats-new-title" data-i18n="news.kicker">Novidades 1.22</p>
+        <ul class="whats-new-list">
+          <li data-i18n="news.1">Resumo do dia e insights locais</li>
+          <li data-i18n="news.2">Lembrete de reavaliação do DVRS</li>
+          <li data-i18n="news.3">Frequência de piscada e alongamento de ciclo (1 h)</li>
+          <li data-i18n="news.4">Builds macOS DMG + Windows EXE/MSIX</li>
+        </ul>
+        <a class="whats-new-link" href="https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.22.7" target="_blank" rel="noopener" data-i18n="news.link">Notas da versão no GitHub</a>
+      </aside>
       <div class="trust-row">
         <span class="trust-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6.5v5c0 4.5 3.4 8 8 9.5 4.6-1.5 8-5 8-9.5v-5L12 3Z"></path><path d="M9 12l2 2 4-4.5"></path></svg>
@@ -597,6 +626,10 @@ document.documentElement.setAttribute("data-theme",t);})();
         <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.6.q">O que há de novo na versão 1.22?</summary>
         <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.6.a">Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e builds multiplataforma atualizados.</p>
       </details>
+      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
+        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.7.q">O Windows ou o macOS bloqueiam a instalação?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.7.a">Pode acontecer enquanto não houver assinatura paga de código. No macOS use xattr -cr no .dmg se o sistema disser que o arquivo está danificado. No Windows, se o SmartScreen avisar, escolha Mais informações e Executar mesmo assim — o binário vem do GitHub Releases open source.</p>
+      </details>
     </div>
   </div>
 </section>
@@ -671,6 +704,8 @@ document.documentElement.setAttribute("data-theme",t);})();
     <div class="footer-links">
       <a href="https://github.com/Sudo-psc/dry-eye-widget" target="_blank" rel="noopener" data-i18n="foot.gh">GitHub</a>
       <a href="https://github.com/Sudo-psc/dry-eye-widget/releases" target="_blank" rel="noopener" data-i18n="foot.releases">Releases</a>
+      <a href="https://github.com/Sudo-psc/dry-eye-widget/blob/main/docs/ROADMAP.md" target="_blank" rel="noopener" data-i18n="foot.roadmap">Roadmap</a>
+      <a href="#faq" data-i18n="foot.faq">FAQ</a>
       <a href="https://github.com/Sudo-psc/dry-eye-widget/blob/main/docs/legal/termos-de-uso.md" target="_blank" rel="noopener" data-i18n="foot.terms">Termos de Uso</a>
       <a href="https://github.com/Sudo-psc/dry-eye-widget/blob/main/docs/legal/politica-de-privacidade.md" target="_blank" rel="noopener" data-i18n="foot.privacy">Privacidade</a>
     </div>

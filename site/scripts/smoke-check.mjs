@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const root = new URL("..", import.meta.url).pathname;
@@ -111,6 +111,41 @@ if (pubVer[1] !== indexVer[1] || pubVer[1] !== badgeVer[1]) {
   fail(
     `Version mismatch: pubspec=${pubVer[1]} schema=${indexVer?.[1]} badge=${badgeVer?.[1]}`,
   );
+}
+
+// Artefatos críticos da landing (SEO, PWA-lite, robots).
+const requiredAssets = [
+  "site.webmanifest",
+  "robots.txt",
+  "sitemap.xml",
+  "assets/icon-256.png",
+  "assets/og-hero.jpg",
+  "assets/doctor.png",
+];
+for (const rel of requiredAssets) {
+  if (!existsSync(join(root, rel))) {
+    fail(`Missing required site asset: ${rel}`);
+  }
+}
+
+const manifest = read(join(root, "site.webmanifest"));
+if (!manifest.includes('"name"') || !manifest.includes("icon-256.png")) {
+  fail("site.webmanifest must declare name and icon-256.png.");
+}
+
+const robots = read(join(root, "robots.txt"));
+if (!robots.includes("Sitemap: https://olhossecos.com.br/app/sitemap.xml")) {
+  fail("robots.txt must declare the production sitemap URL.");
+}
+
+if (!indexHtml.includes('rel="manifest" href="site.webmanifest"')) {
+  fail("site/index.html must link site.webmanifest.");
+}
+if (!indexHtml.includes('rel="apple-touch-icon"')) {
+  fail("site/index.html must declare apple-touch-icon.");
+}
+if (!indexHtml.includes("og:locale")) {
+  fail("site/index.html must declare og:locale for social SEO.");
 }
 
 if (failures.length) {

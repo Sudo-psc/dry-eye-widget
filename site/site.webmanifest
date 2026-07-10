@@ -1,0 +1,19 @@
+{
+  "name": "Dry Eye Widget",
+  "short_name": "Dry Eye",
+  "description": "Lembrete gentil da regra 20-20-20 para fadiga visual digital e olho seco. Open source, macOS e Windows.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0B121D",
+  "theme_color": "#0B121D",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "assets/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

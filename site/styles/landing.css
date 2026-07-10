@@ -49,6 +49,42 @@
   font-weight: 700;
 }
 
+/* Faixa de novidades no hero */
+.whats-new {
+  margin: 16px 0 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  max-width: 36rem;
+  text-align: left;
+}
+.whats-new-kicker {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-strong, #2F6FC4);
+}
+.whats-new-list {
+  margin: 0 0 10px;
+  padding-left: 1.15rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.whats-new-list li + li {
+  margin-top: 4px;
+}
+.whats-new-link {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--accent-strong, #2F6FC4);
+  text-decoration: none;
+}
+.whats-new-link:hover {
+  text-decoration: underline;
+}
+
 :root {
   /* Accent (tweakable) */
   --accent: #4A90E2;

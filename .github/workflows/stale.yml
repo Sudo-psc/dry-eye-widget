@@ -1,0 +1,36 @@
+# Marca e fecha PRs/issues inativos para reduzir ruído no roadmap.
+
+name: Stale hygiene
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: roadmap,pinned,security
+          exempt-pr-labels: pinned,security
+          stale-issue-message: >
+            Esta issue ficou sem atividade. Comente para mantê-la aberta
+            ou ela será fechada automaticamente em 14 dias.
+          stale-pr-message: >
+            Este PR ficou sem atividade. Atualize o branch ou comente para
+            evitar o fechamento automático em 14 dias.
+          close-issue-message: Fechada por inatividade. Reabra se ainda for relevante.
+          close-pr-message: Fechado por inatividade. Reabra com um branch atualizado se ainda for necessário.
+          operations-per-run: 40

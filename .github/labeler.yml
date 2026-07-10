@@ -1,0 +1,29 @@
+# Usado por .github/workflows/label-paths.yml
+
+site:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "site/**"
+
+flutter:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "lib/**"
+          - "test/**"
+          - "pubspec.yaml"
+          - "pubspec.lock"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/dependabot.yml"
+          - ".github/labeler.yml"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "README.md"
+          - "CHANGELOG.md"
+          - "projects/**"

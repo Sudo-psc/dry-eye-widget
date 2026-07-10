@@ -2,9 +2,17 @@
 
 Updated: 2026-07-10
 
-Current phase: Landing refreshed for app 1.22.7 (version badge, a11y, features, FAQ) + CI/smoke automation.
+Current phase: Landing round 2 (manifest, SEO, what's-new, FAQ install, smoke assets) + GitHub automation round 2 (PR template, labeler, stale, changelog guard, CI summary).
 
-Landing cycles (2026-07-10):
+Landing cycles round 2 (2026-07-10):
+
+- site.webmanifest + apple-touch-icon + CSS preload
+- og:locale, hreflang, robots meta
+- Hero "Novidades 1.22" strip
+- FAQ install blocked macOS/Windows + schema
+- Nav/footer links + smoke required assets
+
+Landing cycles round 1 (2026-07-10):
 
 - Version badge + JSON-LD softwareVersion 1.22.7
 - Skip link and focus-visible styles
