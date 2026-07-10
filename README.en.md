@@ -171,7 +171,7 @@ flutter build windows --release
 | [`docs/IMPROVEMENT-AUTOMATION.md`](docs/IMPROVEMENT-AUTOMATION.md) | Workflows and automation |
 | [`docs/lighthouse/LATEST.md`](docs/lighthouse/LATEST.md) | Landing Lighthouse baseline |
 | [`CHANGELOG.md`](CHANGELOG.md) | Version history |
-| [`site/`](site/) | Static landing (GitHub Pages) |
+| [`site/README.md`](site/README.md) | Static landing: layout, smoke, Pages deploy |
 
 Requirements: **Xcode** (macOS) · **Visual Studio 2022** with C++ (Windows). Flutter **≥ 3.44**.
 
