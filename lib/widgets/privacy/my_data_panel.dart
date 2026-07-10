@@ -9,7 +9,7 @@ import '../../services/dvrs_storage_service.dart';
 import '../../services/health_data_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/storage_service.dart';
-import '../../ui/app_theme.dart';
+import '../../utils/constants.dart';
 import '../liquid_glass.dart';
 
 /// Painel LGPD: exportar JSON local e apagar histórico de saúde.

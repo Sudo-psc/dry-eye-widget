@@ -2,6 +2,17 @@
 
 ## now
 
+- [x] Aprovar e registrar o design UX acompanhar / agir / entender.
+- [x] Criar worktree e branch isolados para a evolução de UX.
+- [x] Dividir o painel rápido em página principal e página Sistema.
+- [x] Reduzir a altura nominal do painel e verificar navegação/retorno.
+- [x] Preservar aba e pilha de retorno entre Hub, DVRS e Relatórios.
+- [x] Incorporar DVRS e Relatórios no Hub sem duplicar regras de negócio.
+- [x] Agrupar Progresso e Painel em Evolução: Hábitos / Indicadores.
+- [x] Padronizar estados vazio, indisponível, erro e sucesso nas telas do Hub.
+- [x] Validar janela estreita e escala de texto de 160% sem overflow.
+- [x] Executar testes completos, análise e build macOS release.
+
 - [x] P0 product: Day Summary hub + proactive insight + DVRS recheck nudge (v1.22.0).
 - [x] Quick wins 1.22.1: tray Day Summary + tray i18n; localize close tooltips/dashboard title; open Day Summary after onboarding.
 - [x] Quick wins 1.22.2: completion insight; dashboard tab i18n; reports header i18n.
@@ -17,6 +28,8 @@
 - [x] Verify the DVRS single-page flow with focused widget tests and static analysis.
 
 ## next
+
+- [ ] Inspecionar manualmente o fluxo no macOS e Windows antes da release pública.
 
 - [ ] Manually inspect Day Summary, DVRS nudge banner/snooze, and optional system notification on macOS.
 - [ ] Manually inspect the DVRS single-page questionnaire in the desktop window, especially narrow window widths and long option labels.

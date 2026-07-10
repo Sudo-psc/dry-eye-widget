@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_strings.dart';
+import '../../l10n/feature_strings.dart';
 import '../../models/break_stats_data.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/daily_insight.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/constants.dart';
+import '../../ui/panel_state_view.dart';
 import '../liquid_glass.dart';
 
 /// Tela "Meu Progresso": devolve ao usuário a narrativa dos dados de pausas já
@@ -111,7 +113,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   );
 
   Widget _body(ThemeData theme, AppStrings s) {
-    if (_stats.totalReminders == 0) return _empty(theme, s);
+    if (_stats.totalReminders == 0) return _empty(s);
 
     final now = DateTime.now();
     final streak = _stats.currentStreak(now);
@@ -354,29 +356,18 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _empty(ThemeData theme, AppStrings s) => Center(
-    child: Padding(
+  Widget _empty(AppStrings s) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
+    return Padding(
       padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.insights_outlined,
-            size: 40,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            s.progressEmpty,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.4,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
-            ),
-          ),
-        ],
+      child: PanelStateView(
+        icon: Icons.insights_outlined,
+        title: f.stateProgressEmptyTitle,
+        message: s.progressEmpty,
       ),
-    ),
-  );
+    );
+  }
 }
+

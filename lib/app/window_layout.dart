@@ -34,8 +34,11 @@ class WindowSizes {
   static const Size gentleBreak = Size(430, 164);
   static const Size inactivity = Size(320, 120);
 
-  /// Altura do painel de menu (linha compacta de pausas + itens + cabeçalhos).
-  static const double menuPanelHeight = 560;
+  /// Altura das páginas do painel rápido.
+  ///
+  /// A divulgação progressiva mantém ações diárias e Sistema em páginas de
+  /// altura semelhante, evitando a antiga lista linear alta.
+  static const double menuPanelHeight = 350;
 
   static Size compact(double ballSize) => Size(ballSize + 28, ballSize + 28);
 
@@ -43,9 +46,9 @@ class WindowSizes {
       Size(300, ballSize + 24 + menuPanelHeight + 8);
 
   static Size blinkReminder(double ballSize) => Size(
-        math.max(ballSize + 156, 176.0).toDouble(),
-        math.max(ballSize + 24, 52.0).toDouble(),
-      );
+    math.max(ballSize + 156, 176.0).toDouble(),
+    math.max(ballSize + 24, 52.0).toDouble(),
+  );
 
   /// Tamanho alvo para um [WindowLayout] (exceto ball/menu que dependem da bolinha).
   static Size? fixedSizeFor(WindowLayout layout) {

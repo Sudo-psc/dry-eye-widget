@@ -23,7 +23,12 @@ enum _DvrsView { intro, questions, result, history }
 /// → histórico. É o único questionário principal do app. Linguagem sempre
 /// educativa e de triagem.
 class DvrsScreen extends StatefulWidget {
-  const DvrsScreen({super.key, required this.onClose, this.onExportPdf});
+  const DvrsScreen({
+    super.key,
+    required this.onClose,
+    this.onExportPdf,
+    this.embedded = false,
+  });
 
   /// Volta para a tela anterior (fecha o questionário).
   final VoidCallback onClose;
@@ -31,6 +36,9 @@ class DvrsScreen extends StatefulWidget {
   /// Exporta o resultado no relatório PDF. Quando `null`, o botão de exportar
   /// não é exibido.
   final Future<void> Function(DvrsResult result)? onExportPdf;
+
+  /// Quando verdadeiro, reutiliza somente o conteúdo dentro do Hub.
+  final bool embedded;
 
   @override
   State<DvrsScreen> createState() => _DvrsScreenState();
@@ -70,8 +78,8 @@ class _DvrsScreenState extends State<DvrsScreen> {
 
   Future<void> _persistDraft() async {
     await context.read<DvrsStorageService>().saveDraft(
-          Map<String, int>.from(_selected),
-        );
+      Map<String, int>.from(_selected),
+    );
   }
 
   // --- Navegação ----------------------------------------------------------
@@ -154,20 +162,18 @@ class _DvrsScreenState extends State<DvrsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final content = Column(
+      children: [
+        _header(theme),
+        Expanded(child: _body(theme)),
+      ],
+    );
+    if (widget.embedded) return content;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: LiquidGlass(
-          fillOpacity: 0.8,
-          blur: 20,
-          child: Column(
-            children: [
-              _header(theme),
-              Expanded(child: _body(theme)),
-            ],
-          ),
-        ),
+        child: LiquidGlass(fillOpacity: 0.8, blur: 20, child: content),
       ),
     );
   }
@@ -344,10 +350,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
             },
             child: Text(f.dvrsDraftDiscard),
           ),
-          FilledButton(
-            onPressed: _start,
-            child: Text(f.dvrsDraftResume),
-          ),
+          FilledButton(onPressed: _start, child: Text(f.dvrsDraftResume)),
         ],
       ),
     );
@@ -608,7 +611,11 @@ class _DvrsScreenState extends State<DvrsScreen> {
                 key: ValueKey(_saved),
               ),
             ),
-            label: Text(_saved ? context.read<SettingsProvider>().strings.dvrsSaved : context.read<SettingsProvider>().strings.dvrsSaveResult),
+            label: Text(
+              _saved
+                  ? context.read<SettingsProvider>().strings.dvrsSaved
+                  : context.read<SettingsProvider>().strings.dvrsSaveResult,
+            ),
             style: FilledButton.styleFrom(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -622,7 +629,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
           child: OutlinedButton.icon(
             onPressed: () => setState(() => _view = _DvrsView.history),
             icon: const Icon(Icons.history, size: 18),
-            label: Text(context.read<SettingsProvider>().strings.dvrsViewHistory),
+            label: Text(
+              context.read<SettingsProvider>().strings.dvrsViewHistory,
+            ),
           ),
         ),
         if (widget.onExportPdf != null) ...[
@@ -632,7 +641,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
             child: OutlinedButton.icon(
               onPressed: _exportPdf,
               icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-              label: Text(context.read<SettingsProvider>().strings.dvrsExportPdf),
+              label: Text(
+                context.read<SettingsProvider>().strings.dvrsExportPdf,
+              ),
             ),
           ),
         ],

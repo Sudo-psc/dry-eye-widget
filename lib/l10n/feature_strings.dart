@@ -14,9 +14,34 @@ class FeatureStrings {
 
   String get healthHubTitle => _en ? 'Visual health' : 'Saúde visual';
   String get healthHubTabToday => _en ? 'Today' : 'Hoje';
-  String get healthHubTabProgress => _en ? 'Progress' : 'Progresso';
+  String get healthHubTabProgress => _en ? 'Trends' : 'Evolução';
   String get healthHubTabScreen => _en ? 'Screen' : 'Tela';
   String get healthHubTabDvrs => 'DVRS';
+  String get healthHubTabReports => _en ? 'Reports' : 'Relatórios';
+  String get healthHubEvolutionHabits => _en ? 'Habits' : 'Hábitos';
+  String get healthHubEvolutionIndicators => _en ? 'Indicators' : 'Indicadores';
+  String get stateProgressEmptyTitle =>
+      _en ? 'Your progress starts here' : 'Sua evolução começa aqui';
+  String get stateDvrsEmptyTitle =>
+      _en ? 'No saved results' : 'Sem resultados salvos';
+  String get stateDvrsEmptyMessage => _en
+      ? 'Complete and save the DVRS to follow changes over time.'
+      : 'Responda e salve o DVRS para acompanhar a evolução ao longo do tempo.';
+  String get stateScreenEmptyTitle =>
+      _en ? 'No data in this period' : 'Sem dados neste período';
+  String get stateScreenEmptyMessage => _en
+      ? 'Active screen time will appear here as it is recorded.'
+      : 'O tempo de tela ativo aparecerá aqui conforme for registrado.';
+  String get stateScreenUnavailableTitle =>
+      _en ? 'Screen tracking is off' : 'Monitoramento de tela desativado';
+  String get stateScreenUnavailableMessage => _en
+      ? 'Enable local screen tracking in Settings to view trends.'
+      : 'Ative a coleta local nas Configurações para visualizar tendências.';
+  String get stateReportSuccessTitle =>
+      _en ? 'Report saved' : 'Relatório salvo';
+  String get stateReportErrorTitle => _en
+      ? 'Could not create the report'
+      : 'Não foi possível gerar o relatório';
   String get healthHubOpenQuestionnaire =>
       _en ? 'Take DVRS questionnaire' : 'Responder DVRS';
   String get healthHubOpenReports =>
@@ -25,18 +50,18 @@ class FeatureStrings {
   String get myDataTitle => _en ? 'My data' : 'Meus dados';
   String get myDataSubtitle => _en
       ? 'Everything stays on this device. Export or erase health history '
-          'whenever you want.'
+            'whenever you want.'
       : 'Tudo fica neste dispositivo. Exporte ou apague o histórico de saúde '
-          'quando quiser.';
+            'quando quiser.';
   String get myDataExport =>
       _en ? 'Export health data (JSON)' : 'Exportar dados de saúde (JSON)';
   String get myDataClearHealth =>
       _en ? 'Erase health history' : 'Apagar histórico de saúde';
   String get myDataClearHealthHint => _en
       ? 'Removes DVRS results, break stats, screen time, activity stats and '
-          'environment checklist. Preferences are kept.'
+            'environment checklist. Preferences are kept.'
       : 'Remove resultados do DVRS, estatísticas de pausas, tempo de tela, '
-          'atividade e checklist ambiental. Preferências são mantidas.';
+            'atividade e checklist ambiental. Preferências são mantidas.';
   String get myDataConfirmClear => _en
       ? 'Erase all local health history? This cannot be undone.'
       : 'Apagar todo o histórico local de saúde? Esta ação não pode ser desfeita.';
@@ -47,8 +72,7 @@ class FeatureStrings {
   String get myDataCancel => _en ? 'Cancel' : 'Cancelar';
   String get myDataConfirm => _en ? 'Erase' : 'Apagar';
   String get myDataClose => _en ? 'Close' : 'Fechar';
-  String get myDataInstrument =>
-      _en ? 'Instrument' : 'Instrumento';
+  String get myDataInstrument => _en ? 'Instrument' : 'Instrumento';
   String get myDataDvrsCount =>
       _en ? 'DVRS results saved' : 'Resultados DVRS salvos';
   String get myDataDisclaimer => _en
@@ -61,13 +85,15 @@ class FeatureStrings {
   String get dvrsDraftDiscard => _en ? 'Discard' : 'Descartar';
   String get dvrsDraftSaved =>
       _en ? 'Draft saved locally' : 'Rascunho salvo localmente';
-  String get dvrsDomainCompare =>
-      _en ? 'Domain comparison (latest vs previous)' : 'Comparação de domínios (atual vs anterior)';
+  String get dvrsDomainCompare => _en
+      ? 'Domain comparison (latest vs previous)'
+      : 'Comparação de domínios (atual vs anterior)';
   String get dvrsTooltipScore =>
       _en ? 'Score: {score}/100 on {date}' : 'Score: {score}/100 em {date}';
   String get dvrsVersionLabel =>
       _en ? 'Instrument version' : 'Versão do instrumento';
 
-  String get narrativeSectionTitle =>
-      _en ? 'Narrative for the ophthalmologist' : 'Narrativa para o oftalmologista';
+  String get narrativeSectionTitle => _en
+      ? 'Narrative for the ophthalmologist'
+      : 'Narrativa para o oftalmologista';
 }

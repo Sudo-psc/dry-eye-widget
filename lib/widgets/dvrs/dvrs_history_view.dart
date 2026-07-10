@@ -8,6 +8,7 @@ import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../ui/glass_card.dart';
+import '../../ui/panel_state_view.dart';
 import '../../ui/section_header.dart';
 import '../../ui/trend_line_chart.dart';
 import 'dvrs_ui.dart';
@@ -47,17 +48,15 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     if (_history.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Text(
-            'Você ainda não tem resultados salvos do DVRS. Responda o '
-            'questionário e salve para acompanhar a evolução.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
+      final f = FeatureStrings.of(
+        context.read<SettingsProvider>().value.languageCode,
+      );
+      return Padding(
+        padding: const EdgeInsets.all(32),
+        child: PanelStateView(
+          icon: Icons.assignment_outlined,
+          title: f.stateDvrsEmptyTitle,
+          message: f.stateDvrsEmptyMessage,
         ),
       );
     }
@@ -399,3 +398,4 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     );
   }
 }
+

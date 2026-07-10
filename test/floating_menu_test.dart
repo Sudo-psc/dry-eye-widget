@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('menu flutuante exibe hub de saúde e abre o questionário DVRS', (
+  testWidgets('painel principal prioriza pausas e hub de saúde', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(800, 1200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    var dvrsOpened = 0;
+    var hubOpened = 0;
     final f = FeatureStrings.of('pt');
 
     await tester.pumpWidget(
@@ -29,9 +29,7 @@ void main() {
               onTogglePause: () {},
               onExtendCycle: () {},
               onGuidance: () {},
-              onHealthHub: () {},
-              onDvrs: () => dvrsOpened++,
-              onReports: () {},
+              onHealthHub: () => hubOpened++,
               onMyData: () {},
               onCheckUpdates: () {},
               onAbout: () {},
@@ -45,16 +43,19 @@ void main() {
     );
 
     expect(find.text(f.menuHealthHub), findsOneWidget);
-    expect(find.text(ptStrings.menuDvrs), findsOneWidget);
-    expect(find.text(f.menuMyData), findsOneWidget);
+    expect(find.text(ptStrings.menuGuidance), findsOneWidget);
+    expect(find.text(ptStrings.menuGroupSystem), findsOneWidget);
+    expect(find.text(ptStrings.menuDvrs), findsNothing);
+    expect(find.text(ptStrings.menuReports), findsNothing);
+    expect(find.text(f.menuMyData), findsNothing);
 
-    await tester.tap(find.text(ptStrings.menuDvrs));
+    await tester.tap(find.text(f.menuHealthHub));
     await tester.pump();
 
-    expect(dvrsOpened, 1);
+    expect(hubOpened, 1);
   });
 
-  testWidgets('painel do menu cabe na janela e mostra o item "Sair"', (
+  testWidgets('ações de sistema aparecem em uma segunda página', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(800, 1200);
@@ -79,8 +80,6 @@ void main() {
               onExtendCycle: () {},
               onGuidance: () {},
               onHealthHub: () {},
-              onDvrs: () {},
-              onReports: () {},
               onMyData: () {},
               onCheckUpdates: () {},
               onAbout: () {},
@@ -93,6 +92,22 @@ void main() {
       ),
     );
 
+    expect(find.text(ptStrings.menuQuit), findsNothing);
+
+    await tester.tap(find.text(ptStrings.menuGroupSystem));
+    await tester.pumpAndSettle();
+
+    expect(find.text(f.menuMyData), findsOneWidget);
+    expect(find.text(ptStrings.menuCheckUpdates), findsOneWidget);
+    expect(find.text(ptStrings.menuSettings), findsOneWidget);
+    expect(find.text(ptStrings.menuAbout), findsOneWidget);
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
+    expect(find.text(f.menuHealthHub), findsNothing);
+
+    await tester.tap(find.text(ptStrings.back));
+    await tester.pumpAndSettle();
+
+    expect(find.text(f.menuHealthHub), findsOneWidget);
+    expect(find.text(ptStrings.menuQuit), findsNothing);
   });
 }

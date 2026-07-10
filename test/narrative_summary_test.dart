@@ -57,6 +57,8 @@ void main() {
     expect(data.narrative!.contains('DVRS'), isTrue);
 
     final pure = NarrativeSummary.buildPt(data);
-    expect(pure, contains('oftalmolog'));
+    // Radical anterior ao acento de "oftalmológica", estável em UTF-8.
+    expect(pure, contains('oftalmol'));
   });
 }
+

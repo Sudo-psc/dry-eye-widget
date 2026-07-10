@@ -1,5 +1,20 @@
 # Handoff
 
+## UX em três momentos — 2026-07-10
+
+Trabalho ativo em `/Users/philipecruz/app_dry_eye_widget-ux-three-moments`,
+branch `codex/ux-three-moments`. O primeiro recorte está implementado: painel
+principal enxuto, segunda página Sistema, janela menor e retorno contextual
+Hub → DVRS → Relatório. A aba ativa do Hub é preservada. DVRS e Relatórios agora
+rodam dentro do Hub; Evolução alterna entre Hábitos e Indicadores. Estados vazio,
+indisponível, erro e sucesso foram unificados. O design aprovado está
+em `docs/superpowers/specs/2026-07-10-ux-three-moments-design.md`; a evidência
+está em `projects/dry-eye-widget-app/runs/2026-07-10-ux-three-moments-menu-evidence.md`.
+
+Validação final: 215 testes aprovados, análise limpa, QA automatizado em escala
+de 160% e build macOS release aprovado. Próxima ação recomendada: inspeção manual
+no macOS e Windows antes de uma release pública.
+
 ## Current State
 
 Version target: **1.22.0** — P0 product loop for discovery and retention.

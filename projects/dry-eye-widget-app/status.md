@@ -2,6 +2,18 @@
 
 Updated: 2026-07-10
 
+## UX em três momentos — implementação concluída
+
+Concluída na branch `codex/ux-three-moments`. O painel rápido agora usa
+divulgação progressiva: ações diárias e Hub ficam no primeiro nível; manutenção
+e saída ficam numa segunda página Sistema. A altura nominal caiu de 560 para
+350 px. O Hub agora preserva aba e contexto ao navegar por DVRS e Relatórios.
+DVRS e Relatórios foram incorporados ao Hub, que agora oferece Hoje, Evolução,
+DVRS e Relatórios; Evolução contém Hábitos e Indicadores. Estados do Hub foram
+padronizados e a navegação foi validada em escala de 160%. Os 215 testes, a
+análise e o build macOS release passaram. Evidência:
+`runs/2026-07-10-ux-three-moments-menu-evidence.md`.
+
 ## 1.23.0 five improvements panel
 
 Shipped: health hub, narrative PDF, My Data, DVRS 1.1, window_layout + ARB scaffold + signing readiness script.

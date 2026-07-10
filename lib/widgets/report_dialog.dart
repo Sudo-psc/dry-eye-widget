@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../l10n/app_strings.dart';
+import '../l10n/feature_strings.dart';
 import '../models/dvrs_assessment.dart';
 import '../models/environment_checklist.dart';
 import '../models/report_options.dart';
@@ -14,12 +15,18 @@ import '../services/pdf_report_service.dart';
 import '../services/report_builder.dart';
 import '../services/screen_time_service.dart';
 import '../services/storage_service.dart';
+import '../ui/panel_state_view.dart';
 import 'liquid_glass.dart';
 
 class ReportDialog extends StatefulWidget {
-  const ReportDialog({super.key, required this.onClose});
+  const ReportDialog({
+    super.key,
+    required this.onClose,
+    this.embedded = false,
+  });
 
   final VoidCallback onClose;
+  final bool embedded;
 
   @override
   State<ReportDialog> createState() => _ReportDialogState();
@@ -35,6 +42,7 @@ class _ReportDialogState extends State<ReportDialog> {
   DateTime _customStart = DateTime.now().subtract(const Duration(days: 14));
   DateTime _customEnd = DateTime.now();
   bool _isBusy = false;
+  String? _errorMessage;
 
   /// Checklist ambiental opcional (carregado e persistido localmente).
   EnvironmentChecklist? _environment;
@@ -113,7 +121,10 @@ class _ReportDialogState extends State<ReportDialog> {
     final messenger = ScaffoldMessenger.of(context);
     final strings = context.read<SettingsProvider>().strings;
     final data = _buildReportData();
-    setState(() => _isBusy = true);
+    setState(() {
+      _isBusy = true;
+      _errorMessage = null;
+    });
     try {
       final bytes = await _pdfService.generateReport(data);
       final file = await _pdfService.savePdfToDevice(bytes, _fileName());
@@ -151,7 +162,10 @@ class _ReportDialogState extends State<ReportDialog> {
     if (confirmed != true || !mounted) return;
 
     final data = _buildReportData();
-    setState(() => _isBusy = true);
+    setState(() {
+      _isBusy = true;
+      _errorMessage = null;
+    });
     try {
       final bytes = await _pdfService.generateReport(data);
       final file = await _pdfService.savePdfFile(bytes, _fileName());
@@ -191,8 +205,10 @@ class _ReportDialogState extends State<ReportDialog> {
 
   void _showError(ScaffoldMessengerState messenger, Object e) {
     debugPrint('Erro ao gerar relatório: $e');
+    final message = context.read<SettingsProvider>().strings.reportsErrorText(e);
+    if (mounted) setState(() => _errorMessage = message);
     messenger.showSnackBar(
-      SnackBar(content: Text(context.read<SettingsProvider>().strings.reportsErrorText(e))),
+      SnackBar(content: Text(message)),
     );
   }
 
@@ -219,8 +235,58 @@ class _ReportDialogState extends State<ReportDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = context.watch<SettingsProvider>().strings;
+    final f = FeatureStrings.of(
+      context.watch<SettingsProvider>().value.languageCode,
+    );
     // Prévia recalculada a cada rebuild (dados locais em memória).
     final preview = _buildReportData();
+
+    final content = Column(
+      children: [
+        _header(theme, strings),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              _personalCard(theme, strings),
+              const SizedBox(height: 24),
+              _periodSelector(theme),
+              const SizedBox(height: 24),
+              _identificationFields(theme),
+              const SizedBox(height: 24),
+              _environmentSection(theme),
+              const SizedBox(height: 24),
+              _previewCard(theme, preview),
+              const SizedBox(height: 16),
+              _disclaimerBanner(theme),
+              const SizedBox(height: 24),
+              if (_errorMessage != null) ...[
+                PanelStateView(
+                  compact: true,
+                  tone: PanelStateTone.error,
+                  icon: Icons.error_outline,
+                  title: f.stateReportErrorTitle,
+                  message: _errorMessage!,
+                ),
+                const SizedBox(height: 16),
+              ],
+              if (_lastSavedFile != null) ...[
+                PanelStateView(
+                  compact: true,
+                  tone: PanelStateTone.success,
+                  icon: Icons.check_circle_outline,
+                  title: f.stateReportSuccessTitle,
+                  message: strings.reportsPdfSavedText(_lastSavedFile!.path),
+                ),
+                const SizedBox(height: 16),
+              ],
+              _actionButtons(),
+            ],
+          ),
+        ),
+      ],
+    );
+    if (widget.embedded) return content;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -229,31 +295,7 @@ class _ReportDialogState extends State<ReportDialog> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: Column(
-            children: [
-              _header(theme, strings),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(24),
-                  children: [
-                    _personalCard(theme, strings),
-                    const SizedBox(height: 24),
-                    _periodSelector(theme),
-                    const SizedBox(height: 24),
-                    _identificationFields(theme),
-                    const SizedBox(height: 24),
-                    _environmentSection(theme),
-                    const SizedBox(height: 24),
-                    _previewCard(theme, preview),
-                    const SizedBox(height: 16),
-                    _disclaimerBanner(theme),
-                    const SizedBox(height: 24),
-                    _actionButtons(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          child: content,
         ),
       ),
     );

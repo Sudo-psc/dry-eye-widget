@@ -8,8 +8,7 @@ import 'liquid_glass.dart';
 
 /// Item do menu flutuante.
 class _MenuItem {
-  const _MenuItem(this.icon, this.label, this.onTap,
-      {this.emphasized = false});
+  const _MenuItem(this.icon, this.label, this.onTap, {this.emphasized = false});
   final IconData icon;
   final String label;
   final VoidCallback onTap;
@@ -17,7 +16,10 @@ class _MenuItem {
 }
 
 /// Menu flutuante exibido ao clicar na bolinha (apenas no estado IDLE).
-class FloatingMenu extends StatelessWidget {
+///
+/// O primeiro nível concentra ações frequentes. Manutenção e saída ficam numa
+/// segunda página para reduzir carga cognitiva sem esconder funcionalidades.
+class FloatingMenu extends StatefulWidget {
   const FloatingMenu({
     super.key,
     required this.strings,
@@ -30,8 +32,6 @@ class FloatingMenu extends StatelessWidget {
     required this.onExtendCycle,
     required this.onGuidance,
     required this.onHealthHub,
-    required this.onDvrs,
-    required this.onReports,
     required this.onMyData,
     required this.onCheckUpdates,
     required this.onAbout,
@@ -50,8 +50,6 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onExtendCycle;
   final VoidCallback onGuidance;
   final VoidCallback onHealthHub;
-  final VoidCallback onDvrs;
-  final VoidCallback onReports;
   final VoidCallback onMyData;
   final VoidCallback onCheckUpdates;
   final VoidCallback onAbout;
@@ -60,43 +58,53 @@ class FloatingMenu extends StatelessWidget {
   final VoidCallback onDismiss;
 
   @override
+  State<FloatingMenu> createState() => _FloatingMenuState();
+}
+
+class _FloatingMenuState extends State<FloatingMenu> {
+  bool _showSystem = false;
+
+  @override
   Widget build(BuildContext context) {
-    final s = strings;
+    final s = widget.strings;
 
     // Pausas: ações frequentes e de baixa carga textual → linha única de ícones
     // (com tooltip/Semantics para acessibilidade), economizando bastante altura.
     final pauseItems = <_MenuItem>[
-      _MenuItem(Icons.play_circle_outline, s.menuStartBreak, onStartNow),
-      _MenuItem(Icons.refresh, s.menuReset, onReset),
+      _MenuItem(Icons.play_circle_outline, s.menuStartBreak, widget.onStartNow),
+      _MenuItem(Icons.refresh, s.menuReset, widget.onReset),
       _MenuItem(
-        isPaused ? Icons.play_arrow : Icons.pause,
-        isPaused ? s.menuResume : s.menuPause,
-        onTogglePause,
+        widget.isPaused ? Icons.play_arrow : Icons.pause,
+        widget.isPaused ? s.menuResume : s.menuPause,
+        widget.onTogglePause,
       ),
-      _MenuItem(Icons.schedule, s.menuExtendCycle, onExtendCycle),
+      _MenuItem(Icons.schedule, s.menuExtendCycle, widget.onExtendCycle),
     ];
 
-    // Saúde visual: hub unificado + DVRS + relatório.
+    // Saúde visual: o Hub concentra DVRS, relatórios e tendências. Orientações
+    // permanece direta por ser conteúdo de consulta rápida.
     final healthItems = <_MenuItem>[
       _MenuItem(
         Icons.favorite_outline,
-        healthHubLabel,
-        onHealthHub,
+        widget.healthHubLabel,
+        widget.onHealthHub,
         emphasized: true,
       ),
-      _MenuItem(Icons.menu_book_outlined, s.menuGuidance, onGuidance),
-      _MenuItem(Icons.assignment, s.menuDvrs, onDvrs),
-      _MenuItem(Icons.picture_as_pdf_outlined, s.menuReports, onReports),
+      _MenuItem(Icons.menu_book_outlined, s.menuGuidance, widget.onGuidance),
     ];
 
     // Sistema: manutenção do app. "Sobre" (com link do GitHub dentro) fica logo
     // acima de "Sair".
     final systemItems = <_MenuItem>[
-      _MenuItem(Icons.shield_outlined, myDataLabel, onMyData),
-      _MenuItem(Icons.system_update_alt, s.menuCheckUpdates, onCheckUpdates),
-      _MenuItem(Icons.settings_outlined, s.menuSettings, onSettings),
-      _MenuItem(Icons.info_outline, s.menuAbout, onAbout),
-      _MenuItem(Icons.close, s.menuQuit, onQuit),
+      _MenuItem(Icons.shield_outlined, widget.myDataLabel, widget.onMyData),
+      _MenuItem(
+        Icons.system_update_alt,
+        s.menuCheckUpdates,
+        widget.onCheckUpdates,
+      ),
+      _MenuItem(Icons.settings_outlined, s.menuSettings, widget.onSettings),
+      _MenuItem(Icons.info_outline, s.menuAbout, widget.onAbout),
+      _MenuItem(Icons.close, s.menuQuit, widget.onQuit),
     ];
 
     _MenuRow rowFor(_MenuItem item) => _MenuRow(
@@ -105,20 +113,35 @@ class FloatingMenu extends StatelessWidget {
       emphasized: item.emphasized,
       onTap: () {
         item.onTap();
-        onDismiss();
+        widget.onDismiss();
       },
     );
 
-    final children = <Widget>[
-      _SectionHeader(s.menuGroupActions),
-      _CompactActionRow(items: pauseItems, onDismiss: onDismiss),
-      const _MenuDivider(),
-      _SectionHeader(s.menuGroupHealth),
-      ...healthItems.map(rowFor),
-      const _MenuDivider(),
-      _SectionHeader(s.menuGroupSystem),
-      ...systemItems.map(rowFor),
-    ];
+    final children = _showSystem
+        ? <Widget>[
+            _MenuRow(
+              icon: Icons.arrow_back_rounded,
+              label: s.back,
+              onTap: () => setState(() => _showSystem = false),
+            ),
+            const _MenuDivider(),
+            _SectionHeader(s.menuGroupSystem),
+            ...systemItems.map(rowFor),
+          ]
+        : <Widget>[
+            _SectionHeader(s.menuGroupActions),
+            _CompactActionRow(items: pauseItems, onDismiss: widget.onDismiss),
+            const _MenuDivider(),
+            _SectionHeader(s.menuGroupHealth),
+            ...healthItems.map(rowFor),
+            const _MenuDivider(),
+            _MenuRow(
+              icon: Icons.tune_rounded,
+              label: s.menuGroupSystem,
+              showChevron: true,
+              onTap: () => setState(() => _showSystem = true),
+            ),
+          ];
 
     return Semantics(
       container: true,
@@ -132,9 +155,15 @@ class FloatingMenu extends StatelessWidget {
         blur: 32,
         saturation: 1.6,
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: children,
+        child: AnimatedSwitcher(
+          duration: AppMotion.normal,
+          switchInCurve: AppMotion.standard,
+          switchOutCurve: AppMotion.standard,
+          child: Column(
+            key: ValueKey(_showSystem),
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          ),
         ),
       ),
     );
@@ -234,12 +263,8 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
                 child: Icon(
                   widget.icon,
                   size: 22,
-                  color: _hover
-                      ? AppColors.idleBall
-                      : AppColors.textPrimary,
-                  shadows: const [
-                    Shadow(color: Colors.black54, blurRadius: 4),
-                  ],
+                  color: _hover ? AppColors.idleBall : AppColors.textPrimary,
+                  shadows: const [Shadow(color: Colors.black54, blurRadius: 4)],
                 ),
               ),
             ),
@@ -268,9 +293,7 @@ class _SectionHeader extends StatelessWidget {
             fontWeight: FontWeight.w700,
             letterSpacing: 1.0,
             color: AppColors.textMuted,
-            shadows: [
-              Shadow(color: Colors.black54, blurRadius: 4),
-            ],
+            shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
           ),
         ),
       ),
@@ -298,12 +321,14 @@ class _MenuRow extends StatefulWidget {
     required this.label,
     required this.onTap,
     this.emphasized = false,
+    this.showChevron = false,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final bool emphasized;
+  final bool showChevron;
 
   @override
   State<_MenuRow> createState() => _MenuRowState();
@@ -403,7 +428,7 @@ class _MenuRowState extends State<_MenuRow> {
                       ),
                     ),
                   ),
-                  if (widget.emphasized)
+                  if (widget.emphasized || widget.showChevron)
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 18,

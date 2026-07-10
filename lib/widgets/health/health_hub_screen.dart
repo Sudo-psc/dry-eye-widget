@@ -3,13 +3,15 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/feature_strings.dart';
 import '../../providers/settings_provider.dart';
-import '../../ui/app_theme.dart';
+import '../../utils/constants.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../dvrs/dvrs_screen.dart';
 import '../progress/progress_screen.dart';
+import '../report_dialog.dart';
 import '../summary/day_summary_screen.dart';
 import '../liquid_glass.dart';
 
-/// Hub unificado de saúde visual: Hoje · Progresso · Painel (tela + DVRS).
+/// Hub unificado de saúde visual: Hoje · Evolução · DVRS · Relatórios.
 ///
 /// Reduz a densidade do menu flutuante e concentra descoberta em uma janela.
 class HealthHubScreen extends StatefulWidget {
@@ -17,18 +19,16 @@ class HealthHubScreen extends StatefulWidget {
     super.key,
     required this.onClose,
     required this.onStartBreak,
-    required this.onDvrs,
-    required this.onReports,
     required this.onSnoozeDvrsNudge,
     this.initialTab = 0,
+    this.onTabChanged,
   });
 
   final VoidCallback onClose;
   final VoidCallback onStartBreak;
-  final VoidCallback onDvrs;
-  final VoidCallback onReports;
   final Future<void> Function() onSnoozeDvrsNudge;
   final int initialTab;
+  final ValueChanged<int>? onTabChanged;
 
   @override
   State<HealthHubScreen> createState() => _HealthHubScreenState();
@@ -37,22 +37,36 @@ class HealthHubScreen extends StatefulWidget {
 class _HealthHubScreenState extends State<HealthHubScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
+  int _evolutionIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    final initial = widget.initialTab.clamp(0, 2);
-    _tabs = TabController(length: 3, vsync: this, initialIndex: initial);
+    final initial = widget.initialTab.clamp(0, 3);
+    _tabs = TabController(length: 4, vsync: this, initialIndex: initial);
+    _tabs.addListener(_handleTabChanged);
   }
 
   @override
   void dispose() {
+    _tabs.removeListener(_handleTabChanged);
     _tabs.dispose();
     super.dispose();
   }
 
+  void _handleTabChanged() {
+    if (!_tabs.indexIsChanging) {
+      widget.onTabChanged?.call(_tabs.index);
+    }
+  }
+
   void _goTab(int i) {
-    _tabs.animateTo(i.clamp(0, 2));
+    _tabs.animateTo(i.clamp(0, 3));
+  }
+
+  void _openEvolution(int index) {
+    setState(() => _evolutionIndex = index.clamp(0, 1));
+    _goTab(1);
   }
 
   @override
@@ -75,14 +89,18 @@ class _HealthHubScreenState extends State<HealthHubScreen>
                 color: theme.colorScheme.surface.withValues(alpha: 0.35),
                 child: TabBar(
                   controller: _tabs,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
                   labelColor: AppColors.idleBall,
-                  unselectedLabelColor:
-                      theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.65,
+                  ),
                   indicatorColor: AppColors.idleBall,
                   tabs: [
                     Tab(text: f.healthHubTabToday),
                     Tab(text: f.healthHubTabProgress),
-                    Tab(text: f.healthHubTabScreen),
+                    Tab(text: f.healthHubTabDvrs),
+                    Tab(text: f.healthHubTabReports),
                   ],
                 ),
               ),
@@ -95,18 +113,27 @@ class _HealthHubScreenState extends State<HealthHubScreen>
                     DaySummaryScreen(
                       onClose: widget.onClose,
                       onStartBreak: widget.onStartBreak,
-                      onDvrs: widget.onDvrs,
-                      onProgress: () => _goTab(1),
-                      onDashboard: () => _goTab(2),
+                      onDvrs: () => _goTab(2),
+                      onProgress: () => _openEvolution(0),
+                      onDashboard: () => _openEvolution(1),
                       onSnoozeDvrsNudge: widget.onSnoozeDvrsNudge,
                       embedded: true,
                     ),
-                    ProgressScreen(onClose: widget.onClose, embedded: true),
-                    DashboardScreen(onClose: widget.onClose, embedded: true),
+                    _EvolutionSection(
+                      index: _evolutionIndex,
+                      onChanged: (index) {
+                        setState(() => _evolutionIndex = index);
+                      },
+                    ),
+                    DvrsScreen(
+                      embedded: true,
+                      onClose: () => _goTab(0),
+                      onExportPdf: (_) async => _goTab(3),
+                    ),
+                    ReportDialog(embedded: true, onClose: () => _goTab(0)),
                   ],
                 ),
               ),
-              _footerActions(theme, f),
             ],
           ),
         ),
@@ -118,9 +145,7 @@ class _HealthHubScreenState extends State<HealthHubScreen>
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface.withValues(alpha: 0.55),
-        border: Border(
-          bottom: BorderSide(color: AppColors.divider),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.divider)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4, 6, 14, 6),
@@ -162,29 +187,57 @@ class _HealthHubScreenState extends State<HealthHubScreen>
       ),
     );
   }
+}
 
-  Widget _footerActions(ThemeData theme, FeatureStrings f) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: widget.onDvrs,
-              icon: const Icon(Icons.assignment_outlined, size: 18),
-              label: Text(f.healthHubOpenQuestionnaire),
+class _EvolutionSection extends StatelessWidget {
+  const _EvolutionSection({required this.index, required this.onChanged});
+
+  final int index;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final lang = context.watch<SettingsProvider>().value.languageCode;
+    final f = FeatureStrings.of(lang);
+
+    return Column(
+      children: [
+        Material(
+          color: theme.colorScheme.surface.withValues(alpha: 0.2),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<int>(
+                segments: [
+                  ButtonSegment(
+                    value: 0,
+                    icon: const Icon(Icons.local_florist_outlined),
+                    label: Text(f.healthHubEvolutionHabits),
+                  ),
+                  ButtonSegment(
+                    value: 1,
+                    icon: const Icon(Icons.insights_outlined),
+                    label: Text(f.healthHubEvolutionIndicators),
+                  ),
+                ],
+                selected: {index},
+                onSelectionChanged: (selection) => onChanged(selection.first),
+              ),
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: FilledButton.tonalIcon(
-              onPressed: widget.onReports,
-              icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-              label: Text(f.healthHubOpenReports),
-            ),
+        ),
+        Expanded(
+          child: IndexedStack(
+            index: index,
+            children: [
+              ProgressScreen(onClose: () {}, embedded: true),
+              DashboardScreen(onClose: () {}, embedded: true),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
