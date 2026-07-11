@@ -10,7 +10,6 @@ export function Header() {
     [t.nav.mechanism, "#mechanism"],
     [t.nav.monitoring, "#monitoring"],
     [t.nav.ovpp, "#ovpp"],
-    [t.nav.references, "#references"],
   ] as const;
 
   return (
