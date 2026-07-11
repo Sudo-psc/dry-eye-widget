@@ -126,6 +126,17 @@ void main() {
       expect(WidgetSettings.defaults().visualBlinkRemindersEnabled, isTrue);
     });
 
+    test('densidade de UI padrão é confortável e persiste', () {
+      expect(WidgetSettings.defaults().uiDensity, UiDensity.comfortable);
+      final compact = WidgetSettings.defaults().copyWith(
+        uiDensity: UiDensity.compact,
+      );
+      final restored = WidgetSettings.fromMap(compact.toMap());
+      expect(restored.uiDensity, UiDensity.compact);
+      final missing = WidgetSettings.fromMap(const <String, dynamic>{});
+      expect(missing.uiDensity, UiDensity.comfortable);
+    });
+
     test('lembrete sonoro de piscada exige opt-in por padrao', () {
       final defaults = WidgetSettings.defaults();
       expect(defaults.blinkReminderSoundEnabled, isFalse);

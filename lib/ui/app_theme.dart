@@ -72,7 +72,11 @@ ButtonStyle _buttonStyle() => ButtonStyle(
     );
 
 /// Tema central do app: dark Material 3, seed azul, Inter local.
-ThemeData buildAppTheme() {
+///
+/// [visualDensity] pode ser sobrescrito em runtime (preferência de densidade).
+ThemeData buildAppTheme({
+  VisualDensity visualDensity = VisualDensity.standard,
+}) {
   final scheme = ColorScheme.fromSeed(
     seedColor: AppColors.idleBall,
     brightness: Brightness.dark,
@@ -88,7 +92,7 @@ ThemeData buildAppTheme() {
     colorScheme: scheme,
     fontFamily: 'Inter',
     scaffoldBackgroundColor: Colors.transparent,
-    visualDensity: VisualDensity.standard,
+    visualDensity: visualDensity,
     materialTapTargetSize: MaterialTapTargetSize.padded,
     filledButtonTheme: FilledButtonThemeData(style: _buttonStyle()),
     outlinedButtonTheme: OutlinedButtonThemeData(style: _buttonStyle()),

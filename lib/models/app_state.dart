@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../utils/constants.dart';
 
 /// Os estados da máquina de estados do aplicativo.
@@ -76,6 +78,36 @@ extension BallCornerX on BallCorner {
 
 /// Toques curtos usados no lembrete sonoro de piscada.
 enum BlinkReminderSound { softPulse, clearDrop, warmBell, lightTick }
+
+/// Densidade visual da interface (espaçamento de controles e painéis).
+enum UiDensity {
+  /// Mais compacto: menos padding, VisualDensity.compact.
+  compact,
+
+  /// Padrão confortável.
+  comfortable,
+}
+
+extension UiDensityX on UiDensity {
+  String get id => name;
+
+  VisualDensity get visualDensity => this == UiDensity.compact
+      ? VisualDensity.compact
+      : VisualDensity.standard;
+
+  /// Fator de padding (1.0 confortável, 0.85 compacto).
+  double get spacingScale => this == UiDensity.compact ? 0.85 : 1.0;
+}
+
+UiDensity uiDensityFromId(String? id) {
+  switch (id) {
+    case 'compact':
+      return UiDensity.compact;
+    case 'comfortable':
+    default:
+      return UiDensity.comfortable;
+  }
+}
 
 /// Frequência do lembrete visual de piscada.
 enum BlinkReminderFrequency { discreet, normal, frequent }

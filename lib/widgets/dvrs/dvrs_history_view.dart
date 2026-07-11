@@ -10,6 +10,7 @@ import '../../services/dvrs_storage_service.dart';
 import '../../ui/glass_card.dart';
 import '../../ui/section_header.dart';
 import '../../ui/trend_line_chart.dart';
+import '../common/empty_state.dart';
 import 'dvrs_ui.dart';
 
 /// Histórico longitudinal do DVRS: último resultado, variação, gráfico de
@@ -47,18 +48,12 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     if (_history.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Text(
+      return const EmptyState(
+        icon: Icons.assignment_outlined,
+        title: 'Sem avaliações ainda',
+        message:
             'Você ainda não tem resultados salvos do DVRS. Responda o '
             'questionário e salve para acompanhar a evolução.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
-        ),
       );
     }
 

@@ -7,6 +7,8 @@ import '../../services/daily_insight.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/constants.dart';
+import '../common/panel_entrance.dart';
+import '../common/panel_header.dart';
 import '../liquid_glass.dart';
 
 /// Hub “Resumo do dia”: adesão de hoje, streak, último DVRS, insight e CTAs.
@@ -87,7 +89,13 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
 
     final content = Column(
       children: [
-        if (!widget.embedded) _header(theme, s),
+        if (!widget.embedded)
+          PanelHeader(
+            title: s.daySummaryTitle,
+            onLeading: widget.onClose,
+            leadingTooltip: s.close,
+            trailingIcon: Icons.wb_sunny_outlined,
+          ),
         Expanded(
           child: snap == null
               ? const Center(
@@ -113,58 +121,11 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: content,
+          child: PanelEntrance(child: content),
         ),
       ),
     );
   }
-
-  Widget _header(ThemeData theme, AppStrings s) => Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.55),
-          border: Border(
-            bottom: BorderSide(color: AppColors.divider),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(4, 6, 14, 6),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                onPressed: widget.onClose,
-                tooltip: s.close,
-                style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
-              ),
-              const SizedBox(width: 2),
-              Expanded(
-                child: Text(
-                  s.daySummaryTitle,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.idleBall.withValues(alpha: 0.16),
-                ),
-                child: const Icon(
-                  Icons.wb_sunny_outlined,
-                  color: AppColors.idleBall,
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
 
   Widget _body(ThemeData theme, AppStrings s, DaySummarySnapshot snap) {
     return ListView(

@@ -22,6 +22,13 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 - App: UpdateService só HTTPS em hosts GitHub (sem redirects)
 - `SECURITY.md` + `site/.well-known/security.txt`
 
+### Melhorado (UI/UX app — rodada de painéis)
+- `PanelHeader` compartilhado em Resumo, Progresso, Dashboard, Relatório e DVRS
+- `PanelEntrance`: fade + slide suave na abertura dos painéis (respeita reduce motion)
+- `EmptyState` ilustrado em Progresso e histórico DVRS
+- Preferência de densidade da interface (confortável / compacta) em Aparência
+- Contraste de `textSecondary` / `textMuted` no vidro (≥ AA aproximado)
+
 ### Melhorado (UI/UX app — 3×5 quick wins)
 - Tokens: `AppMotion`, `AppRadii` ampliado, cores hover/divider/`textMuted`
 - Tema M3: tooltips, progress, IconButton 44px, paleta semântica DVRS

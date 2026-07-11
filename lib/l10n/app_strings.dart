@@ -54,6 +54,10 @@ class AppStrings {
     required this.ballSize,
     required this.uiScale,
     required this.uiScaleHint,
+    required this.uiDensity,
+    required this.uiDensityHint,
+    required this.uiDensityComfortable,
+    required this.uiDensityCompact,
     required this.colorNormal,
     required this.colorAlert,
     required this.opacityNormal,
@@ -260,6 +264,7 @@ class AppStrings {
     required this.progressAdherence30Label,
     required this.progressInsightLabel,
     required this.progressEmpty,
+    required this.progressEmptyTitle,
     required this.progressDisclaimer,
     required this.progressStreakZeroHint,
     required this.progressInsightStreak,
@@ -408,6 +413,10 @@ class AppStrings {
   final String ballSize;
   final String uiScale;
   final String uiScaleHint;
+  final String uiDensity;
+  final String uiDensityHint;
+  final String uiDensityComfortable;
+  final String uiDensityCompact;
   final String colorNormal;
   final String colorAlert;
   final String opacityNormal;
@@ -549,6 +558,7 @@ class AppStrings {
   final String progressAdherence30Label;
   final String progressInsightLabel;
   final String progressEmpty;
+  final String progressEmptyTitle;
   final String progressDisclaimer;
   final String progressStreakZeroHint;
 
@@ -812,6 +822,12 @@ const AppStrings ptStrings = AppStrings(
   uiScaleHint:
       'Aumenta ou reduz o tamanho de textos e elementos em todas as telas e '
       'janelas. Útil para maior conforto visual.',
+  uiDensity: 'Densidade da interface',
+  uiDensityHint:
+      'Compacta reduz espaçamento entre controles e listas. Confortável é o '
+      'padrão com mais respiro visual.',
+  uiDensityComfortable: 'Confortável',
+  uiDensityCompact: 'Compacta',
   colorNormal: 'Cor (normal)',
   colorAlert: 'Cor (alerta)',
   opacityNormal: 'Opacidade (normal)',
@@ -1011,6 +1027,7 @@ const AppStrings ptStrings = AppStrings(
   progressEmpty:
       'Ainda não há dados de pausas.\nQuando você concluir suas primeiras '
       'pausas, seu progresso aparece aqui.',
+  progressEmptyTitle: 'Sem dados ainda',
   progressDisclaimer:
       'Acompanhamento educativo — reforço de hábito, sem substituir cuidado '
       'médico.',
@@ -1189,6 +1206,12 @@ const AppStrings enStrings = AppStrings(
   uiScaleHint:
       'Scales text and elements up or down across all screens and windows. '
       'Helpful for greater visual comfort.',
+  uiDensity: 'Interface density',
+  uiDensityHint:
+      'Compact reduces spacing between controls and lists. Comfortable is the '
+      'default with more visual breathing room.',
+  uiDensityComfortable: 'Comfortable',
+  uiDensityCompact: 'Compact',
   colorNormal: 'Color (normal)',
   colorAlert: 'Color (alert)',
   opacityNormal: 'Opacity (normal)',
@@ -1383,6 +1406,7 @@ const AppStrings enStrings = AppStrings(
   progressEmpty:
       'No break data yet.\nOnce you complete your first breaks, your progress '
       'shows up here.',
+  progressEmptyTitle: 'No data yet',
   progressDisclaimer:
       'Educational tracking — habit reinforcement, not a substitute for '
       'medical care.',

@@ -14,6 +14,8 @@ import '../services/pdf_report_service.dart';
 import '../services/report_builder.dart';
 import '../services/screen_time_service.dart';
 import '../services/storage_service.dart';
+import 'common/panel_entrance.dart';
+import 'common/panel_header.dart';
 import 'liquid_glass.dart';
 
 class ReportDialog extends StatefulWidget {
@@ -229,67 +231,43 @@ class _ReportDialogState extends State<ReportDialog> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: Column(
-            children: [
-              _header(theme, strings),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(24),
-                  children: [
-                    _personalCard(theme, strings),
-                    const SizedBox(height: 24),
-                    _periodSelector(theme),
-                    const SizedBox(height: 24),
-                    _identificationFields(theme),
-                    const SizedBox(height: 24),
-                    _environmentSection(theme),
-                    const SizedBox(height: 24),
-                    _previewCard(theme, preview),
-                    const SizedBox(height: 16),
-                    _disclaimerBanner(theme),
-                    const SizedBox(height: 24),
-                    _actionButtons(),
-                  ],
+          child: PanelEntrance(
+            child: Column(
+              children: [
+                PanelHeader(
+                  title: strings.menuReports,
+                  onLeading: widget.onClose,
+                  leadingTooltip: strings.back,
+                  leadingIcon: Icons.arrow_back_rounded,
+                  trailingIcon: Icons.description_outlined,
                 ),
-              ),
-            ],
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(24),
+                    children: [
+                      _personalCard(theme, strings),
+                      const SizedBox(height: 24),
+                      _periodSelector(theme),
+                      const SizedBox(height: 24),
+                      _identificationFields(theme),
+                      const SizedBox(height: 24),
+                      _environmentSection(theme),
+                      const SizedBox(height: 24),
+                      _previewCard(theme, preview),
+                      const SizedBox(height: 16),
+                      _disclaimerBanner(theme),
+                      const SizedBox(height: 24),
+                      _actionButtons(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
-  Widget _header(ThemeData theme, AppStrings strings) => Container(
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.5),
-          border: Border(
-            bottom: BorderSide(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: widget.onClose,
-              tooltip: strings.back,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                strings.menuReports,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
 
   Widget _personalCard(ThemeData theme, AppStrings strings) => Container(
         padding: const EdgeInsets.all(16),

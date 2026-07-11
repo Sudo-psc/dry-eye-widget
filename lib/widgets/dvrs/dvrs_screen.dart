@@ -9,6 +9,8 @@ import '../../models/dvrs_definitions.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
+import '../common/panel_entrance.dart';
+import '../common/panel_header.dart';
 import '../liquid_glass.dart';
 import 'dvrs_history_view.dart';
 import 'dvrs_result_view.dart';
@@ -154,6 +156,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final strings = context.read<SettingsProvider>().strings;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ClipRRect(
@@ -161,11 +164,19 @@ class _DvrsScreenState extends State<DvrsScreen> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: Column(
-            children: [
-              _header(theme),
-              Expanded(child: _body(theme)),
-            ],
+          child: PanelEntrance(
+            child: Column(
+              children: [
+                PanelHeader(
+                  title: _headerTitle,
+                  onLeading: _onHeaderBack,
+                  leadingTooltip: strings.back,
+                  leadingIcon: Icons.arrow_back_rounded,
+                  trailingIcon: Icons.assignment_outlined,
+                ),
+                Expanded(child: _body(theme)),
+              ],
+            ),
           ),
         ),
       ),
@@ -195,37 +206,6 @@ class _DvrsScreenState extends State<DvrsScreen> {
         break;
     }
   }
-
-  Widget _header(ThemeData theme) => Container(
-    height: 56,
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    decoration: BoxDecoration(
-      color: theme.colorScheme.surface.withValues(alpha: 0.5),
-      border: Border(
-        bottom: BorderSide(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-        ),
-      ),
-    ),
-    child: Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _onHeaderBack,
-          tooltip: context.read<SettingsProvider>().strings.back,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            _headerTitle,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    ),
-  );
 
   Widget _body(ThemeData theme) {
     switch (_view) {

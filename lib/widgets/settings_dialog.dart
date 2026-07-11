@@ -316,6 +316,35 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   ),
                   _hint(s.uiScaleHint),
                   const SizedBox(height: 8),
+                  Text(
+                    s.uiDensity,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      _choiceButton(
+                        label: s.uiDensityComfortable,
+                        selected: _draft.uiDensity == UiDensity.comfortable,
+                        onTap: () => _set(
+                          _draft.copyWith(uiDensity: UiDensity.comfortable),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _choiceButton(
+                        label: s.uiDensityCompact,
+                        selected: _draft.uiDensity == UiDensity.compact,
+                        onTap: () => _set(
+                          _draft.copyWith(uiDensity: UiDensity.compact),
+                        ),
+                      ),
+                    ],
+                  ),
+                  _hint(s.uiDensityHint),
+                  const SizedBox(height: 8),
                   _slider(
                     label: s.ballSize,
                     value: _draft.ballSize,

@@ -8,6 +8,9 @@ import '../../services/daily_insight.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/constants.dart';
+import '../common/empty_state.dart';
+import '../common/panel_entrance.dart';
+import '../common/panel_header.dart';
 import '../liquid_glass.dart';
 
 /// Tela "Meu Progresso": devolve ao usuário a narrativa dos dados de pausas já
@@ -45,7 +48,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final s = context.read<SettingsProvider>().strings;
     final content = Column(
       children: [
-        if (!widget.embedded) _header(theme, s),
+        if (!widget.embedded)
+          PanelHeader(
+            title: s.progressTitle,
+            onLeading: widget.onClose,
+            leadingTooltip: s.close,
+            trailingIcon: Icons.local_florist_outlined,
+          ),
         Expanded(child: _body(theme, s)),
       ],
     );
@@ -57,58 +66,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: content,
+          child: PanelEntrance(child: content),
         ),
       ),
     );
   }
-
-  Widget _header(ThemeData theme, AppStrings s) => Container(
-    decoration: BoxDecoration(
-      color: theme.colorScheme.surface.withValues(alpha: 0.55),
-      border: const Border(
-        bottom: BorderSide(color: AppColors.divider),
-      ),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(4, 6, 14, 6),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.close_rounded),
-            onPressed: widget.onClose,
-            tooltip: s.close,
-            style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: Text(
-              s.progressTitle,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.idleBall.withValues(alpha: 0.16),
-            ),
-            child: const Icon(
-              Icons.local_florist_outlined,
-              color: AppColors.idleBall,
-              size: 20,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 
   Widget _body(ThemeData theme, AppStrings s) {
     if (_stats.totalReminders == 0) return _empty(theme, s);
@@ -354,29 +316,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _empty(ThemeData theme, AppStrings s) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.insights_outlined,
-            size: 40,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            s.progressEmpty,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              height: 1.4,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+  Widget _empty(ThemeData theme, AppStrings s) => EmptyState(
+        icon: Icons.insights_outlined,
+        title: s.progressEmptyTitle,
+        message: s.progressEmpty,
+      );
 }

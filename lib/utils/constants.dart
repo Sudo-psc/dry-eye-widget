@@ -19,10 +19,11 @@ class AppColors {
   static const Color glassShadow = Color(0x4D000000); // 0.30 de opacidade
 
   static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xCCFFFFFF);
+  /// Secundário com contraste ≥ ~4.5:1 sobre vidro escuro típico (WCAG AA).
+  static const Color textSecondary = Color(0xE0FFFFFF);
 
-  /// Rótulos terciários (headers de seção, meta).
-  static const Color textMuted = Color(0x8CFFFFFF);
+  /// Rótulos terciários (headers de seção, meta) — ainda legíveis em vidro.
+  static const Color textMuted = Color(0xB3FFFFFF);
 
   /// Fundo escuro de diálogos (Sobre, configurações).
   static const Color surface = Color(0xFF2A2A2A);
@@ -126,6 +127,9 @@ class AppDefaults {
   static const double uiScale = 1.0;
   static const double minUiScale = 0.8;
   static const double maxUiScale = 1.6;
+
+  /// Densidade de espaçamento: confortável (padrão) ou compacta.
+  static const String uiDensity = 'comfortable';
 
   /// Indica se o usuário já concluiu o onboarding de primeira execução.
   static const bool onboardingComplete = false;

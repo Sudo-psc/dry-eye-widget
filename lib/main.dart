@@ -224,14 +224,22 @@ class DryEyeApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      // Aplica a escala de UI (acessibilidade) a toda a árvore de telas e
-      // diálogos. Lê do SettingsProvider e reage a mudanças em tempo real.
+      // Aplica escala de UI e densidade (acessibilidade) a toda a árvore.
+      // Lê do SettingsProvider e reage a mudanças em tempo real.
       builder: (context, child) {
-        final scale = context.watch<SettingsProvider>().value.uiScale;
+        final settings = context.watch<SettingsProvider>().value;
         final media = MediaQuery.of(context);
-        return MediaQuery(
-          data: media.copyWith(textScaler: TextScaler.linear(scale)),
-          child: child ?? const SizedBox.shrink(),
+        final themed = Theme.of(context).copyWith(
+          visualDensity: settings.uiDensity.visualDensity,
+        );
+        return Theme(
+          data: themed,
+          child: MediaQuery(
+            data: media.copyWith(
+              textScaler: TextScaler.linear(settings.uiScale),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
       home: const HomePage(),

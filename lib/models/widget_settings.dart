@@ -51,6 +51,7 @@ class WidgetSettings {
     required this.pauseOnInactivity,
     required this.cameraPresence,
     required this.uiScale,
+    required this.uiDensity,
     required this.onboardingComplete,
     required this.dvrsReminderEnabled,
   });
@@ -172,6 +173,9 @@ class WidgetSettings {
   /// `MediaQuery.textScaler`, afeta todo o texto dos diálogos e telas.
   final double uiScale;
 
+  /// Densidade de espaçamento da interface.
+  final UiDensity uiDensity;
+
   /// Marca que o onboarding de primeira execução já foi concluído.
   final bool onboardingComplete;
 
@@ -218,6 +222,7 @@ class WidgetSettings {
     pauseOnInactivity: AppDefaults.pauseOnInactivity,
     cameraPresence: AppDefaults.cameraPresence,
     uiScale: AppDefaults.uiScale,
+    uiDensity: UiDensity.comfortable,
     onboardingComplete: AppDefaults.onboardingComplete,
     dvrsReminderEnabled: AppDefaults.dvrsReminderEnabled,
   );
@@ -267,6 +272,7 @@ class WidgetSettings {
     bool? pauseOnInactivity,
     bool? cameraPresence,
     double? uiScale,
+    UiDensity? uiDensity,
     bool? onboardingComplete,
     bool? dvrsReminderEnabled,
   }) {
@@ -317,6 +323,7 @@ class WidgetSettings {
       pauseOnInactivity: pauseOnInactivity ?? this.pauseOnInactivity,
       cameraPresence: cameraPresence ?? this.cameraPresence,
       uiScale: uiScale ?? this.uiScale,
+      uiDensity: uiDensity ?? this.uiDensity,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       dvrsReminderEnabled: dvrsReminderEnabled ?? this.dvrsReminderEnabled,
     ).normalized();
@@ -387,6 +394,7 @@ class WidgetSettings {
         AppDefaults.maxUiScale,
         d.uiScale,
       ),
+      uiDensity: uiDensity,
       onboardingComplete: onboardingComplete,
       dvrsReminderEnabled: dvrsReminderEnabled,
     );
@@ -444,6 +452,7 @@ class WidgetSettings {
     'pauseOnInactivity': pauseOnInactivity,
     'cameraPresence': cameraPresence,
     'uiScale': uiScale,
+    'uiDensity': uiDensity.id,
     'onboardingComplete': onboardingComplete,
     'dvrsReminderEnabled': dvrsReminderEnabled,
   };
@@ -526,6 +535,7 @@ class WidgetSettings {
           map['pauseOnInactivity'] as bool? ?? d.pauseOnInactivity,
       cameraPresence: map['cameraPresence'] as bool? ?? d.cameraPresence,
       uiScale: (map['uiScale'] as num?)?.toDouble() ?? d.uiScale,
+      uiDensity: uiDensityFromId(map['uiDensity'] as String?),
       onboardingComplete:
           map['onboardingComplete'] as bool? ?? d.onboardingComplete,
       dvrsReminderEnabled:

@@ -15,6 +15,8 @@ import '../../ui/section_header.dart';
 import '../../ui/stat_tile.dart';
 import '../../ui/trend_line_chart.dart';
 import '../../utils/constants.dart';
+import '../common/panel_entrance.dart';
+import '../common/panel_header.dart';
 import '../dvrs/dvrs_history_view.dart';
 import '../dvrs/dvrs_ui.dart';
 import '../liquid_glass.dart';
@@ -514,9 +516,45 @@ class _DashboardScreenState extends State<DashboardScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = context.watch<SettingsProvider>().strings;
+    final tabBar = TabBar(
+      controller: _tabs,
+      indicatorColor: AppColors.idleBall,
+      labelColor: AppColors.idleBall,
+      unselectedLabelColor: AppColors.textSecondary,
+      labelStyle: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelStyle: const TextStyle(fontSize: 12),
+      indicatorSize: TabBarIndicatorSize.tab,
+      tabs: [
+        Tab(
+          iconMargin: const EdgeInsets.only(bottom: 2),
+          icon: const Icon(Icons.space_dashboard_outlined, size: 18),
+          text: strings.dashboardTabOverview,
+        ),
+        Tab(
+          iconMargin: const EdgeInsets.only(bottom: 2),
+          icon: const Icon(Icons.monitor_outlined, size: 18),
+          text: strings.dashboardTabScreen,
+        ),
+        Tab(
+          iconMargin: const EdgeInsets.only(bottom: 2),
+          icon: const Icon(Icons.assignment_outlined, size: 18),
+          text: strings.dashboardTabDvrs,
+        ),
+      ],
+    );
     final content = Column(
       children: [
-        if (!widget.embedded) _header(theme, strings),
+        if (!widget.embedded)
+          PanelHeader(
+            title: strings.menuDashboard,
+            onLeading: widget.onClose,
+            leadingTooltip: strings.close,
+            trailingIcon: Icons.space_dashboard_outlined,
+            bottom: tabBar,
+          ),
         if (widget.embedded)
           Material(
             color: theme.colorScheme.surface.withValues(alpha: 0.2),
@@ -553,76 +591,9 @@ class _DashboardScreenState extends State<DashboardScreen>
         child: LiquidGlass(
           fillOpacity: 0.8,
           blur: 20,
-          child: content,
+          child: PanelEntrance(child: content),
         ),
       ),
     );
   }
-
-  Widget _header(ThemeData theme, AppStrings strings) => Container(
-    decoration: BoxDecoration(
-      color: theme.colorScheme.surface.withValues(alpha: 0.5),
-      border: Border(
-        bottom: BorderSide(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-        ),
-      ),
-    ),
-    child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: widget.onClose,
-                tooltip: strings.close,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  strings.menuDashboard,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-        TabBar(
-          controller: _tabs,
-          indicatorColor: AppColors.idleBall,
-          labelColor: AppColors.idleBall,
-          unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
-          indicatorSize: TabBarIndicatorSize.tab,
-          tabs: [
-            Tab(
-              iconMargin: const EdgeInsets.only(bottom: 2),
-              icon: const Icon(Icons.space_dashboard_outlined, size: 18),
-              text: strings.dashboardTabOverview,
-            ),
-            Tab(
-              iconMargin: const EdgeInsets.only(bottom: 2),
-              icon: const Icon(Icons.monitor_outlined, size: 18),
-              text: strings.dashboardTabScreen,
-            ),
-            Tab(
-              iconMargin: const EdgeInsets.only(bottom: 2),
-              icon: const Icon(Icons.assignment_outlined, size: 18),
-              text: strings.dashboardTabDvrs,
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
 }
