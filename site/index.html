@@ -20,8 +20,8 @@ document.documentElement.setAttribute("data-theme",t);})();
 <link rel="dns-prefetch" href="https://apps.microsoft.com">
 <!-- Só as famílias usadas no CSS (Hanken + Roboto Mono). Menos pesos = menos bytes no critical path. -->
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="preload" href="styles/landing.css?v=20260711-qa2" as="style">
-<link rel="stylesheet" href="styles/landing.css?v=20260711-qa2">
+<link rel="preload" href="styles/landing.css?v=20260711-qa8" as="style">
+<link rel="stylesheet" href="styles/landing.css?v=20260711-qa8">
 <link rel="stylesheet" href="styles/widget-screens.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="styles/widget-screens.css"></noscript>
 <link rel="icon" href="assets/icon-256.png" type="image/png">
@@ -199,13 +199,13 @@ document.documentElement.setAttribute("data-theme",t);})();
         <button type="button" data-lang="pt" aria-pressed="true">PT</button>
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
-      <a class="icon-btn science-mobile-link" href="science/" aria-label="Ciência" title="Ciência" data-i18n-aria="nav.science" data-i18n-title="nav.science">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .25.96l5.5 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.75-2.96L9.75 8.96A2 2 0 0 0 10 8V2"></path><path d="M6.5 15h11M8.5 2h7"></path></svg>
-      </a>
       <button class="icon-btn" id="theme-toggle" type="button" aria-label="Alternar tema">
         <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"></path></svg>
         <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"></path></svg>
       </button>
+      <a class="icon-btn science-mobile-link" href="science/" aria-label="Ciência" title="Ciência" data-i18n-aria="nav.science" data-i18n-title="nav.science">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .25.96l5.5 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.75-2.96L9.75 8.96A2 2 0 0 0 10 8V2"></path><path d="M6.5 15h11M8.5 2h7"></path></svg>
+      </a>
       <a class="icon-btn github-header-link" href="https://github.com/Sudo-psc/dry-eye-widget" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.15 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path></svg>
       </a>
@@ -219,7 +219,7 @@ document.documentElement.setAttribute("data-theme",t);})();
   <div class="wrap">
     <div class="hero-copy">
       <span class="hero-badge glass"><span class="dot"></span><span data-i18n="hero.badge">Open source · MIT · macOS &amp; Windows</span></span>
-      <p class="version-pill" aria-label="Versão atual"><span data-i18n="hero.version">Versão</span> <strong id="app-version">1.23.0</strong></p>
+      <p class="version-pill" aria-label="Versão atual" data-i18n-aria="hero.version.aria"><span data-i18n="hero.version">Versão</span> <strong id="app-version">1.23.0</strong></p>
       <h1 data-i18n="hero.title">Sua tela não avisa quando seus olhos <em>precisam de pausa</em>. Este widget avisa.</h1>
       <p class="hero-sub" data-i18n="hero.sub">Um lembrete gentil e flutuante que aplica a regra oftalmológica 20-20-20 — desenvolvido por um médico oftalmologista para prevenir a fadiga visual digital e o olho seco.</p>
       <div class="dl-row">
@@ -674,34 +674,34 @@ document.documentElement.setAttribute("data-theme",t);})();
       <span class="kicker" data-i18n="faq.kicker">Dúvidas Frequentes</span>
       <h2 data-i18n="faq.title">Perguntas Frequentes (FAQ)</h2>
     </div>
-    <div class="faq-list reveal" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.1.q">O que é a regra 20-20-20?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.1.a">Uma recomendação clínica simples: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) de distância por 20 segundos. Isso relaxa a musculatura ciliar e estimula piscadas completas, melhorando a lubrificação.</p>
+    <div class="faq-list reveal">
+      <details class="glass">
+        <summary data-i18n="faq.1.q">O que é a regra 20-20-20?</summary>
+        <p data-i18n="faq.1.a">Uma recomendação clínica simples: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) de distância por 20 segundos. Isso relaxa a musculatura ciliar e estimula piscadas completas, melhorando a lubrificação.</p>
       </details>
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.2.q">O widget coleta meus dados?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.2.a">Não. O Dry Eye Widget é open source, funciona localmente e não tem telemetria de uso. A única conexão prevista é a checagem opcional de atualizações no GitHub.</p>
+      <details class="glass">
+        <summary data-i18n="faq.2.q">O widget coleta meus dados?</summary>
+        <p data-i18n="faq.2.a">Não. O Dry Eye Widget é open source, funciona localmente e não tem telemetria de uso. A única conexão prevista é a checagem opcional de atualizações no GitHub.</p>
       </details>
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.3.q">O app funciona offline?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.3.a">Sim. Todas as funcionalidades principais, incluindo temporizadores, o DVRS e orientações, rodam nativamente offline.</p>
+      <details class="glass">
+        <summary data-i18n="faq.3.q">O app funciona offline?</summary>
+        <p data-i18n="faq.3.a">Sim. Todas as funcionalidades principais, incluindo temporizadores, o DVRS e orientações, rodam nativamente offline.</p>
       </details>
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.4.q">O app substitui o tratamento médico?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.4.a">Não. Ele é uma ferramenta preventiva de apoio a hábitos. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e orientação individual.</p>
+      <details class="glass">
+        <summary data-i18n="faq.4.q">O app substitui o tratamento médico?</summary>
+        <p data-i18n="faq.4.a">Não. Ele é uma ferramenta preventiva de apoio a hábitos. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e orientação individual.</p>
       </details>
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.5.q">O que é o DVRS?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.5.a">O DVRS (Índice de Risco Visual Digital) é um questionário educativo de triagem com 16 perguntas. Gera score e mensagens educativas — nunca um diagnóstico médico.</p>
+      <details class="glass">
+        <summary data-i18n="faq.5.q">O que é o DVRS?</summary>
+        <p data-i18n="faq.5.a">O DVRS (Índice de Risco Visual Digital) é um questionário educativo de triagem com 16 perguntas. Gera score e mensagens educativas — nunca um diagnóstico médico.</p>
       </details>
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.6.q">O que há de novo na versão 1.23?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.6.a">Hub de saúde, relatório PDF narrativo, painel Meus dados, DVRS 1.1, resumo do dia, insights proativos e builds multiplataforma atualizados.</p>
+      <details class="glass">
+        <summary data-i18n="faq.6.q">O que há de novo na versão 1.23?</summary>
+        <p data-i18n="faq.6.a">Hub de saúde, relatório PDF narrativo, painel Meus dados, DVRS 1.1, resumo do dia, insights proativos e builds multiplataforma atualizados.</p>
       </details>
-      <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.7.q">O Windows ou o macOS bloqueiam a instalação?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.7.a">Pode acontecer enquanto não houver assinatura paga de código. No macOS use xattr -cr no .dmg se o sistema disser que o arquivo está danificado. No Windows, se o SmartScreen avisar, escolha Mais informações e Executar mesmo assim — o binário vem do GitHub Releases open source.</p>
+      <details class="glass">
+        <summary data-i18n="faq.7.q">O Windows ou o macOS bloqueiam a instalação?</summary>
+        <p data-i18n="faq.7.a">Pode acontecer enquanto não houver assinatura paga de código. No macOS use xattr -cr no .dmg se o sistema disser que o arquivo está danificado. No Windows, se o SmartScreen avisar, escolha Mais informações e Executar mesmo assim — o binário vem do GitHub Releases open source.</p>
       </details>
     </div>
   </div>

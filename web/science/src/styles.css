@@ -1484,14 +1484,45 @@ h3 {
 }
 
 @media (max-width: 560px) {
-  .brand small,
+  /* Keep the eye mark; drop wordmark so PT/EN + theme + App fit. */
+  .brand > span:not(.brand-mark),
   .github-link,
   .app-link span {
     display: none;
   }
 
+  .header-inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    width: min(calc(100% - 20px), var(--page));
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 0.3rem;
+    margin-left: 0;
+    justify-self: end;
+    justify-content: flex-end;
+  }
+
+  .lang-switch button {
+    padding: 8px 9px;
+    font-size: 10px;
+  }
+
+  .icon-button,
+  .github-link,
   .app-link {
-    @apply w-10 px-0;
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  .app-link {
+    @apply w-[2.15rem] px-0;
   }
 
   .hero-section {

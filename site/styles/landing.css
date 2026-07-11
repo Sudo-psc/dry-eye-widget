@@ -682,6 +682,59 @@ a.icon-btn.science-mobile-link {
 /* O infográfico está em português; oculta na versão em inglês. */
 html[lang="en"] .cost-info { display: none; }
 
+/* ---------- FAQ ---------- */
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.faq-list details.glass {
+  padding: 14px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.faq-list details.glass[open] {
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--line));
+  box-shadow: var(--shadow);
+}
+.faq-list summary {
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text);
+}
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list summary::after {
+  content: "+";
+  flex: none;
+  width: 1.4em;
+  text-align: center;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.15em;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+.faq-list details[open] summary::after {
+  content: "–";
+}
+.faq-list details > p {
+  margin: 12px 0 2px;
+  opacity: 0.85;
+  line-height: 1.55;
+  color: var(--text-2);
+  font-size: 0.98rem;
+}
+
 /* ---------- Science CTA ---------- */
 .science-cta {
   display: grid;
@@ -727,25 +780,81 @@ html[lang="en"] .cost-info { display: none; }
   .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
   .hero-demo { min-height: 420px; }
   .rule-grid, .stat-grid, .feature-grid, .cost-highlights, .evidence-pillars { grid-template-columns: 1fr 1fr; }
-  .main-nav { display: none; }
+  /* Remove nav from layout entirely so it cannot widen the fixed header bar. */
+  .main-nav {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
   a.icon-btn.science-mobile-link { display: inline-flex; }
   .science-cta { grid-template-columns: 1fr; padding: 22px 20px; }
+  .site-header .bar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
 }
 @media (max-width: 640px) {
-  .site-header .bar { gap: 8px; padding-inline: 12px; }
-  .header-actions { margin-left: auto; gap: 4px; flex-shrink: 0; }
-  .github-header-link { display: none; }
-  .brand span { display: none; }
-  .icon-btn { width: 34px; height: 34px; }
-  .icon-btn svg { width: 17px; height: 17px; }
-  .lang-switch button { padding: 9px 10px; font-size: 11px; }
-  /* Keep Ciência reachable when the pill nav is hidden. */
-  a.icon-btn.science-mobile-link {
+  /* Compact header: logo | PT/EN + theme + science */
+  .site-header .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-left: auto;
+    flex: 0 0 auto;
+  }
+  .github-header-link { display: none !important; }
+  .brand { gap: 0; flex: 0 0 auto; min-width: 0; }
+  .brand span { display: none !important; }
+  .brand img { width: 28px; height: 28px; }
+  .icon-btn {
     display: inline-flex;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+  }
+  .icon-btn svg { width: 17px; height: 17px; }
+  .lang-switch {
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 34px;
+  }
+  .lang-switch button {
+    padding: 0 10px;
+    min-width: 34px;
+    height: 34px;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+  a.icon-btn.science-mobile-link {
+    display: inline-flex !important;
     color: var(--accent);
     border-color: color-mix(in oklab, var(--accent) 40%, var(--line));
     background: var(--accent-soft);
   }
+  #theme-toggle { display: inline-flex !important; }
+  .hero-copy { gap: 14px; }
+  .hero-sub { font-size: 16px; }
+  .dl-row { gap: 10px; }
+  .btn-dl, .btn-store { width: 100%; justify-content: center; }
+  .trust-row { gap: 8px 14px; }
+  .trust-item { font-size: 12.5px; }
   .rule-grid, .stat-grid, .feature-grid, .evidence-pillars { grid-template-columns: 1fr; }
   .doctor-card { grid-template-columns: 1fr; justify-items: start; }
   .ref-item { grid-template-columns: 28px 1fr; }
