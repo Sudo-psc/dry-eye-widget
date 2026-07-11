@@ -33,7 +33,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 0 0 12px;
+  margin: 0;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 0.78rem;
@@ -42,6 +42,9 @@
   color: var(--text-2);
   background: var(--accent-soft);
   border: 1px solid var(--line);
+  width: fit-content;
+  max-width: 100%;
+  justify-self: start;
 }
 .version-pill strong {
   font-family: var(--font-mono);
@@ -209,6 +212,7 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   background: var(--accent-strong);
 }
 .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+/* Visible only on narrow headers (see responsive block). Accent tint keeps it findable. */
 .science-mobile-link { display: none; }
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -283,7 +287,58 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
 .btn-store small { font-size: 11px; font-weight: 600; opacity: 0.78; letter-spacing: 0.02em; }
 .btn-store strong { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
 .dl-meta { font-size: 13px; color: var(--text-3); display: flex; flex-wrap: wrap; gap: 6px 18px; }
-.dl-meta a { color: var(--text-2); font-weight: 600; border-bottom: 1px solid var(--line); transition: color 160ms ease, border-color 160ms ease; }
+.dl-meta a { color: var(--text-2); font-weight: 600; border-radius: 0; border-bottom: 1px solid var(--line); transition: color 160ms ease, border-color 160ms ease; }
+.hero-mac-note {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-3);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--surface-strong) 80%, transparent);
+  padding: 0;
+  overflow: hidden;
+}
+.hero-mac-note summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 10px 14px;
+  user-select: none;
+}
+.hero-mac-note summary::-webkit-details-marker { display: none; }
+.hero-mac-note summary::before {
+  content: "›";
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 160ms ease;
+  color: var(--accent);
+  font-weight: 700;
+}
+.hero-mac-note[open] summary::before { transform: rotate(90deg); }
+.hero-mac-note p {
+  margin: 0;
+  padding: 0 14px 8px;
+  opacity: 0.9;
+}
+.hero-mac-note code {
+  display: block;
+  margin: 0 14px 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(127, 127, 127, 0.14);
+  font-size: 0.86em;
+  user-select: all;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.science-mobile-link {
+  color: var(--accent);
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--line));
+  background: var(--accent-soft);
+}
 .dl-meta a:hover { color: var(--accent); border-color: var(--accent); }
 
 .trust-row { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--line); }
@@ -676,10 +731,20 @@ html[lang="en"] .cost-info { display: none; }
   .science-cta { grid-template-columns: 1fr; padding: 22px 20px; }
 }
 @media (max-width: 640px) {
-  .site-header .bar { gap: 12px; padding-inline: 16px; }
-  .header-actions { margin-left: auto; gap: 6px; }
+  .site-header .bar { gap: 8px; padding-inline: 12px; }
+  .header-actions { margin-left: auto; gap: 4px; flex-shrink: 0; }
   .github-header-link { display: none; }
   .brand span { display: none; }
+  .icon-btn { width: 34px; height: 34px; }
+  .icon-btn svg { width: 17px; height: 17px; }
+  .lang-switch button { padding: 9px 10px; font-size: 11px; }
+  /* Keep Ciência reachable when the pill nav is hidden. */
+  .science-mobile-link {
+    display: inline-flex !important;
+    color: var(--accent);
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--line));
+    background: var(--accent-soft);
+  }
   .rule-grid, .stat-grid, .feature-grid, .evidence-pillars { grid-template-columns: 1fr; }
   .doctor-card { grid-template-columns: 1fr; justify-items: start; }
   .ref-item { grid-template-columns: 28px 1fr; }

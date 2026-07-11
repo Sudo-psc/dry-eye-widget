@@ -20,8 +20,8 @@ document.documentElement.setAttribute("data-theme",t);})();
 <link rel="dns-prefetch" href="https://apps.microsoft.com">
 <!-- Só as famílias usadas no CSS (Hanken + Roboto Mono). Menos pesos = menos bytes no critical path. -->
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="preload" href="styles/landing.css?v=20260710-header" as="style">
-<link rel="stylesheet" href="styles/landing.css?v=20260710-header">
+<link rel="preload" href="styles/landing.css?v=20260711-qa" as="style">
+<link rel="stylesheet" href="styles/landing.css?v=20260711-qa">
 <link rel="stylesheet" href="styles/widget-screens.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="styles/widget-screens.css"></noscript>
 <link rel="icon" href="assets/icon-256.png" type="image/png">
@@ -67,8 +67,8 @@ document.documentElement.setAttribute("data-theme",t);})();
       "medicalSpecialty": "Ophthalmology",
       "identifier": "CRM-MG 69.870 · CRM-SP 204.923 · RQE 71.903",
       "url": "https://portal.cfm.org.br/busca-medicos/"
-    },
-
+    }
+  },
   {
     "@context": "https://schema.org",
     "@type": "VideoObject",
@@ -125,10 +125,10 @@ document.documentElement.setAttribute("data-theme",t);})();
       },
       {
         "@type": "Question",
-        "name": "O que há de novo na versão 1.22?",
+        "name": "O que há de novo na versão 1.23?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e melhor suporte multiplataforma."
+          "text": "Hub de saúde, relatório PDF narrativo, painel Meus dados, DVRS 1.1, resumo do dia, insights proativos e builds multiplataforma atualizados."
         }
       },
       {
@@ -187,7 +187,7 @@ document.documentElement.setAttribute("data-theme",t);})();
       <img src="assets/icon-256.png" alt="Dry Eye Widget" width="36" height="36">
       <span>Dry Eye Widget</span>
     </a>
-    <nav class="main-nav" aria-label="Principal">
+    <nav class="main-nav" aria-label="Principal" data-i18n-aria="nav.aria">
       <a href="#sobre" data-i18n="nav.about">Sobre</a>
       <a href="#recursos" data-i18n="nav.features">Recursos</a>
       <a href="science/" class="nav-cta" data-i18n="nav.science">Ciência</a>
@@ -238,11 +238,11 @@ document.documentElement.setAttribute("data-theme",t);})();
         <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip" data-i18n="hero.meta.zip">versão portátil (.zip)</a>
         <a href="https://github.com/Sudo-psc/dry-eye-widget/releases" target="_blank" rel="noopener noreferrer" data-i18n="hero.meta.releases">todas as versões</a>
       </p>
-      <p class="dl-note" style="margin-top:10px;font-size:.82rem;opacity:.72;line-height:1.5;max-width:56ch">
-        <span data-i18n="hero.note.mac">No macOS, se aparecer que o arquivo "está danificado", ele não está corrompido — falta apenas a assinatura paga da Apple. Abra o Terminal, rode o comando abaixo e então abra o .dmg normalmente:</span>
-        <br>
-        <code style="display:inline-block;margin-top:4px;padding:2px 7px;border-radius:5px;background:rgba(127,127,127,.18);font-size:.82em;user-select:all">xattr -cr ~/Downloads/DryEyeWidget*.dmg</code>
-      </p>
+      <details class="dl-note hero-mac-note">
+        <summary data-i18n="hero.note.mac.summary">macOS: se o .dmg disser “danificado”</summary>
+        <p data-i18n="hero.note.mac">No macOS, se aparecer que o arquivo "está danificado", ele não está corrompido — falta apenas a assinatura paga da Apple. Abra o Terminal, rode o comando abaixo e então abra o .dmg normalmente:</p>
+        <code>xattr -cr ~/Downloads/DryEyeWidget*.dmg</code>
+      </details>
       <div class="trust-row">
         <span class="trust-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6.5v5c0 4.5 3.4 8 8 9.5 4.6-1.5 8-5 8-9.5v-5L12 3Z"></path><path d="M9 12l2 2 4-4.5"></path></svg>
@@ -696,8 +696,8 @@ document.documentElement.setAttribute("data-theme",t);})();
         <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.5.a">O DVRS (Índice de Risco Visual Digital) é um questionário educativo de triagem com 16 perguntas. Gera score e mensagens educativas — nunca um diagnóstico médico.</p>
       </details>
       <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
-        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.6.q">O que há de novo na versão 1.22?</summary>
-        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.6.a">Resumo do dia, insights proativos, lembrete de reavaliação do DVRS, frequência de piscada configurável, alongamento de ciclo por 1 hora e builds multiplataforma atualizados.</p>
+        <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.6.q">O que há de novo na versão 1.23?</summary>
+        <p style="margin-top: 12px; opacity: 0.8; line-height: 1.5;" data-i18n="faq.6.a">Hub de saúde, relatório PDF narrativo, painel Meus dados, DVRS 1.1, resumo do dia, insights proativos e builds multiplataforma atualizados.</p>
       </details>
       <details class="glass" style="padding: 16px; border-radius: 12px; cursor: pointer;">
         <summary style="font-weight: 600; font-size: 1.1rem;" data-i18n="faq.7.q">O Windows ou o macOS bloqueiam a instalação?</summary>
@@ -807,7 +807,7 @@ document.documentElement.setAttribute("data-theme",t);})();
           </span>
         </a>
       </div>
-      <ul class="science-cta-points" aria-label="Tópicos">
+      <ul class="science-cta-points" aria-label="Tópicos" data-i18n-aria="sci.topics">
         <li data-i18n="sci.p1">Fisiologia e mecanismo</li>
         <li data-i18n="sci.p2">Monitoramento longitudinal</li>
         <li data-i18n="sci.p3">Protocolo aberto OVPP</li>

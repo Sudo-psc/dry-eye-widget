@@ -77,6 +77,10 @@ export function LanguageProvider({
     document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
     document.documentElement.setAttribute("data-lang", lang);
     persistLang(lang);
+    document.title =
+      lang === "pt"
+        ? "A ciência por trás do Dry Eye Widget | Saúde visual baseada em evidências"
+        : "The Science Behind Dry Eye Widget | Evidence-Based Visual Health";
   }, [lang]);
 
   const setLang = useCallback((next: Lang) => {
