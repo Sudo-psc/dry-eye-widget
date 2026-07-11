@@ -90,6 +90,13 @@ class FeatureStrings {
       : 'Comparação de domínios (atual vs anterior)';
   String get dvrsTooltipScore =>
       _en ? 'Score: {score}/100 on {date}' : 'Score: {score}/100 em {date}';
+  String get dvrsDeleteConfirmTitle =>
+      _en ? 'Delete this DVRS result?' : 'Excluir este resultado do DVRS?';
+  String get dvrsDeleteConfirmMessage => _en
+      ? 'This assessment will be permanently removed from your history.'
+      : 'Esta avaliação será removida permanentemente do seu histórico.';
+  String get dvrsDeleteCancel => _en ? 'Cancel' : 'Cancelar';
+  String get dvrsDeleteConfirm => _en ? 'Delete' : 'Excluir';
   String get dvrsVersionLabel =>
       _en ? 'Instrument version' : 'Versão do instrumento';
 

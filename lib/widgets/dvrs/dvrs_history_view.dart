@@ -37,7 +37,28 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     setState(() => _history = storage.getDvrsHistory());
   }
 
-  Future<void> _delete(String id) async {
+  Future<void> _confirmDelete(String id) async {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(f.dvrsDeleteConfirmTitle),
+        content: Text(f.dvrsDeleteConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(f.dvrsDeleteCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(f.dvrsDeleteConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
     final storage = context.read<DvrsStorageService>();
     await storage.deleteDvrsResult(id);
     if (!mounted) return;
@@ -386,12 +407,13 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
                     ),
                   ),
                   IconButton(
+                    key: ValueKey<String>('dvrs_delete_${r.id}'),
                     icon: const Icon(Icons.delete_outline, size: 20),
                     tooltip: context
                         .read<SettingsProvider>()
                         .strings
                         .dvrsHistoryDelete,
-                    onPressed: () => _delete(r.id),
+                    onPressed: () => _confirmDelete(r.id),
                   ),
                 ],
               ),

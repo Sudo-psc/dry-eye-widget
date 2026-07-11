@@ -43,15 +43,14 @@ class HealthDataService {
         'role': 'educational_screening',
         'isDiagnostic': false,
       },
-      'privacy': {
-        'localOnly': true,
-        'telemetry': false,
-      },
+      'privacy': {'localOnly': true, 'telemetry': false},
       'dvrs': history.map((r) => r.toMap()).toList(),
       'dvrsDraft': dvrs.loadDraft(),
       'breakStats': jsonDecode(storage.loadBreakStats().toJson()),
       'screenTime': jsonDecode(screenTime.data.toJson()),
-      'activityStats': jsonDecode(storage.loadActivityStats().toJson()),
+      // Usa o snapshot vivo para incluir amostras ainda dentro da janela de
+      // persistência, assim como já fazemos com o tempo de tela.
+      'activityStats': jsonDecode(activity.data.toJson()),
       'environmentChecklist': storage.loadEnvironmentChecklist()?.toMap(),
       // Envelope OVPP-ready: métricas agregadas versionadas, opt-in no uso.
       'ovppReadyMetrics': _ovppMetrics(history, storage.loadBreakStats(), at),
@@ -129,7 +128,9 @@ class HealthDataService {
     await dvrs.clearDraft();
     await storage.clearBreakStats();
     await screenTime.clear();
-    await storage.clearActivityStats();
+    // Limpa também o snapshot em memória. Apagar apenas o SharedPreferences
+    // permitiria que o próximo flush do serviço ativo restaurasse os dados.
+    await activity.clear();
     await storage.clearEnvironmentChecklist();
     await storage.saveDvrsNudgeSnoozedUntil(null);
     await storage.saveDvrsNudgeNotifiedDay('');

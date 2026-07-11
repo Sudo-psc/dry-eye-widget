@@ -2,6 +2,11 @@
 
 ## now
 
+- [x] Ciclo 1 crítico: impedir ressurreição de atividade após exclusão LGPD.
+- [x] Ciclo 2 crítico: confirmar antes de excluir resultado DVRS.
+- [x] Ciclo 3 crítico: incluir atividade ainda não persistida na exportação.
+- [x] Validar os três ciclos com testes focados, suíte completa, análise e build.
+
 - [x] Aprovar e registrar o design UX acompanhar / agir / entender.
 - [x] Criar worktree e branch isolados para a evolução de UX.
 - [x] Dividir o painel rápido em página principal e página Sistema.
@@ -44,6 +49,9 @@
 - Signed macOS release validation remains blocked until signing/provisioning is available for the HealthKit entitlement.
 
 ## improve
+
+- Adicionar injeção de falhas de armazenamento para validar mensagens de erro
+  e recuperação durante exportação e exclusão de dados.
 
 - Add an integration-level window layout test if a reliable desktop window harness is introduced.
 - Add a small desktop visual QA script or harness for edge docking screenshots after window_manager upgrades.

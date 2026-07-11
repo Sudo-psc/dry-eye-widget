@@ -1,5 +1,15 @@
 # Handoff
 
+## Auditoria crítica em três ciclos — 2026-07-11
+
+O fluxo LGPD foi endurecido em dois pontos: `clearHealthHistory` agora chama o
+serviço vivo de atividade para zerar memória e armazenamento, e o mapa exportado
+usa `activity.data`, incluindo amostras ainda dentro da janela de persistência.
+O histórico DVRS agora mostra confirmação localizada antes de excluir uma
+avaliação. Os testes de regressão estão em `test/health_data_service_test.dart`
+e `test/dvrs_history_view_test.dart`. Validação final: 224 testes, análise
+estática e build macOS release aprovados.
+
 ## UX em três momentos — 2026-07-10
 
 Trabalho ativo em `/Users/philipecruz/app_dry_eye_widget-ux-three-moments`,

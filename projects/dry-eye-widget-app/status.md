@@ -1,6 +1,16 @@
 # Status
 
-Updated: 2026-07-10
+Updated: 2026-07-11
+
+## Auditoria crítica em três ciclos — concluída
+
+Três falhas de prioridade crítica foram corrigidas: a exclusão LGPD agora
+limpa também a atividade mantida em memória e não permite que um flush futuro
+restaure dados apagados; a exclusão de resultados DVRS exige confirmação; e a
+exportação JSON usa o snapshot vivo de atividade para não omitir amostras ainda
+não persistidas. Foram adicionados três cenários de regressão. A suíte completa
+com 224 testes, a análise estática e o build macOS release passaram. Evidência:
+`runs/2026-07-11-critical-bugs-three-cycles.md`.
 
 ## UX em três momentos — implementação concluída
 
