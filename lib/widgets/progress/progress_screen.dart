@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_strings.dart';
+import '../../l10n/feature_strings.dart';
 import '../../models/break_stats_data.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/daily_insight.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/storage_service.dart';
 import '../../utils/constants.dart';
-import '../common/empty_state.dart';
 import '../common/panel_entrance.dart';
 import '../common/panel_header.dart';
+import '../../ui/panel_state_view.dart';
 import '../liquid_glass.dart';
 
 /// Tela "Meu Progresso": devolve ao usuário a narrativa dos dados de pausas já
@@ -20,7 +21,11 @@ import '../liquid_glass.dart';
 /// taxa de adesão recente, total de pausas e um insight proativo. Todos os
 /// dados são locais — lidos diretamente do [StorageService].
 class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key, required this.onClose, this.embedded = false});
+  const ProgressScreen({
+    super.key,
+    required this.onClose,
+    this.embedded = false,
+  });
 
   final VoidCallback onClose;
   final bool embedded;
@@ -37,7 +42,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        setState(() => _stats = context.read<StorageService>().loadBreakStats());
+        setState(
+          () => _stats = context.read<StorageService>().loadBreakStats(),
+        );
       }
     });
   }
@@ -73,17 +80,23 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _body(ThemeData theme, AppStrings s) {
-    if (_stats.totalReminders == 0) return _empty(theme, s);
+    if (_stats.totalReminders == 0) return _empty(s);
 
     final now = DateTime.now();
     final streak = _stats.currentStreak(now);
     final best = _stats.bestStreak();
     final total = _stats.totalCompleted;
 
-    final from7 = DateTime(now.year, now.month, now.day)
-        .subtract(const Duration(days: 6));
-    final from30 = DateTime(now.year, now.month, now.day)
-        .subtract(const Duration(days: 29));
+    final from7 = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
+    final from30 = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 29));
     final adh7 = _stats.adherenceForRange(from7, now);
     final adh30 = _stats.adherenceForRange(from30, now);
     final has7 = _stats.sumForRange(from7, now).reminders > 0;
@@ -162,7 +175,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
-              active ? Icons.local_fire_department : Icons.local_fire_department_outlined,
+              active
+                  ? Icons.local_fire_department
+                  : Icons.local_fire_department_outlined,
               color: accent,
               size: 32,
             ),
@@ -284,7 +299,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.lightbulb_outline, color: AppColors.idleBall, size: 22),
+          const Icon(
+            Icons.lightbulb_outline,
+            color: AppColors.idleBall,
+            size: 22,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -316,9 +335,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _empty(ThemeData theme, AppStrings s) => EmptyState(
+  Widget _empty(AppStrings s) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: PanelStateView(
         icon: Icons.insights_outlined,
-        title: s.progressEmptyTitle,
+        title: f.stateProgressEmptyTitle,
         message: s.progressEmpty,
-      );
+      ),
+    );
+  }
 }

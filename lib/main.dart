@@ -272,6 +272,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _healthHubOpen = false;
   bool _myDataOpen = false;
   bool _onboardingOpen = false;
+  bool _returnToDvrsAfterReport = false;
+  int _healthHubTab = 0;
   bool _wasActive = false;
   int _currentStreak = 0;
   String _completionInsight = '';
@@ -1100,6 +1102,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _reportOpen = false;
       _healthHubOpen = false;
       _myDataOpen = false;
+      _returnToDvrsAfterReport = false;
     });
     _applyLayout(WindowLayout.dvrs);
   }
@@ -1141,7 +1144,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     );
   }
 
-  void _openReport() {
+  void _openReport({
+    bool returnToDvrs = false,
+  }) {
     setState(() {
       _menuOpen = false;
       _settingsOpen = false;
@@ -1153,13 +1158,25 @@ class _HomePageState extends State<HomePage> with TrayListener {
       _reportOpen = true;
       _healthHubOpen = false;
       _myDataOpen = false;
+      _returnToDvrsAfterReport = returnToDvrs;
     });
     _applyLayout(WindowLayout.report);
   }
 
   void _closeReport() {
-    setState(() => _reportOpen = false);
-    _restoreAfterPanel();
+    final returnToDvrs = _returnToDvrsAfterReport;
+    setState(() {
+      _reportOpen = false;
+      _returnToDvrsAfterReport = false;
+      if (returnToDvrs) {
+        _dvrsOpen = true;
+      }
+    });
+    if (returnToDvrs) {
+      _applyLayout(WindowLayout.dvrs);
+    } else {
+      _restoreAfterPanel();
+    }
   }
 
   void _closeAllPanelsFlags() {
@@ -1179,12 +1196,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
     setState(() {
       _closeAllPanelsFlags();
       _healthHubOpen = true;
+      _healthHubTab = 0;
+      _returnToDvrsAfterReport = false;
     });
     _applyLayout(WindowLayout.healthHub);
   }
 
   void _closeHealthHub() {
-    setState(() => _healthHubOpen = false);
+    setState(() {
+      _healthHubOpen = false;
+      _returnToDvrsAfterReport = false;
+    });
     _restoreAfterPanel();
   }
 
@@ -1274,7 +1296,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = Center(
         child: DvrsScreen(
           onClose: _closeDvrs,
-          onExportPdf: (_) async => _openReport(),
+          onExportPdf: (_) async => _openReport(returnToDvrs: true),
         ),
       );
     } else if (_screenTimeOpen) {
@@ -1308,17 +1330,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = Center(
         child: HealthHubScreen(
           onClose: _closeHealthHub,
+          initialTab: _healthHubTab,
+          onTabChanged: (tab) => _healthHubTab = tab,
           onStartBreak: () {
             setState(() => _healthHubOpen = false);
             _timer.startBreakNow();
-          },
-          onDvrs: () {
-            setState(() => _healthHubOpen = false);
-            _openDvrs();
-          },
-          onReports: () {
-            setState(() => _healthHubOpen = false);
-            _openReport();
           },
           onSnoozeDvrsNudge: _snoozeDvrsNudge,
         ),
@@ -1441,8 +1457,6 @@ class _HomePageState extends State<HomePage> with TrayListener {
                 onExtendCycle: timer.stretchCycleOneHour,
                 onGuidance: _openGuidance,
                 onHealthHub: _openHealthHub,
-                onDvrs: _openDvrs,
-                onReports: _openReport,
                 onMyData: _openMyData,
                 onCheckUpdates: _openCheckUpdates,
                 onAbout: _openAbout,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_strings.dart';
+import '../../l10n/feature_strings.dart';
 import '../../models/screen_time_data.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
@@ -10,6 +11,7 @@ import '../../services/screen_time_service.dart';
 import '../../services/storage_service.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/glass_card.dart';
+import '../../ui/panel_state_view.dart';
 import '../../ui/score_gauge.dart';
 import '../../ui/section_header.dart';
 import '../../ui/stat_tile.dart';
@@ -280,8 +282,22 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
     final screenTime = context.watch<ScreenTimeService>();
     final data = screenTime.data;
     final now = DateTime.now();
-    final strings = context.read<SettingsProvider>().strings;
+    final settings = context.watch<SettingsProvider>();
+    final strings = settings.strings;
+    final f = FeatureStrings.of(settings.value.languageCode);
     final todaySecs = data.secondsForDay(now);
+
+    if (!settings.value.screenTimeTracking) {
+      return Padding(
+        padding: const EdgeInsets.all(32),
+        child: PanelStateView(
+          tone: PanelStateTone.unavailable,
+          icon: Icons.desktop_access_disabled_outlined,
+          title: f.stateScreenUnavailableTitle,
+          message: f.stateScreenUnavailableMessage,
+        ),
+      );
+    }
 
     final series = switch (_range) {
       _TimeRange.week  => data.weekSeries(now),
@@ -340,15 +356,11 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
         const SizedBox(height: 14),
         if (total == 0)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40),
-            child: Center(
-              child: Text(
-                'Nenhum dado neste período',
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
-                ),
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: PanelStateView(
+              icon: Icons.monitor_heart_outlined,
+              title: f.stateScreenEmptyTitle,
+              message: f.stateScreenEmptyMessage,
             ),
           )
         else ...[
@@ -597,3 +609,4 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 }
+

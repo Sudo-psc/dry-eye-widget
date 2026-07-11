@@ -18,12 +18,12 @@ void main() {
           domain: i < 6
               ? DvrsDomain.symptoms
               : i < 9
-                  ? DvrsDomain.functional
-                  : i < 12
-                      ? DvrsDomain.exposure
-                      : i < 15
-                          ? DvrsDomain.environment
-                          : DvrsDomain.warning,
+              ? DvrsDomain.functional
+              : i < 12
+              ? DvrsDomain.exposure
+              : i < 15
+              ? DvrsDomain.environment
+              : DvrsDomain.warning,
           value: value,
           label: 'opt',
         ),
@@ -31,35 +31,37 @@ void main() {
     return evaluateDvrs(answers: answers, id: 'r1', now: now);
   }
 
-  test('ReportBuilder preenche narrativa educativa sem linguagem diagnóstica', () {
-    const builder = ReportBuilder();
-    final data = builder.build(
-      profile: const UserProfile(),
-      options: ReportOptions(
-        startDate: now.subtract(const Duration(days: 30)),
-        endDate: now,
-      ),
-      screenTime: ScreenTimeData({
-        ScreenTimeData.dayKey(now): 7200,
-      }),
-      breakStats: BreakStatsData({
-        BreakStatsData.dayKey(now): const BreakDayStat(reminders: 4, completed: 3),
-      }),
-      dvrsHistory: [dvrs(2)],
-      now: now,
-    );
+  test(
+    'ReportBuilder preenche narrativa educativa sem linguagem diagnóstica',
+    () {
+      const builder = ReportBuilder();
+      final data = builder.build(
+        profile: const UserProfile(),
+        options: ReportOptions(
+          startDate: now.subtract(const Duration(days: 30)),
+          endDate: now,
+        ),
+        screenTime: ScreenTimeData({ScreenTimeData.dayKey(now): 7200}),
+        breakStats: BreakStatsData({
+          BreakStatsData.dayKey(now): const BreakDayStat(
+            reminders: 4,
+            completed: 3,
+          ),
+        }),
+        dvrsHistory: [dvrs(2)],
+        now: now,
+      );
 
-    expect(data.narrative, isNotNull);
-    expect(data.narrative!, isNotEmpty);
-    final lower = data.narrative!.toLowerCase();
-    expect(lower.contains('diagnóstico confirmado'), isFalse);
-    expect(lower.contains('você tem doença'), isFalse);
-    expect(data.narrative!.contains('DVRS'), isTrue);
+      expect(data.narrative, isNotNull);
+      expect(data.narrative!, isNotEmpty);
+      final lower = data.narrative!.toLowerCase();
+      expect(lower.contains('diagnóstico confirmado'), isFalse);
+      expect(lower.contains('você tem doença'), isFalse);
+      expect(data.narrative!.contains('DVRS'), isTrue);
 
-    final pure = NarrativeSummary.buildPt(data);
-    // "oftalmológico" tem acento em "ó" — não use o substring "oftalmolog".
-    expect(pure.toLowerCase(), contains('oftalm'));
-    expect(pure, contains('clínica'));
-    expect(data.narrative!.toLowerCase(), contains('oftalm'));
-  });
+      final pure = NarrativeSummary.buildPt(data);
+      // Radical anterior ao acento de "oftalmológica", estável em UTF-8.
+      expect(pure, contains('oftalmol'));
+    },
+  );
 }

@@ -14,6 +14,7 @@ void main() {
     expect(compact, const Size(60, 60));
     final menu = WindowSizes.menu(32);
     expect(menu.width, 300);
-    expect(menu.height, greaterThan(500));
+    expect(menu.height, greaterThan(350));
+    expect(menu.height, lessThan(450));
   });
 }

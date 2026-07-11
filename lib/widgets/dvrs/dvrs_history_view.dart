@@ -8,9 +8,9 @@ import '../../providers/settings_provider.dart';
 import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../ui/glass_card.dart';
+import '../../ui/panel_state_view.dart';
 import '../../ui/section_header.dart';
 import '../../ui/trend_line_chart.dart';
-import '../common/empty_state.dart';
 import 'dvrs_ui.dart';
 
 /// Histórico longitudinal do DVRS: último resultado, variação, gráfico de
@@ -48,22 +48,27 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     if (_history.isEmpty) {
-      return const EmptyState(
-        icon: Icons.assignment_outlined,
-        title: 'Sem avaliações ainda',
-        message:
-            'Você ainda não tem resultados salvos do DVRS. Responda o '
-            'questionário e salve para acompanhar a evolução.',
+      final f = FeatureStrings.of(
+        context.read<SettingsProvider>().value.languageCode,
+      );
+      return Padding(
+        padding: const EdgeInsets.all(32),
+        child: PanelStateView(
+          icon: Icons.assignment_outlined,
+          title: f.stateDvrsEmptyTitle,
+          message: f.stateDvrsEmptyMessage,
+        ),
       );
     }
 
     final latest = _history.last;
-    final previous =
-        _history.length >= 2 ? _history[_history.length - 2] : null;
-    final trend =
-        previous == null ? null : compareDvrsTrend(previous, latest);
-    final delta =
-        previous == null ? null : latest.totalScore - previous.totalScore;
+    final previous = _history.length >= 2
+        ? _history[_history.length - 2]
+        : null;
+    final trend = previous == null ? null : compareDvrsTrend(previous, latest);
+    final delta = previous == null
+        ? null
+        : latest.totalScore - previous.totalScore;
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -157,8 +162,11 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
             const SizedBox(height: 10),
             Row(
               children: [
-                Icon(DvrsUi.trendIcon(trend),
-                    size: 16, color: DvrsUi.trendColor(trend)),
+                Icon(
+                  DvrsUi.trendIcon(trend),
+                  size: 16,
+                  color: DvrsUi.trendColor(trend),
+                ),
                 const SizedBox(width: 6),
                 Text(
                   '${DvrsUi.trendLabel(trend)} (${delta > 0 ? '+' : ''}$delta '
@@ -189,12 +197,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeader(title),
-          TrendLineChart(
-            points: points,
-            minY: 0,
-            maxY: 100,
-            height: 160,
-          ),
+          TrendLineChart(points: points, minY: 0, maxY: 100, height: 160),
           if (points.isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(
@@ -258,8 +261,8 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     final color = delta > 1
         ? const Color(0xFFE57373)
         : delta < -1
-            ? const Color(0xFF81C784)
-            : theme.colorScheme.onSurface.withValues(alpha: 0.55);
+        ? const Color(0xFF81C784)
+        : theme.colorScheme.onSurface.withValues(alpha: 0.55);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -374,8 +377,9 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
                           DvrsUi.formatDate(r.createdAt),
                           style: TextStyle(
                             fontSize: 11,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.6),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
                           ),
                         ),
                       ],
@@ -383,7 +387,10 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline, size: 20),
-                    tooltip: context.read<SettingsProvider>().strings.dvrsHistoryDelete,
+                    tooltip: context
+                        .read<SettingsProvider>()
+                        .strings
+                        .dvrsHistoryDelete,
                     onPressed: () => _delete(r.id),
                   ),
                 ],
