@@ -20,8 +20,8 @@ document.documentElement.setAttribute("data-theme",t);})();
 <link rel="dns-prefetch" href="https://apps.microsoft.com">
 <!-- Só as famílias usadas no CSS (Hanken + Roboto Mono). Menos pesos = menos bytes no critical path. -->
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="preload" href="styles/landing.css?v=20260711-qa9" as="style">
-<link rel="stylesheet" href="styles/landing.css?v=20260711-qa9">
+<link rel="preload" href="styles/landing.css?v=20260711-qa10" as="style">
+<link rel="stylesheet" href="styles/landing.css?v=20260711-qa10">
 <link rel="stylesheet" href="styles/widget-screens.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="styles/widget-screens.css"></noscript>
 <link rel="icon" href="assets/icon-256.png" type="image/png">
@@ -195,13 +195,14 @@ document.documentElement.setAttribute("data-theme",t);})();
       <a href="#faq" data-i18n="nav.faq">FAQ</a>
     </nav>
     <div class="header-actions">
-      <div class="lang-switch" role="group" aria-label="Idioma">
+      <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-aria="a11y.lang">
         <button type="button" data-lang="pt" aria-pressed="true">PT</button>
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
-      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Alternar tema">
-        <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"></path></svg>
-        <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"></path></svg>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Alternar tema" data-i18n-aria="a11y.theme">
+        <!-- Light mode shows moon (switch to dark); dark mode shows sun (switch to light) — matches science page. -->
+        <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"></path></svg>
+        <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"></path></svg>
       </button>
       <a class="icon-btn science-mobile-link" href="science/" aria-label="Ciência" title="Ciência" data-i18n-aria="nav.science" data-i18n-title="nav.science">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .25.96l5.5 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.75-2.96L9.75 8.96A2 2 0 0 0 10 8V2"></path><path d="M6.5 15h11M8.5 2h7"></path></svg>
@@ -308,7 +309,8 @@ document.documentElement.setAttribute("data-theme",t);})();
         muted
         loop
         playsinline
-        aria-label="Demonstração do Dry Eye Widget em funcionamento">
+        aria-label="Demonstração do Dry Eye Widget em funcionamento"
+        data-i18n-aria="video.aria">
       </video>
     </figure>
   </div>

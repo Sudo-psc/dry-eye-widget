@@ -180,6 +180,12 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
   gap: 4px;
 }
 .foot-author { margin-top: 10px; }
+/* Platform filter — clearer pressed state on touch devices */
+.platform-switch button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
 .section-head { max-width: 640px; margin-bottom: 32px; display: grid; gap: 14px; }
 .section-head h2 { font-size: clamp(28px, 3.4vw, 38px); }
 .section-head p { color: var(--text-2); font-size: 17px; text-wrap: pretty; }
