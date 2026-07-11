@@ -39,8 +39,14 @@ function detectLang(): Lang {
     // storage may be unavailable
   }
   if (typeof navigator !== "undefined") {
-    const nav = (navigator.language || "").toLowerCase();
-    if (nav.startsWith("pt")) return "pt";
+    const langs = navigator.languages && navigator.languages.length
+      ? navigator.languages
+      : [navigator.language || "pt-BR"];
+    for (const l of langs) {
+      const low = l.toLowerCase();
+      if (low.startsWith("pt")) return "pt";
+      if (low.startsWith("en")) return "en";
+    }
   }
   return "pt";
 }
