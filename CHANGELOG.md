@@ -6,6 +6,16 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.23.1] - 2026-07-11
+
+### Melhorado
+- Hub de saúde visual com navegação integrada entre resumo, progresso, DVRS e
+  relatórios, reduzindo etapas para acompanhar os dados pessoais.
+- Estados vazios, sucesso e erro unificados e acessíveis nos painéis de
+  progresso, histórico DVRS e geração de relatórios.
+- Menu flutuante simplificado, com descoberta progressiva das funções de
+  saúde visual.
+
 ### Adicionado — Science page (2026-07-10)
 - Nova subpágina científica em `site/science/`, acessível pelo header e rodapé da landing.
 - Fonte modular React + TypeScript + Tailwind CSS + Framer Motion + Lucide em `web/science/`.

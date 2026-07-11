@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>Lembrete gentil da regra 20-20-20 para fadiga visual digital e olho seco.</em><br>
-  <strong>Versão 1.23.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Versão 1.23.1</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
