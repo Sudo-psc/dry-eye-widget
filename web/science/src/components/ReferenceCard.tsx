@@ -1,11 +1,17 @@
 import { ArrowUpRight } from "lucide-react";
 import type { ScientificReference } from "../data/references";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function ReferenceCard({ reference }: { reference: ScientificReference }) {
+  const { t } = useLanguage();
+  const category =
+    t.ref.categories[reference.category] ?? reference.category;
+  const aria = t.ref.viewAria.replace("{name}", reference.shortName);
+
   return (
     <article className="reference-card">
       <div className="reference-topline">
-        <span>{reference.category}</span>
+        <span>{category}</span>
         <time dateTime={String(reference.year)}>{reference.year}</time>
       </div>
       <h3>{reference.shortName}</h3>
@@ -18,9 +24,9 @@ export function ReferenceCard({ reference }: { reference: ScientificReference })
           href={`https://doi.org/${reference.doi}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`View reference: ${reference.shortName} (opens in a new tab)`}
+          aria-label={aria}
         >
-          View reference <ArrowUpRight aria-hidden="true" />
+          {t.ref.view} <ArrowUpRight aria-hidden="true" />
         </a>
       </div>
     </article>

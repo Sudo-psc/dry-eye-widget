@@ -132,6 +132,18 @@ export type Strings = {
     journal: string;
     navAria: string;
   };
+  header: {
+    primaryAria: string;
+    sectionsAria: string;
+    homeAria: string;
+    backAppAria: string;
+    githubAria: string;
+  };
+  ref: {
+    view: string;
+    viewAria: string; // use {name} placeholder
+    categories: Record<string, string>;
+  };
 };
 
 export const STRINGS: Record<Lang, Strings> = {
@@ -420,6 +432,31 @@ export const STRINGS: Record<Lang, Strings> = {
       journal: "Journal",
       navAria: "Footer navigation",
     },
+    header: {
+      primaryAria: "Primary navigation",
+      sectionsAria: "Science sections",
+      homeAria: "Dry Eye Widget home",
+      backAppAria: "Back to Dry Eye Widget app page",
+      githubAria: "Dry Eye Widget on GitHub (opens in a new tab)",
+    },
+    ref: {
+      view: "View reference",
+      viewAria: "View reference: {name} (opens in a new tab)",
+      categories: {
+        "Current consensus": "Current consensus",
+        "Clinical guideline": "Clinical guideline",
+        Definition: "Definition",
+        Physiology: "Physiology",
+        "Digital work": "Digital work",
+        Epidemiology: "Epidemiology",
+        Mechanism: "Mechanism",
+        "Occupational health": "Occupational health",
+        "Occupational screening": "Occupational screening",
+        "Visual function": "Visual function",
+        "Behavioral support": "Behavioral support",
+        "Digital intervention": "Digital intervention",
+      },
+    },
   },
   pt: {
     skip: "Pular para o conteúdo científico",
@@ -705,6 +742,31 @@ export const STRINGS: Record<Lang, Strings> = {
       product: "Produto",
       journal: "Blog",
       navAria: "Navegação do rodapé",
+    },
+    header: {
+      primaryAria: "Navegação principal",
+      sectionsAria: "Seções científicas",
+      homeAria: "Início Dry Eye Widget",
+      backAppAria: "Voltar à página do app Dry Eye Widget",
+      githubAria: "Dry Eye Widget no GitHub (abre em nova aba)",
+    },
+    ref: {
+      view: "Ver referência",
+      viewAria: "Ver referência: {name} (abre em nova aba)",
+      categories: {
+        "Current consensus": "Consenso atual",
+        "Clinical guideline": "Diretriz clínica",
+        Definition: "Definição",
+        Physiology: "Fisiologia",
+        "Digital work": "Trabalho digital",
+        Epidemiology: "Epidemiologia",
+        Mechanism: "Mecanismo",
+        "Occupational health": "Saúde ocupacional",
+        "Occupational screening": "Triagem ocupacional",
+        "Visual function": "Função visual",
+        "Behavioral support": "Apoio comportamental",
+        "Digital intervention": "Intervenção digital",
+      },
     },
   },
 };
