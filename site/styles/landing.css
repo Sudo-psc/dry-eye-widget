@@ -156,6 +156,30 @@ h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; text-
 }
 .kicker::before { content: ""; width: 22px; height: 2px; background: var(--accent); border-radius: 2px; }
 .section { padding: var(--section-gap) 0; scroll-margin-top: calc(var(--header-h) + 24px); }
+/* Stacked sections after the first in a sequence drop extra top padding. */
+.section.section-continue { padding-top: 0; }
+.faq-list summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.figure-frame {
+  margin: 28px auto 0;
+  max-width: 720px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.figure-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cred-chip.github {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.foot-author { margin-top: 10px; }
 .section-head { max-width: 640px; margin-bottom: 32px; display: grid; gap: 14px; }
 .section-head h2 { font-size: clamp(28px, 3.4vw, 38px); }
 .section-head p { color: var(--text-2); font-size: 17px; text-wrap: pretty; }

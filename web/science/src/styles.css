@@ -1042,11 +1042,12 @@ h3 {
 }
 
 .future-boundary p {
-  @apply grid text-xs leading-relaxed;
+  @apply grid gap-1 text-xs leading-relaxed;
   color: #a9bac9;
 }
 
 .future-boundary strong {
+  display: block;
   color: #f0d9a8;
 }
 
@@ -1177,11 +1178,12 @@ h3 {
 }
 
 .book-bridge p {
-  @apply grid text-sm leading-6;
+  @apply grid gap-1 text-sm leading-6;
   color: var(--ink-soft);
 }
 
 .book-bridge strong {
+  display: block;
   color: var(--ink);
 }
 
