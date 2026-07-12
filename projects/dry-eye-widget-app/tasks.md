@@ -7,7 +7,7 @@
 - [x] Integrar encaixe magnético suave.
 - [x] Evoluir o anel de progresso.
 - [x] Adicionar testes e evidência visual.
-- [ ] Publicar e validar a release v1.24.0.
+- [x] Publicar e validar a release v1.24.0.
 
 - [x] Ciclo 1 crítico: impedir ressurreição de atividade após exclusão LGPD.
 - [x] Ciclo 2 crítico: confirmar antes de excluir resultado DVRS.
@@ -56,6 +56,8 @@
 - Windows runtime inspection is blocked until a Windows build/test environment is used.
 - Signed macOS release validation remains blocked until signing/provisioning is available for the HealthKit entitlement.
 - Assinatura Authenticode depende da configuração externa do certificado.
+- Atualização de `olhossecos.com.br/app/` depende do acesso ao nginx/VPS; o
+  GitHub Pages já está em 1.24.0, mas o host canônico ainda serve 1.23.0.
 
 ## improve
 

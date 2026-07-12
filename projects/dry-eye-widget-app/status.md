@@ -2,13 +2,16 @@
 
 Updated: 2026-07-11
 
-## Interação líquida da bolinha — candidato v1.24.0
+## Interação líquida da bolinha — v1.24.0 publicada
 
 Pressão imediata, deformação direcional, inércia curta e docking magnético
 suave foram implementados. A trajetória de soltura é monotônica, sem quique ou
 overshoot. O anel de progresso ganhou gradiente, profundidade e ponta luminosa,
 respeitando reduzir movimento. Passaram 231 testes, análise estática, captura
-visual determinística e build macOS release. Evidência:
+visual determinística e build macOS release. A release pública contém DMG,
+instalador EXE, ZIP portátil e MSIX, todos com integridade verificada após o
+download. GitHub Pages exibe 1.24.0. O nginx de `olhossecos.com.br/app/` ainda
+serve 1.23.0 e depende do deploy VPS externo. Evidência:
 `runs/2026-07-11-liquid-orb-qa.md`.
 
 ## Auditoria crítica em três ciclos — concluída

@@ -10,8 +10,10 @@ docking sem salto ou overshoot.
 O componente visual reage à pressão e ao arraste com deformação limitada. O
 anel preserva o progresso exato e acompanha o material sem comprometer sua
 semântica. Com reduzir movimento, inércia e efeitos transitórios são suprimidos.
-Validação em `runs/2026-07-11-liquid-orb-qa.md`. Próxima ação: publicar a tag
-v1.24.0, acompanhar os workflows e verificar os quatro artefatos da release.
+Validação em `runs/2026-07-11-liquid-orb-qa.md`. A tag v1.24.0 foi publicada e
+os quatro artefatos passaram nas verificações de checksum e integridade. A
+próxima ação externa é sincronizar o nginx de `olhossecos.com.br/app/`, ainda em
+1.23.0, com o GitHub Pages, que já exibe 1.24.0.
 
 ## Auditoria crítica em três ciclos — 2026-07-11
 
