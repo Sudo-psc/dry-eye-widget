@@ -2,7 +2,7 @@
 
 Landing com artefato estático servida em **[olhossecos.com.br/app/](https://olhossecos.com.br/app/)** e espelhada no GitHub Pages do repositório. A página principal continua em HTML/CSS/JS sem bundler; a subpágina Science é pré-renderizada a partir de React/TypeScript.
 
-Alinhada ao app **1.23.1** e ao README raiz do projeto.
+Alinhada ao app **1.23.2** e ao README raiz do projeto.
 
 | | |
 |---|---|

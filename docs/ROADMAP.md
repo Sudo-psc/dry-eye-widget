@@ -1,6 +1,6 @@
 # Roadmap — Dry Eye Widget
 
-Atualizado: 2026-07-11 · Versão atual: **1.23.1**
+Atualizado: 2026-07-11 · Versão atual: **1.23.2**
 
 Documento vivo de prioridades. Itens feitos ficam no CHANGELOG; aqui só o que ainda importa.
 

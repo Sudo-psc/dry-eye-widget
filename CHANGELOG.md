@@ -6,6 +6,14 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.23.2] - 2026-07-11
+
+### Corrigido
+- A exclusão LGPD limpa atividade tanto da memória quanto do armazenamento,
+  impedindo que uma gravação automática restaure dados apagados.
+- A exportação JSON inclui amostras recentes de atividade ainda não persistidas.
+- A exclusão de resultados DVRS exige confirmação explícita e localizada.
+
 ## [1.23.1] - 2026-07-11
 
 ### Melhorado
