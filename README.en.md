@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>A gentle 20-20-20 reminder for digital eye strain and dry eye.</em><br>
-  <strong>Version 1.23.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Version 1.24.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">

@@ -2,6 +2,15 @@
 
 Updated: 2026-07-11
 
+## Interação líquida da bolinha — candidato v1.24.0
+
+Pressão imediata, deformação direcional, inércia curta e docking magnético
+suave foram implementados. A trajetória de soltura é monotônica, sem quique ou
+overshoot. O anel de progresso ganhou gradiente, profundidade e ponta luminosa,
+respeitando reduzir movimento. Passaram 231 testes, análise estática, captura
+visual determinística e build macOS release. Evidência:
+`runs/2026-07-11-liquid-orb-qa.md`.
+
 ## Auditoria crítica em três ciclos — concluída
 
 Três falhas de prioridade crítica foram corrigidas: a exclusão LGPD agora
@@ -27,7 +36,6 @@ análise e o build macOS release passaram. Evidência:
 ## 1.23.0 five improvements panel
 
 Shipped: health hub, narrative PDF, My Data, DVRS 1.1, window_layout + ARB scaffold + signing readiness script.
-
 
 Current phase: five quick-win cycles shipped through 1.22.7 (15 improvements).
 

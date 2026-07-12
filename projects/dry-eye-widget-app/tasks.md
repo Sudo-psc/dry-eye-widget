@@ -2,6 +2,13 @@
 
 ## now
 
+- [x] Refinar pressão e arraste da bolinha.
+- [x] Implementar inércia curta sem overshoot.
+- [x] Integrar encaixe magnético suave.
+- [x] Evoluir o anel de progresso.
+- [x] Adicionar testes e evidência visual.
+- [ ] Publicar e validar a release v1.24.0.
+
 - [x] Ciclo 1 crítico: impedir ressurreição de atividade após exclusão LGPD.
 - [x] Ciclo 2 crítico: confirmar antes de excluir resultado DVRS.
 - [x] Ciclo 3 crítico: incluir atividade ainda não persistida na exportação.
@@ -34,8 +41,9 @@
 
 ## next
 
+- [ ] Executar checklist manual de arraste em Windows 10 e 11.
+- [ ] Validar o build macOS assinado quando a identidade estiver disponível.
 - [ ] Inspecionar manualmente o fluxo no macOS e Windows antes da release pública.
-
 - [ ] Manually inspect Day Summary, DVRS nudge banner/snooze, and optional system notification on macOS.
 - [ ] Manually inspect the DVRS single-page questionnaire in the desktop window, especially narrow window widths and long option labels.
 - [ ] Manually inspect left and right edge docking on macOS with real dragging, hover, click-to-undock, and size changes.
@@ -47,17 +55,19 @@
 
 - Windows runtime inspection is blocked until a Windows build/test environment is used.
 - Signed macOS release validation remains blocked until signing/provisioning is available for the HealthKit entitlement.
+- Assinatura Authenticode depende da configuração externa do certificado.
 
 ## improve
 
-- Adicionar injeção de falhas de armazenamento para validar mensagens de erro
-  e recuperação durante exportação e exclusão de dados.
-
+- Adicionar teste de integração nativo para posição real da janela.
+- Medir frame pacing da bolinha em hardware Windows de entrada.
+- Adicionar injeção de falhas de armazenamento para validar mensagens de erro e recuperação durante exportação e exclusão de dados.
 - Add an integration-level window layout test if a reliable desktop window harness is introduced.
 - Add a small desktop visual QA script or harness for edge docking screenshots after window_manager upgrades.
 - Add a visual regression or golden-style check for the DVRS question list if the project adopts stable desktop widget snapshots.
 
 ## recurring
 
+- Revalidar interação, docking e reduzir movimento antes de cada release.
 - Re-run full tests and platform build before each desktop release.
 - Re-check macOS and Windows floating-window behavior after window_manager upgrades.

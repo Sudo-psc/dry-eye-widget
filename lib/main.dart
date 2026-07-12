@@ -37,6 +37,7 @@ import 'services/update_service.dart';
 import 'ui/app_theme.dart';
 import 'utils/constants.dart';
 import 'utils/edge_snap.dart';
+import 'utils/orb_motion.dart';
 import 'widgets/about_panel.dart';
 import 'widgets/dvrs/dvrs_screen.dart';
 import 'widgets/eye_drops_reminder.dart';
@@ -229,9 +230,9 @@ class DryEyeApp extends StatelessWidget {
       builder: (context, child) {
         final settings = context.watch<SettingsProvider>().value;
         final media = MediaQuery.of(context);
-        final themed = Theme.of(context).copyWith(
-          visualDensity: settings.uiDensity.visualDensity,
-        );
+        final themed = Theme.of(
+          context,
+        ).copyWith(visualDensity: settings.uiDensity.visualDensity);
         return Theme(
           data: themed,
           child: MediaQuery(
@@ -282,6 +283,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _blinkReminderVisible = false;
   Timer? _blinkReminderTicker;
   Timer? _blinkReminderHideTimer;
+  int _ballReleaseGeneration = 0;
 
   final UpdateService _updater = UpdateService();
   UpdateResult? _updateResult;
@@ -420,6 +422,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   @override
   void dispose() {
+    _cancelBallRelease();
     _timer.removeListener(_onStateChanged);
     _settings.removeListener(_onSettingsChanged);
     trayManager.removeListener(this);
@@ -434,16 +437,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
   void _startBlinkReminderLoop() {
     _blinkReminderTicker?.cancel();
     final intervalMs = _settings.value.blinkReminderFrequency.intervalMs;
-    _blinkReminderTicker = Timer.periodic(
-      Duration(milliseconds: intervalMs),
-      (_) {
-        if (_canTriggerBlinkReminder) {
-          unawaited(_triggerBlinkReminder());
-        } else if (_blinkReminderVisible) {
-          _hideBlinkReminder(restoreLayout: true);
-        }
-      },
-    );
+    _blinkReminderTicker = Timer.periodic(Duration(milliseconds: intervalMs), (
+      _,
+    ) {
+      if (_canTriggerBlinkReminder) {
+        unawaited(_triggerBlinkReminder());
+      } else if (_blinkReminderVisible) {
+        _hideBlinkReminder(restoreLayout: true);
+      }
+    });
   }
 
   bool get _canTriggerBlinkReminder =>
@@ -533,8 +535,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       final stats = storage.loadBreakStats();
       final now = DateTime.now();
       _currentStreak = stats.currentStreak(now);
-      final lastDvrs =
-          context.read<DvrsStorageService>().getLatestDvrsResult();
+      final lastDvrs = context.read<DvrsStorageService>().getLatestDvrsResult();
       final nudge = DailyInsightEngine.isDvrsNudgeDue(
         now: now,
         enabled: _settings.value.dvrsReminderEnabled,
@@ -775,7 +776,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         _aboutOpen = false;
         _reportOpen = false;
         _healthHubOpen = false;
-      _myDataOpen = false;
+        _myDataOpen = false;
       });
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
@@ -796,6 +797,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Future<void> _applyLayout(WindowLayout layout) async {
+    _cancelBallRelease();
     if (layout != WindowLayout.blinkReminder && _blinkReminderVisible) {
       _blinkReminderHideTimer?.cancel();
       _blinkReminderHideTimer = null;
@@ -948,45 +950,55 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   Future<void> _onBallDragStart() async {
     if (_timer.state != AppState.idle || _menuOpen) return;
+    _cancelBallRelease();
+    if (_dockEdge != null) await _undock();
     await windowManager.startDragging();
   }
 
-  Future<void> _onBallDragEnd() async {
-    try {
-      var pos = await windowManager.getPosition();
-      final winSize = await windowManager.getSize();
+  void _cancelBallRelease() => _ballReleaseGeneration++;
 
-      // Encaixe na borda (meia-lua) quando habilitado nas configurações.
-      BallDockEdge? edge;
-      if (_settings.value.edgeSnap) {
-        final display = await screenRetriever.getPrimaryDisplay();
-        final screenSize = display.visibleSize ?? display.size;
-        final origin = display.visiblePosition ?? Offset.zero;
-        final screen = origin & screenSize;
-        edge = dockEdgeFor(
-          windowPos: pos,
-          windowSize: winSize,
-          screen: screen,
-          threshold: math.max(kDockThreshold, winSize.width * 0.72),
-        );
-        if (edge != null) {
-          pos = dockedWindowPosition(
-            edge: edge,
-            windowPos: pos,
-            windowSize: winSize,
-            screen: screen,
-          );
-          await windowManager.setPosition(pos);
+  Future<void> _onBallDragEnd(Offset velocity) async {
+    try {
+      final reduceMotion =
+          MediaQuery.maybeOf(context)?.disableAnimations == true;
+      final storage = context.read<StorageService>();
+      final start = await windowManager.getPosition();
+      final winSize = await windowManager.getSize();
+      final display = await screenRetriever.getPrimaryDisplay();
+      final screenSize = display.visibleSize ?? display.size;
+      final origin = display.visiblePosition ?? Offset.zero;
+      final plan = planOrbRelease(
+        start: start,
+        velocity: velocity,
+        windowSize: winSize,
+        screen: origin & screenSize,
+        edgeSnapEnabled: _settings.value.edgeSnap,
+        dockThreshold: math.max(kDockThreshold, winSize.width * 0.72),
+      );
+      final generation = ++_ballReleaseGeneration;
+
+      if (!reduceMotion && plan.velocity.distance >= 40) {
+        final stopwatch = Stopwatch()..start();
+        while (mounted && generation == _ballReleaseGeneration) {
+          final t =
+              stopwatch.elapsedMicroseconds /
+              (plan.duration.inMicroseconds.toDouble());
+          await windowManager.setPosition(orbReleasePosition(plan, t));
+          if (t >= 1) break;
+          await Future<void>.delayed(const Duration(milliseconds: 16));
         }
       }
-      if (mounted && edge != _dockEdge) setState(() => _dockEdge = edge);
+      if (!mounted || generation != _ballReleaseGeneration) return;
 
-      _ballPosition = pos;
-      if (mounted) {
-        final storage = context.read<StorageService>();
-        await storage.saveBallPosition(pos.dx, pos.dy);
-        await storage.saveDockEdge(edge?.id);
+      await windowManager.setPosition(plan.target);
+      final edge = plan.dockEdge;
+      if (edge != _dockEdge) {
+        setState(() => _dockEdge = edge);
       }
+
+      _ballPosition = plan.target;
+      await storage.saveBallPosition(plan.target.dx, plan.target.dy);
+      await storage.saveDockEdge(edge?.id);
     } catch (_) {
       /* ignora */
     }
@@ -1144,9 +1156,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     );
   }
 
-  void _openReport({
-    bool returnToDvrs = false,
-  }) {
+  void _openReport({bool returnToDvrs = false}) {
     setState(() {
       _menuOpen = false;
       _settingsOpen = false;
@@ -1446,10 +1456,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
               const SizedBox(height: 8),
               FloatingMenu(
                 strings: strings,
-                healthHubLabel:
-                    FeatureStrings.of(settings.languageCode).menuHealthHub,
-                myDataLabel:
-                    FeatureStrings.of(settings.languageCode).menuMyData,
+                healthHubLabel: FeatureStrings.of(
+                  settings.languageCode,
+                ).menuHealthHub,
+                myDataLabel: FeatureStrings.of(
+                  settings.languageCode,
+                ).menuMyData,
                 isPaused: timer.isPaused,
                 onStartNow: timer.startBreakNow,
                 onReset: timer.reset,

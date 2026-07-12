@@ -1,5 +1,18 @@
 # Handoff
 
+## Interação líquida da bolinha — 2026-07-11
+
+A v1.24.0 substitui o retorno elástico por uma soltura mais previsível: a
+velocidade é limitada, projetada por uma janela curta e interpolada com curva
+monotônica. Se o destino estiver perto da borda, a mesma curva conclui o
+docking sem salto ou overshoot.
+
+O componente visual reage à pressão e ao arraste com deformação limitada. O
+anel preserva o progresso exato e acompanha o material sem comprometer sua
+semântica. Com reduzir movimento, inércia e efeitos transitórios são suprimidos.
+Validação em `runs/2026-07-11-liquid-orb-qa.md`. Próxima ação: publicar a tag
+v1.24.0, acompanhar os workflows e verificar os quatro artefatos da release.
+
 ## Auditoria crítica em três ciclos — 2026-07-11
 
 O fluxo LGPD foi endurecido em dois pontos: `clearHealthHistory` agora chama o

@@ -57,7 +57,7 @@ class FloatingBall extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onSecondaryTap;
   final VoidCallback? onDragStart;
-  final VoidCallback? onDragEnd;
+  final ValueChanged<Offset>? onDragEnd;
 
   /// Espessura do anel de progresso e folga ao redor da bolinha.
   static const double ringStroke = 3.0;
@@ -74,7 +74,15 @@ class _FloatingBallState extends State<FloatingBall>
   late final AnimationController _hover;
   late final AnimationController _reminder;
   late final AnimationController _reminderBurst;
+  late final AnimationController _press;
+  late final AnimationController _release;
+  late final AnimationController _ring;
   late final Animation<double> _opacity;
+  bool _reduceMotion = false;
+  bool _pressed = false;
+  bool _dragging = false;
+  Offset _dragVector = Offset.zero;
+  Offset _releaseVector = Offset.zero;
 
   @override
   void initState() {
@@ -103,11 +111,36 @@ class _FloatingBallState extends State<FloatingBall>
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
+    _press = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 140),
+      reverseDuration: const Duration(milliseconds: 220),
+    );
+    _release = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 340),
+    );
+    _ring = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2600),
+    );
     _syncAnimation();
     _syncOrbAnimation();
     _syncReminderAnimation();
+    _syncRingAnimation();
     if (widget.blinkReminderVisible && !widget.isActive) {
       _reminderBurst.forward(from: 0);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduce = MediaQuery.maybeOf(context)?.disableAnimations == true;
+    if (reduce != _reduceMotion) {
+      _reduceMotion = reduce;
+      _syncOrbAnimation();
+      _syncRingAnimation();
     }
   }
 
@@ -138,6 +171,11 @@ class _FloatingBallState extends State<FloatingBall>
         _reminderBurst.forward(from: 0);
       }
     }
+    if (oldWidget.showProgress != widget.showProgress ||
+        oldWidget.isActive != widget.isActive ||
+        oldWidget.dockEdge != widget.dockEdge) {
+      _syncRingAnimation();
+    }
   }
 
   void _syncAnimation() {
@@ -151,13 +189,83 @@ class _FloatingBallState extends State<FloatingBall>
 
   void _syncOrbAnimation() {
     final intensity = widget.orbIntensity.clamp(0.0, 1.0);
-    if (widget.dynamicOrbEffect && intensity > 0) {
+    if (widget.dynamicOrbEffect && intensity > 0 && !_reduceMotion) {
       _orb.duration = Duration(milliseconds: widget.isActive ? 1800 : 3200);
       _orb.repeat();
     } else {
       _orb.stop();
       _orb.value = 0;
     }
+  }
+
+  void _syncRingAnimation() {
+    final visible =
+        widget.showProgress && !widget.isActive && widget.dockEdge == null;
+    if (visible && !_reduceMotion) {
+      if (!_ring.isAnimating) _ring.repeat();
+    } else {
+      _ring.stop();
+      _ring.value = 0;
+    }
+  }
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() => _pressed = value);
+    if (value) {
+      _release.stop();
+      _press.forward();
+    } else {
+      _press.reverse();
+    }
+  }
+
+  void _handlePanStart(DragStartDetails details) {
+    setState(() {
+      _dragging = true;
+      _dragVector = Offset.zero;
+    });
+    _setPressed(true);
+    widget.onDragStart?.call();
+  }
+
+  void _handlePanUpdate(DragUpdateDetails details) {
+    final delta = details.delta;
+    if (delta == Offset.zero) return;
+    final energy = (delta.distance / 12).clamp(0.08, 1.0).toDouble();
+    final direction = delta / delta.distance;
+    setState(() {
+      _dragVector = Offset.lerp(_dragVector, direction * energy, 0.42)!;
+    });
+  }
+
+  void _handlePanEnd(DragEndDetails details) {
+    final velocity = details.velocity.pixelsPerSecond;
+    final speed = velocity.distance;
+    final direction = speed == 0 ? _dragVector : velocity / speed;
+    final energy = (speed / 1500).clamp(0.0, 1.0).toDouble();
+    setState(() {
+      _dragging = false;
+      _releaseVector = direction * energy;
+      _dragVector = Offset.zero;
+    });
+    _setPressed(false);
+    if (!_reduceMotion && energy > 0.02) {
+      _release.forward(from: 0);
+    } else {
+      _release.value = 1;
+    }
+    widget.onDragEnd?.call(velocity);
+  }
+
+  void _handlePanCancel() {
+    setState(() {
+      _dragging = false;
+      _dragVector = Offset.zero;
+      _releaseVector = Offset.zero;
+    });
+    _setPressed(false);
+    widget.onDragEnd?.call(Offset.zero);
   }
 
   void _syncReminderAnimation() {
@@ -176,6 +284,9 @@ class _FloatingBallState extends State<FloatingBall>
     _hover.dispose();
     _reminder.dispose();
     _reminderBurst.dispose();
+    _press.dispose();
+    _release.dispose();
+    _ring.dispose();
     super.dispose();
   }
 
@@ -209,6 +320,8 @@ class _FloatingBallState extends State<FloatingBall>
         _hover,
         _reminder,
         _reminderBurst,
+        _press,
+        _release,
       ]),
       builder: (context, _) {
         final reminderPulse = reminderVisible
@@ -225,6 +338,19 @@ class _FloatingBallState extends State<FloatingBall>
         )!;
         final hovered = widget.hoverReactiveBall && _hover.value > 0.01;
         final hoverEase = Curves.easeOutCubic.transform(_hover.value);
+        final pressEase = Curves.easeOutCubic.transform(_press.value);
+        final releaseWave = _reduceMotion || _release.value >= 1
+            ? 0.0
+            : math.sin(_release.value * math.pi) *
+                  math.exp(-_release.value * 2.8);
+        final motion = _dragging ? _dragVector : _releaseVector * releaseWave;
+        final motionStrength = motion.distance.clamp(0.0, 1.0);
+        final motionAngle = motionStrength > 0.001
+            ? math.atan2(motion.dy, motion.dx)
+            : 0.0;
+        final stretch = _reduceMotion ? 0.0 : motionStrength;
+        final scaleX = 1.0 + stretch * 0.10 + pressEase * 0.028;
+        final scaleY = 1.0 - stretch * 0.045 - pressEase * 0.045;
         final hoverScale = 1.0 + hoverEase * (docked ? 0.13 : 0.11);
         final reminderScale = 1.0 + reminderPulse * 0.08 + burst * 0.14;
         final dockScale = docked ? 0.96 : 1.0;
@@ -234,105 +360,132 @@ class _FloatingBallState extends State<FloatingBall>
         final opacity = widget.isActive
             ? _opacity.value
             : (baseOpacity + (1.0 - baseOpacity) * burst);
-        return Transform.scale(
-          scale: dockScale * liveScale * hoverScale * reminderScale,
+        final transform = Matrix4.identity()
+          ..rotateZ(motionAngle)
+          ..multiply(Matrix4.diagonal3Values(scaleX, scaleY, 1));
+        return Transform(
+          key: const ValueKey<String>('floating_ball_material'),
+          alignment: Alignment.center,
+          transform: transform,
           child: Opacity(
             opacity: opacity,
-            child: Container(
-              width: s,
-              height: s,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  center: const Alignment(-0.3, -0.3),
-                  radius: 1.0,
-                  colors: [
-                    Color.lerp(effColor, Colors.white, 0.6)!,
-                    effColor,
-                    Color.lerp(effColor, Colors.black, 0.4)!,
+            child: Transform.scale(
+              scale: dockScale * liveScale * hoverScale * reminderScale,
+              child: Container(
+                width: s,
+                height: s,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    center: Alignment(
+                      (-0.32 - motion.dx * 0.16).clamp(-0.7, 0.1),
+                      (-0.34 - motion.dy * 0.16).clamp(-0.7, 0.1),
+                    ),
+                    radius: 1.06,
+                    colors: [
+                      Color.lerp(effColor, Colors.white, 0.68)!,
+                      Color.lerp(effColor, const Color(0xFF7AE8FF), 0.12)!,
+                      effColor,
+                      Color.lerp(effColor, Colors.black, 0.48)!,
+                    ],
+                    stops: const [0.0, 0.28, 0.64, 1.0],
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withValues(
+                      alpha: 0.38 + pressEase * 0.22,
+                    ),
+                    width: 0.9 + pressEase * 0.5,
+                  ),
+                  boxShadow: [
+                    // Sombra de profundidade (sempre, para "flutuar").
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: docked ? 0.26 : 0.34,
+                      ),
+                      blurRadius: s * (0.22 + hoverEase * 0.08),
+                      offset: Offset(
+                        motion.dx * s * 0.08,
+                        s * (0.10 + hoverEase * 0.02) + motion.dy * s * 0.06,
+                      ),
+                    ),
+                    if (widget.dynamicOrbEffect)
+                      BoxShadow(
+                        color: const Color(0xFF53D8FF).withValues(
+                          alpha: 0.16 + effectiveOrbIntensity * 0.22,
+                        ),
+                        blurRadius: s * (0.32 + effectiveOrbIntensity * 0.22),
+                        spreadRadius:
+                            effectiveOrbIntensity * (docked ? 1.0 : 1.8),
+                      ),
+                    if (hovered)
+                      BoxShadow(
+                        color: const Color(
+                          0xFF79F2D0,
+                        ).withValues(alpha: 0.26 + hoverEase * 0.22),
+                        blurRadius: s * (0.36 + hoverEase * 0.18),
+                        spreadRadius: 1.0 + hoverEase * 2.0,
+                      ),
+                    if (reminderVisible || burst > 0)
+                      BoxShadow(
+                        color: const Color(0xFF88F7FF).withValues(
+                          alpha: (0.30 + reminderPulse * 0.30 + burst * 0.35)
+                              .clamp(0.0, 1.0),
+                        ),
+                        blurRadius:
+                            s * (0.44 + reminderPulse * 0.26 + burst * 0.40),
+                        spreadRadius: 2.0 + reminderPulse * 2.5 + burst * 3.0,
+                      ),
+                    // Brilho colorido quando em alerta.
+                    if (widget.isActive)
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.6),
+                        blurRadius: 14,
+                        spreadRadius: 2,
+                      ),
                   ],
-                  stops: const [0.0, 0.6, 1.0],
                 ),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.4),
-                  width: 1.0,
-                ),
-                boxShadow: [
-                  // Sombra de profundidade (sempre, para "flutuar").
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: docked ? 0.26 : 0.34),
-                    blurRadius: s * (0.22 + hoverEase * 0.08),
-                    offset: Offset(0, s * (0.10 + hoverEase * 0.02)),
-                  ),
-                  if (widget.dynamicOrbEffect)
-                    BoxShadow(
-                      color: const Color(
-                        0xFF53D8FF,
-                      ).withValues(alpha: 0.16 + effectiveOrbIntensity * 0.22),
-                      blurRadius: s * (0.32 + effectiveOrbIntensity * 0.22),
-                      spreadRadius:
-                          effectiveOrbIntensity * (docked ? 1.0 : 1.8),
-                    ),
-                  if (hovered)
-                    BoxShadow(
-                      color: const Color(
-                        0xFF79F2D0,
-                      ).withValues(alpha: 0.26 + hoverEase * 0.22),
-                      blurRadius: s * (0.36 + hoverEase * 0.18),
-                      spreadRadius: 1.0 + hoverEase * 2.0,
-                    ),
-                  if (reminderVisible || burst > 0)
-                    BoxShadow(
-                      color: const Color(0xFF88F7FF).withValues(
-                        alpha: (0.30 + reminderPulse * 0.30 + burst * 0.35)
-                            .clamp(0.0, 1.0),
+                // Reflexo especular (brilho de vidro) no topo-esquerdo.
+                child: Stack(
+                  children: [
+                    if (effectiveOrbIntensity > 0)
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _DynamicOrbPainter(
+                            phase: _orb.value,
+                            baseColor: color,
+                            intensity: effectiveOrbIntensity,
+                            hovered: hovered,
+                            isActive: widget.isActive,
+                            motion: motion,
+                            pressure: pressEase,
+                          ),
+                        ),
                       ),
-                      blurRadius:
-                          s * (0.44 + reminderPulse * 0.26 + burst * 0.40),
-                      spreadRadius: 2.0 + reminderPulse * 2.5 + burst * 3.0,
-                    ),
-                  // Brilho colorido quando em alerta.
-                  if (widget.isActive)
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.6),
-                      blurRadius: 14,
-                      spreadRadius: 2,
-                    ),
-                ],
-              ),
-              // Reflexo especular (brilho de vidro) no topo-esquerdo.
-              child: Stack(
-                children: [
-                  if (effectiveOrbIntensity > 0)
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: _DynamicOrbPainter(
-                          phase: _orb.value,
-                          baseColor: color,
-                          intensity: effectiveOrbIntensity,
-                          hovered: hovered,
-                          isActive: widget.isActive,
+                    Positioned(
+                      left: s * (0.13 - motion.dx * 0.055 + pressEase * 0.02),
+                      top: s * (0.10 - motion.dy * 0.045 + pressEase * 0.018),
+                      child: Container(
+                        width: s * (0.38 + pressEase * 0.04),
+                        height: s * (0.22 + pressEase * 0.025),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(s),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(
+                                alpha: 0.72 + pressEase * 0.14,
+                              ),
+                              Colors.white.withValues(alpha: 0.18),
+                              Colors.white.withValues(alpha: 0.0),
+                            ],
+                            stops: const [0.0, 0.48, 1.0],
+                          ),
                         ),
                       ),
                     ),
-                  Positioned(
-                    left: s * 0.16,
-                    top: s * 0.12,
-                    child: Container(
-                      width: s * 0.34,
-                      height: s * 0.34,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            Colors.white.withValues(alpha: 0.7),
-                            Colors.white.withValues(alpha: 0.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -350,11 +503,55 @@ class _FloatingBallState extends State<FloatingBall>
         child: Stack(
           alignment: Alignment.center,
           children: [
-            CustomPaint(
-              size: Size.square(ringSize),
-              painter: _ProgressRingPainter(
-                progress: widget.progress.clamp(0.0, 1.0),
-                strokeWidth: FloatingBall.ringStroke,
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                begin: 0,
+                end: widget.progress.clamp(0.0, 1.0),
+              ),
+              duration: _reduceMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 520),
+              curve: Curves.easeOutCubic,
+              builder: (context, progress, _) => AnimatedBuilder(
+                animation: Listenable.merge([_press, _release, _ring]),
+                builder: (context, _) {
+                  final press = Curves.easeOutCubic.transform(_press.value);
+                  final wave = _reduceMotion || _release.value >= 1
+                      ? 0.0
+                      : math.sin(_release.value * math.pi) *
+                            math.exp(-_release.value * 2.8);
+                  final motion = _dragging
+                      ? _dragVector
+                      : _releaseVector * wave;
+                  final strength = motion.distance.clamp(0.0, 1.0);
+                  final angle = strength > 0.001
+                      ? math.atan2(motion.dy, motion.dx)
+                      : 0.0;
+                  final transform = Matrix4.identity()
+                    ..rotateZ(angle)
+                    ..multiply(
+                      Matrix4.diagonal3Values(
+                        1 + strength * 0.075 + press * 0.018,
+                        1 - strength * 0.032 - press * 0.028,
+                        1,
+                      ),
+                    );
+                  return Transform(
+                    key: const ValueKey<String>('floating_ball_progress_ring'),
+                    alignment: Alignment.center,
+                    transform: transform,
+                    child: CustomPaint(
+                      size: Size.square(ringSize),
+                      painter: _ProgressRingPainter(
+                        progress: progress,
+                        strokeWidth: FloatingBall.ringStroke,
+                        baseColor: color,
+                        phase: _ring.value,
+                        reduceMotion: _reduceMotion,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             circle,
@@ -377,10 +574,16 @@ class _FloatingBallState extends State<FloatingBall>
 
     Widget interactive = GestureDetector(
       behavior: HitTestBehavior.opaque,
+      onTapDown: (_) => _setPressed(true),
+      onTapUp: (_) => _setPressed(false),
+      onTapCancel: () => _setPressed(false),
       onTap: widget.onTap,
       onSecondaryTap: widget.onSecondaryTap,
-      onPanStart: (_) => widget.onDragStart?.call(),
-      onPanEnd: (_) => widget.onDragEnd?.call(),
+      onPanDown: (_) => _setPressed(true),
+      onPanStart: _handlePanStart,
+      onPanUpdate: _handlePanUpdate,
+      onPanEnd: _handlePanEnd,
+      onPanCancel: _handlePanCancel,
       child: visual,
     );
     final label = widget.semanticLabel;
@@ -388,12 +591,18 @@ class _FloatingBallState extends State<FloatingBall>
       interactive = Semantics(
         button: true,
         label: label,
+        value: ringVisible
+            ? '${(widget.progress.clamp(0.0, 1.0) * 100).round()}%'
+            : null,
         child: ExcludeSemantics(child: interactive),
       );
     }
 
     return MouseRegion(
-      cursor: SystemMouseCursors.grab,
+      key: const ValueKey<String>('floating_ball_pointer'),
+      cursor: _pressed || _dragging
+          ? SystemMouseCursors.grabbing
+          : SystemMouseCursors.grab,
       onEnter: (_) {
         if (widget.hoverReactiveBall) _hover.forward();
       },
@@ -485,6 +694,8 @@ class _DynamicOrbPainter extends CustomPainter {
     required this.intensity,
     required this.hovered,
     required this.isActive,
+    required this.motion,
+    required this.pressure,
   });
 
   final double phase;
@@ -492,11 +703,16 @@ class _DynamicOrbPainter extends CustomPainter {
   final double intensity;
   final bool hovered;
   final bool isActive;
+  final Offset motion;
+  final double pressure;
 
   @override
   void paint(Canvas canvas, Size size) {
     final s = size.shortestSide;
-    final center = Offset(size.width / 2, size.height / 2);
+    final center = Offset(
+      size.width / 2 - motion.dx * s * 0.07,
+      size.height / 2 - motion.dy * s * 0.07 + pressure * s * 0.02,
+    );
     final bounds = Rect.fromLTWH(0, 0, size.width, size.height);
     final circle = Path()
       ..addOval(Rect.fromCircle(center: center, radius: s / 2));
@@ -520,7 +736,7 @@ class _DynamicOrbPainter extends CustomPainter {
       ).createShader(bounds);
     canvas.drawCircle(center, s * 0.48, glow);
 
-    final spin = phase * 2 * math.pi;
+    final spin = phase * 2 * math.pi + motion.dx * 0.45 - motion.dy * 0.24;
     final hoverLift = hovered ? 1.25 : 1.0;
     final activeLift = isActive ? 1.18 : 1.0;
     final alpha = (0.18 + intensity * 0.28) * hoverLift * activeLift;
@@ -627,16 +843,26 @@ class _DynamicOrbPainter extends CustomPainter {
       old.baseColor != baseColor ||
       old.intensity != intensity ||
       old.hovered != hovered ||
-      old.isActive != isActive;
+      old.isActive != isActive ||
+      old.motion != motion ||
+      old.pressure != pressure;
 }
 
-/// Desenha o arco de progresso (branco) na borda externa da bolinha,
-/// começando no topo (12h) e crescendo em sentido horário.
+/// Arco líquido com gradiente, espessura orgânica e ponta luminosa.
 class _ProgressRingPainter extends CustomPainter {
-  _ProgressRingPainter({required this.progress, required this.strokeWidth});
+  _ProgressRingPainter({
+    required this.progress,
+    required this.strokeWidth,
+    required this.baseColor,
+    required this.phase,
+    required this.reduceMotion,
+  });
 
   final double progress;
   final double strokeWidth;
+  final Color baseColor;
+  final double phase;
+  final bool reduceMotion;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -644,32 +870,86 @@ class _ProgressRingPainter extends CustomPainter {
     final radius = (size.width - strokeWidth) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
 
-    // Borda escura suave para visibilidade em fundos brancos (Sombra / Contorno)
+    // Profundidade externa para continuar legível sobre fundos claros.
     final shadowTrack = Paint()
-      ..color = Colors.black.withValues(alpha: 0.25)
+      ..color = Colors.black.withValues(alpha: 0.28)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth + 1.5;
+      ..strokeWidth = strokeWidth + 2.2
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.6);
     canvas.drawCircle(center, radius, shadowTrack);
 
-    // Trilho de fundo sutil (círculo completo).
     final track = Paint()
-      ..color = Colors.white.withValues(alpha: 0.2)
+      ..shader = SweepGradient(
+        colors: [
+          Colors.white.withValues(alpha: 0.08),
+          baseColor.withValues(alpha: 0.18),
+          Colors.white.withValues(alpha: 0.13),
+          Colors.white.withValues(alpha: 0.08),
+        ],
+        stops: const [0, 0.35, 0.72, 1],
+      ).createShader(rect)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
     canvas.drawCircle(center, radius, track);
 
     if (progress <= 0) return;
 
-    // Arco de progresso: -pi/2 = topo; sweep positivo = sentido horário.
-    final arc = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, -math.pi / 2, 2 * math.pi * progress, false, arc);
+    final urgency = ((progress - 0.75) / 0.25).clamp(0.0, 1.0);
+    final pulse = reduceMotion || progress < 0.9
+        ? 0.0
+        : (math.sin(phase * math.pi * 2) * 0.5 + 0.5) * urgency;
+    final totalSweep = math.pi * 2 * progress;
+    final segments = math.max(8, (48 * progress).ceil());
+    final segmentSweep = totalSweep / segments;
+    final start = -math.pi / 2;
+    final bright = Color.lerp(baseColor, const Color(0xFFB8FFF4), 0.66)!;
+    final deep = Color.lerp(baseColor, const Color(0xFF2F80FF), 0.38)!;
+
+    for (var i = 0; i < segments; i++) {
+      final fraction = segments == 1 ? 1.0 : i / (segments - 1);
+      final liquid = reduceMotion
+          ? 0.0
+          : math.sin((fraction * 3.2 + phase) * math.pi * 2) * 0.12;
+      final paint = Paint()
+        ..color = Color.lerp(
+          deep,
+          bright,
+          fraction,
+        )!.withValues(alpha: 0.78 + fraction * 0.22)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth * (0.86 + fraction * 0.24 + liquid)
+        ..strokeCap = StrokeCap.round;
+      canvas.drawArc(
+        rect,
+        start + i * segmentSweep,
+        segmentSweep + 0.012,
+        false,
+        paint,
+      );
+    }
+
+    final tipAngle = start + totalSweep;
+    final tip = Offset(
+      center.dx + math.cos(tipAngle) * radius,
+      center.dy + math.sin(tipAngle) * radius,
+    );
+    final haloRadius = strokeWidth * (1.7 + urgency * 0.8 + pulse * 0.8);
+    final halo = Paint()
+      ..color = bright.withValues(alpha: 0.28 + urgency * 0.18 + pulse * 0.2)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, haloRadius);
+    canvas.drawCircle(tip, haloRadius, halo);
+    canvas.drawCircle(
+      tip,
+      strokeWidth * (0.64 + urgency * 0.16 + pulse * 0.12),
+      Paint()..color = Color.lerp(bright, Colors.white, 0.58)!,
+    );
   }
 
   @override
   bool shouldRepaint(_ProgressRingPainter old) =>
-      old.progress != progress || old.strokeWidth != strokeWidth;
+      old.progress != progress ||
+      old.strokeWidth != strokeWidth ||
+      old.baseColor != baseColor ||
+      old.phase != phase ||
+      old.reduceMotion != reduceMotion;
 }

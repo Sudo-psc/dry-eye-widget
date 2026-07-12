@@ -6,6 +6,22 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.24.0] - 2026-07-11
+
+### Melhorado
+- Bolinha com material de vidro líquido, resposta imediata à pressão e
+  deformação direcional sutil durante o arraste.
+- Soltura com inércia curta e controlada, desaceleração sem overshoot e encaixe
+  magnético suave nas bordas.
+- Anel de progresso líquido com gradiente, profundidade, ponta luminosa e
+  intensificação discreta perto da pausa.
+- Movimento reduzido respeitado tanto na física quanto nos efeitos visuais.
+
+### Testado
+- Cobertura automatizada de pressão, arraste, velocidade, limites de tela,
+  docking monotônico, semântica do progresso e preferência de reduzir movimento.
+- Captura visual determinística nos tamanhos compacto e ampliado.
+
 ## [1.23.2] - 2026-07-11
 
 ### Corrigido

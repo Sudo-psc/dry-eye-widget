@@ -126,4 +126,104 @@ void main() {
 
     expect(taps, 1);
   });
+
+  testWidgets('pressionar comprime imediatamente o material', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: Center(child: FloatingBall(isActive: false))),
+      ),
+    );
+
+    expect(
+      tester
+          .widget<MouseRegion>(
+            find.byKey(const ValueKey('floating_ball_pointer')),
+          )
+          .cursor,
+      SystemMouseCursors.grab,
+    );
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(FloatingBall)),
+    );
+    await tester.pump(const Duration(milliseconds: 120));
+    expect(
+      tester
+          .widget<MouseRegion>(
+            find.byKey(const ValueKey('floating_ball_pointer')),
+          )
+          .cursor,
+      SystemMouseCursors.grabbing,
+    );
+
+    await gesture.up();
+    await tester.pump(const Duration(milliseconds: 260));
+  });
+
+  testWidgets(
+    'arraste entrega velocidade de soltura e mantém clique separado',
+    (tester) async {
+      var dragStarts = 0;
+      var taps = 0;
+      var releaseVelocity = Offset.zero;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: FloatingBall(
+                isActive: false,
+                onTap: () => taps++,
+                onDragStart: () => dragStarts++,
+                onDragEnd: (velocity) => releaseVelocity = velocity,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.fling(
+        find.byType(FloatingBall),
+        const Offset(120, 24),
+        1000,
+      );
+      await tester.pump();
+
+      expect(dragStarts, 1);
+      expect(releaseVelocity.distance, greaterThan(0));
+      expect(taps, 0);
+    },
+  );
+
+  testWidgets('anel líquido expõe progresso e respeita reduzir movimento', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: Scaffold(
+            body: Center(
+              child: FloatingBall(
+                isActive: false,
+                showProgress: true,
+                progress: 0.92,
+                semanticLabel: 'Lembrete ocular',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('floating_ball_progress_ring')),
+      findsOneWidget,
+    );
+    final semantics = tester.getSemantics(
+      find.bySemanticsLabel('Lembrete ocular'),
+    );
+    expect(semantics.label, 'Lembrete ocular');
+    expect(semantics.value, '92%');
+    expect(tester.binding.transientCallbackCount, 0);
+  });
 }
