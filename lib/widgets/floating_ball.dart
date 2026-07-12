@@ -59,9 +59,13 @@ class FloatingBall extends StatefulWidget {
   final VoidCallback? onDragStart;
   final ValueChanged<Offset>? onDragEnd;
 
-  /// Espessura do anel de progresso e folga ao redor da bolinha.
-  static const double ringStroke = 3.0;
-  static const double ringGap = 4.0;
+  /// Espessura e folga adaptativas: o anel permanece delicado no tamanho
+  /// padrão, mas ganha presença suficiente em bolas maiores sem parecer pesado.
+  static double ringStrokeForSize(double size) =>
+      (size * 0.072).clamp(2.4, 4.4).toDouble();
+
+  static double ringGapForSize(double size) =>
+      (size * 0.09).clamp(3.0, 5.0).toDouble();
 
   @override
   State<FloatingBall> createState() => _FloatingBallState();
@@ -495,8 +499,9 @@ class _FloatingBallState extends State<FloatingBall>
 
     Widget visual = circle;
     if (ringVisible) {
-      final ringSize =
-          widget.size + (FloatingBall.ringGap + FloatingBall.ringStroke) * 2;
+      final ringStroke = FloatingBall.ringStrokeForSize(widget.size);
+      final ringGap = FloatingBall.ringGapForSize(widget.size);
+      final ringSize = widget.size + (ringGap + ringStroke) * 2;
       visual = SizedBox(
         width: ringSize,
         height: ringSize,
@@ -544,7 +549,7 @@ class _FloatingBallState extends State<FloatingBall>
                       size: Size.square(ringSize),
                       painter: _ProgressRingPainter(
                         progress: progress,
-                        strokeWidth: FloatingBall.ringStroke,
+                        strokeWidth: ringStroke,
                         baseColor: color,
                         phase: _ring.value,
                         reduceMotion: _reduceMotion,
@@ -848,7 +853,7 @@ class _DynamicOrbPainter extends CustomPainter {
       old.pressure != pressure;
 }
 
-/// Arco líquido com gradiente, espessura orgânica e ponta luminosa.
+/// Arco líquido contínuo com profundidade, reflexo e ponta luminosa.
 class _ProgressRingPainter extends CustomPainter {
   _ProgressRingPainter({
     required this.progress,
@@ -867,30 +872,41 @@ class _ProgressRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - strokeWidth) / 2;
+    final radius = (size.shortestSide - strokeWidth * 2.35) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
+    const start = -math.pi / 2;
 
-    // Profundidade externa para continuar legível sobre fundos claros.
-    final shadowTrack = Paint()
-      ..color = Colors.black.withValues(alpha: 0.28)
+    // Sombra externa e aro interno dão separação sobre fundos claros ou escuros
+    // sem transformar o progresso numa borda pesada.
+    final outerDepth = Paint()
+      ..color = Colors.black.withValues(alpha: 0.30)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth + 2.2
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.6);
-    canvas.drawCircle(center, radius, shadowTrack);
+      ..strokeWidth = strokeWidth * 1.7
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 0.72);
+    canvas.drawCircle(center, radius, outerDepth);
 
     final track = Paint()
       ..shader = SweepGradient(
         colors: [
-          Colors.white.withValues(alpha: 0.08),
-          baseColor.withValues(alpha: 0.18),
-          Colors.white.withValues(alpha: 0.13),
-          Colors.white.withValues(alpha: 0.08),
+          Colors.white.withValues(alpha: 0.10),
+          baseColor.withValues(alpha: 0.22),
+          Colors.white.withValues(alpha: 0.16),
+          baseColor.withValues(alpha: 0.14),
+          Colors.white.withValues(alpha: 0.10),
         ],
-        stops: const [0, 0.35, 0.72, 1],
+        stops: const [0, 0.26, 0.52, 0.78, 1],
+        transform: const GradientRotation(start),
       ).createShader(rect)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
     canvas.drawCircle(center, radius, track);
+
+    final innerRim = Paint()
+      ..color = Colors.white.withValues(alpha: 0.11)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(0.7, strokeWidth * 0.28);
+    canvas.drawCircle(center, radius - strokeWidth * 0.42, innerRim);
 
     if (progress <= 0) return;
 
@@ -898,50 +914,69 @@ class _ProgressRingPainter extends CustomPainter {
     final pulse = reduceMotion || progress < 0.9
         ? 0.0
         : (math.sin(phase * math.pi * 2) * 0.5 + 0.5) * urgency;
-    final totalSweep = math.pi * 2 * progress;
-    final segments = math.max(8, (48 * progress).ceil());
-    final segmentSweep = totalSweep / segments;
-    final start = -math.pi / 2;
-    final bright = Color.lerp(baseColor, const Color(0xFFB8FFF4), 0.66)!;
-    final deep = Color.lerp(baseColor, const Color(0xFF2F80FF), 0.38)!;
+    final totalSweep = math.pi * 2 * progress.clamp(0.0, 1.0);
+    final aqua = Color.lerp(baseColor, const Color(0xFFA9FFF2), 0.72)!;
+    final warm = Color.lerp(aqua, const Color(0xFFFFE39A), urgency * 0.42)!;
+    final deep = Color.lerp(baseColor, const Color(0xFF2878EA), 0.42)!;
+    final shimmer = reduceMotion ? 0.0 : math.sin(phase * math.pi * 2) * 0.025;
 
-    for (var i = 0; i < segments; i++) {
-      final fraction = segments == 1 ? 1.0 : i / (segments - 1);
-      final liquid = reduceMotion
-          ? 0.0
-          : math.sin((fraction * 3.2 + phase) * math.pi * 2) * 0.12;
-      final paint = Paint()
-        ..color = Color.lerp(
-          deep,
-          bright,
-          fraction,
-        )!.withValues(alpha: 0.78 + fraction * 0.22)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth * (0.86 + fraction * 0.24 + liquid)
-        ..strokeCap = StrokeCap.round;
-      canvas.drawArc(
-        rect,
-        start + i * segmentSweep,
-        segmentSweep + 0.012,
-        false,
-        paint,
-      );
-    }
+    // Halo contínuo: substitui dezenas de segmentos e mantém o arco suave em
+    // todos os tamanhos, inclusive durante a transição do progresso.
+    final glow = Paint()
+      ..color = warm.withValues(alpha: 0.24 + urgency * 0.10 + pulse * 0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth * (1.65 + pulse * 0.10)
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 1.05);
+    canvas.drawArc(rect, start, totalSweep, false, glow);
+
+    final progressPaint = Paint()
+      ..shader = SweepGradient(
+        startAngle: start,
+        endAngle: start + math.pi * 2,
+        colors: [deep, baseColor, aqua, warm],
+        stops: const [0.0, 0.30, 0.72, 1.0],
+        transform: GradientRotation(shimmer),
+      ).createShader(rect)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth * (1.02 + pulse * 0.04)
+      ..strokeCap = StrokeCap.round;
+    canvas.drawArc(rect, start, totalSweep, false, progressPaint);
+
+    // Reflexo interno deslocado para o lado da luz: cria volume sem alterar a
+    // extensão matemática do progresso.
+    final highlightRect = Rect.fromCircle(
+      center: center,
+      radius: radius - strokeWidth * 0.22,
+    );
+    final highlight = Paint()
+      ..color = Colors.white.withValues(alpha: 0.34 + pulse * 0.08)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(0.8, strokeWidth * 0.26)
+      ..strokeCap = StrokeCap.round;
+    canvas.drawArc(highlightRect, start, totalSweep, false, highlight);
+
+    final origin = Offset(center.dx, center.dy - radius);
+    canvas.drawCircle(
+      origin,
+      strokeWidth * 0.24,
+      Paint()..color = Colors.white.withValues(alpha: 0.62),
+    );
 
     final tipAngle = start + totalSweep;
     final tip = Offset(
       center.dx + math.cos(tipAngle) * radius,
       center.dy + math.sin(tipAngle) * radius,
     );
-    final haloRadius = strokeWidth * (1.7 + urgency * 0.8 + pulse * 0.8);
+    final haloRadius = strokeWidth * (1.45 + urgency * 0.55 + pulse * 0.45);
     final halo = Paint()
-      ..color = bright.withValues(alpha: 0.28 + urgency * 0.18 + pulse * 0.2)
+      ..color = warm.withValues(alpha: 0.30 + urgency * 0.16 + pulse * 0.16)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, haloRadius);
     canvas.drawCircle(tip, haloRadius, halo);
     canvas.drawCircle(
       tip,
-      strokeWidth * (0.64 + urgency * 0.16 + pulse * 0.12),
-      Paint()..color = Color.lerp(bright, Colors.white, 0.58)!,
+      strokeWidth * (0.60 + urgency * 0.12 + pulse * 0.08),
+      Paint()..color = Color.lerp(warm, Colors.white, 0.62)!,
     );
   }
 

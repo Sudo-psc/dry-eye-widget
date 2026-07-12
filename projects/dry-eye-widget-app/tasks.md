@@ -2,6 +2,17 @@
 
 ## now
 
+- [x] Sincronizar metadados e changelog da release 1.24.1+71.
+- [x] Executar análise, suíte completa e smoke da landing.
+- [x] Gerar app macOS universal e DMG da release 1.24.1.
+- [x] Validar versão interna, estrutura do DMG e SHA-256.
+
+- [x] Substituir o anel segmentado por arco contínuo em camadas.
+- [x] Adaptar espessura e folga aos tamanhos 18–96 px.
+- [x] Preservar semântica de progresso e reduzir movimento.
+- [x] Atualizar prévia visual em 32, 56 e 96 px.
+- [x] Validar teste focado, suíte completa, análise e build release.
+
 - [x] Auditar menu rápido, menu Sistema e Resumo do dia com capturas atuais.
 - [x] Adicionar rótulos visíveis e suporte de teclado às ações rápidas.
 - [x] Tornar foco, saída destrutiva e reduzir movimento consistentes.

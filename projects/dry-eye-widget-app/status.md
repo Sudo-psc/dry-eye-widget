@@ -2,6 +2,28 @@
 
 Updated: 2026-07-12
 
+## Build da release 1.24.1 — concluído em 2026-07-12
+
+A versão foi sincronizada como 1.24.1+71 no app, MSIX, landing, README,
+roadmap e changelog. Análise, suíte completa e smoke da landing passaram. O
+build macOS universal foi gerado e empacotado em `dist/DryEyeWidget.dmg`; a
+imagem foi validada por `hdiutil`, o app interno confirmou versão 1.24.1/build
+71 e o SHA-256 é
+`bd13f5007febfcb256df6c5eb16bdc4470f358d66ff4c8806cf9b3419e3f9050`.
+Publicação, tag e builds Windows ainda não foram executados nesta rodada.
+Evidência: `runs/2026-07-12-v1.24.1-release-build.md`.
+
+## Anel de progresso contínuo — concluído em 2026-07-12
+
+O anel da bolinha agora usa um arco contínuo em camadas, com trilha profunda,
+halo, gradiente, reflexo interno e ponta luminosa. Espessura e afastamento se
+adaptam ao tamanho da bolinha, e a proximidade da pausa recebe um aquecimento
+discreto sem alterar a leitura exata do progresso. O desenho deixou de pintar
+até 48 segmentos por frame. Reduzir movimento continua removendo pulsação e
+animações transitórias. Testes focados, suíte completa, análise estática,
+prévia em 32/56/96 px e build macOS release passaram. Evidência:
+`runs/2026-07-12-progress-ring-refinement.md`.
+
 ## Rodada de UI/UX e bugs — concluída em 2026-07-12
 
 O menu rápido agora expõe rótulos curtos nas quatro ações de pausa, aceita

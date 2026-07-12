@@ -6,16 +6,27 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.24.1] - 2026-07-12
+
 ### Melhorado
 - Menu rápido com rótulos curtos nas ações de pausa, foco visível, suporte a
   teclado e respeito à preferência de reduzir movimento.
 - Resumo do dia com cartão DVRS acionável, affordance mais clara e maior
   contraste nos textos auxiliares.
 - Tratamento visual discreto para a ação destrutiva de sair.
+- Anel de progresso contínuo com trilha em profundidade, gradiente, reflexo
+  interno, halo e ponta luminosa.
+- Espessura e afastamento do anel adaptativos entre os tamanhos 18 e 96 px.
+- Aquecimento visual discreto ao aproximar-se da pausa, mantendo a extensão
+  matemática e a semântica percentual do progresso.
 
 ### Corrigido
 - Falhas ao adiar o lembrete DVRS não deixam mais o botão permanentemente
   bloqueado; a interface informa o erro e permite tentar novamente.
+
+### Testado
+- Prévia determinística do anel nos tamanhos 32, 56 e 96 px.
+- Cobertura de escala adaptativa, semântica percentual e reduzir movimento.
 
 ## [1.24.0] - 2026-07-11
 

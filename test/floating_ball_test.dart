@@ -5,6 +5,15 @@ import 'package:dry_eye_widget/utils/edge_snap.dart';
 import 'package:dry_eye_widget/widgets/floating_ball.dart';
 
 void main() {
+  test('anel adapta espessura e folga ao tamanho da bolinha', () {
+    expect(FloatingBall.ringStrokeForSize(18), 2.4);
+    expect(FloatingBall.ringStrokeForSize(48), closeTo(3.456, 0.001));
+    expect(FloatingBall.ringStrokeForSize(96), 4.4);
+    expect(FloatingBall.ringGapForSize(18), 3.0);
+    expect(FloatingBall.ringGapForSize(48), closeTo(4.32, 0.001));
+    expect(FloatingBall.ringGapForSize(96), 5.0);
+  });
+
   testWidgets('botão direito (secondary tap) dispara onSecondaryTap', (
     tester,
   ) async {

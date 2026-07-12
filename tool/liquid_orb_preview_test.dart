@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('captura determinística do vidro líquido e anel', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(640, 280));
+    await tester.binding.setSurfaceSize(const Size(720, 300));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
@@ -25,10 +25,17 @@ void main() {
               children: [
                 FloatingBall(
                   isActive: false,
-                  size: 48,
+                  size: 32,
                   showProgress: true,
-                  progress: 0.62,
+                  progress: 0.35,
                   orbIntensity: 0.72,
+                ),
+                FloatingBall(
+                  isActive: false,
+                  size: 56,
+                  showProgress: true,
+                  progress: 0.68,
+                  orbIntensity: 0.78,
                 ),
                 FloatingBall(
                   isActive: false,

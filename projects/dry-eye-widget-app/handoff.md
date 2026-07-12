@@ -1,5 +1,32 @@
 # Handoff
 
+## Build da release 1.24.1 — 2026-07-12
+
+A release patch 1.24.1+71 reúne o anel contínuo adaptativo, as melhorias de
+acessibilidade do menu rápido e a recuperação de erro do Resumo do dia. Os
+metadados estão alinhados entre Flutter, AppInfo, MSIX, landing, README,
+roadmap e changelog. O app macOS universal e `dist/DryEyeWidget.dmg` foram
+gerados; o DMG é válido, contém versão 1.24.1/build 71 e tem SHA-256
+`bd13f5007febfcb256df6c5eb16bdc4470f358d66ff4c8806cf9b3419e3f9050`.
+
+Esta rodada não publicou tag, GitHub Release ou artefatos Windows. Próxima ação
+para distribuição: push do commit, tag v1.24.1 e acompanhamento dos workflows
+macOS Build, Windows Build e Windows MSIX.
+
+## Anel de progresso contínuo — 2026-07-12
+
+O `FloatingBall` calcula espessura e folga do anel a partir do diâmetro, com
+limites para manter leitura entre 18 e 96 px. `_ProgressRingPainter` usa agora
+um arco contínuo com trilha, sombra, halo, gradiente, reflexo e ponta luminosa,
+substituindo o loop de até 48 segmentos por poucas operações de pintura. A
+urgência aquece suavemente o gradiente após 75%, sem mudar a extensão do arco.
+Reduzir movimento mantém o desenho estático e sem callbacks transitórios.
+
+Validação: teste focado aprovado, suíte completa aprovada, análise sem erros,
+golden revisado em 32/56/96 px e build macOS release concluído. Evidência em
+`runs/2026-07-12-progress-ring-refinement.md`. Próxima verificação recomendada:
+frame pacing em hardware Windows de entrada.
+
 ## Rodada de UI/UX e bugs — 2026-07-12
 
 O primeiro nível do menu preserva quatro ações compactas, agora com rótulos
