@@ -11,6 +11,12 @@ class FeatureStrings {
 
   String get menuHealthHub => _en ? 'Visual health' : 'Saúde visual';
   String get menuMyData => _en ? 'My data' : 'Meus dados';
+  String get menuQuickStart => _en ? 'Start' : 'Iniciar';
+  String get menuQuickReset => _en ? 'Reset' : 'Reiniciar';
+  String get menuQuickPause => _en ? 'Pause' : 'Pausar';
+  String get menuQuickResume => _en ? 'Resume' : 'Retomar';
+  String get menuQuickExtend => _en ? 'Extend' : 'Estender';
+  String get menuTrackingSection => _en ? 'Track' : 'Acompanhar';
 
   String get healthHubTitle => _en ? 'Visual health' : 'Saúde visual';
   String get healthHubTabToday => _en ? 'Today' : 'Hoje';

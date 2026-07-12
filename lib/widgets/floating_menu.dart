@@ -2,17 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../l10n/app_strings.dart';
+import '../l10n/feature_strings.dart';
 import '../ui/app_theme.dart';
 import '../utils/constants.dart';
 import 'liquid_glass.dart';
 
 /// Item do menu flutuante.
 class _MenuItem {
-  const _MenuItem(this.icon, this.label, this.onTap, {this.emphasized = false});
+  const _MenuItem(
+    this.icon,
+    this.label,
+    this.onTap, {
+    this.compactLabel,
+    this.emphasized = false,
+    this.destructive = false,
+  });
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final String? compactLabel;
   final bool emphasized;
+  final bool destructive;
 }
 
 /// Menu flutuante exibido ao clicar na bolinha (apenas no estado IDLE).
@@ -67,18 +77,38 @@ class _FloatingMenuState extends State<FloatingMenu> {
   @override
   Widget build(BuildContext context) {
     final s = widget.strings;
+    final feature = FeatureStrings.of(s.languageCode);
+    final reduceMotion = MediaQuery.maybeOf(context)?.disableAnimations == true;
 
     // Pausas: ações frequentes e de baixa carga textual → linha única de ícones
     // (com tooltip/Semantics para acessibilidade), economizando bastante altura.
     final pauseItems = <_MenuItem>[
-      _MenuItem(Icons.play_circle_outline, s.menuStartBreak, widget.onStartNow),
-      _MenuItem(Icons.refresh, s.menuReset, widget.onReset),
+      _MenuItem(
+        Icons.play_circle_outline,
+        s.menuStartBreak,
+        widget.onStartNow,
+        compactLabel: feature.menuQuickStart,
+      ),
+      _MenuItem(
+        Icons.refresh,
+        s.menuReset,
+        widget.onReset,
+        compactLabel: feature.menuQuickReset,
+      ),
       _MenuItem(
         widget.isPaused ? Icons.play_arrow : Icons.pause,
         widget.isPaused ? s.menuResume : s.menuPause,
         widget.onTogglePause,
+        compactLabel: widget.isPaused
+            ? feature.menuQuickResume
+            : feature.menuQuickPause,
       ),
-      _MenuItem(Icons.schedule, s.menuExtendCycle, widget.onExtendCycle),
+      _MenuItem(
+        Icons.schedule,
+        s.menuExtendCycle,
+        widget.onExtendCycle,
+        compactLabel: feature.menuQuickExtend,
+      ),
     ];
 
     // Saúde visual: o Hub concentra DVRS, relatórios e tendências. Orientações
@@ -104,13 +134,14 @@ class _FloatingMenuState extends State<FloatingMenu> {
       ),
       _MenuItem(Icons.settings_outlined, s.menuSettings, widget.onSettings),
       _MenuItem(Icons.info_outline, s.menuAbout, widget.onAbout),
-      _MenuItem(Icons.close, s.menuQuit, widget.onQuit),
+      _MenuItem(Icons.close, s.menuQuit, widget.onQuit, destructive: true),
     ];
 
     _MenuRow rowFor(_MenuItem item) => _MenuRow(
       icon: item.icon,
       label: item.label,
       emphasized: item.emphasized,
+      destructive: item.destructive,
       onTap: () {
         item.onTap();
         widget.onDismiss();
@@ -132,7 +163,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
             _SectionHeader(s.menuGroupActions),
             _CompactActionRow(items: pauseItems, onDismiss: widget.onDismiss),
             const _MenuDivider(),
-            _SectionHeader(s.menuGroupHealth),
+            _SectionHeader(feature.menuTrackingSection),
             ...healthItems.map(rowFor),
             const _MenuDivider(),
             _MenuRow(
@@ -156,7 +187,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
         saturation: 1.6,
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: AnimatedSwitcher(
-          duration: AppMotion.normal,
+          duration: reduceMotion ? Duration.zero : AppMotion.normal,
           switchInCurve: AppMotion.standard,
           switchOutCurve: AppMotion.standard,
           child: Column(
@@ -187,6 +218,7 @@ class _CompactActionRow extends StatelessWidget {
             Expanded(
               child: _CompactActionButton(
                 icon: item.icon,
+                label: item.compactLabel ?? item.label,
                 tooltip: item.label,
                 onTap: () {
                   item.onTap();
@@ -205,11 +237,13 @@ class _CompactActionRow extends StatelessWidget {
 class _CompactActionButton extends StatefulWidget {
   const _CompactActionButton({
     required this.icon,
+    required this.label,
     required this.tooltip,
     required this.onTap,
   });
 
   final IconData icon;
+  final String label;
   final String tooltip;
   final VoidCallback onTap;
 
@@ -219,52 +253,100 @@ class _CompactActionButton extends StatefulWidget {
 
 class _CompactActionButtonState extends State<_CompactActionButton> {
   bool _hover = false;
+  bool _focused = false;
 
   @override
   Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.maybeOf(context)?.disableAnimations == true;
+    final highlighted = _hover || _focused;
     return Semantics(
       button: true,
       label: widget.tooltip,
       child: Tooltip(
         message: widget.tooltip,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          onEnter: (_) => setState(() => _hover = true),
-          onExit: (_) => setState(() => _hover = false),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onTap,
-            child: AnimatedContainer(
-              duration: AppMotion.fast,
-              curve: AppMotion.standard,
-              height: 44,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppRadii.sm),
-                gradient: _hover
-                    ? const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.hoverFillTop,
-                          AppColors.hoverFillBottom,
-                        ],
-                      )
-                    : null,
-                border: Border.all(
-                  color: _hover ? AppColors.hoverBorder : Colors.transparent,
-                  width: 0.5,
-                ),
-              ),
-              child: AnimatedScale(
-                scale: _hover ? AppMotion.hoverScale : 1.0,
-                duration: AppMotion.fast,
+        child: FocusableActionDetector(
+          onShowFocusHighlight: (value) => setState(() => _focused = value),
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+            SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+          },
+          actions: <Type, Action<Intent>>{
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (_) {
+                widget.onTap();
+                return null;
+              },
+            ),
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _hover = true),
+            onExit: (_) => setState(() => _hover = false),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onTap,
+              child: AnimatedContainer(
+                key: ValueKey('quick-action-${widget.label}'),
+                duration: reduceMotion ? Duration.zero : AppMotion.fast,
                 curve: AppMotion.standard,
-                child: Icon(
-                  widget.icon,
-                  size: 22,
-                  color: _hover ? AppColors.idleBall : AppColors.textPrimary,
-                  shadows: const [Shadow(color: Colors.black54, blurRadius: 4)],
+                height: 58,
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
+                  gradient: highlighted
+                      ? const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.hoverFillTop,
+                            AppColors.hoverFillBottom,
+                          ],
+                        )
+                      : null,
+                  border: Border.all(
+                    color: _focused
+                        ? AppColors.idleBall
+                        : (highlighted
+                              ? AppColors.hoverBorder
+                              : Colors.transparent),
+                    width: _focused ? 1.25 : 0.5,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedScale(
+                      scale: highlighted ? AppMotion.hoverScale : 1.0,
+                      duration: reduceMotion ? Duration.zero : AppMotion.fast,
+                      curve: AppMotion.standard,
+                      child: Icon(
+                        widget.icon,
+                        size: 20,
+                        color: highlighted
+                            ? AppColors.idleBall
+                            : AppColors.textPrimary,
+                        shadows: const [
+                          Shadow(color: Colors.black54, blurRadius: 4),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        height: 1.1,
+                        fontWeight: highlighted
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                        color: highlighted
+                            ? AppColors.idleBall
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -322,6 +404,7 @@ class _MenuRow extends StatefulWidget {
     required this.onTap,
     this.emphasized = false,
     this.showChevron = false,
+    this.destructive = false,
   });
 
   final IconData icon;
@@ -329,6 +412,7 @@ class _MenuRow extends StatefulWidget {
   final VoidCallback onTap;
   final bool emphasized;
   final bool showChevron;
+  final bool destructive;
 
   @override
   State<_MenuRow> createState() => _MenuRowState();
@@ -336,10 +420,16 @@ class _MenuRow extends StatefulWidget {
 
 class _MenuRowState extends State<_MenuRow> {
   bool _hover = false;
+  bool _focused = false;
 
   @override
   Widget build(BuildContext context) {
-    final accent = widget.emphasized || _hover;
+    final reduceMotion = MediaQuery.maybeOf(context)?.disableAnimations == true;
+    final highlighted = _hover || _focused;
+    final accent = widget.emphasized || highlighted;
+    final accentColor = widget.destructive
+        ? Theme.of(context).colorScheme.error
+        : AppColors.idleBall;
     return Semantics(
       button: true,
       label: widget.label,
@@ -348,6 +438,11 @@ class _MenuRowState extends State<_MenuRow> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: FocusableActionDetector(
+          onShowFocusHighlight: (value) => setState(() => _focused = value),
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+            SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+          },
           actions: <Type, Action<Intent>>{
             ActivateIntent: CallbackAction<ActivateIntent>(
               onInvoke: (_) {
@@ -363,7 +458,7 @@ class _MenuRowState extends State<_MenuRow> {
               widget.onTap();
             },
             child: AnimatedContainer(
-              duration: AppMotion.fast,
+              duration: reduceMotion ? Duration.zero : AppMotion.fast,
               curve: AppMotion.standard,
               margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
               // Pequeno "deslize" para a direita ao passar o mouse.
@@ -375,7 +470,7 @@ class _MenuRowState extends State<_MenuRow> {
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppRadii.sm),
-                gradient: _hover
+                gradient: highlighted && !widget.destructive
                     ? const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -385,25 +480,36 @@ class _MenuRowState extends State<_MenuRow> {
                         ],
                       )
                     : null,
+                color: highlighted && widget.destructive
+                    ? accentColor.withValues(alpha: 0.12)
+                    : null,
                 border: Border.all(
-                  color: widget.emphasized && !_hover
-                      ? AppColors.idleBall.withValues(alpha: 0.35)
-                      : (_hover ? AppColors.hoverBorder : Colors.transparent),
-                  width: 0.5,
+                  color: _focused
+                      ? accentColor
+                      : (widget.emphasized && !highlighted
+                            ? AppColors.idleBall.withValues(alpha: 0.35)
+                            : (highlighted
+                                  ? (widget.destructive
+                                        ? accentColor.withValues(alpha: 0.55)
+                                        : AppColors.hoverBorder)
+                                  : Colors.transparent)),
+                  width: _focused ? 1.25 : 0.5,
                 ),
               ),
               child: Row(
                 children: [
                   AnimatedScale(
-                    scale: _hover ? AppMotion.hoverScale : 1.0,
-                    duration: AppMotion.fast,
+                    scale: highlighted ? AppMotion.hoverScale : 1.0,
+                    duration: reduceMotion ? Duration.zero : AppMotion.fast,
                     curve: AppMotion.standard,
                     child: Icon(
                       widget.icon,
                       size: 18,
-                      color: accent
-                          ? AppColors.idleBall
-                          : AppColors.textPrimary,
+                      color: widget.destructive
+                          ? accentColor.withValues(alpha: accent ? 1 : 0.82)
+                          : (accent
+                                ? AppColors.idleBall
+                                : AppColors.textPrimary),
                       shadows: const [
                         Shadow(color: Colors.black54, blurRadius: 4),
                       ],
@@ -418,8 +524,10 @@ class _MenuRowState extends State<_MenuRow> {
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.2,
-                        color: AppColors.textPrimary,
-                        fontWeight: widget.emphasized || _hover
+                        color: widget.destructive && highlighted
+                            ? accentColor
+                            : AppColors.textPrimary,
+                        fontWeight: widget.emphasized || highlighted
                             ? FontWeight.w600
                             : FontWeight.w400,
                         shadows: const [
@@ -432,7 +540,7 @@ class _MenuRowState extends State<_MenuRow> {
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 18,
-                      color: AppColors.idleBall.withValues(alpha: 0.75),
+                      color: accentColor.withValues(alpha: 0.75),
                     ),
                 ],
               ),

@@ -1,6 +1,15 @@
 # Status
 
-Updated: 2026-07-11
+Updated: 2026-07-12
+
+## Rodada de UI/UX e bugs — concluída em 2026-07-12
+
+O menu rápido agora expõe rótulos curtos nas quatro ações de pausa, aceita
+teclado com foco visível, respeita reduzir movimento e diferencia a ação de
+saída. O Resumo do dia tornou o cartão DVRS acionável, elevou o contraste de
+textos auxiliares e recupera corretamente quando o adiamento falha. A auditoria
+antes/depois, 235 testes, análise estática e build macOS release passaram.
+Evidência: `runs/2026-07-12-ui-ux-audit-and-fixes.md`.
 
 ## Interação líquida da bolinha — v1.24.0 publicada
 

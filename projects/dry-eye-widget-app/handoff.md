@@ -1,5 +1,18 @@
 # Handoff
 
+## Rodada de UI/UX e bugs — 2026-07-12
+
+O primeiro nível do menu preserva quatro ações compactas, agora com rótulos
+PT/EN, foco visível e ativação por Enter/Espaço. Linhas e ações rápidas anulam
+transições quando reduzir movimento está ativo. O cartão DVRS do Resumo do dia
+é um `InkWell` semântico e a falha do adiamento usa `try/catch/finally`, snackbar
+localizado e desbloqueio garantido.
+
+Validação final: 235 testes, análise limpa, golden antes/depois em três estados
+e build macOS release aprovado. Evidência completa em
+`runs/2026-07-12-ui-ux-audit-and-fixes.md`. Próxima melhoria recomendada:
+integração nativa para foco/posição de janela e QA manual no Windows.
+
 ## Interação líquida da bolinha — 2026-07-11
 
 A v1.24.0 substitui o retorno elástico por uma soltura mais previsível: a

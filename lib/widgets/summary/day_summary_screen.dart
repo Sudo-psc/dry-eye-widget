@@ -75,10 +75,19 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
   Future<void> _snooze() async {
     if (_snoozing) return;
     setState(() => _snoozing = true);
-    await widget.onSnoozeDvrsNudge();
-    if (!mounted) return;
-    setState(() => _snoozing = false);
-    _reload();
+    try {
+      await widget.onSnoozeDvrsNudge();
+      if (mounted) _reload();
+    } catch (_) {
+      if (mounted) {
+        final s = context.read<SettingsProvider>().strings;
+        ScaffoldMessenger.maybeOf(
+          context,
+        )?.showSnackBar(SnackBar(content: Text(s.daySummaryNudgeError)));
+      }
+    } finally {
+      if (mounted) setState(() => _snoozing = false);
+    }
   }
 
   @override
@@ -150,7 +159,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 11,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -158,16 +167,13 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
     );
   }
 
-  Widget _statsRow(
-    ThemeData theme,
-    AppStrings s,
-    DaySummarySnapshot snap,
-  ) {
+  Widget _statsRow(ThemeData theme, AppStrings s, DaySummarySnapshot snap) {
     final todayValue = snap.todayReminders == 0
         ? '—'
         : '${snap.todayCompleted}/${snap.todayReminders}';
-    final adhValue =
-        snap.hasAdherence7 ? '${(snap.adherence7 * 100).round()}%' : '—';
+    final adhValue = snap.hasAdherence7
+        ? '${(snap.adherence7 * 100).round()}%'
+        : '—';
 
     return Row(
       children: [
@@ -238,7 +244,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
             label,
             style: TextStyle(
               fontSize: 11,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
             ),
           ),
           if (hint != null)
@@ -246,7 +252,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
               hint,
               style: TextStyle(
                 fontSize: 10,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
               ),
             ),
         ],
@@ -254,11 +260,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
     );
   }
 
-  Widget _dvrsCard(
-    ThemeData theme,
-    AppStrings s,
-    DaySummarySnapshot snap,
-  ) {
+  Widget _dvrsCard(ThemeData theme, AppStrings s, DaySummarySnapshot snap) {
     final last = snap.lastDvrs;
     final title = s.daySummaryDvrsLabel;
     final body = last == null
@@ -269,64 +271,85 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
             snap.daysSinceDvrs ?? 0,
           );
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+    final radius = BorderRadius.circular(14);
+    return Semantics(
+      button: true,
+      label: '$title. $body',
+      child: Material(
+        color: Colors.transparent,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.35),
+            borderRadius: radius,
+            border: Border.all(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.16),
+            ),
+          ),
+          child: InkWell(
+            key: const ValueKey('day-summary-dvrs-card'),
+            borderRadius: radius,
+            onTap: widget.onDvrs,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.idleBall.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.assignment_outlined,
+                      color: AppColors.idleBall,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.76,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          body,
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 1.3,
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.92,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.idleBall,
+                    size: 22,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.idleBall.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.assignment_outlined,
-              color: AppColors.idleBall,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.3,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _nudgeBanner(
-    ThemeData theme,
-    AppStrings s,
-    DaySummarySnapshot snap,
-  ) {
+  Widget _nudgeBanner(ThemeData theme, AppStrings s, DaySummarySnapshot snap) {
     final body = snap.lastDvrs == null
         ? s.daySummaryNudgeBodyNever
         : s.daySummaryNudgeBodyDue;
@@ -395,11 +418,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
     );
   }
 
-  Widget _insightCard(
-    ThemeData theme,
-    AppStrings s,
-    DaySummarySnapshot snap,
-  ) {
+  Widget _insightCard(ThemeData theme, AppStrings s, DaySummarySnapshot snap) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

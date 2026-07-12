@@ -198,6 +198,7 @@ class AppStrings {
     required this.daySummaryNudgeBodyDue,
     required this.daySummaryNudgeDismiss,
     required this.daySummaryNudgeDo,
+    required this.daySummaryNudgeError,
     required this.daySummaryCtaBreak,
     required this.daySummaryCtaDvrs,
     required this.daySummaryCtaProgress,
@@ -317,6 +318,7 @@ class AppStrings {
   final String daySummaryNudgeBodyDue;
   final String daySummaryNudgeDismiss;
   final String daySummaryNudgeDo;
+  final String daySummaryNudgeError;
   final String daySummaryCtaBreak;
   final String daySummaryCtaDvrs;
   final String daySummaryCtaProgress;
@@ -501,7 +503,6 @@ class AppStrings {
   final String updateCommandCopied;
   final String close;
 
-
   final String pauseOnInactivityLabel;
   final String inactivityTitle;
   final String inactivityBody;
@@ -666,7 +667,6 @@ class AppStrings {
           .replaceAll('{label}', label)
           .replaceAll('{n}', '$days');
 
-
   String reportsPdfSavedText(String path) =>
       reportsPdfSaved.replaceAll('{path}', path);
 
@@ -700,9 +700,9 @@ const AppStrings ptStrings = AppStrings(
   daySummaryTodayLabel: 'Hoje',
   daySummaryTodayHint: 'concluídas / avisos',
   daySummaryDvrsLabel: 'DVRS',
-  daySummaryDvrsNever: 'Ainda não há avaliação. O DVRS é educativo e leva poucos minutos.',
-  daySummaryDvrsLast:
-      'Último score {score} · {label} · há {n} dias',
+  daySummaryDvrsNever:
+      'Ainda não há avaliação. O DVRS é educativo e leva poucos minutos.',
+  daySummaryDvrsLast: 'Último score {score} · {label} · há {n} dias',
   daySummaryNudgeTitle: 'Hora de reavaliar',
   daySummaryNudgeBodyNever:
       'Depois de algumas pausas, vale fazer o DVRS para entender seu risco visual digital.',
@@ -710,6 +710,8 @@ const AppStrings ptStrings = AppStrings(
       'Já se passaram cerca de duas semanas desde a última avaliação. Uma reavaliação ajuda a acompanhar tendências.',
   daySummaryNudgeDismiss: 'Lembrar depois',
   daySummaryNudgeDo: 'Fazer DVRS',
+  daySummaryNudgeError:
+      'Não foi possível adiar agora. Tente novamente em alguns instantes.',
   daySummaryCtaBreak: 'Iniciar pausa',
   daySummaryCtaDvrs: 'DVRS',
   daySummaryCtaProgress: 'Progresso',
@@ -733,8 +735,7 @@ const AppStrings ptStrings = AppStrings(
   dashboardTabDvrs: 'DVRS',
   back: 'Voltar',
   reportsPersonalTitle: 'Relatório pessoal',
-  reportsPersonalSubtitle:
-      'Exporte seu DVRS, tempo de tela e pausas em PDF.',
+  reportsPersonalSubtitle: 'Exporte seu DVRS, tempo de tela e pausas em PDF.',
   dvrsStart: 'Iniciar DVRS',
   dvrsViewHistory: 'Ver histórico',
   dvrsCalculate: 'Calcular resultado',
@@ -1087,8 +1088,7 @@ const AppStrings enStrings = AppStrings(
   daySummaryDvrsLabel: 'DVRS',
   daySummaryDvrsNever:
       'No assessment yet. DVRS is educational and takes a few minutes.',
-  daySummaryDvrsLast:
-      'Last score {score} · {label} · {n} days ago',
+  daySummaryDvrsLast: 'Last score {score} · {label} · {n} days ago',
   daySummaryNudgeTitle: 'Time to recheck',
   daySummaryNudgeBodyNever:
       'After a few breaks, try the DVRS to understand your digital visual risk.',
@@ -1096,6 +1096,8 @@ const AppStrings enStrings = AppStrings(
       'About two weeks have passed since your last assessment. A recheck helps track trends.',
   daySummaryNudgeDismiss: 'Remind me later',
   daySummaryNudgeDo: 'Take DVRS',
+  daySummaryNudgeError:
+      'Could not snooze this reminder. Please try again in a moment.',
   daySummaryCtaBreak: 'Start break',
   daySummaryCtaDvrs: 'DVRS',
   daySummaryCtaProgress: 'Progress',
@@ -1119,8 +1121,7 @@ const AppStrings enStrings = AppStrings(
   dashboardTabDvrs: 'DVRS',
   back: 'Back',
   reportsPersonalTitle: 'Personal report',
-  reportsPersonalSubtitle:
-      'Export your DVRS, screen time and breaks as a PDF.',
+  reportsPersonalSubtitle: 'Export your DVRS, screen time and breaks as a PDF.',
   dvrsStart: 'Start DVRS',
   dvrsViewHistory: 'View history',
   dvrsCalculate: 'Calculate result',

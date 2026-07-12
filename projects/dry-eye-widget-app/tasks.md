@@ -2,6 +2,13 @@
 
 ## now
 
+- [x] Auditar menu rápido, menu Sistema e Resumo do dia com capturas atuais.
+- [x] Adicionar rótulos visíveis e suporte de teclado às ações rápidas.
+- [x] Tornar foco, saída destrutiva e reduzir movimento consistentes.
+- [x] Tornar o cartão DVRS acionável e melhorar contraste auxiliar.
+- [x] Recuperar a UI quando o adiamento do DVRS falha.
+- [x] Validar com screenshots, testes focados, suíte completa, análise e build.
+
 - [x] Refinar pressão e arraste da bolinha.
 - [x] Implementar inércia curta sem overshoot.
 - [x] Integrar encaixe magnético suave.
@@ -61,6 +68,7 @@
 
 ## improve
 
+- Consolidar strings recentes em ARB quando a migração de i18n avançar.
 - Adicionar teste de integração nativo para posição real da janela.
 - Medir frame pacing da bolinha em hardware Windows de entrada.
 - Adicionar injeção de falhas de armazenamento para validar mensagens de erro e recuperação durante exportação e exclusão de dados.

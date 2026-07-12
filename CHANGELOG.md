@@ -6,6 +6,17 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Melhorado
+- Menu rápido com rótulos curtos nas ações de pausa, foco visível, suporte a
+  teclado e respeito à preferência de reduzir movimento.
+- Resumo do dia com cartão DVRS acionável, affordance mais clara e maior
+  contraste nos textos auxiliares.
+- Tratamento visual discreto para a ação destrutiva de sair.
+
+### Corrigido
+- Falhas ao adiar o lembrete DVRS não deixam mais o botão permanentemente
+  bloqueado; a interface informa o erro e permite tentar novamente.
+
 ## [1.24.0] - 2026-07-11
 
 ### Melhorado
