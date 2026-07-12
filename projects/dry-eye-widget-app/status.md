@@ -2,7 +2,7 @@
 
 Updated: 2026-07-12
 
-## Release 1.24.2 — pronta para publicação
+## Release 1.24.2 publicada — concluída em 2026-07-12
 
 A segunda rodada de performance reduz trabalho contínuo em duas camadas. A
 bolinha e o anel limitam atualizações visuais ao necessário, e o cronômetro
@@ -12,6 +12,10 @@ atividade ficam isoladas no painel de tempo de tela. A versão foi sincronizada
 como 1.24.2+72. Análise, 238 testes, Science build, smoke da landing, build
 macOS e DMG passaram. Evidência:
 `runs/2026-07-12-v1.24.2-performance-release.md`.
+O commit `b7765b6`, a tag `v1.24.2` e a GitHub Release pública foram enviados.
+CI, Pages, macOS, Windows e MSIX passaram; os quatro artefatos foram baixados
+e reconciliados por hash e integridade. GitHub Pages serve 1.24.2; o nginx do
+domínio personalizado permanece em 1.23.0.
 
 ## Release 1.24.1 publicada — concluída em 2026-07-12
 

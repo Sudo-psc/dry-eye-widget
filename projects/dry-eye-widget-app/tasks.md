@@ -7,7 +7,7 @@
 - [x] Isolar estatísticas de atividade ao painel consumidor.
 - [x] Sincronizar metadados e changelog da release 1.24.2+72.
 - [x] Executar suíte completa, smoke, build macOS e DMG.
-- [ ] Commitar, publicar v1.24.2 e validar os workflows/artefatos.
+- [x] Commitar, publicar v1.24.2 e validar os workflows/artefatos.
 
 - [x] Sincronizar metadados e changelog da release 1.24.1+71.
 - [x] Executar análise, suíte completa e smoke da landing.

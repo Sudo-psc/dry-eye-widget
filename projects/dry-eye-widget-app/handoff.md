@@ -1,6 +1,6 @@
 # Handoff
 
-## Release 1.24.2 — preparação em 2026-07-12
+## Release 1.24.2 publicada — 2026-07-12
 
 A bolinha limita o repaint contínuo a fases perceptíveis e o anel só anima a
 partir de 90%. Em `main.dart`, o `TimerProvider` saiu da observação do build
@@ -8,7 +8,10 @@ raiz e passou a ser consumido apenas no ramo dinâmico; configurações, DVRS,
 relatórios, Hub e outros painéis não reconstroem mais a cada segundo. O painel
 de tempo de tela usa um consumidor localizado para atividade. Metadados estão
 em 1.24.2+72. Análise, 238 testes, Science build, smoke da landing, app macOS
-Release e DMG passaram. Falta publicar e reconciliar os artefatos do GitHub.
+Release e DMG passaram. O commit `b7765b6` e a tag `v1.24.2` foram enviados.
+A release pública contém DMG, instalador EXE, ZIP portátil e MSIX; os cinco
+workflows passaram e os artefatos baixados tiveram hash, estrutura e versão
+verificados. GitHub Pages serve 1.24.2. O nginx externo ainda serve 1.23.0.
 
 ## Release 1.24.1 publicada — 2026-07-12
 
