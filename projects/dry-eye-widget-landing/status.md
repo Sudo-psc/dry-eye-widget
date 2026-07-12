@@ -1,8 +1,16 @@
 # Status
 
-Updated: 2026-07-10
+Updated: 2026-07-12
 
-Current phase: Science subpage implemented and locally verified.
+Current phase: Landing screenshots refreshed and locally verified.
+
+Screenshot refresh (2026-07-12):
+
+- Replaced the macOS floating-menu image with a clean runtime capture of the current liquid orb, progress ring, quick actions and two-level menu.
+- Replaced the legacy dashboard image with the current daily summary flow.
+- Added WebP carousel assets with transparent 16:10 presentation canvases to keep vertical app screens fully visible.
+- Added an isolated Flutter preview target and a repeatable Chrome DevTools capture utility.
+- Browser evidence captured at 1440×1000 and 430×932; static smoke and preview analysis passed.
 
 Science page (2026-07-10):
 

@@ -4,6 +4,8 @@
 
 The official landing output lives in `site/`. The main product page remains `/app/`; the new scientific foundation is published at `/app/science/` and is linked from the main header and footer.
 
+The macOS carousel now uses current v1.24-era UI captures: the liquid floating orb with its refined progress ring and compact menu, plus the daily summary with pauses, streak, adherence and DVRS actions. The new assets are WebP files on transparent 16:10 canvases, which prevents vertical app screens from being cropped in the landing's landscape frames. Reusable capture entrypoints live in `tool/landing_menu_preview.dart` and `tool/capture_landing_section.mjs`.
+
 Science source lives in `web/science/` and uses React, TypeScript, Tailwind CSS, Framer Motion and Lucide. `npm run build --prefix web/science` type-checks, builds and prerenders the page into `site/science/`. The Pages and CI workflows run that build before the site smoke test.
 
 The Science page covers dry-eye relevance, tear-film physiology, longitudinal monitoring, app principles, OVPP, selected scientific references, the related book and the research roadmap. It distinguishes available capabilities from future research directions and does not claim diagnosis, prevention or treatment.
@@ -21,6 +23,7 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 3. Add a recurring scientific-reference freshness review.
 4. Validate a signed macOS build with HealthKit entitlement enabled.
 5. Capture runtime QA for HealthKit states: unavailable, denied, authorized, no samples and samples available.
+6. Refresh the Windows carousel from a real v1.24+ Windows run.
 
 ## Blockers
 
@@ -41,3 +44,4 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 - Local Lighthouse Science mobile: 100 performance / 100 accessibility / 100 best practices / 100 SEO.
 - Local Lighthouse Science desktop: 100 performance / 100 accessibility / 100 best practices / 100 SEO.
 - Browser QA: responsive desktop/mobile, dark-mode toggle, 12 DOI links and lazy book-cover loading passed.
+- 2026-07-12 screenshot refresh: site smoke passed; isolated Flutter preview analysis passed; desktop and mobile carousel captures reviewed at 1440×1000 and 430×932.

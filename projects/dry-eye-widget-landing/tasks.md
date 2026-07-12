@@ -31,6 +31,8 @@
 - [ ] Expand the dashboard with local app metrics beyond HealthKit.
 - [x] Capture or replace carousel with real app screenshots when available.
 - [x] Add Windows-specific installer/tray screenshots when available.
+- [x] 2026-07-12: Refresh the macOS carousel with the current liquid orb/menu and daily summary UI.
+- [x] Add a repeatable isolated preview and desktop/mobile carousel capture path.
 - [ ] Run production-like Lighthouse after deployment.
 - [ ] Verify `/app/science/` on the production custom domain after Pages deploy.
 - [ ] Prepare VPS deploy notes.
@@ -54,6 +56,7 @@
 - Add signed-runtime QA evidence for HealthKit permission states: unavailable, denied, authorized and no samples.
 - Track Flutter macOS Swift Package Manager warnings for `screen_retriever_macos`, `tray_manager`, and `local_notifier`.
 - Add real app screenshots from macOS and Windows release runs.
+- Refresh Windows captures from a real v1.24+ Windows session so the platform set matches the current menu architecture.
 - Add structured article metadata for future blog expansion.
 
 ## recurring
