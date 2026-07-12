@@ -2,15 +2,15 @@
 
 Updated: 2026-07-12
 
-## Build da release 1.24.1 — concluído em 2026-07-12
+## Release 1.24.1 publicada — concluída em 2026-07-12
 
 A versão foi sincronizada como 1.24.1+71 no app, MSIX, landing, README,
 roadmap e changelog. Análise, suíte completa e smoke da landing passaram. O
-build macOS universal foi gerado e empacotado em `dist/DryEyeWidget.dmg`; a
-imagem foi validada por `hdiutil`, o app interno confirmou versão 1.24.1/build
-71 e o SHA-256 é
-`bd13f5007febfcb256df6c5eb16bdc4470f358d66ff4c8806cf9b3419e3f9050`.
-Publicação, tag e builds Windows ainda não foram executados nesta rodada.
+build macOS universal foi gerado e empacotado localmente. O commit `03be377`,
+a tag `v1.24.1` e a GitHub Release pública foram enviados. CI, macOS Build,
+Windows Build, Windows MSIX e Pages passaram; os quatro artefatos publicados
+foram baixados e tiveram integridade e metadados verificados. O GitHub Pages já
+mostra 1.24.1; `olhossecos.com.br/app/` ainda serve 1.23.0 pelo nginx externo.
 Evidência: `runs/2026-07-12-v1.24.1-release-build.md`.
 
 ## Anel de progresso contínuo — concluído em 2026-07-12

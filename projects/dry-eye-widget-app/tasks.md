@@ -6,6 +6,9 @@
 - [x] Executar análise, suíte completa e smoke da landing.
 - [x] Gerar app macOS universal e DMG da release 1.24.1.
 - [x] Validar versão interna, estrutura do DMG e SHA-256.
+- [x] Fazer push da main e publicar a tag v1.24.1.
+- [x] Concluir CI, macOS Build, Windows Build, Windows MSIX e Pages.
+- [x] Baixar e validar os quatro artefatos da GitHub Release.
 
 - [x] Substituir o anel segmentado por arco contínuo em camadas.
 - [x] Adaptar espessura e folga aos tamanhos 18–96 px.
@@ -79,6 +82,9 @@
 
 ## improve
 
+- Atualizar actions/checkout, setup-node, upload-artifact e action-gh-release
+  quando suas versões Node.js 24 estiverem validadas, removendo os avisos de
+  depreciação do Node.js 20 emitidos pelo GitHub Actions.
 - Consolidar strings recentes em ARB quando a migração de i18n avançar.
 - Adicionar teste de integração nativo para posição real da janela.
 - Medir frame pacing da bolinha em hardware Windows de entrada.

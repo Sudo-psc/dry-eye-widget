@@ -1,17 +1,20 @@
 # Handoff
 
-## Build da release 1.24.1 — 2026-07-12
+## Release 1.24.1 publicada — 2026-07-12
 
 A release patch 1.24.1+71 reúne o anel contínuo adaptativo, as melhorias de
 acessibilidade do menu rápido e a recuperação de erro do Resumo do dia. Os
 metadados estão alinhados entre Flutter, AppInfo, MSIX, landing, README,
 roadmap e changelog. O app macOS universal e `dist/DryEyeWidget.dmg` foram
-gerados; o DMG é válido, contém versão 1.24.1/build 71 e tem SHA-256
-`bd13f5007febfcb256df6c5eb16bdc4470f358d66ff4c8806cf9b3419e3f9050`.
+gerados e o commit `03be377` foi publicado com a tag `v1.24.1`. A release está
+pública em `https://github.com/Sudo-psc/dry-eye-widget/releases/tag/v1.24.1`
+com DMG, instalador, ZIP portátil e MSIX. CI e todos os workflows de plataforma
+passaram; os artefatos publicados foram baixados e verificados. GitHub Pages
+serve 1.24.1, enquanto o nginx de `olhossecos.com.br/app/` ainda serve 1.23.0.
 
-Esta rodada não publicou tag, GitHub Release ou artefatos Windows. Próxima ação
-para distribuição: push do commit, tag v1.24.1 e acompanhamento dos workflows
-macOS Build, Windows Build e Windows MSIX.
+Próxima ação externa: sincronizar o deploy do nginx/VPS com o conteúdo já
+publicado no GitHub Pages. Próxima melhoria interna: migrar as GitHub Actions
+que ainda emitem aviso de runtime Node.js 20.
 
 ## Anel de progresso contínuo — 2026-07-12
 
