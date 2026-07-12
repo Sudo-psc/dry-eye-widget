@@ -1,5 +1,15 @@
 # Handoff
 
+## Release 1.24.2 — preparação em 2026-07-12
+
+A bolinha limita o repaint contínuo a fases perceptíveis e o anel só anima a
+partir de 90%. Em `main.dart`, o `TimerProvider` saiu da observação do build
+raiz e passou a ser consumido apenas no ramo dinâmico; configurações, DVRS,
+relatórios, Hub e outros painéis não reconstroem mais a cada segundo. O painel
+de tempo de tela usa um consumidor localizado para atividade. Metadados estão
+em 1.24.2+72. Análise, 238 testes, Science build, smoke da landing, app macOS
+Release e DMG passaram. Falta publicar e reconciliar os artefatos do GitHub.
+
 ## Release 1.24.1 publicada — 2026-07-12
 
 A release patch 1.24.1+71 reúne o anel contínuo adaptativo, as melhorias de

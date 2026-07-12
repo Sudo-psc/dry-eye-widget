@@ -2,6 +2,17 @@
 
 Updated: 2026-07-12
 
+## Release 1.24.2 — pronta para publicação
+
+A segunda rodada de performance reduz trabalho contínuo em duas camadas. A
+bolinha e o anel limitam atualizações visuais ao necessário, e o cronômetro
+global agora reconstrói somente a superfície que exibe progresso ou contagem.
+Painéis estáticos deixam de reconstruir a cada segundo; estatísticas de
+atividade ficam isoladas no painel de tempo de tela. A versão foi sincronizada
+como 1.24.2+72. Análise, 238 testes, Science build, smoke da landing, build
+macOS e DMG passaram. Evidência:
+`runs/2026-07-12-v1.24.2-performance-release.md`.
+
 ## Release 1.24.1 publicada — concluída em 2026-07-12
 
 A versão foi sincronizada como 1.24.1+71 no app, MSIX, landing, README,

@@ -2,6 +2,13 @@
 
 ## now
 
+- [x] Limitar quadros contínuos da bolinha e animação não urgente do anel.
+- [x] Isolar os ticks globais dos painéis estáticos.
+- [x] Isolar estatísticas de atividade ao painel consumidor.
+- [x] Sincronizar metadados e changelog da release 1.24.2+72.
+- [x] Executar suíte completa, smoke, build macOS e DMG.
+- [ ] Commitar, publicar v1.24.2 e validar os workflows/artefatos.
+
 - [x] Sincronizar metadados e changelog da release 1.24.1+71.
 - [x] Executar análise, suíte completa e smoke da landing.
 - [x] Gerar app macOS universal e DMG da release 1.24.1.

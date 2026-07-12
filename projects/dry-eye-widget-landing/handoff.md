@@ -2,6 +2,8 @@
 
 ## Current State
 
+The floating widget now limits background liquid-effect redraws to perceptually useful phase changes: about 20 fps while idle and 25 fps while active. The progress ring no longer spends continuous frames below 90%; it becomes animated only near the break deadline. Hover, press, drag and release remain immediate. Regression tests cover the phase budget and threshold transition.
+
 The official landing output lives in `site/`. The main product page remains `/app/`; the new scientific foundation is published at `/app/science/` and is linked from the main header and footer.
 
 The macOS carousel now uses current v1.24-era UI captures: the liquid floating orb with its refined progress ring and compact menu, plus the daily summary with pauses, streak, adherence and DVRS actions. The new assets are WebP files on transparent 16:10 canvases, which prevents vertical app screens from being cropped in the landing's landscape frames. Reusable capture entrypoints live in `tool/landing_menu_preview.dart` and `tool/capture_landing_section.mjs`.
@@ -32,6 +34,11 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 - Signed HealthKit runtime validation requires a valid Apple signing identity/provisioning setup.
 
 ## Verification
+
+- `flutter test test/floating_ball_test.dart`: 10 tests passed on 2026-07-12, including animation-performance regressions.
+- `flutter analyze`: passed with no issues on 2026-07-12.
+- `flutter test`: all 238 tests passed on 2026-07-12.
+- `flutter build macos --release -t lib/main.dart`: passed on 2026-07-12; app bundle 59.3 MB.
 
 - `flutter analyze`: passed on 2026-06-19.
 - `flutter test test/dry_eye_health_dashboard_test.dart test/healthkit_dashboard_service_test.dart`: passed on 2026-06-19.

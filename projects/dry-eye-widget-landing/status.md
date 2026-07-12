@@ -2,7 +2,15 @@
 
 Updated: 2026-07-12
 
-Current phase: Landing screenshots refreshed and locally verified.
+Current phase: Widget animation performance optimized and fully validated.
+
+Animation performance (2026-07-12):
+
+- Continuous liquid-orb repaint notifications are quantized to about 20 fps idle and 25 fps active, independent of 60/120 Hz display refresh.
+- The progress ring stays static below 90% and animates only when the upcoming break becomes urgent.
+- Direct press, hover, drag and release feedback remains full-frequency for responsiveness.
+- Focused widget suite passed with new frame-budget and adaptive-ring regression coverage.
+- Full analysis and all 238 tests passed; the macOS release app built successfully at 59.3 MB.
 
 Screenshot refresh (2026-07-12):
 

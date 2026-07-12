@@ -2,6 +2,11 @@
 
 ## now
 
+- [x] Reduce continuous floating-orb repaint frequency without changing animation duration.
+- [x] Pause progress-ring animation below the urgency threshold.
+- [x] Add regression tests for bounded visual phases and adaptive ring activity.
+- [x] Complete full analysis, test suite and macOS release build verification.
+
 - [x] Inspect repository and infer runtime constraints.
 - [x] Create local operating summary and implementation contract.
 - [x] Confirm `site/` as the official `/app/` landing.
@@ -58,6 +63,7 @@
 - Add real app screenshots from macOS and Windows release runs.
 - Refresh Windows captures from a real v1.24+ Windows session so the platform set matches the current menu architecture.
 - Add structured article metadata for future blog expansion.
+- Add a profile-mode frame-timing benchmark for the floating widget on 60 Hz and 120 Hz displays.
 
 ## recurring
 

@@ -14,6 +14,47 @@ void main() {
     expect(FloatingBall.ringGapForSize(96), 5.0);
   });
 
+  test('efeitos contínuos usam fases limitadas e anel adaptativo', () {
+    final idleFrames = {
+      for (var i = 0; i <= 1000; i++)
+        FloatingBall.quantizedPhase(i / 1000, FloatingBall.idleOrbPhaseSteps),
+    };
+    final activeFrames = {
+      for (var i = 0; i <= 1000; i++)
+        FloatingBall.quantizedPhase(i / 1000, FloatingBall.activeOrbPhaseSteps),
+    };
+
+    expect(idleFrames.length, lessThanOrEqualTo(65));
+    expect(activeFrames.length, lessThanOrEqualTo(46));
+    expect(FloatingBall.shouldAnimateRing(0.899), isFalse);
+    expect(FloatingBall.shouldAnimateRing(0.9), isTrue);
+  });
+
+  testWidgets('anel só mantém animação contínua perto da pausa', (
+    tester,
+  ) async {
+    Widget app(double progress) => MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: FloatingBall(
+            isActive: false,
+            dynamicOrbEffect: false,
+            showProgress: true,
+            progress: progress,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(0.68));
+    await tester.pumpAndSettle();
+    expect(tester.binding.transientCallbackCount, 0);
+
+    await tester.pumpWidget(app(0.94));
+    await tester.pump();
+    expect(tester.binding.transientCallbackCount, greaterThan(0));
+  });
+
   testWidgets('botão direito (secondary tap) dispara onSecondaryTap', (
     tester,
   ) async {

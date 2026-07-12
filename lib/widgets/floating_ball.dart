@@ -67,6 +67,20 @@ class FloatingBall extends StatefulWidget {
   static double ringGapForSize(double size) =>
       (size * 0.09).clamp(3.0, 5.0).toDouble();
 
+  static const double ringAnimationThreshold = 0.9;
+  static const int idleOrbPhaseSteps = 64;
+  static const int activeOrbPhaseSteps = 45;
+  static const int ringPhaseSteps = 52;
+
+  /// Reduz notificações visuais contínuas sem alterar a duração do movimento.
+  static double quantizedPhase(double value, int steps) {
+    final normalized = value.clamp(0.0, 1.0);
+    return (normalized * steps).floor() / steps;
+  }
+
+  static bool shouldAnimateRing(double progress) =>
+      progress.clamp(0.0, 1.0) >= ringAnimationThreshold;
+
   @override
   State<FloatingBall> createState() => _FloatingBallState();
 }
@@ -82,6 +96,8 @@ class _FloatingBallState extends State<FloatingBall>
   late final AnimationController _release;
   late final AnimationController _ring;
   late final Animation<double> _opacity;
+  late final ValueNotifier<double> _orbFrame;
+  late final ValueNotifier<double> _ringFrame;
   bool _reduceMotion = false;
   bool _pressed = false;
   bool _dragging = false;
@@ -100,6 +116,8 @@ class _FloatingBallState extends State<FloatingBall>
       vsync: this,
       duration: const Duration(milliseconds: 3200),
     );
+    _orbFrame = ValueNotifier(0);
+    _orb.addListener(_updateOrbFrame);
     _hover = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
@@ -128,6 +146,8 @@ class _FloatingBallState extends State<FloatingBall>
       vsync: this,
       duration: const Duration(milliseconds: 2600),
     );
+    _ringFrame = ValueNotifier(0);
+    _ring.addListener(_updateRingFrame);
     _syncAnimation();
     _syncOrbAnimation();
     _syncReminderAnimation();
@@ -177,7 +197,9 @@ class _FloatingBallState extends State<FloatingBall>
     }
     if (oldWidget.showProgress != widget.showProgress ||
         oldWidget.isActive != widget.isActive ||
-        oldWidget.dockEdge != widget.dockEdge) {
+        oldWidget.dockEdge != widget.dockEdge ||
+        FloatingBall.shouldAnimateRing(oldWidget.progress) !=
+            FloatingBall.shouldAnimateRing(widget.progress)) {
       _syncRingAnimation();
     }
   }
@@ -202,10 +224,28 @@ class _FloatingBallState extends State<FloatingBall>
     }
   }
 
+  void _updateOrbFrame() {
+    final steps = widget.isActive
+        ? FloatingBall.activeOrbPhaseSteps
+        : FloatingBall.idleOrbPhaseSteps;
+    final next = FloatingBall.quantizedPhase(_orb.value, steps);
+    if (_orbFrame.value != next) _orbFrame.value = next;
+  }
+
+  void _updateRingFrame() {
+    final next = FloatingBall.quantizedPhase(
+      _ring.value,
+      FloatingBall.ringPhaseSteps,
+    );
+    if (_ringFrame.value != next) _ringFrame.value = next;
+  }
+
   void _syncRingAnimation() {
     final visible =
         widget.showProgress && !widget.isActive && widget.dockEdge == null;
-    if (visible && !_reduceMotion) {
+    if (visible &&
+        !_reduceMotion &&
+        FloatingBall.shouldAnimateRing(widget.progress)) {
       if (!_ring.isAnimating) _ring.repeat();
     } else {
       _ring.stop();
@@ -284,13 +324,17 @@ class _FloatingBallState extends State<FloatingBall>
   @override
   void dispose() {
     _blink.dispose();
+    _orb.removeListener(_updateOrbFrame);
     _orb.dispose();
     _hover.dispose();
     _reminder.dispose();
     _reminderBurst.dispose();
     _press.dispose();
     _release.dispose();
+    _ring.removeListener(_updateRingFrame);
     _ring.dispose();
+    _orbFrame.dispose();
+    _ringFrame.dispose();
     super.dispose();
   }
 
@@ -320,7 +364,7 @@ class _FloatingBallState extends State<FloatingBall>
     Widget circle = AnimatedBuilder(
       animation: Listenable.merge([
         _opacity,
-        _orb,
+        _orbFrame,
         _hover,
         _reminder,
         _reminderBurst,
@@ -328,6 +372,7 @@ class _FloatingBallState extends State<FloatingBall>
         _release,
       ]),
       builder: (context, _) {
+        final orbPhase = _orbFrame.value;
         final reminderPulse = reminderVisible
             ? math.sin(_reminder.value * math.pi)
             : 0.0;
@@ -359,7 +404,7 @@ class _FloatingBallState extends State<FloatingBall>
         final reminderScale = 1.0 + reminderPulse * 0.08 + burst * 0.14;
         final dockScale = docked ? 0.96 : 1.0;
         final liveScale = widget.dynamicOrbEffect && !widget.isActive
-            ? 1.0 + math.sin(_orb.value * math.pi * 2) * 0.012
+            ? 1.0 + math.sin(orbPhase * math.pi * 2) * 0.012
             : 1.0;
         final opacity = widget.isActive
             ? _opacity.value
@@ -455,7 +500,7 @@ class _FloatingBallState extends State<FloatingBall>
                       Positioned.fill(
                         child: CustomPaint(
                           painter: _DynamicOrbPainter(
-                            phase: _orb.value,
+                            phase: orbPhase,
                             baseColor: color,
                             intensity: effectiveOrbIntensity,
                             hovered: hovered,
@@ -518,7 +563,7 @@ class _FloatingBallState extends State<FloatingBall>
                   : const Duration(milliseconds: 520),
               curve: Curves.easeOutCubic,
               builder: (context, progress, _) => AnimatedBuilder(
-                animation: Listenable.merge([_press, _release, _ring]),
+                animation: Listenable.merge([_press, _release, _ringFrame]),
                 builder: (context, _) {
                   final press = Curves.easeOutCubic.transform(_press.value);
                   final wave = _reduceMotion || _release.value >= 1
@@ -551,7 +596,7 @@ class _FloatingBallState extends State<FloatingBall>
                         progress: progress,
                         strokeWidth: ringStroke,
                         baseColor: color,
-                        phase: _ring.value,
+                        phase: _ringFrame.value,
                         reduceMotion: _reduceMotion,
                       ),
                     ),

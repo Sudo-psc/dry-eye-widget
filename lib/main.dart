@@ -1292,7 +1292,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   @override
   Widget build(BuildContext context) {
-    final timer = context.watch<TimerProvider>();
+    // Painéis estáticos não devem reconstruir a cada tick de um segundo. O
+    // TimerProvider fica observado apenas no ramo que realmente exibe estado,
+    // contagem regressiva ou progresso do ciclo.
     final provider = context.watch<SettingsProvider>();
     final settings = provider.value;
     final strings = provider.strings;
@@ -1311,12 +1313,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
       );
     } else if (_screenTimeOpen) {
       body = Center(
-        child: Consumer<ScreenTimeService>(
-          builder: (context, screenTime, _) => ScreenTimeDialog(
+        child: Consumer2<ScreenTimeService, ActivityStatsService>(
+          builder: (context, screenTime, activityStats, _) => ScreenTimeDialog(
             strings: strings,
             data: screenTime.data,
             trackingEnabled: settings.screenTimeTracking,
-            activity: context.watch<ActivityStatsService>().data,
+            activity: activityStats.data,
             activityEnabled: settings.activityMonitorEnabled,
             onToggleActivity: _setActivityMonitor,
             onClose: _closeScreenTime,
@@ -1365,10 +1367,26 @@ class _HomePageState extends State<HomePage> with TrayListener {
       body = Center(
         child: GuidanceDialog(strings: strings, onClose: _closeGuidance),
       );
-    } else if (timer.eyeDropsAlert) {
-      body = EyeDropsReminder(strings: strings, onDone: _timer.dismissEyeDrops);
-    } else if (timer.state.isActive) {
-      body = settings.usesFullScreenBreak
+    } else {
+      body = Consumer<TimerProvider>(
+        builder: (context, liveTimer, _) =>
+            _buildTimerSurface(liveTimer, settings, strings),
+      );
+    }
+
+    return Scaffold(backgroundColor: Colors.transparent, body: body);
+  }
+
+  Widget _buildTimerSurface(
+    TimerProvider timer,
+    WidgetSettings settings,
+    AppStrings strings,
+  ) {
+    if (timer.eyeDropsAlert) {
+      return EyeDropsReminder(strings: strings, onDone: _timer.dismissEyeDrops);
+    }
+    if (timer.state.isActive) {
+      return settings.usesFullScreenBreak
           ? _buildBreakOverlay(timer, settings, strings)
           : GentleBreakCard(
               state: timer.state,
@@ -1377,16 +1395,14 @@ class _HomePageState extends State<HomePage> with TrayListener {
               totalSeconds: timer.phaseSeconds,
               completionInsight: _completionInsight,
             );
-    } else if (timer.inactivityAlert) {
-      body = InactivityPauseCard(
+    }
+    if (timer.inactivityAlert) {
+      return InactivityPauseCard(
         strings: strings,
         onResume: _timer.resumeFromInactivity,
       );
-    } else {
-      body = _buildCompact(timer, settings, strings);
     }
-
-    return Scaffold(backgroundColor: Colors.transparent, body: body);
+    return _buildCompact(timer, settings, strings);
   }
 
   FloatingBall _ball({

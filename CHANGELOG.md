@@ -6,6 +6,22 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.24.2] - 2026-07-12
+
+### Melhorado
+- Efeitos líquidos da bolinha atualizam somente os quadros perceptíveis, com
+  cerca de 20 fps em repouso e 25 fps em alerta, preservando a duração e a
+  resposta direta ao hover, pressão e arraste.
+- O anel de progresso permanece estático durante a maior parte do ciclo e
+  anima somente a partir de 90%, quando a proximidade da pausa é relevante.
+- Configurações, relatórios, DVRS, Hub e demais painéis estáticos deixam de ser
+  reconstruídos a cada segundo pelo cronômetro global.
+- Estatísticas de atividade ficam isoladas ao painel que realmente as exibe.
+
+### Testado
+- Cobertura de orçamento de fases visuais e ativação adaptativa do anel.
+- Análise estática, suíte completa, build macOS e artefatos multiplataforma.
+
 ## [1.24.1] - 2026-07-12
 
 ### Melhorado
