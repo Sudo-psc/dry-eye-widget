@@ -103,9 +103,50 @@ Resumo recente: [`docs/lighthouse/LATEST.md`](../docs/lighthouse/LATEST.md).
 
 ## Deploy
 
-1. Commit em `main` alterando `site/**`, `web/science/**` ou o workflow Pages.
-2. GitHub Actions: **Deploy Pages (site)** → build Science + smoke + `upload-pages-artifact` + deploy.
-3. Produção canônica: reverse-proxy / host apontando `olhossecos.com.br/app/` para o artefato publicado (ou espelho do Pages).
+### Canais de publicação
+
+- **Canônico (produção):** VPS com nginx servindo `root /var/www/olhossecos` + `location /app/`.
+- **Espelho:** GitHub Pages (`https://sudo-psc.github.io/dry-eye-widget/`), útil para validação e fallback de distribuição.
+
+### Runbook manual no VPS (copy-paste)
+
+Na máquina local (raiz do repo):
+
+```bash
+npm ci --prefix web/science
+npm run build --prefix web/science
+node site/scripts/smoke-check.mjs
+```
+
+No VPS (`/var/www/olhossecos`):
+
+```bash
+STAMP="$(date +%Y%m%d-%H%M%S)"
+cp -a /var/www/olhossecos/app /var/www/olhossecos/app.bak-"$STAMP"
+rsync -av --delete /caminho/do/repo/site/ /var/www/olhossecos/app/
+chown -R www-data:www-data /var/www/olhossecos/app
+```
+
+### Verificação rápida pós-deploy (curl)
+
+```bash
+curl -I https://olhossecos.com.br/app/
+curl -fsSL https://olhossecos.com.br/app/ | grep -Eo 'id="app-version">[^<]+'
+curl -fsSL https://olhossecos.com.br/app/science/ | grep -i '<title>'
+```
+
+### Rollback
+
+No VPS, restaurar o último backup criado antes do deploy:
+
+```bash
+BACKUP="$(ls -dt /var/www/olhossecos/app.bak-* | head -n1)"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+cp -a /var/www/olhossecos/app /var/www/olhossecos/app.failed-"$STAMP"
+rm -rf /var/www/olhossecos/app
+cp -a "$BACKUP" /var/www/olhossecos/app
+chown -R www-data:www-data /var/www/olhossecos/app
+```
 
 Não use mais o fluxo antigo de repositório separado `dry-eye-widget-landing` como fonte da verdade — a landing vive **neste** repo.
 
