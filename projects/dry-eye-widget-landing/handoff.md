@@ -2,6 +2,8 @@
 
 ## Current State
 
+The PT-BR and English GitHub READMEs now show the current v1.24 liquid-menu and daily-summary screenshots directly from the canonical landing assets, with a link to the full macOS and Windows gallery.
+
 The floating widget now limits background liquid-effect redraws to perceptually useful phase changes: about 20 fps while idle and 25 fps while active. The progress ring no longer spends continuous frames below 90%; it becomes animated only near the break deadline. Hover, press, drag and release remain immediate. Regression tests cover the phase budget and threshold transition.
 
 The official landing output lives in `site/`. The main product page remains `/app/`; the new scientific foundation is published at `/app/science/` and is linked from the main header and footer.

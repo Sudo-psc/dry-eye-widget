@@ -1,6 +1,11 @@
 # Status
 
-Updated: 2026-07-12
+Updated: 2026-07-13
+
+README screenshots (2026-07-13):
+
+- Replaced the legacy animated carousel in both README languages with the current v1.24 liquid-menu and daily-summary captures.
+- Linked the compact README gallery to the complete macOS and Windows capture set on the public landing page.
 
 Current phase: Widget animation performance optimized and fully validated.
 

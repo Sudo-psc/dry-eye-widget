@@ -118,14 +118,11 @@ All builds: **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
 ## Screenshots
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/media/carousel-dark.gif">
-    <source media="(prefers-color-scheme: light)" srcset="docs/media/carousel-light.gif">
-    <img src="docs/media/carousel-dark.gif" alt="Dry Eye Widget screen carousel" width="820">
-  </picture>
+  <img src="site/assets/shots/ball-menu.webp" alt="Liquid widget with progress ring, quick actions and floating menu on macOS" width="405">
+  <img src="site/assets/shots/day-summary.webp" alt="Daily summary with breaks, streak, adherence and DVRS access on macOS" width="405">
 </p>
 
-<p align="center"><sub>Light/dark follows GitHub · <a href="docs/media/carousel-dark.mp4">dark video</a> · <a href="docs/media/carousel-light.mp4">light video</a></sub></p>
+<p align="center"><sub>Current v1.24 interface · widget, quick actions, menu and daily summary · <a href="https://olhossecos.com.br/app/#capturas">see all macOS and Windows screenshots</a></sub></p>
 
 ---
 

@@ -2,6 +2,8 @@
 
 ## now
 
+- [x] 2026-07-13: Replace the legacy README screenshot carousel with current v1.24 menu and daily-summary captures in PT-BR and EN.
+
 - [x] Reduce continuous floating-orb repaint frequency without changing animation duration.
 - [x] Pause progress-ring animation below the urgency threshold.
 - [x] Add regression tests for bounded visual phases and adaptive ring activity.
