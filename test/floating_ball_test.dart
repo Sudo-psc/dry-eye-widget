@@ -269,11 +269,67 @@ void main() {
       find.byKey(const ValueKey('floating_ball_progress_ring')),
       findsOneWidget,
     );
+    expect(
+      find.byKey(const ValueKey('floating_ball_inner_effect')),
+      findsOneWidget,
+    );
     final semantics = tester.getSemantics(
       find.bySemanticsLabel('Lembrete ocular'),
     );
     expect(semantics.label, 'Lembrete ocular');
     expect(semantics.value, '92%');
+    expect(tester.binding.transientCallbackCount, 0);
+  });
+
+  testWidgets('íris aurora só é pintada quando o efeito dinâmico está ativo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              dynamicOrbEffect: false,
+              orbIntensity: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey('floating_ball_inner_effect')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('íris aurora usa relógio discreto sem ticker contínuo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              dynamicOrbEffect: true,
+              hoverReactiveBall: false,
+              orbIntensity: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('floating_ball_inner_effect')),
+      findsOneWidget,
+    );
+    expect(tester.binding.transientCallbackCount, 0);
+
+    await tester.pump(const Duration(milliseconds: 100));
     expect(tester.binding.transientCallbackCount, 0);
   });
 }

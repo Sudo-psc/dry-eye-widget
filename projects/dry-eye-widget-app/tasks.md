@@ -2,6 +2,11 @@
 
 ## now
 
+- [x] 2026-07-16: Testar o bundle macOS Release como aplicativo real.
+- [x] 2026-07-16: Criar o efeito interno “íris aurora” da bolinha.
+- [x] 2026-07-16: Remover o ticker contínuo da íris e medir CPU em repouso.
+- [x] 2026-07-16: Validar análise, testes, build e renderização local.
+
 - [x] 2026-07-16: Revisar os caminhos quentes afetados pelo UI/UX vNext.
 - [x] 2026-07-16: Consolidar a persistência do onboarding em uma gravação final.
 - [x] 2026-07-16: Evitar atualização redundante do `SettingsProvider`.
@@ -119,6 +124,8 @@
 
 ## improve
 
+- Se o selo ad hoc externo voltar a ficar defasado após build limpo, adicionar
+  reparo local seguro e `codesign --verify --deep --strict` ao empacotamento.
 - Transformar o harness visual atual em uma matriz PT-BR/EN, 100%/200% e
   largura compacta/padrão para as superfícies principais.
 - Converter resultados das tarefas moderadas em checks de regressão quando forem

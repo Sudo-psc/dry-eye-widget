@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -68,8 +69,8 @@ class FloatingBall extends StatefulWidget {
       (size * 0.09).clamp(3.0, 5.0).toDouble();
 
   static const double ringAnimationThreshold = 0.9;
-  static const int idleOrbPhaseSteps = 64;
-  static const int activeOrbPhaseSteps = 45;
+  static const int idleOrbPhaseSteps = 32;
+  static const int activeOrbPhaseSteps = 30;
   static const int ringPhaseSteps = 52;
 
   /// Reduz notificações visuais contínuas sem alterar a duração do movimento.
@@ -88,7 +89,6 @@ class FloatingBall extends StatefulWidget {
 class _FloatingBallState extends State<FloatingBall>
     with TickerProviderStateMixin {
   late final AnimationController _blink;
-  late final AnimationController _orb;
   late final AnimationController _hover;
   late final AnimationController _reminder;
   late final AnimationController _reminderBurst;
@@ -98,6 +98,9 @@ class _FloatingBallState extends State<FloatingBall>
   late final Animation<double> _opacity;
   late final ValueNotifier<double> _orbFrame;
   late final ValueNotifier<double> _ringFrame;
+  Timer? _orbTimer;
+  Duration? _orbTick;
+  double _orbPhase = 0;
   bool _reduceMotion = false;
   bool _pressed = false;
   bool _dragging = false;
@@ -112,12 +115,7 @@ class _FloatingBallState extends State<FloatingBall>
       begin: 1.0,
       end: 0.3,
     ).animate(CurvedAnimation(parent: _blink, curve: Curves.easeInOut));
-    _orb = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3200),
-    );
     _orbFrame = ValueNotifier(0);
-    _orb.addListener(_updateOrbFrame);
     _hover = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
@@ -216,20 +214,27 @@ class _FloatingBallState extends State<FloatingBall>
   void _syncOrbAnimation() {
     final intensity = widget.orbIntensity.clamp(0.0, 1.0);
     if (widget.dynamicOrbEffect && intensity > 0 && !_reduceMotion) {
-      _orb.duration = Duration(milliseconds: widget.isActive ? 1800 : 3200);
-      _orb.repeat();
+      final durationMs = widget.isActive ? 1800 : 3200;
+      final steps = widget.isActive
+          ? FloatingBall.activeOrbPhaseSteps
+          : FloatingBall.idleOrbPhaseSteps;
+      final tick = Duration(milliseconds: (durationMs / steps).round());
+      if (_orbTimer != null && _orbTick == tick) return;
+      _orbTimer?.cancel();
+      _orbTick = tick;
+      _orbTimer = Timer.periodic(tick, (_) {
+        if (!mounted) return;
+        _orbPhase = (_orbPhase + tick.inMilliseconds / durationMs) % 1.0;
+        final next = FloatingBall.quantizedPhase(_orbPhase, steps);
+        if (_orbFrame.value != next) _orbFrame.value = next;
+      });
     } else {
-      _orb.stop();
-      _orb.value = 0;
+      _orbTimer?.cancel();
+      _orbTimer = null;
+      _orbTick = null;
+      _orbPhase = 0;
+      if (_orbFrame.value != 0) _orbFrame.value = 0;
     }
-  }
-
-  void _updateOrbFrame() {
-    final steps = widget.isActive
-        ? FloatingBall.activeOrbPhaseSteps
-        : FloatingBall.idleOrbPhaseSteps;
-    final next = FloatingBall.quantizedPhase(_orb.value, steps);
-    if (_orbFrame.value != next) _orbFrame.value = next;
   }
 
   void _updateRingFrame() {
@@ -324,8 +329,7 @@ class _FloatingBallState extends State<FloatingBall>
   @override
   void dispose() {
     _blink.dispose();
-    _orb.removeListener(_updateOrbFrame);
-    _orb.dispose();
+    _orbTimer?.cancel();
     _hover.dispose();
     _reminder.dispose();
     _reminderBurst.dispose();
@@ -499,6 +503,9 @@ class _FloatingBallState extends State<FloatingBall>
                     if (effectiveOrbIntensity > 0)
                       Positioned.fill(
                         child: CustomPaint(
+                          key: const ValueKey<String>(
+                            'floating_ball_inner_effect',
+                          ),
                           painter: _DynamicOrbPainter(
                             phase: orbPhase,
                             baseColor: color,
@@ -735,8 +742,9 @@ class _BlinkReminderPill extends StatelessWidget {
   }
 }
 
-/// Desenha fitas luminosas internas em tons frios, inspiradas no efeito de
-/// assistentes visuais, sem usar tons de rosa.
+/// Desenha uma "íris aurora": fitas aquáticas em profundidade, um halo de
+/// íris, reflexo cáustico e uma pequena gota orbital. O resultado remete ao
+/// cuidado ocular sem transformar a bolinha num ícone literal de olho.
 class _DynamicOrbPainter extends CustomPainter {
   _DynamicOrbPainter({
     required this.phase,
@@ -791,14 +799,16 @@ class _DynamicOrbPainter extends CustomPainter {
     final activeLift = isActive ? 1.18 : 1.0;
     final alpha = (0.18 + intensity * 0.28) * hoverLift * activeLift;
 
+    // Duas auroras passam por trás da íris. A diferença de velocidade cria
+    // paralaxe suficiente para sugerir profundidade mesmo no tamanho padrão.
     _drawRibbon(
       canvas,
       size,
       angle: spin,
       colorA: const Color(0xFF5EEBFF),
       colorB: const Color(0xFF2F80FF),
-      alpha: alpha.clamp(0.0, 0.72),
-      width: s * (0.16 + intensity * 0.08),
+      alpha: (alpha * 0.88).clamp(0.0, 0.66),
+      width: s * (0.14 + intensity * 0.07),
       vertical: false,
     );
     _drawRibbon(
@@ -807,32 +817,173 @@ class _DynamicOrbPainter extends CustomPainter {
       angle: -spin * 0.82 + math.pi / 2.7,
       colorA: const Color(0xFFB8FFF4),
       colorB: const Color(0xFF26D59E),
-      alpha: (alpha * 0.82).clamp(0.0, 0.62),
-      width: s * (0.14 + intensity * 0.07),
+      alpha: (alpha * 0.72).clamp(0.0, 0.56),
+      width: s * (0.12 + intensity * 0.06),
       vertical: true,
     );
-    _drawRibbon(
+
+    _drawIrisHalo(
       canvas,
       size,
-      angle: spin * 0.58 + math.pi / 1.35,
-      colorA: Colors.white,
-      colorB: const Color(0xFF64C8FF),
-      alpha: (alpha * 0.62).clamp(0.0, 0.48),
-      width: s * (0.10 + intensity * 0.05),
-      vertical: false,
+      center: center,
+      spin: spin,
+      intensity: intensity,
+      hovered: hovered,
+      isActive: isActive,
     );
 
+    // Núcleo levemente deslocado: funciona como uma lente, não como pupila.
     final core = Paint()
       ..shader = RadialGradient(
+        center: const Alignment(-0.22, -0.28),
+        radius: 0.86,
         colors: [
-          Colors.white.withValues(alpha: 0.32 * intensity),
-          const Color(0xFF9CF7FF).withValues(alpha: 0.18 * intensity),
+          Colors.white.withValues(alpha: 0.48 * intensity),
+          const Color(0xFFB8FFF4).withValues(alpha: 0.28 * intensity),
+          const Color(0xFF35C9FF).withValues(alpha: 0.12 * intensity),
           Colors.transparent,
         ],
-      ).createShader(Rect.fromCircle(center: center, radius: s * 0.28));
-    canvas.drawCircle(center, s * (hovered ? 0.24 : 0.20), core);
+        stops: const [0.0, 0.34, 0.70, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: s * 0.30));
+    canvas.drawCircle(center, s * (hovered ? 0.235 : 0.21), core);
+
+    _drawCausticCrescent(
+      canvas,
+      size,
+      center: center,
+      spin: spin,
+      alpha: (alpha * 0.82).clamp(0.0, 0.58),
+    );
+    _drawOrbitingTear(
+      canvas,
+      size,
+      center: center,
+      spin: spin,
+      intensity: intensity,
+      hovered: hovered,
+    );
 
     canvas.restore();
+  }
+
+  void _drawIrisHalo(
+    Canvas canvas,
+    Size size, {
+    required Offset center,
+    required double spin,
+    required double intensity,
+    required bool hovered,
+    required bool isActive,
+  }) {
+    final s = size.shortestSide;
+    final breath = math.sin(spin * 0.72) * s * 0.012;
+    final radius = s * (hovered ? 0.255 : 0.235) + breath;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    final rotation = GradientRotation(spin * 0.58);
+    final haloAlpha = (0.22 + intensity * 0.30 + (isActive ? 0.08 : 0.0)).clamp(
+      0.0,
+      0.68,
+    );
+
+    final softHalo = Paint()
+      ..color = const Color(0xFF65F4E1).withValues(alpha: haloAlpha * 0.32)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = s * 0.12
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, s * 0.055);
+    canvas.drawCircle(center, radius, softHalo);
+
+    final iris = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = s * (0.035 + intensity * 0.018)
+      ..blendMode = BlendMode.screen
+      ..shader = SweepGradient(
+        colors: [
+          const Color(0xFFB8FFF4).withValues(alpha: haloAlpha),
+          const Color(0xFF4FE6FF).withValues(alpha: haloAlpha * 0.70),
+          Colors.white.withValues(alpha: haloAlpha * 0.92),
+          const Color(0xFF3A8DFF).withValues(alpha: haloAlpha * 0.58),
+          const Color(0xFFB8FFF4).withValues(alpha: haloAlpha),
+        ],
+        stops: const [0.0, 0.26, 0.48, 0.76, 1.0],
+        transform: rotation,
+      ).createShader(rect);
+    canvas.drawCircle(center, radius, iris);
+
+    // Pequenas aberturas dão textura de íris sem adicionar imagens ou assets.
+    final glints = Paint()
+      ..color = Colors.white.withValues(alpha: haloAlpha * 0.52)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = math.max(0.55, s * 0.018)
+      ..blendMode = BlendMode.screen;
+    for (var i = 0; i < 5; i++) {
+      final start = spin * 0.42 + i * (math.pi * 2 / 5);
+      canvas.drawArc(rect, start, 0.22 + intensity * 0.05, false, glints);
+    }
+  }
+
+  void _drawCausticCrescent(
+    Canvas canvas,
+    Size size, {
+    required Offset center,
+    required double spin,
+    required double alpha,
+  }) {
+    final s = size.shortestSide;
+    final rect = Rect.fromCenter(
+      center: center.translate(-s * 0.025, -s * 0.02),
+      width: s * 0.48,
+      height: s * 0.31,
+    );
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(-spin * 0.24 - 0.28);
+    canvas.translate(-center.dx, -center.dy);
+    final caustic = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = math.max(0.75, s * 0.026)
+      ..blendMode = BlendMode.screen
+      ..shader = LinearGradient(
+        colors: [
+          Colors.transparent,
+          Colors.white.withValues(alpha: alpha),
+          const Color(0xFF9CFFF1).withValues(alpha: alpha * 0.72),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.30, 0.70, 1.0],
+      ).createShader(rect);
+    canvas.drawArc(rect, math.pi * 0.18, math.pi * 0.98, false, caustic);
+    canvas.restore();
+  }
+
+  void _drawOrbitingTear(
+    Canvas canvas,
+    Size size, {
+    required Offset center,
+    required double spin,
+    required double intensity,
+    required bool hovered,
+  }) {
+    final s = size.shortestSide;
+    final angle = spin * 0.86 - math.pi / 2;
+    final orbit = s * (hovered ? 0.31 : 0.285);
+    final point = center + Offset(math.cos(angle), math.sin(angle)) * orbit;
+    final radius = s * (0.027 + intensity * 0.012);
+    final halo = Paint()
+      ..color = const Color(
+        0xFFB8FFF4,
+      ).withValues(alpha: (0.24 + intensity * 0.24).clamp(0.0, 0.58))
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 1.45);
+    canvas.drawCircle(point, radius * 2.1, halo);
+    canvas.drawCircle(
+      point,
+      radius,
+      Paint()
+        ..color = Color.lerp(const Color(0xFF79F2D0), Colors.white, 0.68)!
+        ..blendMode = BlendMode.screen,
+    );
   }
 
   void _drawRibbon(

@@ -2,6 +2,16 @@
 
 Updated: 2026-07-16
 
+## Íris aurora e teste local — concluídos em 2026-07-16
+
+O efeito interno da bolinha foi redesenhado como uma lente “íris aurora”, com
+paralaxe aquática, halo, reflexo cáustico e gota orbital. O repaint contínuo de
+60 Hz foi removido: o efeito usa relógio discreto de 10 Hz em repouso e cerca de
+17 Hz no alerta, permanecendo estático com Reduzir movimento. Na amostra local,
+o Release caiu de 11,9–19,7% para 2,3–3,6% de CPU estabilizada, com 44–45 MB de
+memória. Análise, testes focados, suíte completa, build macOS Release e inspeção
+visual real passaram. Evidência: `runs/2026-07-16-iris-aurora-local-test.md`.
+
 ## Revisão de performance e build — concluída localmente em 2026-07-16
 
 A revisão pós-UI/UX eliminou amplificação de escrita no onboarding: sliders agora

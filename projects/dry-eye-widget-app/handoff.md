@@ -1,5 +1,22 @@
 # Handoff
 
+## Íris aurora e runtime local — 2026-07-16
+
+`FloatingBall` agora desenha uma composição interna de íris/lente com fitas em
+paralaxe, halo, cáustica e gota orbital. A animação não mantém mais um ticker de
+60 Hz: um timer atualiza 32 fases em 3,2 s no idle e 30 fases em 1,8 s no alerta.
+O guardrail em `floating_ball_test.dart` verifica que não há callback transitório
+contínuo. Reduzir movimento continua zerando a animação.
+
+O app macOS Release foi aberto e inspecionado encaixado e solto; as preferências
+originais foram restauradas. Análise, suíte completa, 12 testes focados e build
+Release passaram. A CPU estabilizada observada caiu para 2,3–3,6%, ante
+11,9–19,7% antes da troca do relógio. Evidência completa em
+`runs/2026-07-16-iris-aurora-local-test.md`. Próxima validação externa: repetir
+frame pacing e docking em Windows real. O build final exigiu renovar somente o
+selo ad hoc externo após o `App.framework` mudar; a verificação deep/strict
+passou depois disso. Automatizar esse gate se a condição reaparecer.
+
 ## Performance pós-UI/UX e build — 2026-07-16
 
 O onboarding não persiste mais a cada atualização de slider: mantém um rascunho
