@@ -2,6 +2,15 @@
 
 Updated: 2026-07-16
 
+## Movimento suave e magnetismo acelerado — concluídos em 2026-07-16
+
+A íris interna agora filtra amostras de arraste, limita energia e combina o
+vetor suavizado com a soltura, evitando inversões e saltos visuais. O docking
+lateral ganhou curva própria: acelera até 72% do percurso e conclui em 125–220
+ms, com pouso curto sem overshoot. Análise, 19 testes focados, suíte completa com
+254 testes, build macOS Release e execução local passaram. Evidência:
+`runs/2026-07-16-smooth-orb-magnetic-acceleration.md`.
+
 ## Íris aurora e teste local — concluídos em 2026-07-16
 
 O efeito interno da bolinha foi redesenhado como uma lente “íris aurora”, com

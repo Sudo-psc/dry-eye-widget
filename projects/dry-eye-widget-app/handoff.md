@@ -1,5 +1,20 @@
 # Handoff
 
+## Movimento e magnetismo lateral — 2026-07-16
+
+`FloatingBall.smoothMotionVector` amortece o vetor interno com resposta padrão
+de 0,22 e magnitude máxima de 0,82. Na soltura, o vetor filtrado é combinado com
+a velocidade final. Em `orb_motion.dart`, docking usa
+`magneticDockProgress`: aceleração até 72% e desaceleração final curta. A duração
+é proporcional à distância lateral, limitada a 125–220 ms; trajetórias sem
+docking preservam a curva e duração anteriores.
+
+Passaram análise, 19 testes focados, 254 testes totais, build macOS Release e
+codesign deep/strict. O Release novo está aberto e desencaixado em posição
+visível. Evidência em
+`runs/2026-07-16-smooth-orb-magnetic-acceleration.md`. Próximo gate externo:
+sentir o arraste com mouse no macOS e repetir docking em Windows real.
+
 ## Íris aurora e runtime local — 2026-07-16
 
 `FloatingBall` agora desenha uma composição interna de íris/lente com fitas em

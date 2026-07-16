@@ -30,6 +30,22 @@ void main() {
     expect(FloatingBall.shouldAnimateRing(0.9), isTrue);
   });
 
+  test('movimento interno amortece inversões e limita energia', () {
+    final reversed = FloatingBall.smoothMotionVector(
+      const Offset(0.8, 0),
+      const Offset(-0.8, 0),
+    );
+    expect(reversed.dx, greaterThan(0));
+    expect(reversed.distance, lessThan(0.8));
+
+    final limited = FloatingBall.smoothMotionVector(
+      Offset.zero,
+      const Offset(10, 0),
+      response: 1,
+    );
+    expect(limited.distance, closeTo(0.82, 0.001));
+  });
+
   testWidgets('anel só mantém animação contínua perto da pausa', (
     tester,
   ) async {

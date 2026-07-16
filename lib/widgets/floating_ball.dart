@@ -82,6 +82,23 @@ class FloatingBall extends StatefulWidget {
   static bool shouldAnimateRing(double progress) =>
       progress.clamp(0.0, 1.0) >= ringAnimationThreshold;
 
+  /// Filtro de movimento do material interno. Limita energia e absorve
+  /// inversões bruscas para a íris acompanhar a mão sem vibrar.
+  static Offset smoothMotionVector(
+    Offset current,
+    Offset sample, {
+    double response = 0.22,
+    double maxMagnitude = 0.82,
+  }) {
+    if (!sample.dx.isFinite || !sample.dy.isFinite) return current;
+    final limit = maxMagnitude.clamp(0.0, 1.0).toDouble();
+    final distance = sample.distance;
+    final limited = distance > limit && distance > 0
+        ? sample * (limit / distance)
+        : sample;
+    return Offset.lerp(current, limited, response.clamp(0.0, 1.0))!;
+  }
+
   @override
   State<FloatingBall> createState() => _FloatingBallState();
 }
@@ -281,10 +298,13 @@ class _FloatingBallState extends State<FloatingBall>
   void _handlePanUpdate(DragUpdateDetails details) {
     final delta = details.delta;
     if (delta == Offset.zero) return;
-    final energy = (delta.distance / 12).clamp(0.08, 1.0).toDouble();
+    final energy = (delta.distance / 14).clamp(0.04, 0.82).toDouble();
     final direction = delta / delta.distance;
     setState(() {
-      _dragVector = Offset.lerp(_dragVector, direction * energy, 0.42)!;
+      _dragVector = FloatingBall.smoothMotionVector(
+        _dragVector,
+        direction * energy,
+      );
     });
   }
 
@@ -293,9 +313,15 @@ class _FloatingBallState extends State<FloatingBall>
     final speed = velocity.distance;
     final direction = speed == 0 ? _dragVector : velocity / speed;
     final energy = (speed / 1500).clamp(0.0, 1.0).toDouble();
+    final releaseTarget = direction * energy;
     setState(() {
       _dragging = false;
-      _releaseVector = direction * energy;
+      _releaseVector = FloatingBall.smoothMotionVector(
+        _dragVector,
+        releaseTarget,
+        response: 0.52,
+        maxMagnitude: 0.88,
+      );
       _dragVector = Offset.zero;
     });
     _setPressed(false);

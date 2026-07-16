@@ -39,6 +39,10 @@ void main() {
     );
 
     expect(plan.dockEdge, BallDockEdge.right);
+    expect(
+      plan.duration.inMilliseconds,
+      inInclusiveRange(kMagneticDockMinMs, kMagneticDockMaxMs),
+    );
     expect(plan.target.dx, greaterThan(screen.right - window.width));
     expect(orbReleasePosition(plan, 0), plan.start);
     expect(orbReleasePosition(plan, 1), plan.target);
@@ -50,6 +54,35 @@ void main() {
       expect(x, lessThanOrEqualTo(plan.target.dx));
       previousX = x;
     }
+  });
+
+  test('magnetismo lateral acelera e pousa sem impacto', () {
+    expect(magneticDockProgress(0), 0);
+    expect(magneticDockProgress(1), 1);
+
+    var previous = 0.0;
+    for (var i = 1; i <= 100; i++) {
+      final current = magneticDockProgress(i / 100);
+      expect(current, greaterThanOrEqualTo(previous));
+      expect(current, inInclusiveRange(0.0, 1.0));
+      previous = current;
+    }
+
+    final earlyGain = magneticDockProgress(0.3) - magneticDockProgress(0.2);
+    final acceleratedGain =
+        magneticDockProgress(0.6) - magneticDockProgress(0.5);
+    final landingGain = magneticDockProgress(1.0) - magneticDockProgress(0.9);
+    expect(acceleratedGain, greaterThan(earlyGain));
+    expect(landingGain, lessThan(acceleratedGain));
+  });
+
+  test('atração próxima é mais curta que deslocamento magnético longo', () {
+    final near = magneticDockDuration(lateralDistance: 18, threshold: 56);
+    final far = magneticDockDuration(lateralDistance: 180, threshold: 56);
+
+    expect(near.inMilliseconds, greaterThanOrEqualTo(kMagneticDockMinMs));
+    expect(near, lessThan(far));
+    expect(far.inMilliseconds, kMagneticDockMaxMs);
   });
 
   test('inércia controlada termina exatamente no alvo sem sair da tela', () {

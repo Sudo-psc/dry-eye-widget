@@ -2,6 +2,11 @@
 
 ## now
 
+- [x] 2026-07-16: Amortecer o efeito interno durante arraste e soltura.
+- [x] 2026-07-16: Acelerar o magnetismo lateral com pouso sem overshoot.
+- [x] 2026-07-16: Cobrir filtro, curva e duração com testes determinísticos.
+- [x] 2026-07-16: Validar análise, 254 testes, build e execução macOS.
+
 - [x] 2026-07-16: Testar o bundle macOS Release como aplicativo real.
 - [x] 2026-07-16: Criar o efeito interno “íris aurora” da bolinha.
 - [x] 2026-07-16: Remover o ticker contínuo da íris e medir CPU em repouso.

@@ -30,6 +30,40 @@ class OrbReleasePlan {
 
 const double kOrbMaxReleaseSpeed = 1100;
 const double kOrbProjectionSeconds = 0.10;
+const int kMagneticDockMinMs = 125;
+const int kMagneticDockMaxMs = 220;
+
+/// Curva de atração lateral: começa suave, acelera até 72% do caminho e usa o
+/// trecho final apenas para pousar na borda sem impacto ou overshoot.
+double magneticDockProgress(double progress) {
+  final t = progress.clamp(0.0, 1.0).toDouble();
+  const accelerationEnd = 0.72;
+  if (t <= accelerationEnd) {
+    final local = t / accelerationEnd;
+    return accelerationEnd * Curves.easeInCubic.transform(local);
+  }
+  final local = (t - accelerationEnd) / (1 - accelerationEnd);
+  return accelerationEnd +
+      (1 - accelerationEnd) * Curves.easeOutCubic.transform(local);
+}
+
+/// Encaixes próximos terminam mais cedo; deslocamentos maiores ainda têm tempo
+/// suficiente para que a aceleração seja percebida e permaneça controlável.
+Duration magneticDockDuration({
+  required double lateralDistance,
+  required double threshold,
+}) {
+  final safeThreshold = math.max(1.0, threshold);
+  final normalized = (lateralDistance.abs() / (safeThreshold * 2)).clamp(
+    0.0,
+    1.0,
+  );
+  final milliseconds =
+      (kMagneticDockMinMs +
+              (kMagneticDockMaxMs - kMagneticDockMinMs) * normalized)
+          .round();
+  return Duration(milliseconds: milliseconds);
+}
 
 Offset clampOrbVelocity(
   Offset velocity, {
@@ -84,15 +118,22 @@ OrbReleasePlan planOrbRelease({
     }
   }
 
-  final milliseconds = (180 + speed / kOrbMaxReleaseSpeed * 160).round().clamp(
-    180,
-    340,
-  );
+  final duration = edge == null
+      ? Duration(
+          milliseconds: (180 + speed / kOrbMaxReleaseSpeed * 160).round().clamp(
+            180,
+            340,
+          ),
+        )
+      : magneticDockDuration(
+          lateralDistance: target.dx - start.dx,
+          threshold: dockThreshold,
+        );
   return OrbReleasePlan(
     start: start,
     target: target,
     velocity: safeVelocity,
-    duration: Duration(milliseconds: milliseconds),
+    duration: duration,
     screen: screen,
     windowSize: windowSize,
     dockEdge: edge,
@@ -102,8 +143,15 @@ OrbReleasePlan planOrbRelease({
 /// Posição interpolada com desaceleração monotônica e sem overshoot.
 Offset orbReleasePosition(OrbReleasePlan plan, double progress) {
   final t = progress.clamp(0.0, 1.0).toDouble();
+  if (plan.isDocking) {
+    final lateral = magneticDockProgress(t);
+    final vertical = Curves.easeOutCubic.transform(t);
+    return Offset(
+      plan.start.dx + (plan.target.dx - plan.start.dx) * lateral,
+      plan.start.dy + (plan.target.dy - plan.start.dy) * vertical,
+    );
+  }
   final eased = Curves.easeOutCubic.transform(t);
   final position = Offset.lerp(plan.start, plan.target, eased)!;
-  if (plan.isDocking) return position;
   return clampWindowPosition(position, plan.windowSize, plan.screen);
 }
