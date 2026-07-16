@@ -66,6 +66,8 @@
 - Refresh Windows captures from a real v1.24+ Windows session so the platform set matches the current menu architecture.
 - Add structured article metadata for future blog expansion.
 - Add a profile-mode frame-timing benchmark for the floating widget on 60 Hz and 120 Hz displays.
+- [x] 2026-07-13: reposicionar DVRS como registro educativo não validado no app, site e textos legais.
+- [x] Add a claims regression gate for DVRS copy in app and public landing.
 
 ## recurring
 

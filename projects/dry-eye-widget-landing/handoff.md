@@ -2,6 +2,11 @@
 
 ## Current State
 
+The public DVRS wording is now protected by `test/dvrs_claims_test.dart`, which
+checks app and landing surfaces for obsolete clinical-risk language and requires
+the explicit educational/non-validated framing. The site smoke test and all 246
+Flutter tests pass on 2026-07-16.
+
 The PT-BR and English GitHub READMEs now show the current v1.24 liquid-menu and daily-summary screenshots directly from the canonical landing assets, with a link to the full macOS and Windows gallery.
 
 The floating widget now limits background liquid-effect redraws to perceptually useful phase changes: about 20 fps while idle and 25 fps while active. The progress ring no longer spends continuous frames below 90%; it becomes animated only near the break deadline. Hover, press, drag and release remain immediate. Regression tests cover the phase budget and threshold transition.
@@ -54,3 +59,4 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 - Local Lighthouse Science desktop: 100 performance / 100 accessibility / 100 best practices / 100 SEO.
 - Browser QA: responsive desktop/mobile, dark-mode toggle, 12 DOI links and lazy book-cover loading passed.
 - 2026-07-12 screenshot refresh: site smoke passed; isolated Flutter preview analysis passed; desktop and mobile carousel captures reviewed at 1440×1000 and 430×932.
+- 2026-07-13: gauge total removido do resultado/dashboard; faixas renomeadas como carga relatada; não validação declarada na UI, site, política, termos e `docs/DVRS_SAFETY_AND_VALIDATION.md`. Suite completa: 238 testes aprovados.

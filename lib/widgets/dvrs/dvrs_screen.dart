@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/feature_strings.dart';
@@ -19,7 +21,7 @@ import 'dvrs_ui.dart';
 /// Sub-telas do fluxo do DVRS.
 enum _DvrsView { intro, questions, result, history }
 
-/// Tela principal do **DVRS — Índice de Risco Visual Digital**.
+/// Tela principal do DVRS como autorregistro educativo visual.
 ///
 /// Orquestra todo o fluxo: introdução → página única de perguntas → resultado
 /// → histórico. É o único questionário principal do app. Linguagem sempre
@@ -51,6 +53,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
 
   /// Índice da opção escolhida por pergunta (`null` = não respondida).
   final Map<String, int> _selected = {};
+  final Map<String, GlobalKey> _questionKeys = {
+    for (final question in kDvrsQuestions) question.id: GlobalKey(),
+  };
 
   DvrsResult? _result;
   bool _saved = false;
@@ -114,6 +119,38 @@ class _DvrsScreenState extends State<DvrsScreen> {
     });
   }
 
+  void _calculateOrFocusMissing() {
+    if (_allAnswered) {
+      _calculate();
+      return;
+    }
+
+    final missing = kDvrsQuestions
+        .where((question) => !_selected.containsKey(question.id))
+        .toList(growable: false);
+    final contextForQuestion = _questionKeys[missing.first.id]?.currentContext;
+    if (contextForQuestion != null) {
+      unawaited(
+        Scrollable.ensureVisible(
+          contextForQuestion,
+          alignment: 0.12,
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOut,
+        ),
+      );
+    }
+    final languageCode = context.read<SettingsProvider>().value.languageCode;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            FeatureStrings.of(languageCode).dvrsMissingAnswers(missing.length),
+          ),
+        ),
+      );
+  }
+
   void _restart() {
     unawaited(context.read<DvrsStorageService>().clearDraft());
     setState(() {
@@ -165,18 +202,26 @@ class _DvrsScreenState extends State<DvrsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = context.read<SettingsProvider>().strings;
-    final content = Column(
-      children: [
-        if (!widget.embedded)
-          PanelHeader(
-            title: _headerTitle,
-            onLeading: _onHeaderBack,
-            leadingTooltip: strings.back,
-            leadingIcon: Icons.arrow_back_rounded,
-            trailingIcon: Icons.assignment_outlined,
-          ),
-        Expanded(child: _body(theme)),
-      ],
+    final content = CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): _onHeaderBack,
+      },
+      child: Focus(
+        autofocus: true,
+        child: Column(
+          children: [
+            if (!widget.embedded)
+              PanelHeader(
+                title: _headerTitle,
+                onLeading: _onHeaderBack,
+                leadingTooltip: strings.back,
+                leadingIcon: Icons.arrow_back_rounded,
+                trailingIcon: Icons.assignment_outlined,
+              ),
+            Expanded(child: _body(theme)),
+          ],
+        ),
+      ),
     );
     if (widget.embedded) return content;
     return Scaffold(
@@ -197,7 +242,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
       case _DvrsView.history:
         return 'Histórico do DVRS';
       default:
-        return 'Índice de Risco Visual Digital — DVRS';
+        return 'Registro visual digital — DVRS';
     }
   }
 
@@ -235,12 +280,13 @@ class _DvrsScreenState extends State<DvrsScreen> {
     padding: const EdgeInsets.all(24),
     children: [
       const Text(
-        'Índice de Risco Visual Digital',
+        'Registro educativo de sintomas e hábitos',
         style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 8),
       Text(
-        'Ferramenta educativa de triagem e acompanhamento · período '
+        'Autorregistro educativo, não validado para diagnóstico ou decisões '
+        'corporativas · período '
         'avaliado: $kDvrsPeriodLabel',
         style: TextStyle(
           fontSize: 13,
@@ -375,6 +421,10 @@ class _DvrsScreenState extends State<DvrsScreen> {
         ),
         Expanded(
           child: ListView.separated(
+            // São apenas 16 perguntas. Mantê-las montadas permite levar o
+            // usuário com precisão à primeira resposta ausente, mesmo após
+            // ele chegar ao fim da lista.
+            scrollCacheExtent: const ScrollCacheExtent.pixels(20000),
             padding: const EdgeInsets.all(24),
             itemCount: kDvrsQuestions.length + 1,
             separatorBuilder: (_, index) => const SizedBox(height: 16),
@@ -393,12 +443,47 @@ class _DvrsScreenState extends State<DvrsScreen> {
               }
               final questionIndex = index - 1;
               final question = kDvrsQuestions[questionIndex];
-              return _questionCard(theme, question, questionIndex + 1);
+              final isFirstInDomain =
+                  questionIndex == 0 ||
+                  kDvrsQuestions[questionIndex - 1].domain != question.domain;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (isFirstInDomain) ...[
+                    _domainHeader(theme, question.domain),
+                    const SizedBox(height: 10),
+                  ],
+                  _questionCard(theme, question, questionIndex + 1),
+                ],
+              );
             },
           ),
         ),
-        _questionsFooter(theme, _allAnswered),
+        _questionsFooter(theme),
       ],
+    );
+  }
+
+  Widget _domainHeader(ThemeData theme, DvrsDomain domain) {
+    final color = DvrsUi.domainColor(domain);
+    return Semantics(
+      header: true,
+      child: Row(
+        children: [
+          Icon(DvrsUi.domainIcon(domain), color: color, size: 19),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              kDvrsDomainLabels[domain] ?? '',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -406,78 +491,81 @@ class _DvrsScreenState extends State<DvrsScreen> {
     final selected = _selected[q.id];
     final domainColor = DvrsUi.domainColor(q.domain);
     return Container(
-      key: ValueKey<String>('dvrs_question_${q.id}'),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: 0.36),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+      key: _questionKeys[q.id],
+      child: Container(
+        key: ValueKey<String>('dvrs_question_${q.id}'),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withValues(alpha: 0.36),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(
-                'Pergunta $questionNumber',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  'Pergunta $questionNumber',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: domainColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      DvrsUi.domainIcon(q.domain),
-                      size: 14,
-                      color: domainColor,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      kDvrsDomainLabels[q.domain] ?? '',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: domainColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        DvrsUi.domainIcon(q.domain),
+                        size: 14,
                         color: domainColor,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Text(
+                        kDvrsDomainLabels[q.domain] ?? '',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: domainColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              q.title,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
+            const SizedBox(height: 20),
+            for (var i = 0; i < q.options.length; i++) ...[
+              _optionTile(theme, q.options[i].label, selected == i, () {
+                setState(() => _selected[q.id] = i);
+                unawaited(_persistDraft());
+              }),
+              if (i < q.options.length - 1) const SizedBox(height: 10),
             ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            q.title,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
-          const SizedBox(height: 20),
-          for (var i = 0; i < q.options.length; i++) ...[
-            _optionTile(theme, q.options[i].label, selected == i, () {
-              setState(() => _selected[q.id] = i);
-              unawaited(_persistDraft());
-            }),
-            if (i < q.options.length - 1) const SizedBox(height: 10),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -542,7 +630,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
     );
   }
 
-  Widget _questionsFooter(ThemeData theme, bool canCalculate) => Container(
+  Widget _questionsFooter(ThemeData theme) => Container(
     padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
     decoration: BoxDecoration(
       border: Border(
@@ -563,7 +651,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: FilledButton.icon(
-            onPressed: canCalculate ? _calculate : null,
+            onPressed: _calculateOrFocusMissing,
             icon: const Icon(Icons.calculate_outlined, size: 18),
             label: Text(context.read<SettingsProvider>().strings.dvrsCalculate),
           ),

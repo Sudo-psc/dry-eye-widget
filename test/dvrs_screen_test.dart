@@ -55,7 +55,10 @@ void main() {
 
   testWidgets('tela inicial exibe nome, aviso e botão iniciar', (tester) async {
     await _pumpScreen(tester, storage);
-    expect(find.text('Índice de Risco Visual Digital'), findsOneWidget);
+    expect(
+      find.text('Registro educativo de sintomas e hábitos'),
+      findsOneWidget,
+    );
     expect(find.text('Iniciar DVRS'), findsOneWidget);
     expect(find.textContaining('não substitui'), findsWidgets);
   });
@@ -82,19 +85,59 @@ void main() {
     );
   });
 
-  testWidgets('não calcula enquanto todas as perguntas não forem respondidas', (
+  testWidgets('mantém somente a vizinhança visível do questionário montada', (
     tester,
   ) async {
     await _pumpScreen(tester, storage);
     await tester.tap(find.text('Iniciar DVRS'));
     await tester.pumpAndSettle();
-    final calcular = tester.widget<FilledButton>(
-      find.ancestor(
-        of: find.text('Calcular resultado'),
-        matching: find.byType(FilledButton),
-      ),
+
+    final mountedQuestions = kDvrsQuestions.where((question) {
+      return find
+          .byKey(ValueKey<String>('dvrs_question_${question.id}'))
+          .evaluate()
+          .isNotEmpty;
+    }).length;
+
+    expect(mountedQuestions, lessThanOrEqualTo(4));
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey<String>('dvrs_question_q16')),
+      500,
     );
-    expect(calcular.onPressed, isNull);
+    await tester.pumpAndSettle();
+    final retainedQuestions = kDvrsQuestions.where((question) {
+      return find
+          .byKey(ValueKey<String>('dvrs_question_${question.id}'))
+          .evaluate()
+          .isNotEmpty;
+    }).length;
+
+    expect(retainedQuestions, lessThanOrEqualTo(4));
+  });
+
+  testWidgets('leva à primeira pergunta não respondida antes de calcular', (
+    tester,
+  ) async {
+    await _pumpScreen(tester, storage);
+    await tester.tap(find.text('Iniciar DVRS'));
+    await tester.pumpAndSettle();
+
+    final firstCard = find.byKey(const ValueKey<String>('dvrs_question_q1'));
+    await tester.tap(
+      find.descendant(of: firstCard, matching: find.text('Nunca')),
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey<String>('dvrs_question_q16')),
+      500,
+    );
+    await tester.tap(find.text('Calcular resultado'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('15 perguntas não respondidas'), findsOneWidget);
+    final secondCard = find.byKey(const ValueKey<String>('dvrs_question_q2'));
+    expect(tester.getRect(secondCard).top, lessThan(250));
+    expect(find.text('Perfil por domínio'), findsNothing);
   });
 
   testWidgets('fluxo completo calcula e exibe resultado', (tester) async {
@@ -108,9 +151,9 @@ void main() {
     await tester.tap(find.text('Calcular resultado'));
     await tester.pumpAndSettle();
 
-    // Tudo na opção 0 => score 0 => baixo risco.
-    expect(find.text('Baixo risco visual digital'), findsWidgets);
-    expect(find.text('Scores por domínio'), findsOneWidget);
+    // Tudo na opção 0 => perfil educativo de baixa carga relatada.
+    expect(find.text('Registro educativo de sintomas e hábitos'), findsWidgets);
+    expect(find.text('Perfil por domínio'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Salvar resultado'), 200);
     expect(find.text('Salvar resultado'), findsOneWidget);
   });

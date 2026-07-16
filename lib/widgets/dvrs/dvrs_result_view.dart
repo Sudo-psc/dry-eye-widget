@@ -4,14 +4,16 @@ import '../../models/dvrs_assessment.dart';
 import '../../models/dvrs_definitions.dart';
 import '../../ui/glass_card.dart';
 import '../../ui/section_header.dart';
-import '../../ui/score_gauge.dart';
 import 'dvrs_ui.dart';
 
-/// Exibe o conteúdo de um [DvrsResult] (sem botões de ação): score,
-/// classificação, barra de risco, scores por domínio, mensagem educativa e
-/// alerta de segurança. Reutilizável na tela de resultado e no histórico.
+/// Exibe o perfil educativo por domínio sem apresentar o total como escore
+/// clínico ou classificação validada.
 class DvrsResultView extends StatelessWidget {
-  const DvrsResultView({super.key, required this.result, this.showDate = false});
+  const DvrsResultView({
+    super.key,
+    required this.result,
+    this.showDate = false,
+  });
 
   final DvrsResult result;
   final bool showDate;
@@ -19,9 +21,10 @@ class DvrsResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = DvrsUi.classificationColor(result.classification);
-    final safety =
-        DvrsUi.safetyBanner(result.safetyAlertLevel, result.safetyAlertMessage);
+    final safety = DvrsUi.safetyBanner(
+      result.safetyAlertLevel,
+      result.safetyAlertMessage,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,15 +43,20 @@ class DvrsResultView extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
               ],
-              Center(
-                child: ScoreGauge(
-                  score: result.totalScore,
-                  color: color,
-                  segments: DvrsUi.classificationSegments,
+              const Text(
+                'Registro educativo de sintomas e hábitos',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Este perfil organiza respostas para acompanhamento pessoal. '
+                'Não é instrumento clínico validado, diagnóstico, aptidão ou '
+                'medida para decisões da empresa.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
-              const SizedBox(height: 10),
-              Center(child: DvrsUi.classificationChip(result.classification)),
             ],
           ),
         ),
@@ -57,7 +65,7 @@ class DvrsResultView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SectionHeader('Scores por domínio'),
+              SectionHeader('Perfil por domínio'),
               for (final domain in DvrsDomain.values) ...[
                 _domainBar(theme, domain, result.domainScores.valueFor(domain)),
                 const SizedBox(height: 10),
@@ -72,10 +80,7 @@ class DvrsResultView extends StatelessWidget {
             style: const TextStyle(fontSize: 14, height: 1.4),
           ),
         ),
-        if (safety != null) ...[
-          const SizedBox(height: 16),
-          safety,
-        ],
+        if (safety != null) ...[const SizedBox(height: 16), safety],
         const SizedBox(height: 16),
         DvrsUi.disclaimerBanner(theme),
       ],
@@ -111,8 +116,9 @@ class DvrsResultView extends StatelessWidget {
             child: LinearProgressIndicator(
               value: v,
               minHeight: 7,
-              backgroundColor:
-                  theme.colorScheme.onSurface.withValues(alpha: 0.08),
+              backgroundColor: theme.colorScheme.onSurface.withValues(
+                alpha: 0.08,
+              ),
             ),
           ),
         ),

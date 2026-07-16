@@ -1,5 +1,39 @@
 # Handoff
 
+## Performance pós-UI/UX e build — 2026-07-16
+
+O onboarding não persiste mais a cada atualização de slider: mantém um rascunho
+local e chama `_finishOnboarding` uma vez com o estado final. O provider descarta
+updates semanticamente idênticos antes de `notifyListeners` e da escrita. Testes
+de regressão cobrem persistência única, update idêntico e montagem preguiçosa do
+DVRS.
+
+Passaram análise, 249 testes, build Science, smoke, captura visual e build macOS
+universal. O DMG em `dist/DryEyeWidget.dmg` foi validado; o app está em 1.24.2+72,
+com assinatura ad hoc. O host macOS não compila Windows. Para concluir a evidência
+multiplataforma real, enviar o commit e executar `Windows Build` e `Windows MSIX
+(Store)` via GitHub Actions, ou usar um host Windows.
+
+Detalhes: `runs/2026-07-16-ui-ux-performance-build.md`.
+
+## UI/UX vNext implementado — 2026-07-16
+
+O plano canônico em `docs/superpowers/plans/2026-07-16-ui-ux-vnext.md` foi
+executado até o limite verificável no ambiente local. A arquitetura de informação
+do Hub foi achatada; o Resumo ganhou CTA contextual; Configurações foram divididas
+por intenção; onboarding passou a configurar o app; e o DVRS agora recupera a
+primeira pergunta ausente. O gate de claims impede a volta de linguagem clínica
+obsoleta no app e na landing.
+
+Validação: análise limpa, 246 testes aprovados, site smoke aprovado, 32 capturas
+PT-BR/EN antes/depois revisadas e build macOS release de 59,4 MB concluído. A
+evidência e os comandos estão em
+`runs/2026-07-16-ui-ux-vnext-implementation.md`.
+
+Próxima ação: executar as cinco tarefas de referência com participantes no macOS
+e comparar tempos/cliques; depois repetir build, escala e comportamento da janela
+em Windows 125%, 150% e 200%. Não inferir resultados humanos a partir dos testes.
+
 ## Release 1.24.2 publicada — 2026-07-12
 
 A bolinha limita o repaint contínuo a fases perceptíveis e o anel só anima a

@@ -6,6 +6,7 @@ import 'package:dry_eye_widget/services/storage_service.dart';
 import 'package:dry_eye_widget/ui/app_theme.dart';
 import 'package:dry_eye_widget/widgets/health/health_hub_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,7 +70,7 @@ void main() {
   });
 
   testWidgets(
-    'hub permanece utilizável em janela estreita com escala de 160%',
+    'hub permanece utilizável em janela estreita com escala de 200%',
     (tester) async {
       tester.view.physicalSize = const Size(620, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -93,7 +94,7 @@ void main() {
           child: MaterialApp(
             theme: buildAppTheme(),
             home: MediaQuery(
-              data: const MediaQueryData(textScaler: TextScaler.linear(1.6)),
+              data: const MediaQueryData(textScaler: TextScaler.linear(2)),
               child: SizedBox(
                 width: 560,
                 height: 790,
@@ -114,12 +115,47 @@ void main() {
       await tester.tap(find.text(f.healthHubTabProgress));
       await tester.pumpAndSettle();
       expect(find.text(f.healthHubEvolutionHabits), findsOneWidget);
-      expect(find.text(f.healthHubEvolutionIndicators), findsOneWidget);
+      expect(find.text(f.healthHubTabScreen), findsOneWidget);
       expect(tester.takeException(), isNull);
 
-      await tester.tap(find.text(f.healthHubEvolutionIndicators));
+      await tester.tap(find.text(f.healthHubTabScreen));
       await tester.pumpAndSettle();
+      expect(find.byType(TabBar), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Escape fecha o hub a partir do contexto atual', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final storage = await StorageService.init();
+    final dvrs = await DvrsStorageService.init();
+    final settings = SettingsProvider(storage: storage);
+    final screenTime = ScreenTimeService(storage: storage);
+    var closes = 0;
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<StorageService>.value(value: storage),
+          Provider<DvrsStorageService>.value(value: dvrs),
+          ChangeNotifierProvider<SettingsProvider>.value(value: settings),
+          ChangeNotifierProvider<ScreenTimeService>.value(value: screenTime),
+        ],
+        child: MaterialApp(
+          theme: buildAppTheme(),
+          home: HealthHubScreen(
+            onClose: () => closes++,
+            onStartBreak: () {},
+            onSnoozeDvrsNudge: () async {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+
+    expect(closes, 1);
+  });
 }

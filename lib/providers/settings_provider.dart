@@ -25,6 +25,7 @@ class SettingsProvider extends ChangeNotifier {
   /// Substitui todas as configurações e persiste.
   Future<void> update(WidgetSettings next) async {
     final normalized = next.normalized();
+    if (mapEquals(_settings.toMap(), normalized.toMap())) return;
     _settings = normalized;
     notifyListeners();
     await _storage.saveSettings(normalized);

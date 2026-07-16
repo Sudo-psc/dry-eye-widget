@@ -121,8 +121,8 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
-                  'Refaça o DVRS semanalmente ou mensalmente para acompanhar a '
-                  'evolução do seu risco visual digital.',
+                  'Refaça o DVRS quando for útil para acompanhar mudanças nos '
+                  'sintomas e hábitos que você relatou.',
                   style: TextStyle(fontSize: 13, height: 1.35),
                 ),
               ),

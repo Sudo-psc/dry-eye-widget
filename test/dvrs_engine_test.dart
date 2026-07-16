@@ -181,7 +181,7 @@ void main() {
       expect(result.version, 'DVRS_v1.1');
       expect(result.totalScore, 50);
       expect(result.classification, DvrsClassification.moderateRisk);
-      expect(result.classificationLabel, 'Risco moderado');
+      expect(result.classificationLabel, 'Carga relatada moderada');
       expect(result.isDiagnostic, isFalse);
       expect(result.educationalMessage, isNotEmpty);
       expect(result.createdAt, now);

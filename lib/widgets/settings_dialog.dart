@@ -2,14 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../l10n/app_strings.dart';
+import '../l10n/feature_strings.dart';
 import '../models/app_state.dart';
 import '../models/widget_settings.dart';
 import '../ui/app_theme.dart';
 import '../utils/constants.dart';
 import 'flag_icons.dart';
 import 'liquid_glass.dart';
+
+enum _SettingsCategory { general, reminders, appearance, privacy }
 
 /// Painel de configurações. Edita uma cópia local de [WidgetSettings] e
 /// devolve o resultado via [onSave]. Os textos são exibidos no idioma do
@@ -44,6 +48,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late WidgetSettings _draft;
   bool _saving = false;
   bool _resettingLearning = false;
+  _SettingsCategory _category = _SettingsCategory.general;
 
   @override
   void initState() {
@@ -106,553 +111,759 @@ class _SettingsDialogState extends State<SettingsDialog> {
   @override
   Widget build(BuildContext context) {
     final s = AppStrings.of(_draft.languageCode);
+    final f = FeatureStrings.of(_draft.languageCode);
 
-    return LiquidGlass(
-      width: 400,
-      borderRadius: AppRadii.xl,
-      constraints: const BoxConstraints(maxHeight: 640),
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): widget.onClose,
+      },
+      child: Focus(
+        autofocus: true,
+        child: LiquidGlass(
+          width: 400,
+          borderRadius: AppRadii.xl,
+          constraints: const BoxConstraints(maxHeight: 640),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  s.settingsTitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close, color: AppColors.textPrimary),
-                onPressed: widget.onClose,
-              ),
-            ],
-          ),
-          Flexible(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _sectionTitle(s.secLanguage),
-                  Row(
-                    children: [
-                      _langButton(
-                        label: 'Português',
-                        flag: const FlagIcon.brazil(),
-                        selected: _draft.languageCode == 'pt',
-                        onTap: () => _set(_draft.copyWith(languageCode: 'pt')),
-                      ),
-                      const SizedBox(width: 10),
-                      _langButton(
-                        label: 'English',
-                        flag: const FlagIcon.usa(),
-                        selected: _draft.languageCode == 'en',
-                        onTap: () => _set(_draft.copyWith(languageCode: 'en')),
-                      ),
-                    ],
-                  ),
-
-                  _sectionTitle(s.secTiming),
-                  _slider(
-                    label: s.workCycle,
-                    value: _draft.cycleMinutes.toDouble(),
-                    min: 1,
-                    max: 60,
-                    suffix: '${_draft.cycleMinutes} ${s.unitMin}',
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(cycleMinutes: v.round())),
-                  ),
-                  _slider(
-                    label: s.breakDuration,
-                    value: _draft.phaseSeconds.toDouble(),
-                    min: 5,
-                    max: 120,
-                    suffix: '${_draft.phaseSeconds} ${s.unitSec}',
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(phaseSeconds: v.round())),
-                  ),
-                  _switchRow(
-                    label: s.visualBlinkReminders,
-                    value: _draft.visualBlinkRemindersEnabled,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(visualBlinkRemindersEnabled: v)),
-                  ),
-                  _hint(s.visualBlinkRemindersHint),
-                  if (_draft.visualBlinkRemindersEnabled) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      s.blinkReminderFrequency,
+                  Expanded(
+                    child: Text(
+                      s.settingsTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        for (final freq in BlinkReminderFrequency.values) ...[
-                          if (freq != BlinkReminderFrequency.values.first)
-                            const SizedBox(width: 8),
-                          _choiceButton(
-                            label: switch (freq) {
-                              BlinkReminderFrequency.discreet =>
-                                s.blinkFreqDiscreet,
-                              BlinkReminderFrequency.normal =>
-                                s.blinkFreqNormal,
-                              BlinkReminderFrequency.frequent =>
-                                s.blinkFreqFrequent,
-                            },
-                            selected: _draft.blinkReminderFrequency == freq,
-                            onTap: () => _set(
-                              _draft.copyWith(blinkReminderFrequency: freq),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    _hint(s.blinkReminderFrequencyHint),
-                  ],
-                  _switchRow(
-                    label: s.blinkReminderSound,
-                    value: _draft.blinkReminderSoundEnabled,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(blinkReminderSoundEnabled: v)),
-                  ),
-                  _hint(s.blinkReminderSoundHint),
-                  if (_draft.blinkReminderSoundEnabled) ...[
-                    const SizedBox(height: 8),
-                    _slider(
-                      label: s.blinkReminderVolume,
-                      value: _draft.blinkReminderVolume,
-                      min: 0.0,
-                      max: 1.0,
-                      suffix: '${(_draft.blinkReminderVolume * 100).round()}%',
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(blinkReminderVolume: v)),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        _choiceButton(
-                          label: s.blinkReminderSoundLabel(
-                            BlinkReminderSound.softPulse,
-                          ),
-                          selected:
-                              _draft.blinkReminderSound ==
-                              BlinkReminderSound.softPulse,
-                          onTap: () => _set(
-                            _draft.copyWith(
-                              blinkReminderSound: BlinkReminderSound.softPulse,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        _choiceButton(
-                          label: s.blinkReminderSoundLabel(
-                            BlinkReminderSound.clearDrop,
-                          ),
-                          selected:
-                              _draft.blinkReminderSound ==
-                              BlinkReminderSound.clearDrop,
-                          onTap: () => _set(
-                            _draft.copyWith(
-                              blinkReminderSound: BlinkReminderSound.clearDrop,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _choiceButton(
-                          label: s.blinkReminderSoundLabel(
-                            BlinkReminderSound.warmBell,
-                          ),
-                          selected:
-                              _draft.blinkReminderSound ==
-                              BlinkReminderSound.warmBell,
-                          onTap: () => _set(
-                            _draft.copyWith(
-                              blinkReminderSound: BlinkReminderSound.warmBell,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        _choiceButton(
-                          label: s.blinkReminderSoundLabel(
-                            BlinkReminderSound.lightTick,
-                          ),
-                          selected:
-                              _draft.blinkReminderSound ==
-                              BlinkReminderSound.lightTick,
-                          onTap: () => _set(
-                            _draft.copyWith(
-                              blinkReminderSound: BlinkReminderSound.lightTick,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-
-                  _sectionTitle(s.secAppearance),
-                  _slider(
-                    label: s.uiScale,
-                    value: _draft.uiScale,
-                    min: AppDefaults.minUiScale,
-                    max: AppDefaults.maxUiScale,
-                    suffix: '${(_draft.uiScale * 100).round()}%',
-                    onChanged: (v) => _set(_draft.copyWith(uiScale: v)),
-                  ),
-                  _hint(s.uiScaleHint),
-                  const SizedBox(height: 8),
-                  Text(
-                    s.uiDensity,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      _choiceButton(
-                        label: s.uiDensityComfortable,
-                        selected: _draft.uiDensity == UiDensity.comfortable,
-                        onTap: () => _set(
-                          _draft.copyWith(uiDensity: UiDensity.comfortable),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _choiceButton(
-                        label: s.uiDensityCompact,
-                        selected: _draft.uiDensity == UiDensity.compact,
-                        onTap: () => _set(
-                          _draft.copyWith(uiDensity: UiDensity.compact),
-                        ),
-                      ),
-                    ],
-                  ),
-                  _hint(s.uiDensityHint),
-                  const SizedBox(height: 8),
-                  _slider(
-                    label: s.ballSize,
-                    value: _draft.ballSize,
-                    min: AppDefaults.minBallSize,
-                    max: AppDefaults.maxBallSize,
-                    suffix: '${_draft.ballSize.round()} px',
-                    onChanged: (v) => _set(_draft.copyWith(ballSize: v)),
-                  ),
-                  _colorRow(
-                    label: s.colorNormal,
-                    selected: _draft.idleColor,
-                    onPick: (c) => _set(_draft.copyWith(idleColor: c)),
-                  ),
-                  _colorRow(
-                    label: s.colorAlert,
-                    selected: _draft.alertColor,
-                    onPick: (c) => _set(_draft.copyWith(alertColor: c)),
-                  ),
-                  _slider(
-                    label: s.opacityNormal,
-                    value: _draft.idleOpacity,
-                    min: 0.2,
-                    max: 1.0,
-                    suffix: '${(_draft.idleOpacity * 100).round()}%',
-                    onChanged: (v) => _set(_draft.copyWith(idleOpacity: v)),
-                  ),
-                  _switchRow(
-                    label: s.progressRing,
-                    value: _draft.showProgressRing,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(showProgressRing: v)),
-                  ),
-                  _switchRow(
-                    label: s.dynamicOrbEffect,
-                    value: _draft.dynamicOrbEffect,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(dynamicOrbEffect: v)),
-                  ),
-                  if (_draft.dynamicOrbEffect)
-                    _slider(
-                      label: s.orbIntensity,
-                      value: _draft.orbIntensity,
-                      min: 0.0,
-                      max: 1.0,
-                      suffix: '${(_draft.orbIntensity * 100).round()}%',
-                      onChanged: (v) => _set(_draft.copyWith(orbIntensity: v)),
-                    ),
-                  _switchRow(
-                    label: s.hoverReactiveBall,
-                    value: _draft.hoverReactiveBall,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(hoverReactiveBall: v)),
-                  ),
-                  _switchRow(
-                    label: s.edgeSnapLabel,
-                    value: _draft.edgeSnap,
-                    onChanged: (v) => _set(_draft.copyWith(edgeSnap: v)),
-                  ),
-
-                  _sectionTitle(s.secDuringBreak),
-                  _switchRow(
-                    label: s.gentleMode,
-                    value: _draft.gentleMode,
-                    onChanged: (v) => _set(_draft.copyWith(gentleMode: v)),
-                  ),
-                  _hint(s.gentleHint),
-                  if (_draft.gentleMode) ...[
-                    const SizedBox(height: 8),
-                    _switchRow(
-                      label: s.lockScreenOnBreak,
-                      value: _draft.lockScreenOnBreak,
-                      onChanged: (v) =>
-                          _set(_draft.copyWith(lockScreenOnBreak: v)),
-                    ),
-                    _hint(s.lockScreenHint),
-                  ],
-                  const SizedBox(height: 8),
-                  _switchRow(
-                    label: s.dimBackground,
-                    value: _draft.dimBackground,
-                    onChanged: (v) => _set(_draft.copyWith(dimBackground: v)),
-                  ),
-                  if (_draft.dimBackground)
-                    _slider(
-                      label: s.dimIntensity,
-                      value: _draft.dimOpacity,
-                      min: 0.0,
-                      max: 0.6,
-                      suffix: '${(_draft.dimOpacity * 100).round()}%',
-                      onChanged: (v) => _set(_draft.copyWith(dimOpacity: v)),
-                    ),
-                  _slider(
-                    label: s.overlayOpacity,
-                    value: _draft.overlayOpacity,
-                    min: 0.05,
-                    max: 0.4,
-                    suffix: '${(_draft.overlayOpacity * 100).round()}%',
-                    onChanged: (v) => _set(_draft.copyWith(overlayOpacity: v)),
-                  ),
-                  _slider(
-                    label: s.overlayBlur,
-                    value: _draft.overlayBlur,
-                    min: 0,
-                    max: 40,
-                    suffix: '${_draft.overlayBlur.round()} px',
-                    onChanged: (v) => _set(_draft.copyWith(overlayBlur: v)),
-                  ),
-
-                  _sectionTitle(s.secEyeDrops),
-                  _switchRow(
-                    label: s.eyeDropsEnable,
-                    value: _draft.eyeDropsEnabled,
-                    onChanged: (v) => _set(_draft.copyWith(eyeDropsEnabled: v)),
-                  ),
-                  if (_draft.eyeDropsEnabled) ...[
-                    const SizedBox(height: 6),
-                    _hint(s.eyeDropsInterval),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        _choiceButton(
-                          label: s.eyeDropsEvery4h,
-                          selected: _draft.eyeDropsIntervalHours == 4,
-                          onTap: () =>
-                              _set(_draft.copyWith(eyeDropsIntervalHours: 4)),
-                        ),
-                        const SizedBox(width: 10),
-                        _choiceButton(
-                          label: s.eyeDropsEvery6h,
-                          selected: _draft.eyeDropsIntervalHours == 6,
-                          onTap: () =>
-                              _set(_draft.copyWith(eyeDropsIntervalHours: 6)),
-                        ),
-                      ],
-                    ),
-                  ],
-
-                  _sectionTitle(s.secInactivity),
-                  _switchRow(
-                    label: s.pauseOnInactivityLabel,
-                    value: _draft.pauseOnInactivity,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(pauseOnInactivity: v)),
-                  ),
-                  if (_draft.pauseOnInactivity) ...[
-                    _switchRow(
-                      label: s.cameraPresenceLabel,
-                      value: _draft.cameraPresence,
-                      onChanged: Platform.isMacOS
-                          ? (v) => _onToggleCamera(v, s)
-                          : null,
-                    ),
-                    _hint(
-                      Platform.isMacOS
-                          ? s.cameraPresenceHint
-                          : s.cameraUnavailableHint,
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: _resettingLearning ? null : _resetLearning,
-                        icon: const Icon(Icons.restart_alt, size: 18),
-                        label: Text(s.resetLearningLabel),
-                      ),
-                    ),
-                  ],
-
-                  _sectionTitle(s.secScreenTime),
-                  _switchRow(
-                    label: s.screenTimeEnable,
-                    value: _draft.screenTimeTracking,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(screenTimeTracking: v)),
-                  ),
-                  _hint(s.screenTimeHint),
-                  _switchRow(
-                    label: s.activityMonitorEnable,
-                    value: _draft.activityMonitorEnabled,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(activityMonitorEnabled: v)),
-                  ),
-                  _hint(s.activityMonitorHint),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: widget.onOpenScreenTime,
-                      icon: const Icon(Icons.bar_chart_outlined, size: 18),
-                      label: Text(s.screenTimeView),
-                    ),
-                  ),
-
-                  _sectionTitle(s.secGeneral),
-                  _switchRow(
-                    label: s.dvrsReminderEnable,
-                    value: _draft.dvrsReminderEnabled,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(dvrsReminderEnabled: v)),
-                  ),
-                  _hint(s.dvrsReminderHint),
-                  _switchRow(
-                    label: s.enableSound,
-                    value: _draft.soundEnabled,
-                    onChanged: (v) => _set(_draft.copyWith(soundEnabled: v)),
-                  ),
-                  _switchRow(
-                    label: s.enableNotifications,
-                    value: _draft.notificationsEnabled,
-                    onChanged: (v) =>
-                        _set(_draft.copyWith(notificationsEnabled: v)),
-                  ),
-                  _switchRow(
-                    label: s.launchAtLogin,
-                    value: _draft.launchAtLogin,
-                    onChanged: (v) => _set(_draft.copyWith(launchAtLogin: v)),
-                  ),
-                  _switchRow(
-                    label: s.hideDock,
-                    value: _draft.hideDockIcon,
-                    onChanged: (v) => _set(_draft.copyWith(hideDockIcon: v)),
-                  ),
-
-                  _sectionTitle(s.secVisibility),
-                  _switchRow(
-                    label: s.disableMenuBar,
-                    value: _draft.hideMenuBarItem,
-                    onChanged: (v) => _set(
-                      _draft.copyWith(
-                        hideMenuBarItem: v,
-                        hideFloatingWidget: v
-                            ? false
-                            : _draft.hideFloatingWidget,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
-                  _switchRow(
-                    label: s.disableFloating,
-                    value: _draft.hideFloatingWidget,
-                    onChanged: (v) => _set(
-                      _draft.copyWith(
-                        hideFloatingWidget: v,
-                        hideMenuBarItem: v ? false : _draft.hideMenuBarItem,
-                      ),
-                    ),
-                  ),
-                  _hint(s.exclusivityHint),
-                  const SizedBox(height: 8),
-                  Text(
-                    s.defaultPosition,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  DropdownButton<BallCorner>(
-                    value: _draft.defaultCorner,
-                    isExpanded: true,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: AppColors.textPrimary),
-                    underline: Container(
-                      height: 1,
-                      color: AppColors.glassBorder,
-                    ),
-                    items: [
-                      for (final corner in BallCorner.values)
-                        DropdownMenuItem(
-                          value: corner,
-                          child: Text(s.cornerLabel(corner)),
-                        ),
-                    ],
-                    onChanged: (v) => _set(
-                      _draft.copyWith(defaultCorner: v ?? _draft.defaultCorner),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.textPrimary),
+                    onPressed: widget.onClose,
                   ),
                 ],
               ),
-            ),
-          ),
-          const Divider(color: AppColors.glassBorder),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 12,
-            runSpacing: 8,
-            children: [
-              TextButton(
-                onPressed: widget.onReset,
-                child: Text(s.restoreDefaults),
+              const SizedBox(height: 8),
+              _categoryPicker(f),
+              const SizedBox(height: 4),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_category == _SettingsCategory.general) ...[
+                        _sectionTitle(s.secLanguage),
+                        Row(
+                          children: [
+                            _langButton(
+                              label: 'Português',
+                              flag: const FlagIcon.brazil(),
+                              selected: _draft.languageCode == 'pt',
+                              onTap: () =>
+                                  _set(_draft.copyWith(languageCode: 'pt')),
+                            ),
+                            const SizedBox(width: 10),
+                            _langButton(
+                              label: 'English',
+                              flag: const FlagIcon.usa(),
+                              selected: _draft.languageCode == 'en',
+                              onTap: () =>
+                                  _set(_draft.copyWith(languageCode: 'en')),
+                            ),
+                          ],
+                        ),
+
+                        _sectionTitle(s.secTiming),
+                        _slider(
+                          label: s.workCycle,
+                          value: _draft.cycleMinutes.toDouble(),
+                          min: 1,
+                          max: 60,
+                          suffix: '${_draft.cycleMinutes} ${s.unitMin}',
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(cycleMinutes: v.round())),
+                        ),
+                        _slider(
+                          label: s.breakDuration,
+                          value: _draft.phaseSeconds.toDouble(),
+                          min: 5,
+                          max: 120,
+                          suffix: '${_draft.phaseSeconds} ${s.unitSec}',
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(phaseSeconds: v.round())),
+                        ),
+                      ],
+                      if (_category == _SettingsCategory.reminders) ...[
+                        _sectionTitle(s.secTiming),
+                        _switchRow(
+                          label: s.visualBlinkReminders,
+                          value: _draft.visualBlinkRemindersEnabled,
+                          onChanged: (v) => _set(
+                            _draft.copyWith(visualBlinkRemindersEnabled: v),
+                          ),
+                        ),
+                        _hint(s.visualBlinkRemindersHint),
+                        if (_draft.visualBlinkRemindersEnabled) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            s.blinkReminderFrequency,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              for (final freq
+                                  in BlinkReminderFrequency.values) ...[
+                                if (freq != BlinkReminderFrequency.values.first)
+                                  const SizedBox(width: 8),
+                                _choiceButton(
+                                  label: switch (freq) {
+                                    BlinkReminderFrequency.discreet =>
+                                      s.blinkFreqDiscreet,
+                                    BlinkReminderFrequency.normal =>
+                                      s.blinkFreqNormal,
+                                    BlinkReminderFrequency.frequent =>
+                                      s.blinkFreqFrequent,
+                                  },
+                                  selected:
+                                      _draft.blinkReminderFrequency == freq,
+                                  onTap: () => _set(
+                                    _draft.copyWith(
+                                      blinkReminderFrequency: freq,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          _hint(s.blinkReminderFrequencyHint),
+                        ],
+                        _switchRow(
+                          label: s.blinkReminderSound,
+                          value: _draft.blinkReminderSoundEnabled,
+                          onChanged: (v) => _set(
+                            _draft.copyWith(blinkReminderSoundEnabled: v),
+                          ),
+                        ),
+                        _hint(s.blinkReminderSoundHint),
+                        if (_draft.blinkReminderSoundEnabled) ...[
+                          const SizedBox(height: 8),
+                          _slider(
+                            label: s.blinkReminderVolume,
+                            value: _draft.blinkReminderVolume,
+                            min: 0.0,
+                            max: 1.0,
+                            suffix:
+                                '${(_draft.blinkReminderVolume * 100).round()}%',
+                            onChanged: (v) =>
+                                _set(_draft.copyWith(blinkReminderVolume: v)),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              _choiceButton(
+                                label: s.blinkReminderSoundLabel(
+                                  BlinkReminderSound.softPulse,
+                                ),
+                                selected:
+                                    _draft.blinkReminderSound ==
+                                    BlinkReminderSound.softPulse,
+                                onTap: () => _set(
+                                  _draft.copyWith(
+                                    blinkReminderSound:
+                                        BlinkReminderSound.softPulse,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              _choiceButton(
+                                label: s.blinkReminderSoundLabel(
+                                  BlinkReminderSound.clearDrop,
+                                ),
+                                selected:
+                                    _draft.blinkReminderSound ==
+                                    BlinkReminderSound.clearDrop,
+                                onTap: () => _set(
+                                  _draft.copyWith(
+                                    blinkReminderSound:
+                                        BlinkReminderSound.clearDrop,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              _choiceButton(
+                                label: s.blinkReminderSoundLabel(
+                                  BlinkReminderSound.warmBell,
+                                ),
+                                selected:
+                                    _draft.blinkReminderSound ==
+                                    BlinkReminderSound.warmBell,
+                                onTap: () => _set(
+                                  _draft.copyWith(
+                                    blinkReminderSound:
+                                        BlinkReminderSound.warmBell,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              _choiceButton(
+                                label: s.blinkReminderSoundLabel(
+                                  BlinkReminderSound.lightTick,
+                                ),
+                                selected:
+                                    _draft.blinkReminderSound ==
+                                    BlinkReminderSound.lightTick,
+                                onTap: () => _set(
+                                  _draft.copyWith(
+                                    blinkReminderSound:
+                                        BlinkReminderSound.lightTick,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+
+                      if (_category == _SettingsCategory.appearance) ...[
+                        _sectionTitle(s.secAppearance),
+                        _ballPreview(f),
+                        _slider(
+                          label: s.uiScale,
+                          value: _draft.uiScale,
+                          min: AppDefaults.minUiScale,
+                          max: AppDefaults.maxUiScale,
+                          suffix: '${(_draft.uiScale * 100).round()}%',
+                          onChanged: (v) => _set(_draft.copyWith(uiScale: v)),
+                        ),
+                        _hint(s.uiScaleHint),
+                        const SizedBox(height: 8),
+                        Text(
+                          s.uiDensity,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            _choiceButton(
+                              label: s.uiDensityComfortable,
+                              selected:
+                                  _draft.uiDensity == UiDensity.comfortable,
+                              onTap: () => _set(
+                                _draft.copyWith(
+                                  uiDensity: UiDensity.comfortable,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            _choiceButton(
+                              label: s.uiDensityCompact,
+                              selected: _draft.uiDensity == UiDensity.compact,
+                              onTap: () => _set(
+                                _draft.copyWith(uiDensity: UiDensity.compact),
+                              ),
+                            ),
+                          ],
+                        ),
+                        _hint(s.uiDensityHint),
+                        const SizedBox(height: 8),
+                        _slider(
+                          label: s.ballSize,
+                          value: _draft.ballSize,
+                          min: AppDefaults.minBallSize,
+                          max: AppDefaults.maxBallSize,
+                          suffix: '${_draft.ballSize.round()} px',
+                          onChanged: (v) => _set(_draft.copyWith(ballSize: v)),
+                        ),
+                        _colorRow(
+                          label: s.colorNormal,
+                          selected: _draft.idleColor,
+                          onPick: (c) => _set(_draft.copyWith(idleColor: c)),
+                        ),
+                        _colorRow(
+                          label: s.colorAlert,
+                          selected: _draft.alertColor,
+                          onPick: (c) => _set(_draft.copyWith(alertColor: c)),
+                        ),
+                        _slider(
+                          label: s.opacityNormal,
+                          value: _draft.idleOpacity,
+                          min: 0.2,
+                          max: 1.0,
+                          suffix: '${(_draft.idleOpacity * 100).round()}%',
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(idleOpacity: v)),
+                        ),
+                        _switchRow(
+                          label: s.progressRing,
+                          value: _draft.showProgressRing,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(showProgressRing: v)),
+                        ),
+                        _switchRow(
+                          label: s.dynamicOrbEffect,
+                          value: _draft.dynamicOrbEffect,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(dynamicOrbEffect: v)),
+                        ),
+                        if (_draft.dynamicOrbEffect)
+                          _slider(
+                            label: s.orbIntensity,
+                            value: _draft.orbIntensity,
+                            min: 0.0,
+                            max: 1.0,
+                            suffix: '${(_draft.orbIntensity * 100).round()}%',
+                            onChanged: (v) =>
+                                _set(_draft.copyWith(orbIntensity: v)),
+                          ),
+                        _switchRow(
+                          label: s.hoverReactiveBall,
+                          value: _draft.hoverReactiveBall,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(hoverReactiveBall: v)),
+                        ),
+                        _switchRow(
+                          label: s.edgeSnapLabel,
+                          value: _draft.edgeSnap,
+                          onChanged: (v) => _set(_draft.copyWith(edgeSnap: v)),
+                        ),
+                      ],
+
+                      if (_category == _SettingsCategory.reminders) ...[
+                        _sectionTitle(s.secDuringBreak),
+                        _switchRow(
+                          label: s.gentleMode,
+                          value: _draft.gentleMode,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(gentleMode: v)),
+                        ),
+                        _hint(s.gentleHint),
+                        if (_draft.gentleMode) ...[
+                          const SizedBox(height: 8),
+                          _switchRow(
+                            label: s.lockScreenOnBreak,
+                            value: _draft.lockScreenOnBreak,
+                            onChanged: (v) =>
+                                _set(_draft.copyWith(lockScreenOnBreak: v)),
+                          ),
+                          _hint(s.lockScreenHint),
+                        ],
+                        const SizedBox(height: 8),
+                        _switchRow(
+                          label: s.dimBackground,
+                          value: _draft.dimBackground,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(dimBackground: v)),
+                        ),
+                        if (_draft.dimBackground)
+                          _slider(
+                            label: s.dimIntensity,
+                            value: _draft.dimOpacity,
+                            min: 0.0,
+                            max: 0.6,
+                            suffix: '${(_draft.dimOpacity * 100).round()}%',
+                            onChanged: (v) =>
+                                _set(_draft.copyWith(dimOpacity: v)),
+                          ),
+                        _slider(
+                          label: s.overlayOpacity,
+                          value: _draft.overlayOpacity,
+                          min: 0.05,
+                          max: 0.4,
+                          suffix: '${(_draft.overlayOpacity * 100).round()}%',
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(overlayOpacity: v)),
+                        ),
+                        _slider(
+                          label: s.overlayBlur,
+                          value: _draft.overlayBlur,
+                          min: 0,
+                          max: 40,
+                          suffix: '${_draft.overlayBlur.round()} px',
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(overlayBlur: v)),
+                        ),
+
+                        _sectionTitle(s.secEyeDrops),
+                        _switchRow(
+                          label: s.eyeDropsEnable,
+                          value: _draft.eyeDropsEnabled,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(eyeDropsEnabled: v)),
+                        ),
+                        if (_draft.eyeDropsEnabled) ...[
+                          const SizedBox(height: 6),
+                          _hint(s.eyeDropsInterval),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              _choiceButton(
+                                label: s.eyeDropsEvery4h,
+                                selected: _draft.eyeDropsIntervalHours == 4,
+                                onTap: () => _set(
+                                  _draft.copyWith(eyeDropsIntervalHours: 4),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              _choiceButton(
+                                label: s.eyeDropsEvery6h,
+                                selected: _draft.eyeDropsIntervalHours == 6,
+                                onTap: () => _set(
+                                  _draft.copyWith(eyeDropsIntervalHours: 6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+
+                      if (_category == _SettingsCategory.privacy) ...[
+                        _localOnlyNote(f),
+                        _sectionTitle(s.secInactivity),
+                        _switchRow(
+                          label: s.pauseOnInactivityLabel,
+                          value: _draft.pauseOnInactivity,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(pauseOnInactivity: v)),
+                        ),
+                        if (_draft.pauseOnInactivity) ...[
+                          _switchRow(
+                            label: s.cameraPresenceLabel,
+                            value: _draft.cameraPresence,
+                            onChanged: Platform.isMacOS
+                                ? (v) => _onToggleCamera(v, s)
+                                : null,
+                          ),
+                          _hint(
+                            Platform.isMacOS
+                                ? s.cameraPresenceHint
+                                : s.cameraUnavailableHint,
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed: _resettingLearning
+                                  ? null
+                                  : _resetLearning,
+                              icon: const Icon(Icons.restart_alt, size: 18),
+                              label: Text(s.resetLearningLabel),
+                            ),
+                          ),
+                        ],
+
+                        _sectionTitle(s.secScreenTime),
+                        _switchRow(
+                          label: s.screenTimeEnable,
+                          value: _draft.screenTimeTracking,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(screenTimeTracking: v)),
+                        ),
+                        _hint(s.screenTimeHint),
+                        _switchRow(
+                          label: s.activityMonitorEnable,
+                          value: _draft.activityMonitorEnabled,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(activityMonitorEnabled: v)),
+                        ),
+                        _hint(s.activityMonitorHint),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: widget.onOpenScreenTime,
+                            icon: const Icon(
+                              Icons.bar_chart_outlined,
+                              size: 18,
+                            ),
+                            label: Text(s.screenTimeView),
+                          ),
+                        ),
+                      ],
+
+                      if (_category == _SettingsCategory.general) ...[
+                        _sectionTitle(s.secGeneral),
+                        _switchRow(
+                          label: s.dvrsReminderEnable,
+                          value: _draft.dvrsReminderEnabled,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(dvrsReminderEnabled: v)),
+                        ),
+                        _hint(s.dvrsReminderHint),
+                        _switchRow(
+                          label: s.enableSound,
+                          value: _draft.soundEnabled,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(soundEnabled: v)),
+                        ),
+                        _switchRow(
+                          label: s.enableNotifications,
+                          value: _draft.notificationsEnabled,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(notificationsEnabled: v)),
+                        ),
+                        _switchRow(
+                          label: s.launchAtLogin,
+                          value: _draft.launchAtLogin,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(launchAtLogin: v)),
+                        ),
+                        _switchRow(
+                          label: s.hideDock,
+                          value: _draft.hideDockIcon,
+                          onChanged: (v) =>
+                              _set(_draft.copyWith(hideDockIcon: v)),
+                        ),
+                      ],
+
+                      if (_category == _SettingsCategory.appearance) ...[
+                        _sectionTitle(s.secVisibility),
+                        _switchRow(
+                          label: s.disableMenuBar,
+                          value: _draft.hideMenuBarItem,
+                          onChanged: (v) => _set(
+                            _draft.copyWith(
+                              hideMenuBarItem: v,
+                              hideFloatingWidget: v
+                                  ? false
+                                  : _draft.hideFloatingWidget,
+                            ),
+                          ),
+                        ),
+                        _switchRow(
+                          label: s.disableFloating,
+                          value: _draft.hideFloatingWidget,
+                          onChanged: (v) => _set(
+                            _draft.copyWith(
+                              hideFloatingWidget: v,
+                              hideMenuBarItem: v
+                                  ? false
+                                  : _draft.hideMenuBarItem,
+                            ),
+                          ),
+                        ),
+                        _hint(s.exclusivityHint),
+                        const SizedBox(height: 8),
+                        Text(
+                          s.defaultPosition,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        DropdownButton<BallCorner>(
+                          value: _draft.defaultCorner,
+                          isExpanded: true,
+                          dropdownColor: const Color(0xFF2A2A2A),
+                          style: const TextStyle(color: AppColors.textPrimary),
+                          underline: Container(
+                            height: 1,
+                            color: AppColors.glassBorder,
+                          ),
+                          items: [
+                            for (final corner in BallCorner.values)
+                              DropdownMenuItem(
+                                value: corner,
+                                child: Text(s.cornerLabel(corner)),
+                              ),
+                          ],
+                          onChanged: (v) => _set(
+                            _draft.copyWith(
+                              defaultCorner: v ?? _draft.defaultCorner,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
-              FilledButton(
-                onPressed: _saving ? null : _save,
-                child: _saving
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(s.save),
+              const Divider(color: AppColors.glassBorder),
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                  TextButton(
+                    onPressed: widget.onReset,
+                    child: Text(s.restoreDefaults),
+                  ),
+                  FilledButton(
+                    onPressed: _saving ? null : _save,
+                    child: _saving
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(s.save),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   // --- Componentes auxiliares --------------------------------------------
+
+  Widget _categoryPicker(FeatureStrings f) {
+    final items = <(_SettingsCategory, IconData, String)>[
+      (_SettingsCategory.general, Icons.tune_rounded, f.settingsGeneral),
+      (
+        _SettingsCategory.reminders,
+        Icons.notifications_none_rounded,
+        f.settingsReminders,
+      ),
+      (
+        _SettingsCategory.appearance,
+        Icons.palette_outlined,
+        f.settingsAppearance,
+      ),
+      (_SettingsCategory.privacy, Icons.shield_outlined, f.settingsPrivacy),
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = (constraints.maxWidth - 8) / 2;
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final item in items)
+              SizedBox(
+                width: width,
+                child: OutlinedButton.icon(
+                  key: ValueKey('settings-category-${item.$1.name}'),
+                  onPressed: () => setState(() => _category = item.$1),
+                  icon: Icon(item.$2, size: 18),
+                  label: Text(
+                    item.$3,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 46),
+                    foregroundColor: _category == item.$1
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
+                    backgroundColor: _category == item.$1
+                        ? AppColors.idleBall.withValues(alpha: 0.18)
+                        : Colors.white.withValues(alpha: 0.03),
+                    side: BorderSide(
+                      color: _category == item.$1
+                          ? AppColors.idleBall
+                          : AppColors.glassBorder,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _ballPreview(FeatureStrings f) {
+    final reduceMotion = MediaQuery.maybeOf(context)?.disableAnimations == true;
+    final diameter = _draft.ballSize.clamp(32.0, 88.0);
+    return Semantics(
+      label: f.settingsPreview,
+      image: true,
+      child: Container(
+        key: const ValueKey('settings-ball-preview'),
+        width: double.infinity,
+        height: 118,
+        margin: const EdgeInsets.only(top: 6, bottom: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.035),
+          borderRadius: BorderRadius.circular(AppRadii.md),
+          border: Border.all(color: AppColors.glassBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              f.settingsPreview,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 8),
+            AnimatedContainer(
+              duration: reduceMotion ? Duration.zero : AppMotion.normal,
+              width: diameter,
+              height: diameter,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    _draft.idleColorValue.withValues(alpha: _draft.idleOpacity),
+                    _draft.idleColorValue.withValues(
+                      alpha: _draft.idleOpacity * 0.58,
+                    ),
+                  ],
+                ),
+                border: _draft.showProgressRing
+                    ? Border.all(
+                        color: _draft.idleColorValue.withValues(alpha: 0.9),
+                        width: 3,
+                      )
+                    : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: _draft.idleColorValue.withValues(alpha: 0.28),
+                    blurRadius: 16,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _localOnlyNote(FeatureStrings f) => Container(
+    margin: const EdgeInsets.only(top: 10, bottom: 4),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1ABC9C).withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(AppRadii.sm),
+      border: Border.all(color: const Color(0xFF1ABC9C).withValues(alpha: 0.3)),
+    ),
+    child: Row(
+      children: [
+        const Icon(Icons.lock_outline, size: 19, color: Color(0xFF1ABC9C)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            f.settingsLocalOnly,
+            style: const TextStyle(fontSize: 12, height: 1.35),
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _sectionTitle(String text) => Padding(
     padding: const EdgeInsets.only(top: 16, bottom: 4),

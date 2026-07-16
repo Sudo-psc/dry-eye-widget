@@ -688,7 +688,7 @@ const AppStrings ptStrings = AppStrings(
   menuPause: 'Pausar cronômetro',
   menuResume: 'Retomar cronômetro',
   menuGuidance: 'Orientações',
-  menuDvrs: 'DVRS — Risco Visual Digital',
+  menuDvrs: 'Registro visual digital — DVRS',
   menuScreenTime: 'Tempo de tela',
   menuDashboard: 'Painel',
   menuProgress: 'Meu progresso',
@@ -701,11 +701,11 @@ const AppStrings ptStrings = AppStrings(
   daySummaryTodayHint: 'concluídas / avisos',
   daySummaryDvrsLabel: 'DVRS',
   daySummaryDvrsNever:
-      'Ainda não há avaliação. O DVRS é educativo e leva poucos minutos.',
-  daySummaryDvrsLast: 'Último score {score} · {label} · há {n} dias',
+      'Ainda não há registro. O DVRS é educativo e leva poucos minutos.',
+  daySummaryDvrsLast: 'Último registro · {label} · há {n} dias',
   daySummaryNudgeTitle: 'Hora de reavaliar',
   daySummaryNudgeBodyNever:
-      'Depois de algumas pausas, vale fazer o DVRS para entender seu risco visual digital.',
+      'Depois de algumas pausas, use o DVRS para registrar sintomas e hábitos relacionados às telas.',
   daySummaryNudgeBodyDue:
       'Já se passaram cerca de duas semanas desde a última avaliação. Uma reavaliação ajuda a acompanhar tendências.',
   daySummaryNudgeDismiss: 'Lembrar depois',
@@ -717,14 +717,14 @@ const AppStrings ptStrings = AppStrings(
   daySummaryCtaProgress: 'Progresso',
   daySummaryCtaDashboard: 'Painel',
   daySummaryDisclaimer:
-      'Triagem educativa e reforço de hábito — não substitui consulta oftalmológica.',
+      'Autorregistro educativo e reforço de hábito — não substitui consulta oftalmológica.',
   insightDvrsNever:
-      'Que tal conhecer o DVRS? É uma triagem educativa do seu risco visual digital.',
+      'Que tal conhecer o DVRS? É um autorregistro educativo de sintomas e hábitos.',
   insightDvrsDue:
       'Faz {n} dias desde o último DVRS. Uma reavaliação rápida ajuda a acompanhar mudanças.',
   insightToday:
       'Hoje você concluiu {c} de {r} pausas sugeridas. Cada ciclo conta.',
-  notifyDvrsNudgeTitle: 'Reavaliar risco visual digital',
+  notifyDvrsNudgeTitle: 'Revisar registro visual digital',
   notifyDvrsNudgeBody:
       'Um DVRS rápido ajuda a acompanhar tendências. Abra o Resumo do dia no widget.',
   dvrsReminderEnable: 'Lembrar reavaliação do DVRS',
@@ -1047,7 +1047,7 @@ const AppStrings ptStrings = AppStrings(
   onboardingStep1Title: 'Bem-vindo ao Dry Eye Widget',
   onboardingStep1Body:
       'Um lembrete gentil para descansar os olhos enquanto você usa o '
-      'computador, ajudando a prevenir o desconforto do olho seco digital.',
+      'computador, apoiando pausas e hábitos de conforto visual.',
   onboardingStep2Title: 'A regra 20-20-20',
   onboardingStep2Body:
       'A cada 20 minutos, olhe para algo a cerca de 6 metros de distância por '
@@ -1074,7 +1074,7 @@ const AppStrings enStrings = AppStrings(
   menuPause: 'Pause timer',
   menuResume: 'Resume timer',
   menuGuidance: 'Eye care guide',
-  menuDvrs: 'DVRS — Digital Visual Risk',
+  menuDvrs: 'Digital visual log — DVRS',
   menuScreenTime: 'Screen time',
   menuDashboard: 'Dashboard',
   menuProgress: 'My progress',
@@ -1087,11 +1087,11 @@ const AppStrings enStrings = AppStrings(
   daySummaryTodayHint: 'done / prompts',
   daySummaryDvrsLabel: 'DVRS',
   daySummaryDvrsNever:
-      'No assessment yet. DVRS is educational and takes a few minutes.',
-  daySummaryDvrsLast: 'Last score {score} · {label} · {n} days ago',
+      'No entry yet. DVRS is educational and takes a few minutes.',
+  daySummaryDvrsLast: 'Last entry · {label} · {n} days ago',
   daySummaryNudgeTitle: 'Time to recheck',
   daySummaryNudgeBodyNever:
-      'After a few breaks, try the DVRS to understand your digital visual risk.',
+      'After a few breaks, use DVRS to log screen-related symptoms and habits.',
   daySummaryNudgeBodyDue:
       'About two weeks have passed since your last assessment. A recheck helps track trends.',
   daySummaryNudgeDismiss: 'Remind me later',
@@ -1103,14 +1103,14 @@ const AppStrings enStrings = AppStrings(
   daySummaryCtaProgress: 'Progress',
   daySummaryCtaDashboard: 'Dashboard',
   daySummaryDisclaimer:
-      'Educational screening and habit support — not a substitute for eye care.',
+      'Educational self-report and habit support — not a substitute for eye care.',
   insightDvrsNever:
-      'Curious about DVRS? It’s a short educational check of digital visual risk.',
+      'Curious about DVRS? It’s a short educational log of symptoms and habits.',
   insightDvrsDue:
       'It’s been {n} days since your last DVRS. A quick recheck helps track changes.',
   insightToday:
       'Today you completed {c} of {r} suggested breaks. Every cycle counts.',
-  notifyDvrsNudgeTitle: 'Recheck digital visual risk',
+  notifyDvrsNudgeTitle: 'Review your digital visual log',
   notifyDvrsNudgeBody:
       'A short DVRS helps track trends. Open Today’s summary in the widget.',
   dvrsReminderEnable: 'Remind me to recheck DVRS',

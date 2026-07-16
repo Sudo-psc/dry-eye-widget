@@ -1,6 +1,48 @@
 # Status
 
-Updated: 2026-07-12
+Updated: 2026-07-16
+
+## Revisão de performance e build — concluída localmente em 2026-07-16
+
+A revisão pós-UI/UX eliminou amplificação de escrita no onboarding: sliders agora
+alteram somente o rascunho local e as configurações são entregues uma vez ao
+concluir ou pular. O `SettingsProvider` também ignora estados normalizados
+idênticos, evitando persistência e reconstrução redundantes. O DVRS ganhou um
+orçamento de regressão que mantém no máximo quatro cartões de pergunta montados
+na vizinhança visível durante a rolagem.
+
+Baseline: um único gesto no slider gerava duas atualizações antes da conclusão.
+Estado final: zero atualizações durante a edição e exatamente uma ao concluir.
+Configuração idêntica gera zero notificações do provider.
+
+Validação local: análise limpa; 249 testes aprovados; build e prerender da página
+Science aprovados; smoke da landing aprovado; goldens UI/UX PT/EN aprovados;
+build macOS release universal x86_64/arm64 aprovado; DMG verificado com SHA-256
+`e99ac90a31309837704904a93ee4f953f05a477f37e712b68df4f0997b38d4f5`.
+O build Windows foi tentado e corretamente recusado pelo Flutter no host macOS.
+Os workflows Windows Build e Windows MSIX permanecem configurados para runner
+`windows-latest`, mas exigem push/dispatch ou um host Windows real.
+
+Evidência: `runs/2026-07-16-ui-ux-performance-build.md`.
+
+## UI/UX vNext — implementação automatizável concluída em 2026-07-16
+
+Os recortes implementáveis localmente dos Marcos 0 a 4 foram concluídos. O Hub
+mantém Hoje, Tendências, DVRS e Relatórios, e Tendências deixou de abrir uma
+terceira barra de abas. O Resumo do dia tem uma ação primária contextual.
+Configurações usa Geral, Lembretes, Aparência e Privacidade, com prévia viva da
+bolinha. O onboarding caiu de cinco telas informativas para três etapas práticas
+que aplicam ciclo, tamanho e notificações. O DVRS agrupa perguntas por domínio e,
+se incompleto, informa quantas faltam e leva à primeira pendência.
+
+O gate de linguagem cobre app e landing. Hub, Configurações e onboarding passam
+em escala de texto de 200%. Foram geradas 16 capturas baseline e 16 finais em
+PT-BR/EN. `flutter analyze` passou sem ocorrências, os 246 testes passaram, o
+smoke da landing passou e o build macOS release gerou um app de 59,4 MB.
+Evidência: `runs/2026-07-16-ui-ux-vnext-implementation.md`.
+
+Permanecem externos: tarefas cronometradas e sessões moderadas com usuários,
+leitor de tela/contraste em hardware real, build e QA Windows e frame pacing.
 
 ## Release 1.24.2 publicada — concluída em 2026-07-12
 

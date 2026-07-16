@@ -2,6 +2,17 @@
 
 ## now
 
+- [x] 2026-07-16: Revisar os caminhos quentes afetados pelo UI/UX vNext.
+- [x] 2026-07-16: Consolidar a persistência do onboarding em uma gravação final.
+- [x] 2026-07-16: Evitar atualização redundante do `SettingsProvider`.
+- [x] 2026-07-16: Adicionar orçamento de montagem preguiçosa ao DVRS.
+- [x] 2026-07-16: Executar análise, 249 testes, site, build macOS universal e DMG.
+- [ ] Executar os workflows Windows Build e Windows MSIX a partir do commit.
+
+- [x] 2026-07-16: Mapear o estado atual de UI/UX contra as rodadas já concluídas.
+- [x] 2026-07-16: Criar o brainstorm e roadmap executável de UI/UX vNext.
+- [x] 2026-07-16: Executar os recortes automatizáveis dos Marcos 0 a 4 do UI/UX vNext.
+
 - [x] Limitar quadros contínuos da bolinha e animação não urgente do anel.
 - [x] Isolar os ticks globais dos painéis estáticos.
 - [x] Isolar estatísticas de atividade ao painel consumidor.
@@ -69,6 +80,21 @@
 
 ## next
 
+- [x] UX-01: capturar baseline e estado final das superfícies em PT-BR e EN.
+- [ ] UX-02: cronometrar as cinco tarefas de referência no macOS.
+- [x] UX-03: criar o gate automático de linguagem/claims do DVRS.
+- [x] UX-04: mapear foco, Escape e retorno das superfícies principais.
+- [x] UX-10: simplificar Hub e Resumo e retirar o terceiro nível de Tendências.
+- [x] UX-20: reorganizar Configurações em quatro categorias com prévia viva.
+- [x] UX-23: transformar onboarding em três etapas práticas e persistentes.
+- [x] UX-30: agrupar DVRS por domínio e recuperar a primeira pendência.
+- [x] UX-34: validar Hub, Configurações e onboarding com texto a 200%.
+- [x] UX-42/macOS: executar análise, suíte, capturas, smoke e build release.
+- [ ] UX-40: repetir tarefas cronometradas após obter o baseline moderado.
+- [ ] UX-41: realizar cinco sessões curtas, incluindo acessibilidade.
+- [ ] UX-42/Windows: executar build e QA no Windows.
+- [ ] UX-43: verificar frame pacing e janela em hardware real macOS/Windows.
+
 - [ ] Executar checklist manual de arraste em Windows 10 e 11.
 - [ ] Validar o build macOS assinado quando a identidade estiver disponível.
 - [ ] Inspecionar manualmente o fluxo no macOS e Windows antes da release pública.
@@ -82,12 +108,21 @@
 ## blocked
 
 - Windows runtime inspection is blocked until a Windows build/test environment is used.
+- O artefato Windows não pode ser compilado no host macOS; requer runner Windows
+  local ou envio do commit para GitHub Actions.
+- UX-02, UX-40 e UX-41 dependem de sessões humanas; tempos e hesitações não
+  foram simulados como telemetria.
 - Signed macOS release validation remains blocked until signing/provisioning is available for the HealthKit entitlement.
 - Assinatura Authenticode depende da configuração externa do certificado.
 - Atualização de `olhossecos.com.br/app/` depende do acesso ao nginx/VPS; o
   GitHub Pages já está em 1.24.0, mas o host canônico ainda serve 1.23.0.
 
 ## improve
+
+- Transformar o harness visual atual em uma matriz PT-BR/EN, 100%/200% e
+  largura compacta/padrão para as superfícies principais.
+- Converter resultados das tarefas moderadas em checks de regressão quando forem
+  determinísticos.
 
 - Atualizar actions/checkout, setup-node, upload-artifact e action-gh-release
   quando suas versões Node.js 24 estiverem validadas, removendo os avisos de

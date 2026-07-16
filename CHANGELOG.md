@@ -6,6 +6,25 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Melhorado
+- Hub simplificado para Hoje, Tendências, DVRS e Relatórios, sem terceiro nível
+  de abas; Resumo do dia com uma ação primária contextual.
+- Configurações reorganizadas por intenção, com prévia viva da bolinha, e
+  onboarding reduzido a três etapas práticas.
+- DVRS com agrupamento por domínio, linguagem educativa consistente e retorno
+  automático à primeira pergunta não respondida.
+- Onboarding mantém alterações em rascunho e persiste somente uma vez ao
+  concluir ou pular, evitando escrita a cada evento de slider.
+- Atualizações idênticas de configurações deixam de notificar listeners e
+  regravar o armazenamento.
+
+### Testado
+- Gate automático de claims DVRS no app e na landing.
+- Hub, Configurações e onboarding com escala de texto de 200%.
+- Orçamento de montagem preguiçosa das perguntas do DVRS.
+- Análise, 249 testes, build Science, smoke da landing, goldens PT/EN e build
+  macOS universal com DMG verificado.
+
 ## [1.24.2] - 2026-07-12
 
 ### Melhorado

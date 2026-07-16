@@ -1,32 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_strings.dart';
+import '../../models/widget_settings.dart';
+import '../../ui/app_theme.dart';
 import '../../utils/constants.dart';
 import '../liquid_glass.dart';
-
-/// Passo único do onboarding (ícone + título + corpo).
-class _OnboardingStep {
-  const _OnboardingStep(this.icon, this.color, this.title, this.body);
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String body;
-}
 
 /// Fluxo de boas-vindas exibido na primeira execução do app.
 ///
 /// Apresenta o propósito (saúde ocular digital), a regra 20-20-20, como a
 /// bolinha flutuante funciona e a postura de privacidade. Ao concluir (ou
-/// pular), chama [onFinish], que persiste `onboardingComplete = true`.
+/// pular), entrega o rascunho uma única vez a [onFinish].
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({
     super.key,
     required this.strings,
     required this.onFinish,
+    this.initial,
   });
 
   final AppStrings strings;
-  final VoidCallback onFinish;
+  final Future<void> Function(WidgetSettings settings) onFinish;
+  final WidgetSettings? initial;
 
   @override
   State<OnboardingFlow> createState() => _OnboardingFlowState();
@@ -35,6 +32,14 @@ class OnboardingFlow extends StatefulWidget {
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final _controller = PageController();
   int _index = 0;
+  late WidgetSettings _draft;
+  bool _finishing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _draft = widget.initial ?? WidgetSettings.defaults();
+  }
 
   @override
   void dispose() {
@@ -42,42 +47,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     super.dispose();
   }
 
-  List<_OnboardingStep> _steps(AppStrings s) => [
-    _OnboardingStep(
-      Icons.remove_red_eye_outlined,
-      AppColors.idleBall,
-      s.onboardingStep1Title,
-      s.onboardingStep1Body,
-    ),
-    _OnboardingStep(
-      Icons.timer_outlined,
-      const Color(0xFF50C878),
-      s.onboardingStep2Title,
-      s.onboardingStep2Body,
-    ),
-    _OnboardingStep(
-      Icons.touch_app_outlined,
-      const Color(0xFFFF8C00),
-      s.onboardingStep3Title,
-      s.onboardingStep3Body,
-    ),
-    _OnboardingStep(
-      Icons.lock_outline,
-      const Color(0xFF9B59B6),
-      s.onboardingStep4Title,
-      s.onboardingStep4Body,
-    ),
-    _OnboardingStep(
-      Icons.shield_outlined,
-      const Color(0xFF1ABC9C),
-      s.onboardingStep5Title,
-      s.onboardingStep5Body,
-    ),
-  ];
+  void _update(WidgetSettings next) {
+    setState(() => _draft = next);
+  }
 
   void _next(int lastIndex) {
     if (_index >= lastIndex) {
-      widget.onFinish();
+      unawaited(_finish());
     } else {
       _controller.nextPage(
         duration: const Duration(milliseconds: 280),
@@ -86,11 +62,21 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     }
   }
 
+  Future<void> _finish() async {
+    if (_finishing) return;
+    setState(() => _finishing = true);
+    try {
+      await widget.onFinish(_draft);
+    } finally {
+      if (mounted) setState(() => _finishing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = widget.strings;
-    final steps = _steps(s);
-    final lastIndex = steps.length - 1;
+    const count = 3;
+    const lastIndex = count - 1;
     final isLast = _index == lastIndex;
 
     return Scaffold(
@@ -108,12 +94,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               Expanded(
                 child: PageView.builder(
                   controller: _controller,
-                  itemCount: steps.length,
+                  itemCount: count,
                   onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (_, i) => _stepView(steps[i]),
+                  itemBuilder: (_, i) => _stepView(i, s),
                 ),
               ),
-              _footer(s, steps.length, lastIndex, isLast),
+              _footer(s, count, lastIndex, isLast),
             ],
           ),
         ),
@@ -121,41 +107,167 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     );
   }
 
-  Widget _stepView(_OnboardingStep step) {
+  Widget _stepView(int index, AppStrings s) => switch (index) {
+    0 => _cycleStep(s),
+    1 => _appearanceStep(s),
+    _ => _privacyStep(s),
+  };
+
+  Widget _stepShell({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String body,
+    required Widget controls,
+  }) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(36, 40, 36, 12),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              color: step.color.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(step.icon, color: step.color, size: 48),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(36, 28, 36, 8),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight - 36),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 38),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                body,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.4,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                ),
+              ),
+              const SizedBox(height: 18),
+              controls,
+            ],
           ),
-          const SizedBox(height: 28),
-          Text(
-            step.title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            step.body,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.45,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
+
+  Widget _cycleStep(AppStrings s) => _stepShell(
+    icon: Icons.timer_outlined,
+    color: AppColors.idleBall,
+    title: s.onboardingStep1Title,
+    body: s.onboardingStep2Body,
+    controls: Column(
+      children: [
+        _sliderLabel(s.workCycle, '${_draft.cycleMinutes} ${s.unitMin}'),
+        Slider(
+          key: const ValueKey('onboarding-cycle-slider'),
+          value: _draft.cycleMinutes.toDouble(),
+          min: 5,
+          max: 60,
+          divisions: 11,
+          onChanged: (value) =>
+              _update(_draft.copyWith(cycleMinutes: value.round())),
+        ),
+      ],
+    ),
+  );
+
+  Widget _appearanceStep(AppStrings s) => _stepShell(
+    icon: Icons.touch_app_outlined,
+    color: const Color(0xFFFF8C00),
+    title: s.onboardingStep3Title,
+    body: s.onboardingStep3Body,
+    controls: Column(
+      children: [
+        AnimatedContainer(
+          key: const ValueKey('onboarding-ball-preview'),
+          duration: MediaQuery.maybeOf(context)?.disableAnimations == true
+              ? Duration.zero
+              : AppMotion.normal,
+          width: _draft.ballSize.clamp(32, 88),
+          height: _draft.ballSize.clamp(32, 88),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _draft.idleColorValue.withValues(alpha: _draft.idleOpacity),
+            border: Border.all(color: _draft.idleColorValue, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: _draft.idleColorValue.withValues(alpha: 0.3),
+                blurRadius: 16,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        _sliderLabel(s.ballSize, '${_draft.ballSize.round()} px'),
+        Slider(
+          key: const ValueKey('onboarding-size-slider'),
+          value: _draft.ballSize,
+          min: AppDefaults.minBallSize,
+          max: AppDefaults.maxBallSize,
+          onChanged: (value) => _update(_draft.copyWith(ballSize: value)),
+        ),
+      ],
+    ),
+  );
+
+  Widget _privacyStep(AppStrings s) => _stepShell(
+    icon: Icons.shield_outlined,
+    color: const Color(0xFF1ABC9C),
+    title: s.onboardingStep5Title,
+    body: s.onboardingStep5Body,
+    controls: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1ABC9C).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFF1ABC9C).withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.notifications_none_rounded, size: 21),
+          const SizedBox(width: 10),
+          Expanded(child: Text(s.enableNotifications)),
+          Switch(
+            key: const ValueKey('onboarding-notifications-switch'),
+            value: _draft.notificationsEnabled,
+            onChanged: (value) =>
+                _update(_draft.copyWith(notificationsEnabled: value)),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _sliderLabel(String label, String value) => Row(
+    children: [
+      Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
+      Text(
+        value,
+        style: const TextStyle(
+          color: AppColors.idleBall,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ],
+  );
 
   Widget _footer(AppStrings s, int count, int lastIndex, bool isLast) {
     final theme = Theme.of(context);
@@ -164,7 +276,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       child: Row(
         children: [
           TextButton(
-            onPressed: widget.onFinish,
+            onPressed: _finishing ? null : _finish,
             child: Text(
               s.onboardingSkip,
               style: TextStyle(
@@ -193,7 +305,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             ),
           ),
           FilledButton(
-            onPressed: () => _next(lastIndex),
+            onPressed: _finishing ? null : () => _next(lastIndex),
             child: Text(isLast ? s.onboardingStart : s.onboardingNext),
           ),
         ],

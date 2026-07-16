@@ -18,9 +18,18 @@ class FeatureStrings {
   String get menuQuickExtend => _en ? 'Extend' : 'Estender';
   String get menuTrackingSection => _en ? 'Track' : 'Acompanhar';
 
+  String get settingsGeneral => _en ? 'General' : 'Geral';
+  String get settingsReminders => _en ? 'Reminders' : 'Lembretes';
+  String get settingsAppearance => _en ? 'Appearance' : 'Aparência';
+  String get settingsPrivacy => _en ? 'Privacy' : 'Privacidade';
+  String get settingsPreview => _en ? 'Live preview' : 'Prévia ao vivo';
+  String get settingsLocalOnly => _en
+      ? 'Screen and presence data stay on this device.'
+      : 'Dados de tela e presença ficam somente neste dispositivo.';
+
   String get healthHubTitle => _en ? 'Visual health' : 'Saúde visual';
   String get healthHubTabToday => _en ? 'Today' : 'Hoje';
-  String get healthHubTabProgress => _en ? 'Trends' : 'Evolução';
+  String get healthHubTabProgress => _en ? 'Trends' : 'Tendências';
   String get healthHubTabScreen => _en ? 'Screen' : 'Tela';
   String get healthHubTabDvrs => 'DVRS';
   String get healthHubTabReports => _en ? 'Reports' : 'Relatórios';
@@ -105,6 +114,11 @@ class FeatureStrings {
   String get dvrsDeleteConfirm => _en ? 'Delete' : 'Excluir';
   String get dvrsVersionLabel =>
       _en ? 'Instrument version' : 'Versão do instrumento';
+  String dvrsMissingAnswers(int count) => _en
+      ? '$count unanswered ${count == 1 ? 'question' : 'questions'}. '
+            'Review the first one highlighted.'
+      : '$count ${count == 1 ? 'pergunta não respondida' : 'perguntas não respondidas'}. '
+            'Revise a primeira destacada.';
 
   String get narrativeSectionTitle => _en
       ? 'Narrative for the ophthalmologist'

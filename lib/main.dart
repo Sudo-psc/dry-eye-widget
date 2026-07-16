@@ -404,8 +404,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   /// Conclui (ou pula) o onboarding: persiste a flag e abre o Resumo do dia
   /// para o usuário descobrir o hub de saúde logo na primeira execução.
-  Future<void> _finishOnboarding() async {
-    await _settings.update(_settings.value.copyWith(onboardingComplete: true));
+  Future<void> _finishOnboarding(WidgetSettings draft) async {
+    await _settings.update(draft.copyWith(onboardingComplete: true));
     if (!mounted) return;
     setState(() => _onboardingOpen = false);
     // Descoberta do hub: um toque a mais no dia 1 vale mais que o menu denso.
@@ -1302,7 +1302,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
     Widget body;
     if (_onboardingOpen) {
       body = Center(
-        child: OnboardingFlow(strings: strings, onFinish: _finishOnboarding),
+        child: OnboardingFlow(
+          strings: strings,
+          initial: settings,
+          onFinish: _finishOnboarding,
+        ),
       );
     } else if (_dvrsOpen) {
       body = Center(

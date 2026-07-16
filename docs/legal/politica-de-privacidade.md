@@ -18,7 +18,7 @@ O Dry Eye Widget não possui telemetria de atividade, analytics de uso, monitora
 | Câmera (presença) | **Opcional e desligada por padrão.** Quando ativada, tira **uma única foto local**, verifica se há um rosto e **descarta a imagem na hora** — sem gravar nem enviar. |
 | Aprendizado de inatividade | Estado agregado guardado **cifrado** no próprio dispositivo (Keychain/DPAPI), sem histórico de eventos e sem acesso remoto. |
 | Configurações | Salvas localmente para manter preferências do usuário. |
-| Questionário DVRS | Quando usado, respostas, score, classificação e data ficam salvas localmente para histórico do próprio usuário. |
+| Registro educativo DVRS | Quando usado, respostas, campos internos de acompanhamento e data ficam salvos localmente para histórico do próprio usuário. Não é instrumento clínico validado. |
 | Tempo de tela | Quando ativado, salva histórico diário agregado de tempo ativo de tela, descartando períodos de inatividade. |
 | Atualizações | A checagem opcional consulta o GitHub Releases e não inclui dados de atividade. |
 

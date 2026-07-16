@@ -32,7 +32,7 @@ Em especial, o aplicativo não coleta, armazena nem transmite:
 
 A detecção de inatividade usa apenas uma consulta local ao sistema operacional para saber há quantos segundos ocorreu a última entrada do usuário, como movimento do mouse, clique ou tecla. Esse valor é usado somente para pausar ou retomar o timer dentro do próprio aplicativo. Ele não identifica o que o usuário fez, não cria histórico de atividade e não é enviado para servidores externos.
 
-O questionário DVRS (Índice de Risco Visual Digital) e a visualização de tempo de tela, quando usados, podem salvar histórico local no próprio dispositivo para que o usuário acompanhe sua rotina. Esses dados não são enviados pelo Dry Eye Widget para servidores externos.
+O DVRS é um autorregistro educativo de sintomas e hábitos. Não é instrumento clínico validado, classificação de risco, diagnóstico, avaliação de aptidão ou base para decisões corporativas. Quando usado, pode salvar histórico local no próprio dispositivo para acompanhamento pessoal. Esses dados não são enviados pelo Dry Eye Widget para servidores externos.
 
 A Política de Privacidade explica com mais detalhes como o aplicativo trata dados locais, preferências e atualizações.
 

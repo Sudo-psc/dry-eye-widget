@@ -150,9 +150,9 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
         const SizedBox(height: 14),
         _insightCard(theme, s, snap),
         const SizedBox(height: 18),
-        _primaryActions(s),
+        _primaryAction(s, snap),
         const SizedBox(height: 10),
-        _secondaryActions(s),
+        _secondaryActions(s, snap),
         const SizedBox(height: 16),
         Text(
           s.daySummaryDisclaimer,
@@ -396,22 +396,13 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _snoozing ? null : _snooze,
-                  child: Text(s.daySummaryNudgeDismiss),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  onPressed: widget.onDvrs,
-                  child: Text(s.daySummaryNudgeDo),
-                ),
-              ),
-            ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              onPressed: _snoozing ? null : _snooze,
+              icon: const Icon(Icons.snooze_rounded, size: 18),
+              label: Text(s.daySummaryNudgeDismiss),
+            ),
           ),
         ],
       ),
@@ -465,52 +456,49 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
     );
   }
 
-  Widget _primaryActions(AppStrings s) {
-    return Row(
-      children: [
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: widget.onStartBreak,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(0, 46),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            ),
-            icon: const Icon(Icons.play_circle_outline, size: 18),
-            label: Text(s.daySummaryCtaBreak),
-          ),
+  Widget _primaryAction(AppStrings s, DaySummarySnapshot snap) {
+    final dvrsDue = snap.dvrsNudgeDue;
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        key: const ValueKey('day-summary-primary-action'),
+        onPressed: dvrsDue ? widget.onDvrs : widget.onStartBreak,
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(0, 50),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: FilledButton.tonalIcon(
-            onPressed: widget.onDvrs,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(0, 46),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            ),
-            icon: const Icon(Icons.assignment, size: 18),
-            label: Text(s.daySummaryCtaDvrs),
-          ),
+        icon: Icon(
+          dvrsDue ? Icons.assignment_outlined : Icons.play_circle_outline,
+          size: 19,
         ),
-      ],
+        label: Text(dvrsDue ? s.daySummaryNudgeDo : s.daySummaryCtaBreak),
+      ),
     );
   }
 
-  Widget _secondaryActions(AppStrings s) {
+  Widget _secondaryActions(AppStrings s, DaySummarySnapshot snap) {
     return Row(
       children: [
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: widget.onProgress,
-            icon: const Icon(Icons.trending_up, size: 16),
-            label: Text(s.daySummaryCtaProgress),
+          child: TextButton.icon(
+            onPressed: snap.dvrsNudgeDue ? widget.onStartBreak : widget.onDvrs,
+            icon: Icon(
+              snap.dvrsNudgeDue
+                  ? Icons.play_circle_outline
+                  : Icons.assignment_outlined,
+              size: 17,
+            ),
+            label: Text(
+              snap.dvrsNudgeDue ? s.daySummaryCtaBreak : s.daySummaryCtaDvrs,
+            ),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: widget.onDashboard,
-            icon: const Icon(Icons.dashboard_outlined, size: 16),
-            label: Text(s.daySummaryCtaDashboard),
+          child: TextButton.icon(
+            onPressed: widget.onProgress,
+            icon: const Icon(Icons.trending_up, size: 17),
+            label: Text(s.daySummaryCtaProgress),
           ),
         ),
       ],

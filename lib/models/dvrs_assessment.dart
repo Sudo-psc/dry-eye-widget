@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-/// Modelo de dados do **DVRS — Índice de Risco Visual Digital** (v1.1).
+/// Modelo histórico do **DVRS**, exibido como registro educativo visual (v1.1).
 ///
 /// Instrumento EDUCATIVO de triagem e acompanhamento. Nunca diagnóstico: os
 /// tipos abaixo carregam `isDiagnostic = false` e toda a linguagem produzida é
@@ -40,8 +40,14 @@ extension DvrsDomainId on DvrsDomain {
   }
 }
 
-/// Classificação do risco visual digital por faixa de score (0–100).
-enum DvrsClassification { low, mildAttention, moderateRisk, highRisk, veryHighRisk }
+/// Faixas internas de organização do registro; não são risco ou limiar clínico.
+enum DvrsClassification {
+  low,
+  mildAttention,
+  moderateRisk,
+  highRisk,
+  veryHighRisk,
+}
 
 /// Id estável + rótulo curto de [DvrsClassification].
 extension DvrsClassificationId on DvrsClassification {
@@ -64,15 +70,15 @@ extension DvrsClassificationId on DvrsClassification {
   String get label {
     switch (this) {
       case DvrsClassification.low:
-        return 'Baixo risco visual digital';
+        return 'Carga relatada baixa';
       case DvrsClassification.mildAttention:
-        return 'Atenção leve';
+        return 'Alguns sinais relatados';
       case DvrsClassification.moderateRisk:
-        return 'Risco moderado';
+        return 'Carga relatada moderada';
       case DvrsClassification.highRisk:
-        return 'Risco elevado';
+        return 'Carga relatada elevada';
       case DvrsClassification.veryHighRisk:
-        return 'Risco muito elevado';
+        return 'Carga relatada muito elevada';
     }
   }
 
@@ -85,7 +91,12 @@ extension DvrsClassificationId on DvrsClassification {
 }
 
 /// Nível do alerta de segurança clínica derivado da pergunta 16.
-enum DvrsSafetyAlertLevel { none, attention, medicalEvaluation, priorityEvaluation }
+enum DvrsSafetyAlertLevel {
+  none,
+  attention,
+  medicalEvaluation,
+  priorityEvaluation,
+}
 
 /// Id estável de [DvrsSafetyAlertLevel].
 extension DvrsSafetyAlertLevelId on DvrsSafetyAlertLevel {
@@ -145,19 +156,19 @@ class DvrsAnswer {
   final String label;
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'questionId': questionId,
-        'domain': domain.id,
-        'value': value,
-        'label': label,
-      };
+    'questionId': questionId,
+    'domain': domain.id,
+    'value': value,
+    'label': label,
+  };
 
   factory DvrsAnswer.fromMap(Map<String, dynamic> map) => DvrsAnswer(
-        questionId: map['questionId'] as String? ?? '',
-        domain: DvrsDomainId.fromId(map['domain'] as String?) ??
-            DvrsDomain.symptoms,
-        value: (map['value'] as num?)?.toInt() ?? 0,
-        label: map['label'] as String? ?? '',
-      );
+    questionId: map['questionId'] as String? ?? '',
+    domain:
+        DvrsDomainId.fromId(map['domain'] as String?) ?? DvrsDomain.symptoms,
+    value: (map['value'] as num?)?.toInt() ?? 0,
+    label: map['label'] as String? ?? '',
+  );
 }
 
 /// Scores normalizados (0–100) por domínio.
@@ -194,12 +205,12 @@ class DvrsDomainScores {
   }
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'symptoms': symptoms,
-        'functional': functional,
-        'exposure': exposure,
-        'environment': environment,
-        'warning': warning,
-      };
+    'symptoms': symptoms,
+    'functional': functional,
+    'exposure': exposure,
+    'environment': environment,
+    'warning': warning,
+  };
 
   factory DvrsDomainScores.fromMap(Map<String, dynamic> map) {
     double read(String k) => (map[k] as num?)?.toDouble() ?? 0;
@@ -259,38 +270,38 @@ class DvrsResult {
   final bool includeInPdf;
 
   DvrsResult copyWith({bool? includeInPdf}) => DvrsResult(
-        id: id,
-        userId: userId,
-        createdAt: createdAt,
-        version: version,
-        answers: answers,
-        domainScores: domainScores,
-        totalScore: totalScore,
-        classification: classification,
-        classificationLabel: classificationLabel,
-        educationalMessage: educationalMessage,
-        safetyAlertLevel: safetyAlertLevel,
-        safetyAlertMessage: safetyAlertMessage,
-        isDiagnostic: isDiagnostic,
-        includeInPdf: includeInPdf ?? this.includeInPdf,
-      );
+    id: id,
+    userId: userId,
+    createdAt: createdAt,
+    version: version,
+    answers: answers,
+    domainScores: domainScores,
+    totalScore: totalScore,
+    classification: classification,
+    classificationLabel: classificationLabel,
+    educationalMessage: educationalMessage,
+    safetyAlertLevel: safetyAlertLevel,
+    safetyAlertMessage: safetyAlertMessage,
+    isDiagnostic: isDiagnostic,
+    includeInPdf: includeInPdf ?? this.includeInPdf,
+  );
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'id': id,
-        if (userId != null) 'userId': userId,
-        'createdAt': createdAt.toIso8601String(),
-        'version': version,
-        'answers': answers.map((a) => a.toMap()).toList(),
-        'domainScores': domainScores.toMap(),
-        'totalScore': totalScore,
-        'classification': classification.id,
-        'classificationLabel': classificationLabel,
-        'educationalMessage': educationalMessage,
-        'safetyAlertLevel': safetyAlertLevel.id,
-        if (safetyAlertMessage != null) 'safetyAlertMessage': safetyAlertMessage,
-        'isDiagnostic': false,
-        'includeInPdf': includeInPdf,
-      };
+    'id': id,
+    if (userId != null) 'userId': userId,
+    'createdAt': createdAt.toIso8601String(),
+    'version': version,
+    'answers': answers.map((a) => a.toMap()).toList(),
+    'domainScores': domainScores.toMap(),
+    'totalScore': totalScore,
+    'classification': classification.id,
+    'classificationLabel': classificationLabel,
+    'educationalMessage': educationalMessage,
+    'safetyAlertLevel': safetyAlertLevel.id,
+    if (safetyAlertMessage != null) 'safetyAlertMessage': safetyAlertMessage,
+    'isDiagnostic': false,
+    'includeInPdf': includeInPdf,
+  };
 
   factory DvrsResult.fromMap(Map<String, dynamic> map) {
     final rawAnswers = map['answers'];
@@ -304,12 +315,13 @@ class DvrsResult {
     }
     final classification =
         DvrsClassificationId.fromId(map['classification'] as String?) ??
-            DvrsClassification.low;
+        DvrsClassification.low;
     return DvrsResult(
       id: map['id'] as String? ?? '',
       userId: map['userId'] as String?,
       createdAt:
-          DateTime.tryParse(map['createdAt'] as String? ?? '') ?? DateTime(2000),
+          DateTime.tryParse(map['createdAt'] as String? ?? '') ??
+          DateTime(2000),
       version: map['version'] as String? ?? dvrsVersion,
       answers: List<DvrsAnswer>.unmodifiable(answers),
       domainScores: map['domainScores'] is Map
@@ -330,7 +342,7 @@ class DvrsResult {
       educationalMessage: map['educationalMessage'] as String? ?? '',
       safetyAlertLevel:
           DvrsSafetyAlertLevelId.fromId(map['safetyAlertLevel'] as String?) ??
-              DvrsSafetyAlertLevel.none,
+          DvrsSafetyAlertLevel.none,
       safetyAlertMessage: map['safetyAlertMessage'] as String?,
       includeInPdf: map['includeInPdf'] as bool? ?? false,
     );

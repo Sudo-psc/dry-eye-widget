@@ -5,6 +5,7 @@ import 'package:dry_eye_widget/models/app_state.dart';
 import 'package:dry_eye_widget/models/widget_settings.dart';
 import 'package:dry_eye_widget/widgets/settings_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -14,20 +15,24 @@ void main() {
     VoidCallback? onClose,
     VoidCallback? onReset,
     FutureOr<void> Function()? onResetLearning,
+    TextScaler textScaler = TextScaler.noScaling,
   }) {
     return MaterialApp(
       home: Scaffold(
         body: Center(
-          child: SizedBox(
-            width: 460,
-            height: 900,
-            child: SettingsDialog(
-              initial: initial,
-              onSave: onSave,
-              onClose: onClose ?? () {},
-              onReset: onReset ?? () {},
-              onResetLearning: onResetLearning ?? () {},
-              onOpenScreenTime: () {},
+          child: MediaQuery(
+            data: MediaQueryData(textScaler: textScaler),
+            child: SizedBox(
+              width: 460,
+              height: 900,
+              child: SettingsDialog(
+                initial: initial,
+                onSave: onSave,
+                onClose: onClose ?? () {},
+                onReset: onReset ?? () {},
+                onResetLearning: onResetLearning ?? () {},
+                onOpenScreenTime: () {},
+              ),
             ),
           ),
         ),
@@ -49,6 +54,15 @@ void main() {
     expect(find.text(ptStrings.settingsTitle), findsOneWidget);
     expect(find.text(ptStrings.blinkSpeed), findsNothing);
     expect(find.text(ptStrings.save), findsOneWidget);
+    expect(find.text(ptStrings.workCycle), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('settings-category-reminders')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('settings-category-reminders')));
+    await tester.pumpAndSettle();
+
     expect(find.text(ptStrings.blinkReminderFrequency), findsOneWidget);
   });
 
@@ -97,6 +111,9 @@ void main() {
       ),
     );
 
+    await tester.tap(find.byKey(const ValueKey('settings-category-privacy')));
+    await tester.pumpAndSettle();
+
     final resetButton = find.text(ptStrings.resetLearningLabel);
     await tester.ensureVisible(resetButton);
     await tester.pump();
@@ -129,14 +146,14 @@ void main() {
       host(initial: WidgetSettings.defaults(), onSave: (s) => saved = s),
     );
 
+    await tester.tap(find.byKey(const ValueKey('settings-category-reminders')));
+    await tester.pumpAndSettle();
+
     final soundLabel = find.text(ptStrings.blinkReminderSound);
     await tester.ensureVisible(soundLabel);
     await tester.pump();
 
-    final soundRow = find.ancestor(
-      of: soundLabel,
-      matching: find.byType(Row),
-    );
+    final soundRow = find.ancestor(of: soundLabel, matching: find.byType(Row));
     final soundSwitch = find.descendant(
       of: soundRow,
       matching: find.byType(Switch),
@@ -160,5 +177,57 @@ void main() {
     expect(saved, isNotNull);
     expect(saved!.blinkReminderSoundEnabled, isTrue);
     expect(saved!.blinkReminderSound, BlinkReminderSound.warmBell);
+  });
+
+  testWidgets('aparência mostra prévia viva da bolinha', (tester) async {
+    await tester.pumpWidget(
+      host(initial: WidgetSettings.defaults(), onSave: (_) {}),
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('settings-category-appearance')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('settings-ball-preview')), findsOneWidget);
+    expect(find.text(ptStrings.ballSize), findsOneWidget);
+  });
+
+  testWidgets('categorias permanecem utilizáveis com texto a 200%', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        initial: WidgetSettings.defaults(),
+        onSave: (_) {},
+        textScaler: const TextScaler.linear(2),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    await tester.tap(
+      find.byKey(const ValueKey('settings-category-appearance')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('settings-ball-preview')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Escape fecha configurações sem salvar', (tester) async {
+    var closes = 0;
+    var saves = 0;
+    await tester.pumpWidget(
+      host(
+        initial: WidgetSettings.defaults(),
+        onSave: (_) => saves++,
+        onClose: () => closes++,
+      ),
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+
+    expect(closes, 1);
+    expect(saves, 0);
   });
 }

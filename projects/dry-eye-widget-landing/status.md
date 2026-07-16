@@ -1,6 +1,13 @@
 # Status
 
-Updated: 2026-07-13
+Updated: 2026-07-16
+
+DVRS claims gate (2026-07-16):
+
+- App and landing copy are covered by `test/dvrs_claims_test.dart`.
+- Obsolete clinical-risk wording is rejected and the educational/non-validated
+  positioning is required.
+- Static landing smoke and the complete Flutter suite pass.
 
 README screenshots (2026-07-13):
 
@@ -85,6 +92,8 @@ In progress:
 
 - Signed runtime validation with real HealthKit permissions and samples is still pending.
 - Verification passed on 2026-06-21: `flutter analyze` and full `flutter test`.
+- 2026-07-13: DVRS deixou de apresentar o total como risco clínico validado; UI, site e textos legais explicitam escopo educativo e não diagnóstico.
+- Verificação: `flutter analyze`, smoke do site e 238 testes Flutter aprovados.
 
 Risks:
 

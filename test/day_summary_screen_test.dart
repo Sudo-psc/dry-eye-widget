@@ -67,6 +67,11 @@ void main() {
     expect(find.text(ptStrings.daySummaryTitle), findsOneWidget);
     expect(find.text(ptStrings.daySummaryCtaBreak), findsOneWidget);
     expect(find.text(ptStrings.daySummaryNudgeTitle), findsOneWidget);
+    expect(find.text(ptStrings.daySummaryCtaDashboard), findsNothing);
+    expect(
+      find.byKey(const ValueKey('day-summary-primary-action')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byKey(const ValueKey('day-summary-dvrs-card')));
     await tester.pump();

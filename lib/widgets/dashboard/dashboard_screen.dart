@@ -12,7 +12,6 @@ import '../../services/storage_service.dart';
 import '../../ui/app_theme.dart';
 import '../../ui/glass_card.dart';
 import '../../ui/panel_state_view.dart';
-import '../../ui/score_gauge.dart';
 import '../../ui/section_header.dart';
 import '../../ui/stat_tile.dart';
 import '../../ui/trend_line_chart.dart';
@@ -66,7 +65,11 @@ class _BarChart extends StatelessWidget {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: dense ? 1 : 2),
-                    child: _bar(values[i] / safeMax, i == highlightIdx, fmtValue(values[i])),
+                    child: _bar(
+                      values[i] / safeMax,
+                      i == highlightIdx,
+                      fmtValue(values[i]),
+                    ),
                   ),
                 ),
             ],
@@ -112,7 +115,10 @@ class _BarChart extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: highlighted
-                  ? [AppColors.idleBall, AppColors.idleBall.withValues(alpha: 0.6)]
+                  ? [
+                      AppColors.idleBall,
+                      AppColors.idleBall.withValues(alpha: 0.6),
+                    ]
                   : [
                       AppColors.idleBall.withValues(alpha: 0.55),
                       AppColors.idleBall.withValues(alpha: 0.25),
@@ -145,8 +151,9 @@ class _OverviewTab extends StatelessWidget {
     // DVRS — reusa as variáveis que a aba já usava.
     final dvrsHistory = context.read<DvrsStorageService>().getDvrsHistory();
     final latest = dvrsHistory.isNotEmpty ? dvrsHistory.last : null;
-    final previous =
-        dvrsHistory.length >= 2 ? dvrsHistory[dvrsHistory.length - 2] : null;
+    final previous = dvrsHistory.length >= 2
+        ? dvrsHistory[dvrsHistory.length - 2]
+        : null;
     final trend = (latest != null && previous != null)
         ? compareDvrsTrend(previous, latest)
         : null;
@@ -156,8 +163,8 @@ class _OverviewTab extends StatelessWidget {
     final adh7Start = now.subtract(const Duration(days: 6));
     final double? adherence7 =
         breakStats.sumForRange(adh7Start, now).reminders > 0
-            ? breakStats.adherenceForRange(adh7Start, now)
-            : null;
+        ? breakStats.adherenceForRange(adh7Start, now)
+        : null;
 
     // Sparkline de tempo de tela — últimos 7 dias.
     final last7 = <(DateTime, double)>[
@@ -173,7 +180,10 @@ class _OverviewTab extends StatelessWidget {
           children: [
             Expanded(
               child: StatTile(
-                label: context.read<SettingsProvider>().strings.progressAdherence7Label,
+                label: context
+                    .read<SettingsProvider>()
+                    .strings
+                    .progressAdherence7Label,
                 value: adherence7 == null
                     ? '—'
                     : '${(adherence7 * 100).round()}%',
@@ -185,7 +195,10 @@ class _OverviewTab extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: StatTile(
-                label: context.read<SettingsProvider>().strings.dashboardScreenToday,
+                label: context
+                    .read<SettingsProvider>()
+                    .strings
+                    .dashboardScreenToday,
                 value: screenTodayLabel,
                 icon: Icons.desktop_windows_outlined,
                 footer: last7.length >= 2
@@ -206,37 +219,45 @@ class _OverviewTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionHeader('DVRS — Risco Visual Digital'),
+              const SectionHeader('Registro visual digital — DVRS'),
               if (latest == null)
                 Text(
-                  'Responda o DVRS para acompanhar seu risco visual digital.',
+                  'Use o registro para acompanhar sintomas e hábitos relatados.',
                   style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 )
               else ...[
-                Center(
-                  child: ScoreGauge(
-                    score: latest.totalScore,
-                    color: DvrsUi.classificationColor(latest.classification),
-                    segments: DvrsUi.classificationSegments,
-                    size: 150,
+                Text(
+                  latest.classificationLabel,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Center(
-                  child: DvrsUi.classificationChip(latest.classification),
+                const SizedBox(height: 6),
+                Text(
+                  'Perfil educativo autorrelatado; não é risco clínico, '
+                  'diagnóstico ou medida para decisões corporativas.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
                 ),
                 // Linha de tendência (compareDvrsTrend) — mantida da versão anterior.
                 if (trend != null) ...[
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(DvrsUi.trendIcon(trend),
-                          size: 16, color: DvrsUi.trendColor(trend)),
+                      Icon(
+                        DvrsUi.trendIcon(trend),
+                        size: 16,
+                        color: DvrsUi.trendColor(trend),
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         DvrsUi.trendLabel(trend),
@@ -300,9 +321,9 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
     }
 
     final series = switch (_range) {
-      _TimeRange.week  => data.weekSeries(now),
+      _TimeRange.week => data.weekSeries(now),
       _TimeRange.month => data.monthSeries(now),
-      _TimeRange.year  => data.yearSeries(now),
+      _TimeRange.year => data.yearSeries(now),
     };
 
     final labels = _buildLabels(_range, series, strings);
@@ -320,7 +341,9 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
           decoration: BoxDecoration(
             color: AppColors.idleBall.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.idleBall.withValues(alpha: 0.4)),
+            border: Border.all(
+              color: AppColors.idleBall.withValues(alpha: 0.4),
+            ),
           ),
           child: Row(
             children: [
@@ -380,9 +403,7 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
                 child: _statBox(theme, 'Total no período', _fmtSecs(total)),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: _statBox(theme, 'Média diária', _fmtSecs(avg)),
-              ),
+              Expanded(child: _statBox(theme, 'Média diária', _fmtSecs(avg))),
             ],
           ),
         ],
@@ -495,14 +516,22 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
 
 /// Dashboard integrado de acompanhamento ao longo do tempo.
 ///
-/// Agrega em 3 abas: Resumo, Tempo de Tela e DVRS (Índice de Risco Visual
-/// Digital). Todos os dados são locais — lidos diretamente dos serviços já
+/// Agrega em 3 abas: Resumo, Tempo de Tela e DVRS. Todos os dados são locais —
+/// lidos diretamente dos serviços já
 /// instanciados no Provider tree. Linguagem educativa, nunca diagnóstica.
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.onClose, this.embedded = false});
+  const DashboardScreen({
+    super.key,
+    required this.onClose,
+    this.embedded = false,
+    this.initialTab = 0,
+    this.showTabs = true,
+  });
 
   final VoidCallback onClose;
   final bool embedded;
+  final int initialTab;
+  final bool showTabs;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -515,7 +544,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    _tabs = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTab.clamp(0, 2),
+    );
   }
 
   @override
@@ -533,10 +566,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       indicatorColor: AppColors.idleBall,
       labelColor: AppColors.idleBall,
       unselectedLabelColor: AppColors.textSecondary,
-      labelStyle: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
+      labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       unselectedLabelStyle: const TextStyle(fontSize: 12),
       indicatorSize: TabBarIndicatorSize.tab,
       tabs: [
@@ -565,16 +595,17 @@ class _DashboardScreenState extends State<DashboardScreen>
             onLeading: widget.onClose,
             leadingTooltip: strings.close,
             trailingIcon: Icons.space_dashboard_outlined,
-            bottom: tabBar,
+            bottom: widget.showTabs ? tabBar : null,
           ),
-        if (widget.embedded)
+        if (widget.embedded && widget.showTabs)
           Material(
             color: theme.colorScheme.surface.withValues(alpha: 0.2),
             child: TabBar(
               controller: _tabs,
               labelColor: AppColors.idleBall,
-              unselectedLabelColor:
-                  theme.colorScheme.onSurface.withValues(alpha: 0.65),
+              unselectedLabelColor: theme.colorScheme.onSurface.withValues(
+                alpha: 0.65,
+              ),
               indicatorColor: AppColors.idleBall,
               tabs: [
                 Tab(text: strings.dashboardTabOverview),
@@ -584,14 +615,20 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
         Expanded(
-          child: TabBarView(
-            controller: _tabs,
-            children: const [
-              _OverviewTab(),
-              _ScreenTimeTab(),
-              DvrsHistoryView(),
-            ],
-          ),
+          child: widget.showTabs
+              ? TabBarView(
+                  controller: _tabs,
+                  children: const [
+                    _OverviewTab(),
+                    _ScreenTimeTab(),
+                    DvrsHistoryView(),
+                  ],
+                )
+              : switch (widget.initialTab.clamp(0, 2)) {
+                  1 => const _ScreenTimeTab(),
+                  2 => const DvrsHistoryView(),
+                  _ => const _OverviewTab(),
+                },
         ),
       ],
     );
@@ -609,4 +646,3 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 }
-

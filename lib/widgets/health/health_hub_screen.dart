@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/feature_strings.dart';
@@ -11,7 +12,7 @@ import '../report_dialog.dart';
 import '../summary/day_summary_screen.dart';
 import '../liquid_glass.dart';
 
-/// Hub unificado de saúde visual: Hoje · Evolução · DVRS · Relatórios.
+/// Hub unificado de saúde visual: Hoje · Tendências · DVRS · Relatórios.
 ///
 /// Reduz a densidade do menu flutuante e concentra descoberta em uma janela.
 class HealthHubScreen extends StatefulWidget {
@@ -75,66 +76,73 @@ class _HealthHubScreenState extends State<HealthHubScreen>
     final lang = context.watch<SettingsProvider>().value.languageCode;
     final f = FeatureStrings.of(lang);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: LiquidGlass(
-          fillOpacity: 0.8,
-          blur: 20,
-          child: Column(
-            children: [
-              _header(theme, f),
-              Material(
-                color: theme.colorScheme.surface.withValues(alpha: 0.35),
-                child: TabBar(
-                  controller: _tabs,
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.start,
-                  labelColor: AppColors.idleBall,
-                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(
-                    alpha: 0.65,
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): widget.onClose,
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: LiquidGlass(
+              fillOpacity: 0.8,
+              blur: 20,
+              child: Column(
+                children: [
+                  _header(theme, f),
+                  Material(
+                    color: theme.colorScheme.surface.withValues(alpha: 0.35),
+                    child: TabBar(
+                      controller: _tabs,
+                      isScrollable: true,
+                      tabAlignment: TabAlignment.start,
+                      labelColor: AppColors.idleBall,
+                      unselectedLabelColor: theme.colorScheme.onSurface
+                          .withValues(alpha: 0.65),
+                      indicatorColor: AppColors.idleBall,
+                      tabs: [
+                        Tab(text: f.healthHubTabToday),
+                        Tab(text: f.healthHubTabProgress),
+                        Tab(text: f.healthHubTabDvrs),
+                        Tab(text: f.healthHubTabReports),
+                      ],
+                    ),
                   ),
-                  indicatorColor: AppColors.idleBall,
-                  tabs: [
-                    Tab(text: f.healthHubTabToday),
-                    Tab(text: f.healthHubTabProgress),
-                    Tab(text: f.healthHubTabDvrs),
-                    Tab(text: f.healthHubTabReports),
-                  ],
-                ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabs,
+                      children: [
+                        // Sem chrome próprio: DaySummary ainda tem header; usamos
+                        // onClose do hub e CTAs para abas internas.
+                        DaySummaryScreen(
+                          onClose: widget.onClose,
+                          onStartBreak: widget.onStartBreak,
+                          onDvrs: () => _goTab(2),
+                          onProgress: () => _openEvolution(0),
+                          onDashboard: () => _openEvolution(1),
+                          onSnoozeDvrsNudge: widget.onSnoozeDvrsNudge,
+                          embedded: true,
+                        ),
+                        _EvolutionSection(
+                          index: _evolutionIndex,
+                          onChanged: (index) {
+                            setState(() => _evolutionIndex = index);
+                          },
+                        ),
+                        DvrsScreen(
+                          embedded: true,
+                          onClose: () => _goTab(0),
+                          onExportPdf: (_) async => _goTab(3),
+                        ),
+                        ReportDialog(embedded: true, onClose: () => _goTab(0)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabs,
-                  children: [
-                    // Sem chrome próprio: DaySummary ainda tem header; usamos
-                    // onClose do hub e CTAs para abas internas.
-                    DaySummaryScreen(
-                      onClose: widget.onClose,
-                      onStartBreak: widget.onStartBreak,
-                      onDvrs: () => _goTab(2),
-                      onProgress: () => _openEvolution(0),
-                      onDashboard: () => _openEvolution(1),
-                      onSnoozeDvrsNudge: widget.onSnoozeDvrsNudge,
-                      embedded: true,
-                    ),
-                    _EvolutionSection(
-                      index: _evolutionIndex,
-                      onChanged: (index) {
-                        setState(() => _evolutionIndex = index);
-                      },
-                    ),
-                    DvrsScreen(
-                      embedded: true,
-                      onClose: () => _goTab(0),
-                      onExportPdf: (_) async => _goTab(3),
-                    ),
-                    ReportDialog(embedded: true, onClose: () => _goTab(0)),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -219,7 +227,7 @@ class _EvolutionSection extends StatelessWidget {
                   ButtonSegment(
                     value: 1,
                     icon: const Icon(Icons.insights_outlined),
-                    label: Text(f.healthHubEvolutionIndicators),
+                    label: Text(f.healthHubTabScreen),
                   ),
                 ],
                 selected: {index},
@@ -233,7 +241,12 @@ class _EvolutionSection extends StatelessWidget {
             index: index,
             children: [
               ProgressScreen(onClose: () {}, embedded: true),
-              DashboardScreen(onClose: () {}, embedded: true),
+              DashboardScreen(
+                onClose: () {},
+                embedded: true,
+                initialTab: 1,
+                showTabs: false,
+              ),
             ],
           ),
         ),
