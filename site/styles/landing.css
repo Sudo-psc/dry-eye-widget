@@ -712,6 +712,16 @@ a.icon-btn.science-mobile-link {
 /* O infográfico está em português; oculta na versão em inglês. */
 html[lang="en"] .cost-info { display: none; }
 
+.cost-book {
+  margin: 28px auto 0; max-width: 720px; padding: 26px 28px;
+  border-radius: var(--radius-xl); text-align: center;
+}
+.cost-book p { color: var(--text-2); font-size: 15px; line-height: 1.5; }
+.cost-book em { color: var(--text); font-style: italic; font-weight: 600; }
+.cost-book-actions {
+  margin-top: 18px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+}
+
 /* ---------- FAQ ---------- */
 .faq-list {
   max-width: 800px;

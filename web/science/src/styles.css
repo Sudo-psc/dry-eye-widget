@@ -1187,6 +1187,25 @@ h3 {
   color: var(--ink);
 }
 
+.book-actions {
+  @apply flex flex-wrap gap-3;
+}
+
+.book-author-link {
+  @apply mt-5 inline-flex items-center gap-1.5 text-sm font-semibold;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.book-author-link:hover {
+  color: var(--ink);
+}
+
+.book-author-link svg {
+  @apply size-4;
+}
+
 .vision-section {
   position: relative;
 }
@@ -1382,6 +1401,10 @@ h3 {
   .book-copy > p,
   .book-copy h2 {
     margin-inline: auto;
+  }
+
+  .book-copy .book-actions {
+    justify-content: center;
   }
 
   .monitoring-layout {

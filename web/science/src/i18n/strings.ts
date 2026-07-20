@@ -107,6 +107,9 @@ export type Strings = {
     body: string;
     bridgeTitle: string;
     bridgeBody: string;
+    ctaKindle: string;
+    ctaPaperback: string;
+    ctaApple: string;
     cta: string;
     coverAlt: string;
   };
@@ -369,6 +372,9 @@ export const STRINGS: Record<Lang, Strings> = {
       bridgeTitle: "Conceptual foundation",
       bridgeBody:
         "The book frames the problem; OVPP defines an open measurement path; Dry Eye Widget provides the human interface.",
+      ctaKindle: "Buy on Amazon (Kindle)",
+      ctaPaperback: "Buy paperback",
+      ctaApple: "Buy on Apple Books",
       cta: "Learn more with the author",
       coverAlt: "Cover of O Custo Invisível do Olho Seco by Dr. Philipe Saraiva Cruz",
     },
@@ -680,6 +686,9 @@ export const STRINGS: Record<Lang, Strings> = {
       bridgeTitle: "Fundação conceitual",
       bridgeBody:
         "O livro enquadra o problema; o OVPP define um caminho aberto de medição; o Dry Eye Widget oferece a interface humana.",
+      ctaKindle: "Comprar na Amazon (Kindle)",
+      ctaPaperback: "Comprar capa comum",
+      ctaApple: "Comprar na Apple Books",
       cta: "Saiba mais com o autor",
       coverAlt: "Capa de O Custo Invisível do Olho Seco, do Dr. Philipe Saraiva Cruz",
     },

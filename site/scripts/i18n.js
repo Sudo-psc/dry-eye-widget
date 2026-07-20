@@ -96,6 +96,10 @@
       "cost.sev.sev": "Grave",
       "cost.bars.foot": "Horas perdidas por semana e queda percentual de produtividade, por gravidade da doença do olho seco (DED).",
       "cost.caption": "Panorama completo: impacto na saúde ocular e na produtividade, causas e estratégias de proteção.",
+      "cost.book.note": "Quer se aprofundar? Estes números são o tema do livro <em>O Custo Invisível do Olho Seco</em>, do Dr. Philipe Saraiva Cruz — já disponível na Amazon.",
+      "cost.book.kindle": "Comprar eBook Kindle",
+      "cost.book.paper": "Comprar capa comum",
+      "cost.book.apple": "Comprar na Apple Books",
       "ft.kicker": "Recursos",
       "ft.title": "Pequeno na tela, sério no propósito",
       "ft.1.title": "Widget sempre presente",
@@ -315,6 +319,10 @@
       "cost.sev.sev": "Severe",
       "cost.bars.foot": "Hours lost per week and percentage productivity drop, by dry eye disease (DED) severity.",
       "cost.caption": "Full picture: impact on eye health and productivity, causes and protection strategies.",
+      "cost.book.note": "Want to go deeper? These numbers are the subject of the book <em>O Custo Invisível do Olho Seco</em> (The Invisible Cost of Dry Eye) by Dr. Philipe Saraiva Cruz — now available on Amazon.",
+      "cost.book.kindle": "Buy Kindle eBook",
+      "cost.book.paper": "Buy paperback",
+      "cost.book.apple": "Buy on Apple Books",
       "ft.kicker": "Features",
       "ft.title": "Small on screen, serious in purpose",
       "ft.1.title": "Always-present widget",
@@ -442,7 +450,7 @@
     }
   };
 
-  const HTML_KEYS = new Set(["hero.title"]);
+  const HTML_KEYS = new Set(["hero.title", "cost.book.note"]);
 
   function apply(lang) {
     const dict = STR[lang] || STR.pt;

@@ -400,8 +400,34 @@ export default function App() {
                   {t.book.bridgeBody}
                 </p>
               </div>
+              <div className="book-actions">
+                <a
+                  className="button button--primary"
+                  href="https://www.amazon.com.br/dp/B0H9JW6TGX"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.book.ctaKindle} <ArrowUpRight aria-hidden="true" />
+                </a>
+                <a
+                  className="button button--secondary"
+                  href="https://www.amazon.com.br/dp/6502223133"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.book.ctaPaperback} <ArrowUpRight aria-hidden="true" />
+                </a>
+                <a
+                  className="button button--secondary"
+                  href="https://books.apple.com/us/book/o-custo-invis%C3%ADvel-do-olho-seco/id6792581396"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.book.ctaApple} <ArrowUpRight aria-hidden="true" />
+                </a>
+              </div>
               <a
-                className="button button--primary"
+                className="book-author-link"
                 href="https://saraivavision.com.br/sobre"
                 target="_blank"
                 rel="noopener noreferrer"
