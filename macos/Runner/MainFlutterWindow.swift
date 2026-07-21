@@ -4,6 +4,7 @@ import Cocoa
 import CoreGraphics
 import FlutterMacOS
 import Security
+import ServiceManagement
 import Vision
 
 class MainFlutterWindow: NSWindow {
@@ -17,6 +18,56 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: true)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+
+    // O pacote launch_at_startup implementa o Windows diretamente, mas no
+    // macOS exige que o aplicativo forneça este canal. Sem ele, a opção
+    // "Iniciar com o sistema" terminava em MissingPluginException.
+    let launchAtStartupChannel = FlutterMethodChannel(
+      name: "launch_at_startup",
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
+    launchAtStartupChannel.setMethodCallHandler { (call, result) in
+      guard #available(macOS 13.0, *) else {
+        result(FlutterError(
+          code: "unsupported_macos_version",
+          message: "Iniciar com o sistema requer macOS 13 ou posterior.",
+          details: nil))
+        return
+      }
+
+      let service = SMAppService.mainApp
+      switch call.method {
+      case "launchAtStartupIsEnabled":
+        result(service.status == .enabled)
+      case "launchAtStartupSetEnabled":
+        guard let arguments = call.arguments as? [String: Any],
+          let shouldEnable = arguments["setEnabledValue"] as? Bool
+        else {
+          result(FlutterError(
+            code: "bad_args",
+            message: "setEnabledValue ausente.",
+            details: nil))
+          return
+        }
+
+        do {
+          if shouldEnable {
+            if service.status == .notRegistered || service.status == .notFound {
+              try service.register()
+            }
+          } else if service.status != .notRegistered {
+            try service.unregister()
+          }
+          result(nil)
+        } catch {
+          result(FlutterError(
+            code: "launch_at_startup_failed",
+            message: error.localizedDescription,
+            details: nil))
+        }
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
 
     // Canal de tempo ocioso do sistema (segundos desde a última entrada do
     // usuário — mouse, cliques, teclas — em todo o sistema).

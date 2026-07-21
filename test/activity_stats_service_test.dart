@@ -29,10 +29,7 @@ void main() {
       const ActivitySample(clicks: 3, keys: 10, frontApp: 'Safari'),
       now,
     );
-    svc.applySample(
-      const ActivitySample(clicks: 1, frontApp: 'Xcode'),
-      now,
-    );
+    svc.applySample(const ActivitySample(clicks: 1, frontApp: 'Xcode'), now);
 
     expect(svc.data.clicksForDay(now), 16);
     expect(svc.data.keysForDay(now), 50);
@@ -57,7 +54,9 @@ void main() {
     );
     await svc.flush(now);
 
-    final reloaded = ActivityStatsData.fromJson(storage.loadActivityStats().toJson());
+    final reloaded = ActivityStatsData.fromJson(
+      storage.loadActivityStats().toJson(),
+    );
     expect(reloaded.clicksForDay(now), 5);
     expect(reloaded.appSecondsForDay(now)['Mail'], 5);
     await svc.dispose();
@@ -74,6 +73,28 @@ void main() {
     svc.applySample(const ActivitySample(clicks: 9, frontApp: 'X'), now);
     await svc.clear();
     expect(svc.data.clicksForDay(now), 0);
+    await svc.dispose();
+  });
+
+  test('stop persiste amostras mesmo quando a coleta já está parada', () async {
+    final storage = await newStorage();
+    final svc = ActivityStatsService(
+      storage: storage,
+      monitor: const ActivityMonitorService(),
+      pollIntervalSeconds: 5,
+    );
+    final now = DateTime(2026, 7, 16, 14);
+    svc.applySample(
+      const ActivitySample(clicks: 7, keys: 3, frontApp: 'Finder'),
+      now,
+    );
+
+    await svc.stop();
+
+    final persisted = storage.loadActivityStats();
+    expect(persisted.clicksForDay(now), 7);
+    expect(persisted.keysForDay(now), 3);
+    expect(persisted.appSecondsForDay(now)['Finder'], 5);
     await svc.dispose();
   });
 }

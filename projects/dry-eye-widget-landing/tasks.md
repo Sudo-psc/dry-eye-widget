@@ -2,6 +2,24 @@
 
 ## now
 
+- [x] Preserve the orb's visual origin when the expanded menu is clamped to the screen.
+- [x] Position the menu panel above or below according to the available space around the orb.
+- [x] Make the open-menu orb close the menu directly and remove inactive pan recognizers.
+- [x] Add menu-origin and click regression tests; run analysis, full tests and macOS release build.
+
+- [x] Audit lifecycle, layout, persistence and native-window boundaries for reproducible app defects.
+- [x] Make screen-sensitive widget operations follow the current display in multi-monitor setups.
+- [x] Preserve the compact anchor when an automatic break interrupts a centered panel.
+- [x] Flush pending activity and screen-time state before native app shutdown.
+- [x] Restore the missing macOS launch-at-login platform channel and add a source regression gate.
+- [x] Add regression coverage and run analysis, full tests, release build, signature check and local launch.
+
+- [x] Remove velocity-driven acceleration from the orb's internal material.
+- [x] Preserve the exact compact widget position while opening and closing the menu.
+- [x] Disable drag-position persistence while the expanded menu is visible.
+- [x] Serialize native layout changes to prevent open/close races.
+- [x] Add anchor and motion regression tests; run analysis, all tests and macOS build.
+
 - [x] 2026-07-13: Replace the legacy README screenshot carousel with current v1.24 menu and daily-summary captures in PT-BR and EN.
 
 - [x] Reduce continuous floating-orb repaint frequency without changing animation duration.
@@ -62,10 +80,16 @@
 - Add an annual scientific-reference freshness review for TFOS/AAO updates.
 - Add signed-runtime QA evidence for HealthKit permission states: unavailable, denied, authorized and no samples.
 - Track Flutter macOS Swift Package Manager warnings for `screen_retriever_macos`, `tray_manager`, and `local_notifier`.
+- Decide whether macOS 10.15-12 should gain a bundled legacy login helper or
+  whether the documented minimum for launch-at-login should remain macOS 13.
 - Add real app screenshots from macOS and Windows release runs.
 - Refresh Windows captures from a real v1.24+ Windows session so the platform set matches the current menu architecture.
 - Add structured article metadata for future blog expansion.
 - Add a profile-mode frame-timing benchmark for the floating widget on 60 Hz and 120 Hz displays.
+- Add a macOS integration test driver that clicks the frameless widget using
+  display-aware coordinate conversion on multi-monitor Retina setups.
+- Serialize DVRS draft and settings persistence if runtime evidence exposes
+  overlapping-write loss under rapid interactions.
 - [x] 2026-07-13: reposicionar DVRS como registro educativo não validado no app, site e textos legais.
 - [x] Add a claims regression gate for DVRS copy in app and public landing.
 

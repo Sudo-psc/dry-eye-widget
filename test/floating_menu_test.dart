@@ -2,6 +2,7 @@ import 'package:dry_eye_widget/l10n/app_strings.dart';
 import 'package:dry_eye_widget/l10n/feature_strings.dart';
 import 'package:dry_eye_widget/widgets/floating_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -91,13 +92,12 @@ void main() {
             onSettings: () {},
             onQuit: () {},
             onDismiss: () {},
+            autofocusFirstAction: true,
           ),
         ),
       ),
     );
 
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump();
 
@@ -232,10 +232,377 @@ void main() {
     expect(find.text(ptStrings.menuQuit), findsOneWidget);
     expect(find.text(f.menuHealthHub), findsNothing);
 
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.text(f.menuHealthHub), findsOneWidget);
+    expect(find.text(ptStrings.menuQuit), findsNothing);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+    expect(find.text(ptStrings.menuQuit), findsOneWidget);
+
     await tester.tap(find.text(ptStrings.back));
     await tester.pumpAndSettle();
 
     expect(find.text(f.menuHealthHub), findsOneWidget);
     expect(find.text(ptStrings.menuQuit), findsNothing);
   });
+
+  testWidgets(
+    'silêncio temporário oferece 15 minutos e 1 hora e fecha o menu',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final selectedDurations = <Duration>[];
+      var dismissed = 0;
+      final semantics = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        _menuHarness(
+          onQuietBlinkReminders: selectedDurations.add,
+          onDismiss: () => dismissed++,
+          closeOnDismiss: true,
+        ),
+      );
+
+      final quietAction = find.bySemanticsLabel(
+        ptStrings.menuQuietBlinkReminders,
+      );
+      expect(quietAction, findsOneWidget);
+      expect(
+        tester
+            .getSemantics(quietAction)
+            .getSemanticsData()
+            .hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+      expect(
+        tester
+            .getSize(find.byKey(const ValueKey('quiet-blink-reminders-action')))
+            .height,
+        greaterThanOrEqualTo(44),
+      );
+      semantics.dispose();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(const ValueKey('quiet-blink-reminders-action')),
+          matching: find.byType(TextButton),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(ptStrings.quietBlinkRemindersTitle.toUpperCase()),
+        findsOneWidget,
+      );
+      expect(
+        find.text(ptStrings.quietBlinkRemindersDescription),
+        findsOneWidget,
+      );
+      expect(find.text(ptStrings.quietBlinkFor15Minutes), findsOneWidget);
+      expect(find.text(ptStrings.quietBlinkFor1Hour), findsOneWidget);
+
+      await tester.tap(find.text(ptStrings.quietBlinkFor15Minutes));
+      await tester.pumpAndSettle();
+
+      expect(selectedDurations, const [Duration(minutes: 15)]);
+      expect(dismissed, 1);
+      expect(find.byType(FloatingMenu), findsNothing);
+
+      await tester.pumpWidget(
+        _menuHarness(
+          onQuietBlinkReminders: selectedDurations.add,
+          onDismiss: () => dismissed++,
+          closeOnDismiss: true,
+        ),
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(const ValueKey('quiet-blink-reminders-action')),
+          matching: find.byType(TextButton),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(ptStrings.quietBlinkFor1Hour));
+      await tester.pumpAndSettle();
+
+      expect(selectedDurations, const [
+        Duration(minutes: 15),
+        Duration(hours: 1),
+      ]);
+      expect(dismissed, 2);
+      expect(find.byType(FloatingMenu), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'silêncio ativo permite retomar avisos de piscada imediatamente',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      var resumed = 0;
+      var dismissed = 0;
+      await tester.pumpWidget(
+        _menuHarness(
+          quietUntil: DateTime(2099, 1, 1, 14, 30),
+          onQuietBlinkReminders: (_) {},
+          onResumeBlinkReminders: () => resumed++,
+          onDismiss: () => dismissed++,
+        ),
+      );
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(const ValueKey('quiet-blink-reminders-action')),
+          matching: find.byType(TextButton),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('14:30'), findsOneWidget);
+      expect(find.text(ptStrings.quietBlinkResumeNow), findsOneWidget);
+
+      await tester.tap(find.text(ptStrings.quietBlinkResumeNow));
+      await tester.pump();
+
+      expect(resumed, 1);
+      expect(dismissed, 1);
+    },
+  );
+
+  testWidgets('Escape volta à principal com foco estável e depois fecha', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    var dismissed = 0;
+    await tester.pumpWidget(
+      _menuHarness(
+        autofocusFirstAction: true,
+        onQuietBlinkReminders: (_) {},
+        onDismiss: () => dismissed++,
+      ),
+    );
+
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const ValueKey('quiet-blink-reminders-action')),
+        matching: find.byType(TextButton),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text(ptStrings.quietBlinkRemindersTitle.toUpperCase()),
+      findsOneWidget,
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(ptStrings.quietBlinkRemindersTitle.toUpperCase()),
+      findsNothing,
+    );
+    expect(
+      tester
+          .widget<TextButton>(
+            find.descendant(
+              of: find.byKey(const ValueKey('quiet-blink-reminders-action')),
+              matching: find.byType(TextButton),
+            ),
+          )
+          .focusNode
+          ?.hasFocus,
+      isTrue,
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pumpAndSettle();
+    expect(
+      find.text(ptStrings.quietBlinkRemindersTitle.toUpperCase()),
+      findsOneWidget,
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+
+    expect(dismissed, 1);
+  });
+
+  testWidgets('linhas expõem onTap semântico e alvo mínimo de 44 pixels', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(_menuHarness());
+
+    final systemAction = find.bySemanticsLabel(ptStrings.menuGroupSystem);
+    expect(
+      tester
+          .getSemantics(systemAction)
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap),
+      isTrue,
+    );
+    expect(
+      tester
+          .getSize(
+            find.byKey(ValueKey('menu-row-${ptStrings.menuGroupSystem}')),
+          )
+          .height,
+      greaterThanOrEqualTo(44),
+    );
+
+    final quickStart = find.bySemanticsLabel(ptStrings.menuStartBreak);
+    expect(
+      tester
+          .getSemantics(quickStart)
+          .getSemanticsData()
+          .hasAction(SemanticsAction.tap),
+      isTrue,
+    );
+    expect(
+      tester
+          .getSize(
+            find.byKey(
+              ValueKey(
+                'quick-action-${FeatureStrings.of('pt').menuQuickStart}',
+              ),
+            ),
+          )
+          .height,
+      greaterThanOrEqualTo(44),
+    );
+    semantics.dispose();
+  });
+
+  testWidgets('subpáginas continuam alcançáveis com texto a 200%', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 350);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_menuHarness(textScale: 2));
+    await tester.scrollUntilVisible(
+      find.text(ptStrings.menuGroupSystem),
+      80,
+      scrollable: find.byType(Scrollable),
+    );
+    await tester.tap(find.text(ptStrings.menuGroupSystem));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    await tester.scrollUntilVisible(
+      find.text(ptStrings.menuQuit),
+      80,
+      scrollable: find.byType(Scrollable),
+    );
+    expect(find.text(ptStrings.menuQuit).hitTestable(), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(
+      _menuHarness(
+        quietUntil: DateTime(2099, 1, 1, 14, 30),
+        onQuietBlinkReminders: (_) {},
+        onResumeBlinkReminders: () {},
+        textScale: 2,
+      ),
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const ValueKey('quiet-blink-reminders-action')),
+        matching: find.byType(TextButton),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    await tester.scrollUntilVisible(
+      find.text(ptStrings.quietBlinkResumeNow),
+      80,
+      scrollable: find.byType(Scrollable),
+    );
+    expect(
+      find.text(ptStrings.quietBlinkResumeNow).hitTestable(),
+      findsOneWidget,
+    );
+  });
+}
+
+Widget _menuHarness({
+  DateTime? quietUntil,
+  ValueChanged<Duration>? onQuietBlinkReminders,
+  VoidCallback? onResumeBlinkReminders,
+  VoidCallback? onDismiss,
+  bool autofocusFirstAction = false,
+  bool closeOnDismiss = false,
+  double textScale = 1,
+}) {
+  final feature = FeatureStrings.of('pt');
+  Widget menu(VoidCallback dismiss) => FloatingMenu(
+    strings: ptStrings,
+    healthHubLabel: feature.menuHealthHub,
+    myDataLabel: feature.menuMyData,
+    isPaused: false,
+    blinkRemindersQuietUntil: quietUntil,
+    onQuietBlinkReminders: onQuietBlinkReminders,
+    onResumeBlinkReminders: onResumeBlinkReminders,
+    autofocusFirstAction: autofocusFirstAction,
+    onStartNow: () {},
+    onReset: () {},
+    onTogglePause: () {},
+    onExtendCycle: () {},
+    onGuidance: () {},
+    onHealthHub: () {},
+    onMyData: () {},
+    onCheckUpdates: () {},
+    onAbout: () {},
+    onSettings: () {},
+    onQuit: () {},
+    onDismiss: dismiss,
+  );
+
+  Widget body;
+  if (closeOnDismiss) {
+    var visible = true;
+    body = StatefulBuilder(
+      builder: (context, setState) {
+        if (!visible) return const SizedBox.shrink();
+        return menu(() {
+          onDismiss?.call();
+          setState(() => visible = false);
+        });
+      },
+    );
+  } else {
+    body = menu(onDismiss ?? () {});
+  }
+
+  return MaterialApp(
+    home: Builder(
+      builder: (context) => MediaQuery(
+        data: MediaQuery.of(
+          context,
+        ).copyWith(textScaler: TextScaler.linear(textScale)),
+        child: Scaffold(
+          body: Align(alignment: Alignment.topLeft, child: body),
+        ),
+      ),
+    ),
+  );
 }

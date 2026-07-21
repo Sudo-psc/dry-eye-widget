@@ -2,9 +2,39 @@
 
 ## Current State
 
+The expanded menu no longer pins the orb to its top-left corner. A testable
+`MenuWindowPlacement` compensates the native menu-window clamp, so the orb stays
+over the same visual origin it occupied in compact mode. The action panel is
+placed below the orb when there is room and above it near the bottom edge.
+Clicking the orb inside the open menu now invokes `_closeMenu` directly; because
+that orb is not draggable, its pan recognizers are also disabled so they cannot
+compete with the closing click.
+
+The 2026-07-16 reliability audit corrected four confirmed defects. Widget
+layout decisions now follow the display that contains the current window, so a
+secondary monitor no longer inherits primary-display bounds. Automatic breaks
+cannot replace the compact anchor with a centered panel coordinate. App quit
+also drains pending activity and screen-time persistence before closing.
+
+The audit also found that launch-at-login had no macOS channel implementation.
+`MainFlutterWindow.swift` now backs the package API with `SMAppService.mainApp`
+on macOS 13 or later, validates arguments and reports native failures. The
+release runtime no longer logs MissingPluginException and the operating system
+confirmed the saved login-item preference.
+
+The floating orb no longer derives visual deformation from drag velocity. Its
+iris, highlight, shadow and progress ring keep their calm internal motion while
+the lateral edge magnetism remains fast.
+
+Menu expansion now uses an immutable compact-window anchor. The larger menu may
+be clamped temporarily to the visible screen, but that transient coordinate is
+never persisted as the ball position. Native layout requests are serialized,
+drag callbacks are disabled while the menu is expanded, and closing either the
+menu or a panel restores the original compact coordinate.
+
 The public DVRS wording is now protected by `test/dvrs_claims_test.dart`, which
 checks app and landing surfaces for obsolete clinical-risk language and requires
-the explicit educational/non-validated framing. The site smoke test and all 246
+the explicit educational/non-validated framing. The site smoke test and all 261
 Flutter tests pass on 2026-07-16.
 
 The PT-BR and English GitHub READMEs now show the current v1.24 liquid-menu and daily-summary screenshots directly from the canonical landing assets, with a link to the full macOS and Windows gallery.
@@ -23,7 +53,10 @@ The current branch is `main`. The macOS-only HealthKit foundation remains implem
 
 The Health dashboard UI is connected to `HealthKitDashboardService`. It is available from the floating menu and the system tray/menu bar, requests optional HealthKit permission, and renders the last 7 days of sleep and average heart-rate values with explicit missing-data states.
 
-A widget positioning bug was fixed: the floating widget no longer jumps to random locations when switching layouts (menu, blink reminder, ball). The root causes were `_ballPosition` not syncing with saved storage on startup, `_nudgeIntoScreen` not updating the cached position after clamping, and `blinkReminder` layout not refreshing position before applying.
+A widget positioning bug was fixed: the floating widget no longer adopts the
+temporary position of a larger menu/reminder window. The compact coordinate is
+loaded from storage, isolated in `CompactWindowAnchor`, restored after transient
+layouts and changed only by a real compact-widget drag or explicit undocking.
 
 ## Next Actions
 
@@ -41,6 +74,31 @@ A widget positioning bug was fixed: the floating widget no longer jumps to rando
 - Signed HealthKit runtime validation requires a valid Apple signing identity/provisioning setup.
 
 ## Verification
+
+- Menu origin/click regression group: all 23 tests passed on 2026-07-16.
+- Final `flutter analyze`: passed with no issues on 2026-07-16.
+- Final complete Flutter suite: all 264 tests passed on 2026-07-16.
+- Final macOS release build: passed at 59.4 MB; local ad-hoc reseal and strict
+  deep signature verification passed. Process 87550 is running for inspection.
+
+- Reliability audit: `flutter analyze` passed with no issues on 2026-07-16.
+- Multi-monitor, activity persistence, edge snap, orb motion and macOS startup
+  regression group: all 32 tests passed on 2026-07-16.
+- Complete Flutter suite: all 261 tests passed on 2026-07-16.
+- macOS release build: passed on 2026-07-16; app bundle 59.4 MB.
+- Strict deep signature verification passed. The rebuilt local release launched
+  as process 67893 without the previous startup-channel exception; CoreGraphics
+  confirmed its native window was on screen.
+
+- `flutter analyze` on the affected app/layout/widget files: passed on 2026-07-16.
+- Focused motion and window-anchor tests: all 17 passed on 2026-07-16.
+- `flutter test`: all 256 tests passed on 2026-07-16.
+- `flutter build macos --release`: passed on 2026-07-16; app bundle 59.4 MB.
+- Local `codesign --verify --deep --strict`: passed after ad-hoc reseal.
+- Native runtime: expanded menu observed at 300×407; menu-to-settings-to-close
+  returned to the same starting coordinate. Direct synthetic menu-close click
+  is not used as evidence because Retina multi-monitor coordinate conversion
+  selected the wrong control; a display-aware integration driver remains queued.
 
 - `flutter test test/floating_ball_test.dart`: 10 tests passed on 2026-07-12, including animation-performance regressions.
 - `flutter analyze`: passed with no issues on 2026-07-12.

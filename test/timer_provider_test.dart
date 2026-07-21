@@ -453,6 +453,7 @@ class _MemoryStorage implements StorageService {
   }
 
   DateTime? _dvrsNudgeSnoozedUntil;
+  DateTime? _blinkRemindersQuietUntil;
   String? _dvrsNudgeNotifiedDay;
 
   @override
@@ -461,6 +462,14 @@ class _MemoryStorage implements StorageService {
   @override
   Future<void> saveDvrsNudgeSnoozedUntil(DateTime? until) async {
     _dvrsNudgeSnoozedUntil = until;
+  }
+
+  @override
+  DateTime? loadBlinkRemindersQuietUntil() => _blinkRemindersQuietUntil;
+
+  @override
+  Future<void> saveBlinkRemindersQuietUntil(DateTime? until) async {
+    _blinkRemindersQuietUntil = until;
   }
 
   @override

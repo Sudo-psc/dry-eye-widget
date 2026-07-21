@@ -6,6 +6,8 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.25.0] - 2026-07-21
+
 ### Melhorado
 - Hub simplificado para Hoje, Tendências, DVRS e Relatórios, sem terceiro nível
   de abas; Resumo do dia com uma ação primária contextual.
@@ -17,6 +19,10 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
   concluir ou pular, evitando escrita a cada evento de slider.
 - Atualizações idênticas de configurações deixam de notificar listeners e
   regravar o armazenamento.
+
+### Corrigido
+- O material interno da bolinha não acelera, desloca ou ganha intensidade extra
+  durante o arrasto com mouse; somente o feedback externo de pressão permanece.
 
 ### Testado
 - Gate automático de claims DVRS no app e na landing.

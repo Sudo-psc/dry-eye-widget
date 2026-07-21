@@ -1,7 +1,7 @@
 name: dry_eye_widget
 description: "Widget flutuante de olho seco - lembretes da regra 20-20-20 (always-on-top)."
 publish_to: 'none'
-version: 1.24.2+72
+version: 1.25.0+73
 
 environment:
   sdk: ">=3.12.0 <4.0.0"
@@ -80,7 +80,7 @@ msix_config:
   publisher_display_name: DR. Philipe Saraiva Cruz
   identity_name: DR.PhilipeSaraivaCruz.DryEyeWidget
   publisher: CN=71D5E9B9-21A8-4078-84B2-62C827D80D0E
-  msix_version: 1.24.2.0
+  msix_version: 1.25.0.0
   logo_path: icon.png
   languages: pt-br, en-us
   capabilities: internetClient

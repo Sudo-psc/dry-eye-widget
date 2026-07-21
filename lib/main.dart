@@ -283,7 +283,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _blinkReminderVisible = false;
   Timer? _blinkReminderTicker;
   Timer? _blinkReminderHideTimer;
+  Timer? _blinkReminderQuietTimer;
+  DateTime? _blinkRemindersQuietUntil;
   int _ballReleaseGeneration = 0;
+  Future<void> _layoutQueue = Future<void>.value();
+  final FocusNode _orbFocusNode = FocusNode(debugLabel: 'floating-orb-control');
 
   final UpdateService _updater = UpdateService();
   UpdateResult? _updateResult;
@@ -294,6 +298,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
   bool _widgetEnabled = true;
 
   Offset _ballPosition = const Offset(100, 100);
+  CompactWindowAnchor? _compactWindowAnchor;
+  MenuWindowPlacement? _menuPlacement;
 
   /// Borda em que a bolinha está encaixada (meia-lua); `null` = solta.
   BallDockEdge? _dockEdge;
@@ -326,6 +332,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
     // Inicializa a posicao com o valor salvo para evitar salto para (100, 100).
     final storage = context.read<StorageService>();
+    final quietUntil = storage.loadBlinkRemindersQuietUntil();
+    if (quietUntil != null && quietUntil.isAfter(DateTime.now())) {
+      _blinkRemindersQuietUntil = quietUntil;
+    } else if (quietUntil != null) {
+      unawaited(storage.saveBlinkRemindersQuietUntil(null));
+    }
     final savedX = storage.ballX;
     final savedY = storage.ballY;
     if (savedX != null && savedY != null) {
@@ -428,6 +440,8 @@ class _HomePageState extends State<HomePage> with TrayListener {
     trayManager.removeListener(this);
     _blinkReminderTicker?.cancel();
     _blinkReminderHideTimer?.cancel();
+    _blinkReminderQuietTimer?.cancel();
+    _orbFocusNode.dispose();
     // Libera os players de áudio (regra 20-20-20 + piscada). O TimerProvider,
     // disposto em seguida pelo provider, não toca som no teardown.
     _audio.dispose();
@@ -436,6 +450,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _startBlinkReminderLoop() {
     _blinkReminderTicker?.cancel();
+    if (_blinkRemindersAreQuiet) {
+      _scheduleBlinkReminderQuietExpiry();
+      return;
+    }
     final intervalMs = _settings.value.blinkReminderFrequency.intervalMs;
     _blinkReminderTicker = Timer.periodic(Duration(milliseconds: intervalMs), (
       _,
@@ -450,6 +468,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   bool get _canTriggerBlinkReminder =>
       mounted &&
+      !_blinkRemindersAreQuiet &&
       _isBlinkReminderContextFree &&
       (_canShowVisualBlinkReminder ||
           _settings.value.blinkReminderSoundEnabled);
@@ -473,6 +492,51 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   bool get _canShowVisualBlinkReminder =>
       _settings.value.visualBlinkRemindersEnabled && _widgetEnabled;
+
+  bool get _blinkRemindersAreQuiet {
+    final until = _blinkRemindersQuietUntil;
+    return until != null && DateTime.now().isBefore(until);
+  }
+
+  void _scheduleBlinkReminderQuietExpiry() {
+    _blinkReminderQuietTimer?.cancel();
+    final until = _blinkRemindersQuietUntil;
+    if (until == null) return;
+    final remaining = until.difference(DateTime.now());
+    if (remaining <= Duration.zero) {
+      unawaited(_resumeBlinkReminders());
+      return;
+    }
+    _blinkReminderQuietTimer = Timer(remaining, () {
+      unawaited(_resumeBlinkReminders());
+    });
+  }
+
+  Future<void> _quietBlinkReminders(Duration duration) async {
+    if (duration <= Duration.zero) return;
+    final until = DateTime.now().add(duration);
+    _blinkReminderTicker?.cancel();
+    _hideBlinkReminder(restoreLayout: true);
+    if (mounted) {
+      setState(() => _blinkRemindersQuietUntil = until);
+    } else {
+      _blinkRemindersQuietUntil = until;
+    }
+    await context.read<StorageService>().saveBlinkRemindersQuietUntil(until);
+    _scheduleBlinkReminderQuietExpiry();
+  }
+
+  Future<void> _resumeBlinkReminders() async {
+    _blinkReminderQuietTimer?.cancel();
+    _blinkReminderQuietTimer = null;
+    if (mounted) {
+      setState(() => _blinkRemindersQuietUntil = null);
+    } else {
+      _blinkRemindersQuietUntil = null;
+    }
+    await context.read<StorageService>().saveBlinkRemindersQuietUntil(null);
+    if (mounted) _startBlinkReminderLoop();
+  }
 
   Future<void> _triggerBlinkReminder() async {
     if (!_canTriggerBlinkReminder) return;
@@ -782,7 +846,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
     // estar escondida); garantimos que ela volte a ser exibida.
     if (!_widgetEnabled) await windowManager.show();
-    await _cacheCurrentPosition();
+    // [_ballPosition] é a coordenada canônica compacta. Nunca captura aqui a
+    // janela nativa atual: a pausa pode começar com Settings/DVRS/Hub aberto,
+    // e gravar a posição centralizada faria a bolinha voltar no lugar errado.
     await _applyLayout(
       _settings.value.usesFullScreenBreak
           ? WindowLayout.breakOverlay
@@ -796,8 +862,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _restoreAfterPanel();
   }
 
-  Future<void> _applyLayout(WindowLayout layout) async {
+  Future<void> _applyLayout(WindowLayout layout) {
+    final next = _layoutQueue.then((_) => _performLayout(layout));
+    _layoutQueue = next;
+    return next;
+  }
+
+  Future<void> _performLayout(WindowLayout layout) async {
     _cancelBallRelease();
+    if (layout != WindowLayout.ball && layout != WindowLayout.onboarding) {
+      _compactWindowAnchor ??= CompactWindowAnchor(_ballPosition);
+    }
     if (layout != WindowLayout.blinkReminder && _blinkReminderVisible) {
       _blinkReminderHideTimer?.cancel();
       _blinkReminderHideTimer = null;
@@ -809,25 +884,43 @@ class _HomePageState extends State<HomePage> with TrayListener {
           final ballSize = WindowSizes.compact(_settings.value.ballSize);
           await windowManager.setSize(ballSize);
           final docked = await _dockedPositionForCurrentScreen(ballSize);
-          final pos = docked ?? _ballPosition;
+          final anchor = _compactWindowAnchor;
+          final pos = docked ?? anchor?.position ?? _ballPosition;
           await windowManager.setPosition(pos);
-          if (docked != null) _ballPosition = docked;
+          _ballPosition = docked ?? anchor?.position ?? _ballPosition;
+          _compactWindowAnchor = null;
           break;
         case WindowLayout.blinkReminder:
-          await _cacheCurrentPosition();
           final reminderSize = WindowSizes.blinkReminder(
             _settings.value.ballSize,
           );
           await windowManager.setSize(reminderSize);
           await windowManager.setPosition(_ballPosition);
-          await _nudgeIntoScreen(reminderSize);
+          await _nudgeIntoScreen(
+            reminderSize,
+            anchor: CompactWindowAnchor(_ballPosition),
+          );
           break;
         case WindowLayout.menu:
-          await _cacheCurrentPosition();
+          final anchor =
+              _compactWindowAnchor ?? CompactWindowAnchor(_ballPosition);
+          _compactWindowAnchor = anchor;
+          final ballSize = _settings.value.ballSize;
+          final compactSize = WindowSizes.compact(ballSize);
           final menuSize = WindowSizes.menu(_settings.value.ballSize);
+          final screen = await _screenForWindow(anchor.position, compactSize);
+          final placement = placeMenuWindow(
+            anchor: anchor,
+            compactSize: compactSize,
+            ballSize: ballSize,
+            menuSize: menuSize,
+            screen: screen,
+          );
+          if (mounted && _menuOpen) {
+            setState(() => _menuPlacement = placement);
+          }
           await windowManager.setSize(menuSize);
-          await windowManager.setPosition(_ballPosition);
-          await _nudgeIntoScreen(menuSize);
+          await windowManager.setPosition(placement.windowPosition);
           break;
         case WindowLayout.settings:
           await windowManager.setSize(WindowSizes.settings);
@@ -894,21 +987,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
   }
 
-  Future<void> _nudgeIntoScreen(Size windowSize) async {
+  Future<void> _nudgeIntoScreen(
+    Size windowSize, {
+    required CompactWindowAnchor anchor,
+  }) async {
     try {
-      final display = await screenRetriever.getPrimaryDisplay();
-      final screen = display.visibleSize ?? display.size;
-      final origin = display.visiblePosition ?? Offset.zero;
-      var x = _ballPosition.dx;
-      var y = _ballPosition.dy;
-      x = x.clamp(origin.dx, origin.dx + screen.width - windowSize.width);
-      y = y.clamp(origin.dy, origin.dy + screen.height - windowSize.height);
+      final compactSize = WindowSizes.compact(_settings.value.ballSize);
+      final screen = await _screenForWindow(anchor.position, compactSize);
       // Reposiciona apenas a janela transitória (lembrete/menu, que são
       // maiores) para caber na tela. NÃO grava em [_ballPosition]: a posição
       // canônica da bolinha só muda por arraste do usuário ou no startup —
       // caso contrário, o encaixe da janela maior empurraria a bolinha para
       // dentro a cada lembrete de piscada (a cada 7,5s), fazendo-a "andar".
-      await windowManager.setPosition(Offset(x, y));
+      await windowManager.setPosition(anchor.fitWindow(windowSize, screen));
     } catch (_) {
       /* ignora */
     }
@@ -917,15 +1008,39 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Future<Offset?> _dockedPositionForCurrentScreen(Size windowSize) async {
     final edge = _dockEdge;
     if (edge == null) return null;
-    final display = await screenRetriever.getPrimaryDisplay();
-    final screenSize = display.visibleSize ?? display.size;
-    final origin = display.visiblePosition ?? Offset.zero;
+    final screen = await _screenForWindow(_ballPosition, windowSize);
     return dockedWindowPosition(
       edge: edge,
       windowPos: _ballPosition,
       windowSize: windowSize,
-      screen: origin & screenSize,
+      screen: screen,
     );
+  }
+
+  Future<Rect> _screenForWindow(Offset position, Size windowSize) async {
+    try {
+      final displays = await screenRetriever.getAllDisplays();
+      final screens = displays
+          .map(
+            (display) =>
+                (display.visiblePosition ?? Offset.zero) &
+                (display.visibleSize ?? display.size),
+          )
+          .toList(growable: false);
+      if (screens.isNotEmpty) {
+        return closestScreenForWindow(
+          windowPosition: position,
+          windowSize: windowSize,
+          screens: screens,
+        );
+      }
+    } catch (e) {
+      debugPrint('Falha ao selecionar monitor da janela: $e');
+    }
+
+    final primary = await screenRetriever.getPrimaryDisplay();
+    return (primary.visiblePosition ?? Offset.zero) &
+        (primary.visibleSize ?? primary.size);
   }
 
   // --- Interações da bolinha ---------------------------------------------
@@ -937,8 +1052,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
       unawaited(_undock());
       return;
     }
-    setState(() => _menuOpen = !_menuOpen);
-    _applyLayout(_menuOpen ? WindowLayout.menu : WindowLayout.ball);
+    final opening = !_menuOpen;
+    if (opening) {
+      _compactWindowAnchor ??= CompactWindowAnchor(_ballPosition);
+    }
+    setState(() {
+      _menuOpen = opening;
+      if (opening) _menuPlacement = null;
+    });
+    unawaited(_applyLayout(_menuOpen ? WindowLayout.menu : WindowLayout.ball));
   }
 
   /// Botão direito: atalho para o Resumo do dia (descoberta do hub de saúde).
@@ -958,20 +1080,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
   void _cancelBallRelease() => _ballReleaseGeneration++;
 
   Future<void> _onBallDragEnd(Offset velocity) async {
+    if (_timer.state != AppState.idle || _menuOpen) return;
     try {
       final reduceMotion =
           MediaQuery.maybeOf(context)?.disableAnimations == true;
       final storage = context.read<StorageService>();
       final start = await windowManager.getPosition();
       final winSize = await windowManager.getSize();
-      final display = await screenRetriever.getPrimaryDisplay();
-      final screenSize = display.visibleSize ?? display.size;
-      final origin = display.visiblePosition ?? Offset.zero;
+      final screen = await _screenForWindow(start, winSize);
       final plan = planOrbRelease(
         start: start,
         velocity: velocity,
         windowSize: winSize,
-        screen: origin & screenSize,
+        screen: screen,
         edgeSnapEnabled: _settings.value.edgeSnap,
         dockThreshold: math.max(kDockThreshold, winSize.width * 0.72),
       );
@@ -1012,10 +1133,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     try {
       final pos = await windowManager.getPosition();
       final winSize = await windowManager.getSize();
-      final display = await screenRetriever.getPrimaryDisplay();
-      final screenSize = display.visibleSize ?? display.size;
-      final origin = display.visiblePosition ?? Offset.zero;
-      final screen = origin & screenSize;
+      final screen = await _screenForWindow(pos, winSize);
       final x = edge == BallDockEdge.left
           ? screen.left + 18
           : screen.right - winSize.width - 18;
@@ -1035,8 +1153,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   void _closeMenu() {
     if (!_menuOpen) return;
-    setState(() => _menuOpen = false);
-    _applyLayout(WindowLayout.ball);
+    setState(() {
+      _menuOpen = false;
+      _menuPlacement = null;
+    });
+    unawaited(_applyLayout(WindowLayout.ball));
   }
 
   void _openSettings() {
@@ -1286,7 +1407,17 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
   }
 
-  Future<void> _quit() async => windowManager.close();
+  Future<void> _quit() async {
+    final activityStats = context.read<ActivityStatsService>();
+    final screenTime = context.read<ScreenTimeService>();
+    try {
+      await activityStats.stop();
+      await screenTime.flush();
+    } catch (e) {
+      debugPrint('Falha ao persistir métricas antes de sair: $e');
+    }
+    await windowManager.close();
+  }
 
   // --- Build --------------------------------------------------------------
 
@@ -1416,7 +1547,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     double progress = 0.0,
     bool blinkReminderVisible = false,
     String blinkReminderText = '',
+    VoidCallback? onTap,
   }) {
+    final draggable = interactive && !_menuOpen;
     return FloatingBall(
       isActive: isActive,
       size: s.ballSize,
@@ -1435,10 +1568,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
       semanticLabel: interactive
           ? AppStrings.of(_settings.value.languageCode).ballSemanticLabel
           : null,
-      onTap: interactive ? _onBallTap : null,
+      onTap: interactive ? (onTap ?? _onBallTap) : null,
       onSecondaryTap: interactive ? _onBallSecondaryTap : null,
-      onDragStart: interactive ? _onBallDragStart : null,
-      onDragEnd: interactive ? _onBallDragEnd : null,
+      onDragStart: draggable ? _onBallDragStart : null,
+      onDragEnd: draggable ? _onBallDragEnd : null,
     );
   }
 
@@ -1459,6 +1592,16 @@ class _HomePageState extends State<HomePage> with TrayListener {
       );
       return Center(child: ball);
     }
+    final compactSize = WindowSizes.compact(settings.ballSize);
+    final fallbackBallOffset = Offset(
+      (compactSize.width - settings.ballSize) / 2,
+      (compactSize.height - settings.ballSize) / 2,
+    );
+    final placement = _menuPlacement;
+    final ballOffset = placement?.ballOffset ?? fallbackBallOffset;
+    final panelTop = placement?.panelAbove == true
+        ? ballOffset.dy - 8 - WindowSizes.menuPanelHeight
+        : ballOffset.dy + settings.ballSize + 8;
     return Stack(
       children: [
         Positioned.fill(
@@ -1467,36 +1610,41 @@ class _HomePageState extends State<HomePage> with TrayListener {
             onTap: _closeMenu,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _ball(isActive: false, s: settings),
-              const SizedBox(height: 8),
-              FloatingMenu(
-                strings: strings,
-                healthHubLabel: FeatureStrings.of(
-                  settings.languageCode,
-                ).menuHealthHub,
-                myDataLabel: FeatureStrings.of(
-                  settings.languageCode,
-                ).menuMyData,
-                isPaused: timer.isPaused,
-                onStartNow: timer.startBreakNow,
-                onReset: timer.reset,
-                onTogglePause: timer.togglePause,
-                onExtendCycle: timer.stretchCycleOneHour,
-                onGuidance: _openGuidance,
-                onHealthHub: _openHealthHub,
-                onMyData: _openMyData,
-                onCheckUpdates: _openCheckUpdates,
-                onAbout: _openAbout,
-                onSettings: _openSettings,
-                onQuit: _quit,
-                onDismiss: _closeMenu,
-              ),
-            ],
+        Positioned(
+          left: ballOffset.dx,
+          top: ballOffset.dy,
+          child: _ball(isActive: false, s: settings, onTap: _closeMenu),
+        ),
+        Positioned(
+          left: 10,
+          top: panelTop,
+          child: FloatingMenu(
+            strings: strings,
+            healthHubLabel: FeatureStrings.of(
+              settings.languageCode,
+            ).menuHealthHub,
+            myDataLabel: FeatureStrings.of(settings.languageCode).menuMyData,
+            isPaused: timer.isPaused,
+            onStartNow: timer.startBreakNow,
+            onReset: timer.reset,
+            onTogglePause: timer.togglePause,
+            onExtendCycle: timer.stretchCycleOneHour,
+            onGuidance: _openGuidance,
+            onHealthHub: _openHealthHub,
+            onMyData: _openMyData,
+            onCheckUpdates: _openCheckUpdates,
+            onAbout: _openAbout,
+            onSettings: _openSettings,
+            onQuit: _quit,
+            blinkRemindersQuietUntil: _blinkRemindersQuietUntil,
+            onQuietBlinkReminders: (duration) {
+              if (duration == Duration.zero) {
+                unawaited(_resumeBlinkReminders());
+              } else {
+                unawaited(_quietBlinkReminders(duration));
+              }
+            },
+            onDismiss: _closeMenu,
           ),
         ),
       ],

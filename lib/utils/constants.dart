@@ -227,6 +227,13 @@ class StorageKeys {
   /// ISO-8601 da data até a qual o lembrete de reavaliação do DVRS fica adiado.
   static const String dvrsNudgeSnoozedUntil = 'dvrs_nudge_snoozed_until';
 
+  /// ISO-8601 do fim do silêncio temporário dos avisos de piscada.
+  ///
+  /// É estado operacional: não altera as preferências permanentes de aviso
+  /// visual ou sonoro.
+  static const String blinkRemindersQuietUntil =
+      'blink_reminders_quiet_until';
+
   /// Dia (`AAAA-MM-DD`) em que a notificação de reavaliação do DVRS já foi
   /// enviada — no máximo uma por dia.
   static const String dvrsNudgeNotifiedDay = 'dvrs_nudge_notified_day';
@@ -237,7 +244,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.24.2';
+  static const String version = '1.25.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

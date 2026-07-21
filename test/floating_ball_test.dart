@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dry_eye_widget/utils/edge_snap.dart';
 import 'package:dry_eye_widget/widgets/floating_ball.dart';
@@ -28,22 +30,6 @@ void main() {
     expect(activeFrames.length, lessThanOrEqualTo(46));
     expect(FloatingBall.shouldAnimateRing(0.899), isFalse);
     expect(FloatingBall.shouldAnimateRing(0.9), isTrue);
-  });
-
-  test('movimento interno amortece inversões e limita energia', () {
-    final reversed = FloatingBall.smoothMotionVector(
-      const Offset(0.8, 0),
-      const Offset(-0.8, 0),
-    );
-    expect(reversed.dx, greaterThan(0));
-    expect(reversed.distance, lessThan(0.8));
-
-    final limited = FloatingBall.smoothMotionVector(
-      Offset.zero,
-      const Offset(10, 0),
-      response: 1,
-    );
-    expect(limited.distance, closeTo(0.82, 0.001));
   });
 
   testWidgets('anel só mantém animação contínua perto da pausa', (
@@ -102,6 +88,60 @@ void main() {
     await tester.pump();
     expect(leftTaps, 1);
     expect(secondaryTaps, 1);
+  });
+
+  testWidgets('secondary tap funciona sem callback primário', (tester) async {
+    var secondaryTaps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              onSecondaryTap: () => secondaryTaps++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester
+          .widget<MouseRegion>(
+            find.byKey(const ValueKey('floating_ball_pointer')),
+          )
+          .cursor,
+      SystemMouseCursors.click,
+    );
+    await tester.tap(find.byType(FloatingBall), buttons: kSecondaryButton);
+    await tester.pump();
+    expect(secondaryTaps, 1);
+  });
+
+  testWidgets('bolinha sem arraste reserva o gesto para fechar por clique', (
+    tester,
+  ) async {
+    var taps = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(isActive: false, onTap: () => taps++),
+          ),
+        ),
+      ),
+    );
+
+    final detector = tester
+        .widgetList<GestureDetector>(find.byType(GestureDetector))
+        .firstWhere((candidate) => candidate.onTap != null);
+    expect(detector.onPanStart, isNull);
+    expect(detector.onPanEnd, isNull);
+
+    await tester.tap(find.byType(FloatingBall));
+    await tester.pump();
+    expect(taps, 1);
   });
 
   testWidgets('efeito dinâmico reage ao hover sem quebrar interações', (
@@ -193,10 +233,21 @@ void main() {
     expect(taps, 1);
   });
 
-  testWidgets('pressionar comprime imediatamente o material', (tester) async {
+  testWidgets('cursor é clique em repouso e grabbing só durante arraste', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: Center(child: FloatingBall(isActive: false))),
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              onTap: () {},
+              onDragStart: () {},
+              onDragEnd: (_) {},
+            ),
+          ),
+        ),
       ),
     );
 
@@ -206,11 +257,22 @@ void main() {
             find.byKey(const ValueKey('floating_ball_pointer')),
           )
           .cursor,
-      SystemMouseCursors.grab,
+      SystemMouseCursors.click,
     );
     final gesture = await tester.startGesture(
       tester.getCenter(find.byType(FloatingBall)),
     );
+    await tester.pump();
+    expect(
+      tester
+          .widget<MouseRegion>(
+            find.byKey(const ValueKey('floating_ball_pointer')),
+          )
+          .cursor,
+      SystemMouseCursors.click,
+    );
+
+    await gesture.moveBy(const Offset(24, 0));
     await tester.pump(const Duration(milliseconds: 120));
     expect(
       tester
@@ -223,6 +285,14 @@ void main() {
 
     await gesture.up();
     await tester.pump(const Duration(milliseconds: 260));
+    expect(
+      tester
+          .widget<MouseRegion>(
+            find.byKey(const ValueKey('floating_ball_pointer')),
+          )
+          .cursor,
+      SystemMouseCursors.click,
+    );
   });
 
   testWidgets(
@@ -258,6 +328,38 @@ void main() {
       expect(taps, 0);
     },
   );
+
+  testWidgets('arraste não inclina nem acelera o material interno', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              onDragStart: () {},
+              onDragEnd: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(FloatingBall)),
+    );
+    await gesture.moveBy(const Offset(36, 18));
+    await tester.pump(const Duration(milliseconds: 80));
+
+    final material = tester.widget<Transform>(
+      find.byKey(const ValueKey('floating_ball_material')),
+    );
+    expect(material.transform.storage[1], closeTo(0, 0.0001));
+    expect(material.transform.storage[4], closeTo(0, 0.0001));
+
+    await gesture.up();
+  });
 
   testWidgets('anel líquido expõe progresso e respeita reduzir movimento', (
     tester,
@@ -295,6 +397,267 @@ void main() {
     expect(semantics.label, 'Lembrete ocular');
     expect(semantics.value, '92%');
     expect(tester.binding.transientCallbackCount, 0);
+  });
+
+  testWidgets('semântica expõe ação, dica e valor explícito', (tester) async {
+    final semanticsHandle = tester.ensureSemantics();
+    var semanticTaps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              showProgress: true,
+              progress: 0.92,
+              semanticLabel: 'Lembrete ocular',
+              semanticHint: 'Abrir controles da pausa',
+              semanticValue: 'Pronto para pausar',
+              onTap: () => semanticTaps++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final node = tester.getSemantics(find.bySemanticsLabel('Lembrete ocular'));
+    final data = node.getSemanticsData();
+    expect(node.label, 'Lembrete ocular');
+    expect(node.hint, 'Abrir controles da pausa');
+    expect(node.value, 'Pronto para pausar');
+    expect(data.hasAction(SemanticsAction.tap), isTrue);
+    expect(data.flagsCollection.isButton, isTrue);
+    tester.semantics.tap(find.semantics.byLabel('Lembrete ocular'));
+    await tester.pump();
+    expect(semanticTaps, 1);
+    semanticsHandle.dispose();
+  });
+
+  testWidgets('Pisque é anunciado em live region própria', (tester) async {
+    final semanticsHandle = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              blinkReminderVisible: true,
+              blinkReminderText: 'Pisque',
+              semanticLabel: 'Lembrete ocular',
+              onTap: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final liveRegion = tester.getSemantics(find.bySemanticsLabel('Pisque'));
+    expect(liveRegion.getSemanticsData().flagsCollection.isLiveRegion, isTrue);
+    semanticsHandle.dispose();
+  });
+
+  testWidgets('não usa autofocus e ativa por Enter e Espaço com foco visível', (
+    tester,
+  ) async {
+    final previousHighlightStrategy = FocusManager.instance.highlightStrategy;
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    addTearDown(() {
+      FocusManager.instance.highlightStrategy = previousHighlightStrategy;
+    });
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+    var taps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              focusNode: focusNode,
+              semanticLabel: 'Abrir pausa',
+              onTap: () => taps++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(focusNode.hasFocus, isFalse, reason: 'não deve roubar foco');
+    focusNode.requestFocus();
+    await tester.pump();
+    expect(focusNode.hasFocus, isTrue);
+
+    final focusIndicator = tester.widget<AnimatedContainer>(
+      find.byKey(const ValueKey('floating_ball_focus_indicator')),
+    );
+    final decoration = focusIndicator.foregroundDecoration! as BoxDecoration;
+    final border = decoration.border! as Border;
+    expect(border.top.color, isNot(Colors.transparent));
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+    expect(taps, 2);
+  });
+
+  testWidgets('tamanhos 18 e 32 preservam alvo mínimo de 44 pixels', (
+    tester,
+  ) async {
+    for (final size in <double>[18, 32]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: FloatingBall(isActive: false, size: size, onTap: () {}),
+            ),
+          ),
+        ),
+      );
+
+      final hitTarget = tester.getSize(
+        find.byKey(const ValueKey('floating_ball_hit_target')),
+      );
+      expect(hitTarget.width, greaterThanOrEqualTo(44));
+      expect(hitTarget.height, greaterThanOrEqualTo(44));
+    }
+  });
+
+  testWidgets('reduzir movimento em runtime encerra tickers e timer do orbe', (
+    tester,
+  ) async {
+    Widget app({required bool reduceMotion}) => MaterialApp(
+      home: MediaQuery(
+        data: MediaQueryData(disableAnimations: reduceMotion),
+        child: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              dynamicOrbEffect: true,
+              orbIntensity: 1,
+              blinkReminderVisible: true,
+              blinkReminderText: 'Pisque',
+              showProgress: true,
+              progress: 0.95,
+              onTap: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(reduceMotion: false));
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer();
+    await mouse.moveTo(tester.getCenter(find.byType(FloatingBall)));
+    final press = await tester.startGesture(
+      tester.getCenter(find.byType(FloatingBall)),
+    );
+    await tester.pump(const Duration(milliseconds: 120));
+    final initialPainter = tester
+        .widget<CustomPaint>(
+          find.byKey(const ValueKey('floating_ball_inner_effect')),
+        )
+        .painter;
+    await tester.pump(const Duration(milliseconds: 240));
+    final movingPainter = tester
+        .widget<CustomPaint>(
+          find.byKey(const ValueKey('floating_ball_inner_effect')),
+        )
+        .painter;
+    expect(identical(initialPainter, movingPainter), isFalse);
+    expect(tester.binding.transientCallbackCount, greaterThan(0));
+
+    await tester.pumpWidget(app(reduceMotion: true));
+    await tester.pump();
+    final stoppedPainter = tester
+        .widget<CustomPaint>(
+          find.byKey(const ValueKey('floating_ball_inner_effect')),
+        )
+        .painter;
+    expect(tester.binding.transientCallbackCount, 0);
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(tester.binding.transientCallbackCount, 0);
+    expect(
+      identical(
+        stoppedPainter,
+        tester
+            .widget<CustomPaint>(
+              find.byKey(const ValueKey('floating_ball_inner_effect')),
+            )
+            .painter,
+      ),
+      isTrue,
+    );
+    await press.up();
+    await mouse.removePointer();
+    await tester.pump();
+    expect(tester.binding.transientCallbackCount, 0);
+  });
+
+  testWidgets('superfície oculta suspende animações, timer e interação', (
+    tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+    var taps = 0;
+    Widget app({required bool visible}) => MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: FloatingBall(
+            isActive: true,
+            dynamicOrbEffect: true,
+            orbIntensity: 1,
+            isSurfaceVisible: visible,
+            focusNode: focusNode,
+            semanticLabel: 'Alerta ocular',
+            onTap: () => taps++,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(visible: true));
+    focusNode.requestFocus();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 240));
+    expect(tester.binding.transientCallbackCount, greaterThan(0));
+
+    await tester.pumpWidget(app(visible: false));
+    await tester.pump();
+    final stoppedPainter = tester
+        .widget<CustomPaint>(
+          find.byKey(const ValueKey('floating_ball_inner_effect')),
+        )
+        .painter;
+    expect(tester.binding.transientCallbackCount, 0);
+    expect(find.semantics.byLabel('Alerta ocular'), findsNothing);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(taps, 0);
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(tester.binding.transientCallbackCount, 0);
+    expect(
+      identical(
+        stoppedPainter,
+        tester
+            .widget<CustomPaint>(
+              find.byKey(const ValueKey('floating_ball_inner_effect')),
+            )
+            .painter,
+      ),
+      isTrue,
+    );
+
+    await tester.tap(find.byType(FloatingBall), warnIfMissed: false);
+    await tester.pump();
+    expect(taps, 0);
+    semanticsHandle.dispose();
   });
 
   testWidgets('íris aurora só é pintada quando o efeito dinâmico está ativo', (

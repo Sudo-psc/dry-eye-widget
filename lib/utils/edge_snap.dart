@@ -31,6 +31,9 @@ const double kDockThreshold = 56;
 /// Fração da janela compacta que permanece visível quando encaixada.
 const double kDockVisibleFraction = 0.62;
 
+/// Largura mínima da janela compacta que permanece visível ao encaixar.
+const double kDockMinimumVisibleWidth = 44;
+
 /// Decide a borda de encaixe para a janela em [windowPos] dentro de [screen],
 /// ou `null` se estiver longe das bordas laterais.
 BallDockEdge? dockEdgeFor({
@@ -53,11 +56,19 @@ Offset dockedWindowPosition({
   required Size windowSize,
   required Rect screen,
   double visibleFraction = kDockVisibleFraction,
+  double minimumVisibleWidth = kDockMinimumVisibleWidth,
 }) {
   final visible = visibleFraction.clamp(0.35, 1.0).toDouble();
+  final fractionVisibleWidth = windowSize.width * visible;
+  final clampedMinimumVisibleWidth = minimumVisibleWidth
+      .clamp(0.0, windowSize.width)
+      .toDouble();
+  final visibleWidth = fractionVisibleWidth >= clampedMinimumVisibleWidth
+      ? fractionVisibleWidth
+      : clampedMinimumVisibleWidth;
   final x = edge == BallDockEdge.left
-      ? screen.left - windowSize.width * (1 - visible)
-      : screen.right - windowSize.width * visible;
+      ? screen.left - (windowSize.width - visibleWidth)
+      : screen.right - visibleWidth;
   final y = windowPos.dy.clamp(screen.top, screen.bottom - windowSize.height);
   return Offset(x, y);
 }

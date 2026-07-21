@@ -19,9 +19,9 @@ class ActivityStatsService extends ChangeNotifier {
     required StorageService storage,
     required ActivityMonitorService monitor,
     this.pollIntervalSeconds = 5,
-  })  : _storage = storage,
-        _monitor = monitor,
-        _data = storage.loadActivityStats();
+  }) : _storage = storage,
+       _monitor = monitor,
+       _data = storage.loadActivityStats();
 
   final StorageService _storage;
   final ActivityMonitorService _monitor;
@@ -53,11 +53,14 @@ class ActivityStatsService extends ChangeNotifier {
 
   /// Desliga a coleta e persiste o pendente.
   Future<void> stop() async {
-    if (!_running) return;
-    _running = false;
-    _timer?.cancel();
-    _timer = null;
-    await _monitor.stop();
+    if (_running) {
+      _running = false;
+      _timer?.cancel();
+      _timer = null;
+      await _monitor.stop();
+    }
+    // Também persiste quando a coleta já estava parada: pode haver amostras
+    // aplicadas desde o último flush ou dados aguardando o encerramento.
     await flush();
   }
 

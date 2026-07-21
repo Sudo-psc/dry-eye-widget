@@ -2,6 +2,45 @@
 
 Updated: 2026-07-16
 
+Menu origin and close interaction fix (2026-07-16):
+
+- The expanded menu now compensates its native screen clamp by repositioning
+  the orb inside the menu window, preserving the orb's original visual point.
+- Near the bottom edge, the action panel automatically opens above the orb;
+  elsewhere it remains below, without forcing the orb into the menu corner.
+- Clicking the orb while the menu is open now calls the close path directly,
+  and the non-draggable menu orb no longer registers pan gestures.
+- Static analysis passed, 23 focused layout/orb tests passed and all 264 Flutter
+  tests passed.
+- The macOS release build succeeded at 59.4 MB, was locally resealed, passed
+  strict signature verification and is running for manual inspection.
+
+App reliability audit (2026-07-16):
+
+- Fixed multi-monitor positioning so drag, docking, undocking and screen clamps
+  use the display containing the widget instead of always using the primary display.
+- Protected the canonical compact coordinate when an automatic break starts
+  while a centered panel is open; transient panel coordinates are no longer cached.
+- Made app quit flush pending activity and screen-time data before closing the
+  native window, including samples collected before activity monitoring stopped.
+- Restored the missing macOS launch-at-login channel with ServiceManagement;
+  the saved preference now reaches the operating system instead of throwing a
+  MissingPluginException.
+- Static analysis, 32 focused regression tests and all 261 Flutter tests passed.
+- The macOS release build succeeded at 59.4 MB, passed strict signature
+  verification and launched locally with an on-screen native window.
+
+Widget motion and menu anchor (2026-07-16):
+
+- Removed velocity-driven tilt, stretch, iris displacement and release rebound
+  from the floating orb while preserving the faster lateral magnetism.
+- Added an immutable compact-window anchor for transient menu/reminder layouts.
+- Serialized native layout transitions and disabled drag callbacks while the
+  menu is open, preventing menu-sized windows from overwriting ball position.
+- Static analysis and all 256 Flutter tests passed.
+- macOS release build succeeded at 59.4 MB and its local ad-hoc signature was
+  resealed and verified before launch.
+
 DVRS claims gate (2026-07-16):
 
 - App and landing copy are covered by `test/dvrs_claims_test.dart`.
@@ -14,7 +53,7 @@ README screenshots (2026-07-13):
 - Replaced the legacy animated carousel in both README languages with the current v1.24 liquid-menu and daily-summary captures.
 - Linked the compact README gallery to the complete macOS and Windows capture set on the public landing page.
 
-Current phase: Widget animation performance optimized and fully validated.
+Current phase: App reliability audit completed and locally validated.
 
 Animation performance (2026-07-12):
 
@@ -85,7 +124,9 @@ Completed:
 - Health dashboard UI connected to `HealthKitDashboardService`.
 - Optional HealthKit permission flow added to the app panel.
 - Health dashboard added to the floating menu and system tray/menu bar.
-- Fixed widget positioning bug: `_ballPosition` now syncs with saved storage on startup, `_nudgeIntoScreen` updates the cached position, and `blinkReminder` layout caches position before applying.
+- Fixed widget positioning across transient layouts: saved startup position is
+  loaded as the canonical coordinate, menu/reminder clamping never mutates it,
+  and closing a menu or a panel restores the immutable compact anchor.
 - Scientific foundation page completed with responsive light/dark design, accessible flow diagrams and evidence-safe copy.
 
 In progress:

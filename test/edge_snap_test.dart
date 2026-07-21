@@ -1,8 +1,20 @@
 import 'dart:math' as math;
 
+import 'package:dry_eye_widget/app/window_layout.dart';
 import 'package:dry_eye_widget/utils/edge_snap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+double _visibleHorizontalWidth({
+  required BallDockEdge edge,
+  required Offset position,
+  required Size windowSize,
+  required Rect screen,
+}) {
+  return edge == BallDockEdge.left
+      ? position.dx + windowSize.width - screen.left
+      : screen.right - position.dx;
+}
 
 void main() {
   // Tela 1440x900 começando em (0,0); janela da bolinha 48x48.
@@ -64,7 +76,7 @@ void main() {
         windowSize: win,
         screen: screen,
       );
-      expect(pos.dx, closeTo(-18.24, 0.001));
+      expect(pos.dx, closeTo(-4, 0.001));
       expect(pos.dy, 300);
     });
 
@@ -75,7 +87,7 @@ void main() {
         windowSize: win,
         screen: screen,
       );
-      expect(pos.dx, closeTo(1410.24, 0.001));
+      expect(pos.dx, closeTo(1396, 0.001));
       expect(pos.dy, 250);
     });
 
@@ -89,7 +101,7 @@ void main() {
       expect(pos.dy, 0);
     });
 
-    test('respeita fracao visivel customizada', () {
+    test('mínimo visível prevalece sobre fração menor', () {
       final pos = dockedWindowPosition(
         edge: BallDockEdge.left,
         windowPos: const Offset(10, 300),
@@ -97,7 +109,95 @@ void main() {
         screen: screen,
         visibleFraction: 0.5,
       );
+      expect(pos.dx, -4);
+    });
+
+    test('fração maior que o mínimo é preservada', () {
+      const largeWindow = Size(96, 96);
+      final pos = dockedWindowPosition(
+        edge: BallDockEdge.left,
+        windowPos: const Offset(10, 300),
+        windowSize: largeWindow,
+        screen: screen,
+        visibleFraction: 0.75,
+      );
       expect(pos.dx, -24);
+      expect(
+        _visibleHorizontalWidth(
+          edge: BallDockEdge.left,
+          position: pos,
+          windowSize: largeWindow,
+          screen: screen,
+        ),
+        72,
+      );
+    });
+
+    test('mínimo é configurável e limitado à largura da janela', () {
+      final configured = dockedWindowPosition(
+        edge: BallDockEdge.left,
+        windowPos: const Offset(10, 300),
+        windowSize: win,
+        screen: screen,
+        visibleFraction: 0.5,
+        minimumVisibleWidth: 20,
+      );
+      expect(configured.dx, -24);
+
+      const narrowWindow = Size(30, 30);
+      for (final edge in BallDockEdge.values) {
+        final pos = dockedWindowPosition(
+          edge: edge,
+          windowPos: const Offset(10, 300),
+          windowSize: narrowWindow,
+          screen: screen,
+          minimumVisibleWidth: 100,
+        );
+        expect(
+          _visibleHorizontalWidth(
+            edge: edge,
+            position: pos,
+            windowSize: narrowWindow,
+            screen: screen,
+          ),
+          narrowWindow.width,
+        );
+      }
+    });
+
+    test('matriz esquerda/direita cobre compactos das bolas 18, 32 e 96', () {
+      for (final ballSize in const [18.0, 32.0, 96.0]) {
+        final windowSize = WindowSizes.compact(ballSize);
+        final expectedVisibleWidth = math
+            .max(
+              kDockMinimumVisibleWidth,
+              windowSize.width * kDockVisibleFraction,
+            )
+            .clamp(0.0, windowSize.width)
+            .toDouble();
+
+        for (final edge in BallDockEdge.values) {
+          final pos = dockedWindowPosition(
+            edge: edge,
+            windowPos: const Offset(400, 260),
+            windowSize: windowSize,
+            screen: screen,
+          );
+          expect(
+            _visibleHorizontalWidth(
+              edge: edge,
+              position: pos,
+              windowSize: windowSize,
+              screen: screen,
+            ),
+            closeTo(expectedVisibleWidth, 0.001),
+            reason: 'bola $ballSize, borda ${edge.id}',
+          );
+          expect(pos.dy, 260);
+          expect(pos.dy, greaterThanOrEqualTo(screen.top));
+          expect(pos.dy + windowSize.height, lessThanOrEqualTo(screen.bottom));
+        }
+      }
     });
   });
 
@@ -113,63 +213,76 @@ void main() {
 
   // Cenários típicos de Windows (taskbar, DPI/monitor secundário).
   group('Windows-like display geometry', () {
-    test('taskbar inferior: área visível reduzida ainda encaixa na direita', () {
-      // Work area 1920x1040 (taskbar ~40px) em (0,0).
-      const work = Rect.fromLTWH(0, 0, 1920, 1040);
-      const ball = Size(56, 56);
-      final edge = dockEdgeFor(
-        windowPos: const Offset(1920 - 56 - 12, 800),
-        windowSize: ball,
-        screen: work,
-      );
-      expect(edge, BallDockEdge.right);
-      final pos = dockedWindowPosition(
-        edge: BallDockEdge.right,
-        windowPos: const Offset(1850, 800),
-        windowSize: ball,
-        screen: work,
-      );
-      expect(pos.dx, closeTo(1920 - 56 * kDockVisibleFraction, 0.01));
-      expect(pos.dy, 800);
-      // Não deve empurrar abaixo da work area.
-      expect(pos.dy + ball.height, lessThanOrEqualTo(work.bottom));
+    test(
+      'taskbar inferior: área visível reduzida ainda encaixa na direita',
+      () {
+        // Work area 1920x1040 (taskbar ~40px) em (0,0).
+        const work = Rect.fromLTWH(0, 0, 1920, 1040);
+        const ball = Size(56, 56);
+        final edge = dockEdgeFor(
+          windowPos: const Offset(1920 - 56 - 12, 800),
+          windowSize: ball,
+          screen: work,
+        );
+        expect(edge, BallDockEdge.right);
+        final pos = dockedWindowPosition(
+          edge: BallDockEdge.right,
+          windowPos: const Offset(1850, 800),
+          windowSize: ball,
+          screen: work,
+        );
+        expect(pos.dx, closeTo(1920 - kDockMinimumVisibleWidth, 0.01));
+        expect(pos.dy, 800);
+        // Não deve empurrar abaixo da work area.
+        expect(pos.dy + ball.height, lessThanOrEqualTo(work.bottom));
+      },
+    );
+
+    test('monitor com origem negativa preserva largura e Y visíveis', () {
+      const work = Rect.fromLTWH(-1920, -120, 1920, 1080);
+      final windowSize = WindowSizes.compact(18);
+
+      for (final edge in BallDockEdge.values) {
+        for (final requestedY in const [-500.0, 1500.0]) {
+          final pos = dockedWindowPosition(
+            edge: edge,
+            windowPos: Offset(work.left + 8, requestedY),
+            windowSize: windowSize,
+            screen: work,
+          );
+          expect(
+            _visibleHorizontalWidth(
+              edge: edge,
+              position: pos,
+              windowSize: windowSize,
+              screen: work,
+            ),
+            kDockMinimumVisibleWidth,
+            reason: 'borda ${edge.id}, y solicitado $requestedY',
+          );
+          expect(pos.dy, greaterThanOrEqualTo(work.top));
+          expect(pos.dy + windowSize.height, lessThanOrEqualTo(work.bottom));
+        }
+      }
     });
 
-    test('monitor secundário com origem negativa (esquerda do primário)', () {
-      // Monitor à esquerda: work area em x=-1920.
-      const work = Rect.fromLTWH(-1920, 0, 1920, 1080);
-      const ball = Size(48, 48);
-      final edge = dockEdgeFor(
-        windowPos: const Offset(-1920 + 8, 400),
-        windowSize: ball,
-        screen: work,
-      );
-      expect(edge, BallDockEdge.left);
-      final pos = dockedWindowPosition(
-        edge: BallDockEdge.left,
-        windowPos: const Offset(-1910, 400),
-        windowSize: ball,
-        screen: work,
-      );
-      expect(pos.dx, lessThan(work.left));
-      expect(pos.dx, closeTo(work.left - ball.width * (1 - kDockVisibleFraction), 0.01));
-      expect(pos.dy, 400);
-    });
-
-    test('threshold com bola grande (scale Windows 150%) ainda detecta borda', () {
-      // Bolinha 72px; threshold efetivo no main é max(56, width*0.72).
-      const work = Rect.fromLTWH(0, 0, 2560, 1440);
-      const ball = Size(72, 72);
-      final threshold = math.max(kDockThreshold, ball.width * 0.72);
-      expect(threshold, closeTo(56, 0.01)); // 72*0.72=51.84 < 56
-      final edge = dockEdgeFor(
-        windowPos: Offset(work.right - ball.width - 40, 200),
-        windowSize: ball,
-        screen: work,
-        threshold: threshold,
-      );
-      expect(edge, BallDockEdge.right);
-    });
+    test(
+      'threshold com bola grande (scale Windows 150%) ainda detecta borda',
+      () {
+        // Bolinha 72px; threshold efetivo no main é max(56, width*0.72).
+        const work = Rect.fromLTWH(0, 0, 2560, 1440);
+        const ball = Size(72, 72);
+        final threshold = math.max(kDockThreshold, ball.width * 0.72);
+        expect(threshold, closeTo(56, 0.01)); // 72*0.72=51.84 < 56
+        final edge = dockEdgeFor(
+          windowPos: Offset(work.right - ball.width - 40, 200),
+          windowSize: ball,
+          screen: work,
+          threshold: threshold,
+        );
+        expect(edge, BallDockEdge.right);
+      },
+    );
 
     test('bolinha 96px usa threshold ampliado (width*0.72)', () {
       const work = Rect.fromLTWH(0, 0, 1920, 1080);

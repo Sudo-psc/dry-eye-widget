@@ -117,6 +117,25 @@ class StorageService {
     }
   }
 
+  // --- Silêncio temporário dos avisos de piscada --------------------------
+
+  DateTime? loadBlinkRemindersQuietUntil() {
+    final raw = _prefs.getString(StorageKeys.blinkRemindersQuietUntil);
+    if (raw == null || raw.isEmpty) return null;
+    return DateTime.tryParse(raw);
+  }
+
+  Future<void> saveBlinkRemindersQuietUntil(DateTime? until) async {
+    if (until == null) {
+      await _prefs.remove(StorageKeys.blinkRemindersQuietUntil);
+    } else {
+      await _prefs.setString(
+        StorageKeys.blinkRemindersQuietUntil,
+        until.toIso8601String(),
+      );
+    }
+  }
+
   /// Dia em que a notificação de reavaliação já foi enviada (`AAAA-MM-DD`).
   String? loadDvrsNudgeNotifiedDay() =>
       _prefs.getString(StorageKeys.dvrsNudgeNotifiedDay);

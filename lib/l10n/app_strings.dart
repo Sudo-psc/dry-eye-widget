@@ -255,6 +255,13 @@ class AppStrings {
     required this.blinkFreqFrequent,
     required this.menuExtendCycle,
     required this.extendCycleActiveHint,
+    required this.menuQuietBlinkReminders,
+    required this.quietBlinkRemindersTitle,
+    required this.quietBlinkRemindersDescription,
+    required this.quietBlinkFor15Minutes,
+    required this.quietBlinkFor1Hour,
+    required this.quietBlinkResumeNow,
+    required this.quietBlinkActiveUntil,
     required this.progressTitle,
     required this.progressStreakCurrentLabel,
     required this.progressStreakBestLabel,
@@ -375,6 +382,13 @@ class AppStrings {
   final String blinkFreqFrequent;
   final String menuExtendCycle;
   final String extendCycleActiveHint;
+  final String menuQuietBlinkReminders;
+  final String quietBlinkRemindersTitle;
+  final String quietBlinkRemindersDescription;
+  final String quietBlinkFor15Minutes;
+  final String quietBlinkFor1Hour;
+  final String quietBlinkResumeNow;
+  final String quietBlinkActiveUntil;
 
   final String ballSemanticLabel;
   final String menuSemanticLabel;
@@ -775,6 +789,15 @@ const AppStrings ptStrings = AppStrings(
   blinkFreqFrequent: 'Frequente',
   menuExtendCycle: 'Alongar ciclo (1 h)',
   extendCycleActiveHint: 'Ciclo alongado por 1 hora — menos interrupções.',
+  menuQuietBlinkReminders: 'Silenciar avisos de piscada',
+  quietBlinkRemindersTitle: 'Silenciar avisos de piscada',
+  quietBlinkRemindersDescription:
+      'Pausa temporariamente os avisos visuais e sonoros de piscada. '
+      'Suas preferências continuam iguais.',
+  quietBlinkFor15Minutes: '15 min',
+  quietBlinkFor1Hour: '1 h',
+  quietBlinkResumeNow: 'Retomar agora',
+  quietBlinkActiveUntil: 'Avisos de piscada silenciados até {time}',
   menuReports: 'Relatórios',
   ballSemanticLabel: 'Lembrete de descanso ocular. Toque para abrir o menu.',
   menuSemanticLabel: 'Menu do Dry Eye Widget',
@@ -1161,6 +1184,15 @@ const AppStrings enStrings = AppStrings(
   blinkFreqFrequent: 'Frequent',
   menuExtendCycle: 'Stretch cycle (1 h)',
   extendCycleActiveHint: 'Cycle stretched for 1 hour — fewer interruptions.',
+  menuQuietBlinkReminders: 'Quiet blink cues',
+  quietBlinkRemindersTitle: 'Quiet blink cues',
+  quietBlinkRemindersDescription:
+      'Temporarily pauses visual and sound blink cues. Your preferences '
+      'stay unchanged.',
+  quietBlinkFor15Minutes: '15 min',
+  quietBlinkFor1Hour: '1 hr',
+  quietBlinkResumeNow: 'Resume now',
+  quietBlinkActiveUntil: 'Blink cues quiet until {time}',
   menuReports: 'Reports',
   ballSemanticLabel: 'Eye break reminder. Tap to open the menu.',
   menuSemanticLabel: 'Dry Eye Widget menu',

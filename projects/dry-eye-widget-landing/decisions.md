@@ -20,3 +20,21 @@
 - Prioritize TFOS DEWS III as current consensus while retaining foundational TFOS DEWS II citations.
 - Label OVPP export, biomarkers, AI and multicenter studies as research roadmap items, not current product functionality.
 - Inline the generated Tailwind stylesheet and defer React/Framer hydration until idle because the page is already fully prerendered; this preserves interactivity while keeping Lighthouse at 100.
+
+## 2026-07-16 — App reliability audit
+
+- Resolve screen-sensitive widget layout against the display containing the
+  current window center, with nearest-display and primary-display fallbacks.
+- Keep one canonical compact coordinate and never derive it from temporary
+  menu, reminder, break, settings, dashboard or questionnaire layouts.
+- Treat local activity and screen-time persistence as part of graceful shutdown;
+  flush it before closing the native window even if collection already stopped.
+- Implement launch-at-login with Apple's ServiceManagement API on macOS 13 or
+  later, while retaining the existing package implementation for Windows.
+
+## 2026-07-16 — Expanded menu anchoring
+
+- Preserve the orb's visual screen coordinate, not its fixed local position,
+  when the larger menu window must move to remain inside visible screen bounds.
+- Treat the menu orb as a close control with no drag recognizers; compact-mode
+  dragging remains unchanged.

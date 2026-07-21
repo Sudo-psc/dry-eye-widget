@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../app/orb_interaction.dart';
 import '../utils/constants.dart';
 import '../utils/edge_snap.dart';
 
@@ -31,6 +33,12 @@ class FloatingBall extends StatefulWidget {
     this.blinkReminderText = '',
     this.dockEdge,
     this.semanticLabel,
+    this.semanticHint,
+    this.semanticValue,
+    this.focusNode,
+    this.isSurfaceVisible = true,
+    this.hitTargetExtent = minimumHitTargetExtent,
+    this.interactionMode = OrbInteractionMode.automatic,
     this.onTap,
     this.onSecondaryTap,
     this.onDragStart,
@@ -55,6 +63,12 @@ class FloatingBall extends StatefulWidget {
   /// mais translúcida e sem anel de progresso (discreta).
   final BallDockEdge? dockEdge;
   final String? semanticLabel;
+  final String? semanticHint;
+  final String? semanticValue;
+  final FocusNode? focusNode;
+  final bool isSurfaceVisible;
+  final double hitTargetExtent;
+  final OrbInteractionMode interactionMode;
   final VoidCallback? onTap;
   final VoidCallback? onSecondaryTap;
   final VoidCallback? onDragStart;
@@ -69,6 +83,7 @@ class FloatingBall extends StatefulWidget {
       (size * 0.09).clamp(3.0, 5.0).toDouble();
 
   static const double ringAnimationThreshold = 0.9;
+  static const double minimumHitTargetExtent = 44.0;
   static const int idleOrbPhaseSteps = 32;
   static const int activeOrbPhaseSteps = 30;
   static const int ringPhaseSteps = 52;
@@ -82,23 +97,6 @@ class FloatingBall extends StatefulWidget {
   static bool shouldAnimateRing(double progress) =>
       progress.clamp(0.0, 1.0) >= ringAnimationThreshold;
 
-  /// Filtro de movimento do material interno. Limita energia e absorve
-  /// inversões bruscas para a íris acompanhar a mão sem vibrar.
-  static Offset smoothMotionVector(
-    Offset current,
-    Offset sample, {
-    double response = 0.22,
-    double maxMagnitude = 0.82,
-  }) {
-    if (!sample.dx.isFinite || !sample.dy.isFinite) return current;
-    final limit = maxMagnitude.clamp(0.0, 1.0).toDouble();
-    final distance = sample.distance;
-    final limited = distance > limit && distance > 0
-        ? sample * (limit / distance)
-        : sample;
-    return Offset.lerp(current, limited, response.clamp(0.0, 1.0))!;
-  }
-
   @override
   State<FloatingBall> createState() => _FloatingBallState();
 }
@@ -110,7 +108,6 @@ class _FloatingBallState extends State<FloatingBall>
   late final AnimationController _reminder;
   late final AnimationController _reminderBurst;
   late final AnimationController _press;
-  late final AnimationController _release;
   late final AnimationController _ring;
   late final Animation<double> _opacity;
   late final ValueNotifier<double> _orbFrame;
@@ -119,10 +116,14 @@ class _FloatingBallState extends State<FloatingBall>
   Duration? _orbTick;
   double _orbPhase = 0;
   bool _reduceMotion = false;
+  bool _dependenciesReady = false;
   bool _pressed = false;
   bool _dragging = false;
-  Offset _dragVector = Offset.zero;
-  Offset _releaseVector = Offset.zero;
+  bool _hasFocus = false;
+  bool _showFocusHighlight = false;
+
+  bool get _motionAllowed =>
+      _dependenciesReady && widget.isSurfaceVisible && !_reduceMotion;
 
   @override
   void initState() {
@@ -153,33 +154,23 @@ class _FloatingBallState extends State<FloatingBall>
       duration: const Duration(milliseconds: 140),
       reverseDuration: const Duration(milliseconds: 220),
     );
-    _release = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 340),
-    );
     _ring = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2600),
     );
     _ringFrame = ValueNotifier(0);
     _ring.addListener(_updateRingFrame);
-    _syncAnimation();
-    _syncOrbAnimation();
-    _syncReminderAnimation();
-    _syncRingAnimation();
-    if (widget.blinkReminderVisible && !widget.isActive) {
-      _reminderBurst.forward(from: 0);
-    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final reduce = MediaQuery.maybeOf(context)?.disableAnimations == true;
-    if (reduce != _reduceMotion) {
+    final firstSync = !_dependenciesReady;
+    if (firstSync || reduce != _reduceMotion) {
+      _dependenciesReady = true;
       _reduceMotion = reduce;
-      _syncOrbAnimation();
-      _syncRingAnimation();
+      _syncAllMotion(startReminderBurst: firstSync);
     }
   }
 
@@ -188,49 +179,80 @@ class _FloatingBallState extends State<FloatingBall>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.blinkDuration != widget.blinkDuration) {
       _blink.duration = widget.blinkDuration;
-      if (widget.isActive) _blink.repeat(reverse: true);
     }
-    if (oldWidget.isActive != widget.isActive) {
-      _syncAnimation();
-    }
-    if (oldWidget.dynamicOrbEffect != widget.dynamicOrbEffect ||
-        oldWidget.orbIntensity != widget.orbIntensity ||
-        oldWidget.isActive != widget.isActive) {
-      _syncOrbAnimation();
-    }
-    if (!widget.hoverReactiveBall && _hover.value > 0) {
-      _hover.reverse();
-    }
-    if (oldWidget.blinkReminderVisible != widget.blinkReminderVisible ||
-        oldWidget.isActive != widget.isActive) {
-      _syncReminderAnimation();
-      if (!oldWidget.blinkReminderVisible &&
-          widget.blinkReminderVisible &&
-          !widget.isActive) {
-        _reminderBurst.forward(from: 0);
-      }
-    }
-    if (oldWidget.showProgress != widget.showProgress ||
+
+    final oldReminderVisible =
+        oldWidget.blinkReminderVisible &&
+        !oldWidget.isActive &&
+        oldWidget.dockEdge == null &&
+        oldWidget.blinkReminderText.trim().isNotEmpty;
+    final reminderVisible =
+        widget.blinkReminderVisible &&
+        !widget.isActive &&
+        widget.dockEdge == null &&
+        widget.blinkReminderText.trim().isNotEmpty;
+    final motionInputsChanged =
+        oldWidget.blinkDuration != widget.blinkDuration ||
         oldWidget.isActive != widget.isActive ||
+        oldWidget.dynamicOrbEffect != widget.dynamicOrbEffect ||
+        oldWidget.orbIntensity != widget.orbIntensity ||
+        oldWidget.hoverReactiveBall != widget.hoverReactiveBall ||
+        oldWidget.blinkReminderVisible != widget.blinkReminderVisible ||
+        oldWidget.blinkReminderText != widget.blinkReminderText ||
+        oldWidget.showProgress != widget.showProgress ||
         oldWidget.dockEdge != widget.dockEdge ||
+        oldWidget.isSurfaceVisible != widget.isSurfaceVisible ||
         FloatingBall.shouldAnimateRing(oldWidget.progress) !=
-            FloatingBall.shouldAnimateRing(widget.progress)) {
-      _syncRingAnimation();
+            FloatingBall.shouldAnimateRing(widget.progress);
+    if (motionInputsChanged) {
+      if (!widget.isSurfaceVisible) {
+        _pressed = false;
+        _dragging = false;
+      }
+      _syncAllMotion(
+        startReminderBurst: !oldReminderVisible && reminderVisible,
+      );
+    }
+  }
+
+  void _resetController(AnimationController controller) {
+    controller.stop();
+    if (controller.value != 0) controller.value = 0;
+  }
+
+  void _syncAllMotion({bool startReminderBurst = false}) {
+    _syncAnimation();
+    _syncOrbAnimation();
+    _syncReminderAnimation();
+    _syncRingAnimation();
+
+    if (!_motionAllowed) {
+      _resetController(_hover);
+      _resetController(_reminderBurst);
+      _resetController(_press);
+      return;
+    }
+
+    if (!widget.hoverReactiveBall) _resetController(_hover);
+    final reminderCanAnimate = widget.blinkReminderVisible && !widget.isActive;
+    if (!reminderCanAnimate) {
+      _resetController(_reminderBurst);
+    } else if (startReminderBurst) {
+      _reminderBurst.forward(from: 0);
     }
   }
 
   void _syncAnimation() {
-    if (widget.isActive) {
-      _blink.repeat(reverse: true);
+    if (_motionAllowed && widget.isActive) {
+      if (!_blink.isAnimating) _blink.repeat(reverse: true);
     } else {
-      _blink.stop();
-      _blink.value = 0;
+      _resetController(_blink);
     }
   }
 
   void _syncOrbAnimation() {
     final intensity = widget.orbIntensity.clamp(0.0, 1.0);
-    if (widget.dynamicOrbEffect && intensity > 0 && !_reduceMotion) {
+    if (_motionAllowed && widget.dynamicOrbEffect && intensity > 0) {
       final durationMs = widget.isActive ? 1800 : 3200;
       final steps = widget.isActive
           ? FloatingBall.activeOrbPhaseSteps
@@ -265,21 +287,22 @@ class _FloatingBallState extends State<FloatingBall>
   void _syncRingAnimation() {
     final visible =
         widget.showProgress && !widget.isActive && widget.dockEdge == null;
-    if (visible &&
-        !_reduceMotion &&
+    if (_motionAllowed &&
+        visible &&
         FloatingBall.shouldAnimateRing(widget.progress)) {
       if (!_ring.isAnimating) _ring.repeat();
     } else {
-      _ring.stop();
-      _ring.value = 0;
+      _resetController(_ring);
     }
   }
 
   void _setPressed(bool value) {
+    if (!widget.isSurfaceVisible) return;
     if (_pressed == value) return;
     setState(() => _pressed = value);
-    if (value) {
-      _release.stop();
+    if (!_motionAllowed) {
+      _resetController(_press);
+    } else if (value) {
       _press.forward();
     } else {
       _press.reverse();
@@ -287,69 +310,40 @@ class _FloatingBallState extends State<FloatingBall>
   }
 
   void _handlePanStart(DragStartDetails details) {
-    setState(() {
-      _dragging = true;
-      _dragVector = Offset.zero;
-    });
+    setState(() => _dragging = true);
     _setPressed(true);
     widget.onDragStart?.call();
   }
 
-  void _handlePanUpdate(DragUpdateDetails details) {
-    final delta = details.delta;
-    if (delta == Offset.zero) return;
-    final energy = (delta.distance / 14).clamp(0.04, 0.82).toDouble();
-    final direction = delta / delta.distance;
-    setState(() {
-      _dragVector = FloatingBall.smoothMotionVector(
-        _dragVector,
-        direction * energy,
-      );
-    });
-  }
-
   void _handlePanEnd(DragEndDetails details) {
     final velocity = details.velocity.pixelsPerSecond;
-    final speed = velocity.distance;
-    final direction = speed == 0 ? _dragVector : velocity / speed;
-    final energy = (speed / 1500).clamp(0.0, 1.0).toDouble();
-    final releaseTarget = direction * energy;
-    setState(() {
-      _dragging = false;
-      _releaseVector = FloatingBall.smoothMotionVector(
-        _dragVector,
-        releaseTarget,
-        response: 0.52,
-        maxMagnitude: 0.88,
-      );
-      _dragVector = Offset.zero;
-    });
+    setState(() => _dragging = false);
     _setPressed(false);
-    if (!_reduceMotion && energy > 0.02) {
-      _release.forward(from: 0);
-    } else {
-      _release.value = 1;
-    }
     widget.onDragEnd?.call(velocity);
   }
 
   void _handlePanCancel() {
-    setState(() {
-      _dragging = false;
-      _dragVector = Offset.zero;
-      _releaseVector = Offset.zero;
-    });
+    setState(() => _dragging = false);
     _setPressed(false);
     widget.onDragEnd?.call(Offset.zero);
   }
 
   void _syncReminderAnimation() {
-    if (widget.blinkReminderVisible && !widget.isActive) {
-      _reminder.repeat(reverse: true);
+    if (_motionAllowed && widget.blinkReminderVisible && !widget.isActive) {
+      if (!_reminder.isAnimating) _reminder.repeat(reverse: true);
     } else {
-      _reminder.stop();
-      _reminder.value = 0;
+      _resetController(_reminder);
     }
+  }
+
+  void _handleFocusChange(bool value) {
+    if (_hasFocus == value) return;
+    setState(() => _hasFocus = value);
+  }
+
+  void _handleFocusHighlight(bool value) {
+    if (_showFocusHighlight == value) return;
+    setState(() => _showFocusHighlight = value);
   }
 
   @override
@@ -360,7 +354,6 @@ class _FloatingBallState extends State<FloatingBall>
     _reminder.dispose();
     _reminderBurst.dispose();
     _press.dispose();
-    _release.dispose();
     _ring.removeListener(_updateRingFrame);
     _ring.dispose();
     _orbFrame.dispose();
@@ -370,6 +363,17 @@ class _FloatingBallState extends State<FloatingBall>
 
   @override
   Widget build(BuildContext context) {
+    final interaction = resolveOrbInteraction(
+      mode: widget.interactionMode,
+      hasActivationCallback: widget.onTap != null,
+      hasDragCallback: widget.onDragStart != null || widget.onDragEnd != null,
+    );
+    final canActivate = widget.isSurfaceVisible && interaction.canActivate;
+    final canDrag = widget.isSurfaceVisible && interaction.canDrag;
+    final canSecondaryTap =
+        widget.isSurfaceVisible &&
+        widget.interactionMode.allowsActivation &&
+        widget.onSecondaryTap != null;
     final color = widget.isActive ? widget.alertColor : widget.idleColor;
     final docked = widget.dockEdge != null && !widget.isActive;
     final reminderVisible =
@@ -386,7 +390,12 @@ class _FloatingBallState extends State<FloatingBall>
 
     final s = widget.size;
     final orbIntensity = widget.orbIntensity.clamp(0.0, 1.0);
-    final hoverBoost = widget.hoverReactiveBall ? _hover.value : 0.0;
+    // Durante o arrasto, o material interno permanece independente do mouse.
+    // O feedback de pressão continua na superfície externa, sem intensificar
+    // nem deslocar as auroras internas a cada movimento.
+    final materialHovered =
+        widget.hoverReactiveBall && !_dragging && _hover.value > 0.01;
+    final hoverBoost = materialHovered ? _hover.value : 0.0;
     final effectiveOrbIntensity = widget.dynamicOrbEffect
         ? (orbIntensity + hoverBoost * 0.28).clamp(0.0, 1.0)
         : 0.0;
@@ -399,7 +408,6 @@ class _FloatingBallState extends State<FloatingBall>
         _reminder,
         _reminderBurst,
         _press,
-        _release,
       ]),
       builder: (context, _) {
         final orbPhase = _orbFrame.value;
@@ -415,21 +423,11 @@ class _FloatingBallState extends State<FloatingBall>
           const Color(0xFF9BE8FF),
           burst * 0.45,
         )!;
-        final hovered = widget.hoverReactiveBall && _hover.value > 0.01;
+        final hovered = materialHovered;
         final hoverEase = Curves.easeOutCubic.transform(_hover.value);
         final pressEase = Curves.easeOutCubic.transform(_press.value);
-        final releaseWave = _reduceMotion || _release.value >= 1
-            ? 0.0
-            : math.sin(_release.value * math.pi) *
-                  math.exp(-_release.value * 2.8);
-        final motion = _dragging ? _dragVector : _releaseVector * releaseWave;
-        final motionStrength = motion.distance.clamp(0.0, 1.0);
-        final motionAngle = motionStrength > 0.001
-            ? math.atan2(motion.dy, motion.dx)
-            : 0.0;
-        final stretch = _reduceMotion ? 0.0 : motionStrength;
-        final scaleX = 1.0 + stretch * 0.10 + pressEase * 0.028;
-        final scaleY = 1.0 - stretch * 0.045 - pressEase * 0.045;
+        final scaleX = 1.0 + pressEase * 0.028;
+        final scaleY = 1.0 - pressEase * 0.045;
         final hoverScale = 1.0 + hoverEase * (docked ? 0.13 : 0.11);
         final reminderScale = 1.0 + reminderPulse * 0.08 + burst * 0.14;
         final dockScale = docked ? 0.96 : 1.0;
@@ -440,7 +438,6 @@ class _FloatingBallState extends State<FloatingBall>
             ? _opacity.value
             : (baseOpacity + (1.0 - baseOpacity) * burst);
         final transform = Matrix4.identity()
-          ..rotateZ(motionAngle)
           ..multiply(Matrix4.diagonal3Values(scaleX, scaleY, 1));
         return Transform(
           key: const ValueKey<String>('floating_ball_material'),
@@ -456,10 +453,7 @@ class _FloatingBallState extends State<FloatingBall>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    center: Alignment(
-                      (-0.32 - motion.dx * 0.16).clamp(-0.7, 0.1),
-                      (-0.34 - motion.dy * 0.16).clamp(-0.7, 0.1),
-                    ),
+                    center: const Alignment(-0.32, -0.34),
                     radius: 1.06,
                     colors: [
                       Color.lerp(effColor, Colors.white, 0.68)!,
@@ -482,10 +476,7 @@ class _FloatingBallState extends State<FloatingBall>
                         alpha: docked ? 0.26 : 0.34,
                       ),
                       blurRadius: s * (0.22 + hoverEase * 0.08),
-                      offset: Offset(
-                        motion.dx * s * 0.08,
-                        s * (0.10 + hoverEase * 0.02) + motion.dy * s * 0.06,
-                      ),
+                      offset: Offset(0, s * (0.10 + hoverEase * 0.02)),
                     ),
                     if (widget.dynamicOrbEffect)
                       BoxShadow(
@@ -538,14 +529,13 @@ class _FloatingBallState extends State<FloatingBall>
                             intensity: effectiveOrbIntensity,
                             hovered: hovered,
                             isActive: widget.isActive,
-                            motion: motion,
-                            pressure: pressEase,
+                            pressure: _dragging ? 0.0 : pressEase,
                           ),
                         ),
                       ),
                     Positioned(
-                      left: s * (0.13 - motion.dx * 0.055 + pressEase * 0.02),
-                      top: s * (0.10 - motion.dy * 0.045 + pressEase * 0.018),
+                      left: s * (0.13 + pressEase * 0.02),
+                      top: s * (0.10 + pressEase * 0.018),
                       child: Container(
                         width: s * (0.38 + pressEase * 0.04),
                         height: s * (0.22 + pressEase * 0.025),
@@ -586,57 +576,40 @@ class _FloatingBallState extends State<FloatingBall>
         child: Stack(
           alignment: Alignment.center,
           children: [
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(
-                begin: 0,
-                end: widget.progress.clamp(0.0, 1.0),
+            if (_motionAllowed)
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(
+                  begin: 0,
+                  end: widget.progress.clamp(0.0, 1.0),
+                ),
+                duration: const Duration(milliseconds: 520),
+                curve: Curves.easeOutCubic,
+                builder: (context, progress, _) => AnimatedBuilder(
+                  animation: Listenable.merge([_press, _ringFrame]),
+                  builder: (context, _) => _ProgressRing(
+                    progress: progress,
+                    ringSize: ringSize,
+                    strokeWidth: ringStroke,
+                    baseColor: color,
+                    phase: _ringFrame.value,
+                    press: _press.value,
+                    reduceMotion: false,
+                  ),
+                ),
+              )
+            else
+              AnimatedBuilder(
+                animation: Listenable.merge([_press, _ringFrame]),
+                builder: (context, _) => _ProgressRing(
+                  progress: widget.progress.clamp(0.0, 1.0),
+                  ringSize: ringSize,
+                  strokeWidth: ringStroke,
+                  baseColor: color,
+                  phase: 0,
+                  press: 0,
+                  reduceMotion: true,
+                ),
               ),
-              duration: _reduceMotion
-                  ? Duration.zero
-                  : const Duration(milliseconds: 520),
-              curve: Curves.easeOutCubic,
-              builder: (context, progress, _) => AnimatedBuilder(
-                animation: Listenable.merge([_press, _release, _ringFrame]),
-                builder: (context, _) {
-                  final press = Curves.easeOutCubic.transform(_press.value);
-                  final wave = _reduceMotion || _release.value >= 1
-                      ? 0.0
-                      : math.sin(_release.value * math.pi) *
-                            math.exp(-_release.value * 2.8);
-                  final motion = _dragging
-                      ? _dragVector
-                      : _releaseVector * wave;
-                  final strength = motion.distance.clamp(0.0, 1.0);
-                  final angle = strength > 0.001
-                      ? math.atan2(motion.dy, motion.dx)
-                      : 0.0;
-                  final transform = Matrix4.identity()
-                    ..rotateZ(angle)
-                    ..multiply(
-                      Matrix4.diagonal3Values(
-                        1 + strength * 0.075 + press * 0.018,
-                        1 - strength * 0.032 - press * 0.028,
-                        1,
-                      ),
-                    );
-                  return Transform(
-                    key: const ValueKey<String>('floating_ball_progress_ring'),
-                    alignment: Alignment.center,
-                    transform: transform,
-                    child: CustomPaint(
-                      size: Size.square(ringSize),
-                      painter: _ProgressRingPainter(
-                        progress: progress,
-                        strokeWidth: ringStroke,
-                        baseColor: color,
-                        phase: _ringFrame.value,
-                        reduceMotion: _reduceMotion,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
             circle,
           ],
         ),
@@ -655,44 +628,214 @@ class _FloatingBallState extends State<FloatingBall>
       );
     }
 
+    final requestedHitTarget = widget.hitTargetExtent;
+    final hitTargetExtent = requestedHitTarget.isFinite
+        ? math
+              .max(FloatingBall.minimumHitTargetExtent, requestedHitTarget)
+              .toDouble()
+        : FloatingBall.minimumHitTargetExtent;
+    visual = ConstrainedBox(
+      key: const ValueKey<String>('floating_ball_hit_target'),
+      constraints: BoxConstraints(
+        minWidth: hitTargetExtent,
+        minHeight: hitTargetExtent,
+      ),
+      child: Center(child: visual),
+    );
+
+    final focusVisible = _showFocusHighlight && canActivate;
+    final focusDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(hitTargetExtent),
+      border: Border.all(
+        color: focusVisible
+            ? Theme.of(context).colorScheme.primary
+            : Colors.transparent,
+        width: 2,
+      ),
+      boxShadow: focusVisible
+          ? [
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.92),
+                blurRadius: 0,
+                spreadRadius: 1,
+              ),
+            ]
+          : const [],
+    );
+    visual = _motionAllowed
+        ? AnimatedContainer(
+            key: const ValueKey<String>('floating_ball_focus_indicator'),
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOutCubic,
+            foregroundDecoration: focusDecoration,
+            child: visual,
+          )
+        : Container(
+            key: const ValueKey<String>('floating_ball_focus_indicator'),
+            foregroundDecoration: focusDecoration,
+            child: visual,
+          );
+
+    final canPress = canActivate || canDrag;
     Widget interactive = GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTapDown: (_) => _setPressed(true),
-      onTapUp: (_) => _setPressed(false),
-      onTapCancel: () => _setPressed(false),
-      onTap: widget.onTap,
-      onSecondaryTap: widget.onSecondaryTap,
-      onPanDown: (_) => _setPressed(true),
-      onPanStart: _handlePanStart,
-      onPanUpdate: _handlePanUpdate,
-      onPanEnd: _handlePanEnd,
-      onPanCancel: _handlePanCancel,
+      excludeFromSemantics: true,
+      onTapDown: canPress ? (_) => _setPressed(true) : null,
+      onTapUp: canPress ? (_) => _setPressed(false) : null,
+      onTapCancel: canPress ? () => _setPressed(false) : null,
+      onTap: canActivate ? widget.onTap : null,
+      onSecondaryTap: canSecondaryTap ? widget.onSecondaryTap : null,
+      onPanDown: canDrag ? (_) => _setPressed(true) : null,
+      onPanStart: canDrag ? _handlePanStart : null,
+      onPanEnd: canDrag ? _handlePanEnd : null,
+      onPanCancel: canDrag ? _handlePanCancel : null,
       child: visual,
     );
+
     final label = widget.semanticLabel;
-    if (label != null) {
-      interactive = Semantics(
-        button: true,
-        label: label,
-        value: ringVisible
+    final semanticValue =
+        widget.semanticValue ??
+        (ringVisible
             ? '${(widget.progress.clamp(0.0, 1.0) * 100).round()}%'
-            : null,
-        child: ExcludeSemantics(child: interactive),
+            : null);
+    final hasPrimarySemantics =
+        label != null ||
+        widget.semanticHint != null ||
+        semanticValue != null ||
+        interaction.canActivate;
+    Widget semanticChild = ExcludeSemantics(child: interactive);
+    if (reminderVisible) {
+      semanticChild = Stack(
+        children: [
+          semanticChild,
+          Positioned.fill(
+            child: Semantics(
+              container: true,
+              liveRegion: true,
+              label: widget.blinkReminderText.trim(),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ],
       );
     }
+    if (hasPrimarySemantics) {
+      interactive = Semantics(
+        container: true,
+        explicitChildNodes: reminderVisible,
+        button: interaction.canActivate,
+        enabled: interaction.canActivate ? canActivate : null,
+        focusable: interaction.canActivate,
+        focused: _hasFocus,
+        label: label,
+        hint: widget.semanticHint,
+        value: semanticValue,
+        onTap: canActivate ? widget.onTap : null,
+        child: semanticChild,
+      );
+    } else {
+      interactive = semanticChild;
+    }
 
-    return MouseRegion(
+    interactive = FocusableActionDetector(
+      key: const ValueKey<String>('floating_ball_focus'),
+      enabled: canActivate,
+      autofocus: false,
+      focusNode: widget.focusNode,
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) {
+            if (canActivate) widget.onTap?.call();
+            return null;
+          },
+        ),
+      },
+      onFocusChange: _handleFocusChange,
+      onShowFocusHighlight: _handleFocusHighlight,
+      child: interactive,
+    );
+
+    final pointer = MouseRegion(
       key: const ValueKey<String>('floating_ball_pointer'),
-      cursor: _pressed || _dragging
+      cursor: !widget.isSurfaceVisible
+          ? SystemMouseCursors.basic
+          : _dragging && canDrag
           ? SystemMouseCursors.grabbing
-          : SystemMouseCursors.grab,
+          : interaction.canActivate || canSecondaryTap
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onEnter: (_) {
-        if (widget.hoverReactiveBall) _hover.forward();
+        if (_motionAllowed &&
+            widget.hoverReactiveBall &&
+            (interaction.isInteractive || canSecondaryTap)) {
+          _hover.forward();
+        }
       },
       onExit: (_) {
-        if (widget.hoverReactiveBall) _hover.reverse();
+        if (_motionAllowed && widget.hoverReactiveBall) {
+          _hover.reverse();
+        } else {
+          _resetController(_hover);
+        }
       },
       child: interactive,
+    );
+
+    return ExcludeSemantics(
+      excluding: !widget.isSurfaceVisible,
+      child: IgnorePointer(ignoring: !widget.isSurfaceVisible, child: pointer),
+    );
+  }
+}
+
+class _ProgressRing extends StatelessWidget {
+  const _ProgressRing({
+    required this.progress,
+    required this.ringSize,
+    required this.strokeWidth,
+    required this.baseColor,
+    required this.phase,
+    required this.press,
+    required this.reduceMotion,
+  });
+
+  final double progress;
+  final double ringSize;
+  final double strokeWidth;
+  final Color baseColor;
+  final double phase;
+  final double press;
+  final bool reduceMotion;
+
+  @override
+  Widget build(BuildContext context) {
+    final pressEase = Curves.easeOutCubic.transform(press);
+    final transform = Matrix4.identity()
+      ..multiply(
+        Matrix4.diagonal3Values(
+          1 + pressEase * 0.018,
+          1 - pressEase * 0.028,
+          1,
+        ),
+      );
+    return Transform(
+      key: const ValueKey<String>('floating_ball_progress_ring'),
+      alignment: Alignment.center,
+      transform: transform,
+      child: CustomPaint(
+        size: Size.square(ringSize),
+        painter: _ProgressRingPainter(
+          progress: progress,
+          strokeWidth: strokeWidth,
+          baseColor: baseColor,
+          phase: phase,
+          reduceMotion: reduceMotion,
+        ),
+      ),
     );
   }
 }
@@ -778,7 +921,6 @@ class _DynamicOrbPainter extends CustomPainter {
     required this.intensity,
     required this.hovered,
     required this.isActive,
-    required this.motion,
     required this.pressure,
   });
 
@@ -787,15 +929,14 @@ class _DynamicOrbPainter extends CustomPainter {
   final double intensity;
   final bool hovered;
   final bool isActive;
-  final Offset motion;
   final double pressure;
 
   @override
   void paint(Canvas canvas, Size size) {
     final s = size.shortestSide;
     final center = Offset(
-      size.width / 2 - motion.dx * s * 0.07,
-      size.height / 2 - motion.dy * s * 0.07 + pressure * s * 0.02,
+      size.width / 2,
+      size.height / 2 + pressure * s * 0.02,
     );
     final bounds = Rect.fromLTWH(0, 0, size.width, size.height);
     final circle = Path()
@@ -820,7 +961,7 @@ class _DynamicOrbPainter extends CustomPainter {
       ).createShader(bounds);
     canvas.drawCircle(center, s * 0.48, glow);
 
-    final spin = phase * 2 * math.pi + motion.dx * 0.45 - motion.dy * 0.24;
+    final spin = phase * 2 * math.pi;
     final hoverLift = hovered ? 1.25 : 1.0;
     final activeLift = isActive ? 1.18 : 1.0;
     final alpha = (0.18 + intensity * 0.28) * hoverLift * activeLift;
@@ -1071,7 +1212,6 @@ class _DynamicOrbPainter extends CustomPainter {
       old.intensity != intensity ||
       old.hovered != hovered ||
       old.isActive != isActive ||
-      old.motion != motion ||
       old.pressure != pressure;
 }
 
