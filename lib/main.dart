@@ -18,6 +18,7 @@ import 'models/widget_settings.dart';
 import 'providers/settings_provider.dart';
 import 'providers/timer_provider.dart';
 import 'services/audio_service.dart';
+import 'services/dock_icon_service.dart';
 import 'services/dvrs_storage_service.dart';
 import 'services/idle_service.dart';
 import 'services/notification_service.dart';
@@ -65,6 +66,9 @@ Future<void> main() async {
   final storage = await StorageService.init();
   final dvrsStorage = await DvrsStorageService.init();
   final settings = SettingsProvider(storage: storage);
+  // Primeira execução: adota o idioma do SO antes de qualquer texto ser
+  // montado (bandeja, notificações, janela).
+  await settings.applySystemLanguageOnFirstRun();
   final screenTime = ScreenTimeService(storage: storage);
   final activityStats = ActivityStatsService(
     storage: storage,
@@ -132,7 +136,6 @@ Future<void> main() async {
       );
     }
     await windowManager.setResizable(false);
-    await windowManager.setSkipTaskbar(settings.value.hideDockIcon);
     // Transparência real do conteúdo: no macOS o `setEffect` sozinho deixa o
     // fundo opaco — `makeWindowFullyTransparent` adiciona a máscara vazia que
     // torna o FlutterView de fato transparente (sem blur/sombra).
@@ -145,6 +148,18 @@ Future<void> main() async {
     await windowManager.show();
   });
 
+  // Só depois de a janela existir: no macOS a política de ativação aplicada
+  // durante a subida do app é ignorada e o ícone fica no Dock.
+  final dockIcon = const DockIconService();
+  final dockSettled = await dockIcon.applyWithRetry(settings.value.hideDockIcon);
+  if (dockSettled != null && dockSettled != settings.value.hideDockIcon) {
+    // O sistema recusou a troca: a preferência passa a refletir a realidade em
+    // vez de mostrar um estado que o Dock não tem.
+    await settings.update(
+      settings.value.copyWith(hideDockIcon: dockSettled),
+    );
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -154,6 +169,7 @@ Future<void> main() async {
         Provider<NotificationService>.value(value: notifications),
         Provider<StartupService>.value(value: startup),
         Provider<TrayService>.value(value: tray),
+        Provider<DockIconService>.value(value: dockIcon),
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
         ChangeNotifierProvider<ScreenTimeService>.value(value: screenTime),
         ChangeNotifierProvider<ActivityStatsService>.value(
@@ -260,6 +276,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   late final SettingsProvider _settings;
   late final AudioService _audio;
   late final TrayService _tray;
+  late final DockIconService _dockIcon;
   late final NotificationService _notifications;
 
   bool _menuOpen = false;
@@ -301,6 +318,11 @@ class _HomePageState extends State<HomePage> with TrayListener {
   CompactWindowAnchor? _compactWindowAnchor;
   MenuWindowPlacement? _menuPlacement;
 
+  /// A janela já terminou de crescer para o tamanho do menu. Enquanto for
+  /// `false`, o menu não é pintado — ele apareceria cortado dentro da janela
+  /// compacta. Vale apenas junto de [_menuOpen] e é rearmado a cada abertura.
+  bool _menuReady = false;
+
   /// Borda em que a bolinha está encaixada (meia-lua); `null` = solta.
   BallDockEdge? _dockEdge;
   double _lastBallSize = AppDefaults.ballSize;
@@ -322,6 +344,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     _audio = context.read<AudioService>();
     _notifications = context.read<NotificationService>();
     _tray = context.read<TrayService>();
+    _dockIcon = context.read<DockIconService>();
     _lastBallSize = _settings.value.ballSize;
     _lastDockHidden = _settings.value.hideDockIcon;
     _lastHideMenuBar = _settings.value.hideMenuBarItem;
@@ -553,11 +576,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
 
     if (_blinkReminderVisible || !_canShowVisualBlinkReminder) return;
-    setState(() => _blinkReminderVisible = true);
-    // Encaixada (meia-lua): sem pílula expandida — só o brilho na bolinha.
+    // A janela cresce ANTES de a pílula aparecer: revelada primeiro, ela seria
+    // pintada dentro da janela compacta e apareceria cortada por alguns
+    // quadros. Encaixada (meia-lua) não há pílula expandida — só o brilho na
+    // bolinha —, então a janela permanece do tamanho compacto.
     if (_dockEdge == null) {
       await _applyLayout(WindowLayout.blinkReminder);
+      if (!mounted || _blinkReminderVisible) return;
     }
+    setState(() => _blinkReminderVisible = true);
     _blinkReminderHideTimer?.cancel();
     _blinkReminderHideTimer = Timer(
       const Duration(milliseconds: AppDefaults.blinkReminderVisibleMs),
@@ -769,6 +796,25 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
   }
 
+  /// Aplica a preferência do ícone do Dock e confere o que o sistema aceitou.
+  ///
+  /// O AppKit pode recusar a troca de política de ativação. Sem conferir, a
+  /// configuração ficaria dizendo o contrário do estado real e só tentaria de
+  /// novo se o usuário mexesse no botão. Quando nem a segunda tentativa passa,
+  /// a preferência volta para o estado que o sistema realmente tem.
+  Future<void> _applyDockIcon(bool hidden) async {
+    final settled = await _dockIcon.applyWithRetry(
+      hidden,
+      // Preferência mudou de novo no meio do caminho: o pedido novo é que vale.
+      isStale: () => _settings.value.hideDockIcon != hidden,
+    );
+    if (settled == null || settled == hidden) return;
+    if (!mounted || _settings.value.hideDockIcon != hidden) return;
+    debugPrint('Dock: sistema recusou hideDockIcon=$hidden; mantendo $settled.');
+    _lastDockHidden = settled;
+    await _settings.update(_settings.value.copyWith(hideDockIcon: settled));
+  }
+
   /// Reage a mudanças de configuração: se o tamanho da bolinha mudou e
   /// estamos em modo compacto, redimensiona a janela na hora.
   void _onSettingsChanged() {
@@ -786,7 +832,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final hideDock = _settings.value.hideDockIcon;
     if (hideDock != _lastDockHidden) {
       _lastDockHidden = hideDock;
-      windowManager.setSkipTaskbar(hideDock);
+      unawaited(_applyDockIcon(hideDock));
     }
     final hideMenuBar = _settings.value.hideMenuBarItem;
     if (hideMenuBar != _lastHideMenuBar) {
@@ -916,11 +962,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
             menuSize: menuSize,
             screen: screen,
           );
-          if (mounted && _menuOpen) {
-            setState(() => _menuPlacement = placement);
+          // A janela cresce primeiro; só então o menu é liberado para pintar.
+          // Publicá-lo antes o espremia na janela compacta por alguns quadros.
+          try {
+            await windowManager.setSize(menuSize);
+            await windowManager.setPosition(placement.windowPosition);
+          } finally {
+            if (mounted && _menuOpen) {
+              setState(() {
+                _menuPlacement = placement;
+                _menuReady = true;
+              });
+            }
           }
-          await windowManager.setSize(menuSize);
-          await windowManager.setPosition(placement.windowPosition);
           break;
         case WindowLayout.settings:
           await windowManager.setSize(WindowSizes.settings);
@@ -1058,7 +1112,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
     }
     setState(() {
       _menuOpen = opening;
-      if (opening) _menuPlacement = null;
+      if (opening) {
+        _menuPlacement = null;
+        _menuReady = false;
+      }
     });
     unawaited(_applyLayout(_menuOpen ? WindowLayout.menu : WindowLayout.ball));
   }
@@ -1580,7 +1637,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     WidgetSettings settings,
     AppStrings strings,
   ) {
-    if (!_menuOpen) {
+    // Enquanto a janela não terminar de crescer, o menu não cabe: segue a
+    // bolinha compacta em vez de pintar o painel cortado.
+    if (!_menuOpen || !_menuReady) {
       final edge = timer.state.isActive ? null : _dockEdge;
       final ball = _ball(
         isActive: timer.state.isActive,

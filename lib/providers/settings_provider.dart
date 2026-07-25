@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../l10n/app_strings.dart';
+import '../l10n/system_language.dart';
 import '../models/widget_settings.dart';
 import '../services/storage_service.dart';
 
@@ -29,6 +30,22 @@ class SettingsProvider extends ChangeNotifier {
     _settings = normalized;
     notifyListeners();
     await _storage.saveSettings(normalized);
+  }
+
+  /// Na primeira execução, alinha o idioma do app ao do sistema operacional.
+  ///
+  /// Só age enquanto não existem preferências gravadas — depois disso a escolha
+  /// do usuário em Configurações manda. [localeTags] permite injetar os locales
+  /// do SO nos testes; em produção vêm de [systemLocaleTags].
+  ///
+  /// Quando o idioma detectado já é o padrão, [update] não regrava nada: a
+  /// detecção simplesmente se repete no próximo início com o mesmo resultado.
+  Future<void> applySystemLanguageOnFirstRun({
+    Iterable<String?>? localeTags,
+  }) async {
+    if (_storage.hasStoredSettings) return;
+    final detected = resolveLanguageCode(localeTags ?? systemLocaleTags());
+    await update(_settings.copyWith(languageCode: detected));
   }
 
   /// Restaura os valores de fábrica.

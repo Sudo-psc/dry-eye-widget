@@ -1,27 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../utils/constants.dart';
+import 'design_tokens.dart';
 
-/// Raios de borda padronizados do design system.
-class AppRadii {
-  AppRadii._();
-  static const double xs = 8;
-  static const double sm = 12;
-  static const double md = 16;
-  static const double lg = 20;
-  static const double xl = 24;
-  static const double pill = 999;
-}
-
-/// Durações e curvas de micro-interação (hover, fade de painéis).
-class AppMotion {
-  AppMotion._();
-  static const Duration fast = Duration(milliseconds: 140);
-  static const Duration normal = Duration(milliseconds: 200);
-  static const Duration slow = Duration(milliseconds: 320);
-  static const Curve standard = Curves.easeOutCubic;
-  static const double hoverScale = 1.06;
-}
+export 'design_tokens.dart';
 
 /// Cores semânticas (alinhadas às faixas de risco do DVRS).
 /// A cor NUNCA é o único indicador — sempre acompanhada de texto/ícone.
@@ -46,11 +28,11 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? risk,
     Color? danger,
   }) => AppSemanticColors(
-        success: success ?? this.success,
-        caution: caution ?? this.caution,
-        risk: risk ?? this.risk,
-        danger: danger ?? this.danger,
-      );
+    success: success ?? this.success,
+    caution: caution ?? this.caution,
+    risk: risk ?? this.risk,
+    danger: danger ?? this.danger,
+  );
 
   @override
   AppSemanticColors lerp(AppSemanticColors? other, double t) {
@@ -65,33 +47,69 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
 }
 
 ButtonStyle _buttonStyle() => ButtonStyle(
-      minimumSize: const WidgetStatePropertyAll(Size(64, 44)),
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.sm)),
-      ),
-    );
+  minimumSize: const WidgetStatePropertyAll(
+    Size(64, AppComponentSize.minimumTarget),
+  ),
+  shape: WidgetStatePropertyAll(
+    RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.sm)),
+  ),
+  textStyle: const WidgetStatePropertyAll(
+    TextStyle(fontSize: AppTypography.supporting, fontWeight: FontWeight.w600),
+  ),
+);
 
 /// Tema central do app: dark Material 3, seed azul, Inter local.
 ///
 /// [visualDensity] pode ser sobrescrito em runtime (preferência de densidade).
 ThemeData buildAppTheme({
   VisualDensity visualDensity = VisualDensity.standard,
+  bool highContrast = false,
 }) {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: AppColors.idleBall,
-    brightness: Brightness.dark,
-  ).copyWith(
-    primary: AppColors.idleBall,
-    onPrimary: Colors.white,
-    surface: const Color(0xFF1A1F2A),
-    onSurface: Colors.white,
+  final scheme =
+      ColorScheme.fromSeed(
+        seedColor: AppColorTokens.accent,
+        brightness: Brightness.dark,
+      ).copyWith(
+        primary: AppColorTokens.accent,
+        onPrimary: AppColorTokens.onAccent,
+        surface: highContrast
+            ? AppColorTokens.canvas
+            : AppColorTokens.surfaceRaised,
+        onSurface: AppColorTokens.textPrimary,
+        error: AppColorTokens.danger,
+        onError: AppColorTokens.canvas,
+        outline: highContrast ? AppColorTokens.focus : AppColorTokens.border,
+        outlineVariant: AppColorTokens.borderSubtle,
+      );
+  const textTheme = TextTheme(
+    bodySmall: TextStyle(
+      fontSize: AppTypography.supporting,
+      color: AppColorTokens.textSecondary,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: AppTypography.body,
+      color: AppColorTokens.textPrimary,
+    ),
+    titleMedium: TextStyle(
+      fontSize: AppTypography.title,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.2,
+      color: AppColorTokens.textPrimary,
+    ),
+    headlineSmall: TextStyle(
+      fontSize: AppTypography.headline,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.35,
+      color: AppColorTokens.textPrimary,
+    ),
   );
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: scheme,
     fontFamily: 'Inter',
-    scaffoldBackgroundColor: Colors.transparent,
+    textTheme: textTheme,
+    scaffoldBackgroundColor: AppColorTokens.transparent,
     visualDensity: visualDensity,
     materialTapTargetSize: MaterialTapTargetSize.padded,
     filledButtonTheme: FilledButtonThemeData(style: _buttonStyle()),
@@ -101,34 +119,37 @@ ThemeData buildAppTheme({
       waitDuration: const Duration(milliseconds: 350),
       showDuration: const Duration(seconds: 3),
       decoration: BoxDecoration(
-        color: const Color(0xE61A1F2A),
+        color: AppColorTokens.surfaceOverlay,
         borderRadius: BorderRadius.circular(AppRadii.xs),
-        border: Border.all(color: Colors.white24),
+        border: Border.all(color: AppColorTokens.border),
       ),
       textStyle: const TextStyle(
         fontFamily: 'Inter',
-        fontSize: 12,
+        fontSize: AppTypography.supporting,
         fontWeight: FontWeight.w500,
-        color: Colors.white,
+        color: AppColorTokens.textPrimary,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpace.x3,
+        vertical: AppSpace.x2,
+      ),
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: AppColors.idleBall,
-      circularTrackColor: Color(0x33FFFFFF),
+      color: AppColorTokens.accent,
+      circularTrackColor: AppColorTokens.progressTrack,
     ),
     iconButtonTheme: IconButtonThemeData(
       style: IconButton.styleFrom(
-        minimumSize: const Size(44, 44),
-        foregroundColor: Colors.white.withValues(alpha: 0.92),
+        minimumSize: const Size.square(AppComponentSize.minimumTarget),
+        foregroundColor: AppColorTokens.textPrimary,
       ),
     ),
     extensions: const [
       AppSemanticColors(
-        success: Color(0xFF50C878),
-        caution: Color(0xFFFF8C00),
-        risk: Color(0xFFFF6B35),
-        danger: Color(0xFFFF4444),
+        success: AppColorTokens.success,
+        caution: AppColorTokens.warning,
+        risk: AppColorTokens.danger,
+        danger: AppColorTokens.danger,
       ),
     ],
   );

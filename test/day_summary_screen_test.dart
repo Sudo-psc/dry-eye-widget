@@ -4,6 +4,7 @@ import 'package:dry_eye_widget/models/widget_settings.dart';
 import 'package:dry_eye_widget/providers/settings_provider.dart';
 import 'package:dry_eye_widget/services/dvrs_storage_service.dart';
 import 'package:dry_eye_widget/services/storage_service.dart';
+import 'package:dry_eye_widget/ui/app_theme.dart';
 import 'package:dry_eye_widget/widgets/summary/day_summary_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -72,6 +73,31 @@ void main() {
       find.byKey(const ValueKey('day-summary-primary-action')),
       findsOneWidget,
     );
+
+    final statLabel = tester.widget<Text>(
+      find.text(ptStrings.daySummaryTodayLabel),
+    );
+    final statHint = tester.widget<Text>(
+      find.text(ptStrings.daySummaryTodayHint),
+    );
+    final disclaimer = tester.widget<Text>(
+      find.text(ptStrings.daySummaryDisclaimer),
+    );
+    expect(
+      statLabel.style?.fontSize,
+      greaterThanOrEqualTo(AppTypography.supporting),
+    );
+    expect(
+      statHint.style?.fontSize,
+      greaterThanOrEqualTo(AppTypography.minimumReadable),
+    );
+    expect(
+      disclaimer.style?.fontSize,
+      greaterThanOrEqualTo(AppTypography.supporting),
+    );
+    expect(statLabel.style?.color?.a, greaterThanOrEqualTo(0.8));
+    expect(statHint.style?.color?.a, greaterThanOrEqualTo(0.72));
+    expect(disclaimer.style?.color?.a, greaterThanOrEqualTo(0.72));
 
     await tester.tap(find.byKey(const ValueKey('day-summary-dvrs-card')));
     await tester.pump();

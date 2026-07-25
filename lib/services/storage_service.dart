@@ -45,6 +45,10 @@ class StorageService {
 
   // --- Configurações do widget -------------------------------------------
 
+  /// `false` na primeira execução, antes de qualquer preferência ser gravada.
+  bool get hasStoredSettings =>
+      _prefs.getString(StorageKeys.widgetSettings) != null;
+
   WidgetSettings loadSettings() {
     final raw = _prefs.getString(StorageKeys.widgetSettings);
     if (raw == null) return WidgetSettings.defaults();

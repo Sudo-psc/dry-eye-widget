@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../ui/design_tokens.dart';
+
 /// Painel com efeito "liquid glass": desfoque + saturação do fundo,
 /// preenchimento em gradiente translúcido, brilho superior (reflexo),
 /// realce de borda e sombra de profundidade.
@@ -12,8 +14,8 @@ class LiquidGlass extends StatelessWidget {
   const LiquidGlass({
     super.key,
     required this.child,
-    this.borderRadius = 20,
-    this.blur = 24,
+    this.borderRadius = AppRadii.lg,
+    this.blur = AppDepth.blur,
     this.saturation = 1.0,
     this.padding,
     this.width,
@@ -48,112 +50,77 @@ class LiquidGlass extends StatelessWidget {
     final ig = (1 - s) * lumG;
     final ib = (1 - s) * lumB;
     return <double>[
-      ir + s, ig, ib, 0, 0,
-      ir, ig + s, ib, 0, 0,
-      ir, ig, ib + s, 0, 0,
-      0, 0, 0, 1, 0,
+      ir + s,
+      ig,
+      ib,
+      0,
+      0,
+      ir,
+      ig + s,
+      ib,
+      0,
+      0,
+      ir,
+      ig,
+      ib + s,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(borderRadius);
-    final base = dark ? Colors.black : Colors.white;
-    final topAlpha = fillOpacity ?? (dark ? 0.95 : 0.22);
-    final bottomAlpha = topAlpha * (dark ? 0.94 : 0.55);
+    final highContrast = MediaQuery.maybeOf(context)?.highContrast == true;
+    final base = dark
+        ? AppColorTokens.surfaceOverlay
+        : AppColorTokens.surfaceRaised;
+    final opacity = highContrast
+        ? 1.0
+        : fillOpacity ?? (dark ? AppDepth.darkOpacity : AppDepth.lightOpacity);
 
     // Blur + saturação compostos num único filtro de backdrop.
-    final ImageFilter backdrop = saturation == 1.0
-        ? ImageFilter.blur(sigmaX: blur, sigmaY: blur)
+    final effectiveBlur = highContrast ? 0.0 : blur;
+    final ImageFilter backdrop = saturation == 1.0 || highContrast
+        ? ImageFilter.blur(sigmaX: effectiveBlur, sigmaY: effectiveBlur)
         : ImageFilter.compose(
             outer: ColorFilter.matrix(_saturationMatrix(saturation)),
-            inner: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+            inner: ImageFilter.blur(
+              sigmaX: effectiveBlur,
+              sigmaY: effectiveBlur,
+            ),
           );
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: radius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.42),
-            blurRadius: 34,
-            spreadRadius: -4,
-            offset: const Offset(0, 16),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 6,
-            spreadRadius: -2,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: highContrast ? const [] : AppDepth.floating,
       ),
       child: ClipRRect(
         borderRadius: radius,
-        child: Stack(
-          children: [
-            BackdropFilter(
-              filter: backdrop,
-              child: Container(
-                width: width,
-                constraints: constraints,
-                padding: padding,
-                decoration: BoxDecoration(
-                  borderRadius: radius,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.lerp(base, Colors.white, dark ? 0.14 : 0.35)!
-                          .withValues(alpha: topAlpha),
-                      base.withValues(alpha: bottomAlpha),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: dark ? 0.28 : 0.22),
-                    width: 1,
-                  ),
-                ),
-                child: child,
+        child: BackdropFilter(
+          filter: backdrop,
+          child: Container(
+            width: width,
+            constraints: constraints,
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              color: base.withValues(alpha: opacity),
+              border: Border.all(
+                color: highContrast
+                    ? AppColorTokens.focus
+                    : AppColorTokens.border,
+                width: highContrast ? 2 : 1,
               ),
             ),
-            // Reflexo de luz no topo (faixa clara que esmaece para baixo).
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: IgnorePointer(
-                child: Container(
-                  height: 54,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.white.withValues(alpha: dark ? 0.22 : 0.32),
-                        Colors.white.withValues(alpha: 0.0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Borda interna luminosa: realça o contorno do vidro sem somar
-            // opacidade ao preenchimento (mantém a translucidez).
-            Positioned.fill(
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: radius,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: dark ? 0.10 : 0.16),
-                      width: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+            child: child,
+          ),
         ),
       ),
     );

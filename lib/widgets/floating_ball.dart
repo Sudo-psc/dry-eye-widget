@@ -882,27 +882,47 @@ class _BlinkReminderPill extends StatelessWidget {
               ),
             ],
           ),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(progressRingVisible ? 3 : 8, 5, 14, 5),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                child,
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    text,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0,
-                    ),
-                  ),
+          // Se a janela ainda não tiver crescido para o tamanho da pílula, o
+          // conteúdo é cortado em silêncio em vez de listrar a tela.
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(height / 2),
+            // A pílula se compõe sempre no tamanho pretendido, mesmo que a
+            // janela ainda não tenha crescido: o excedente é cortado em
+            // silêncio em vez de listrar a tela por alguns quadros.
+            child: OverflowBox(
+              alignment: Alignment.centerLeft,
+              minWidth: width,
+              maxWidth: width,
+              minHeight: height,
+              maxHeight: height,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  progressRingVisible ? 3 : 8,
+                  5,
+                  14,
+                  5,
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    child,
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

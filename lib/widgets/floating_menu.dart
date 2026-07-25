@@ -401,8 +401,7 @@ class _CompactActionRow extends StatelessWidget {
   }
 }
 
-/// Botão de ação compacto: ícone centralizado, com tooltip e rótulo semântico
-/// (acessibilidade) já que o texto fica oculto.
+/// Botão de ação compacto: ícone centralizado, rótulo legível e tooltip.
 class _CompactActionButton extends StatefulWidget {
   const _CompactActionButton({
     required this.icon,
@@ -513,7 +512,7 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 9.5,
+                        fontSize: AppTypography.minimumReadable,
                         height: 1.1,
                         fontWeight: highlighted
                             ? FontWeight.w600
@@ -570,7 +569,7 @@ class _HeaderAction extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadii.sm),
             ),
             textStyle: const TextStyle(
-              fontSize: 11,
+              fontSize: AppTypography.supporting,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -633,9 +632,9 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const titleStyle = TextStyle(
-      fontSize: 10.5,
+      fontSize: AppTypography.minimumReadable,
       fontWeight: FontWeight.w700,
-      letterSpacing: 1.0,
+      letterSpacing: 0.8,
       color: AppColors.textMuted,
       shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
     );

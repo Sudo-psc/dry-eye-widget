@@ -1,6 +1,15 @@
 # Status
 
-Updated: 2026-07-16
+Updated: 2026-07-25
+
+## Quick win de legibilidade UI/UX — concluído em 2026-07-25
+
+Menu e Resumo do dia não usam mais rótulos visíveis menores que 11 px nos
+pontos auditados. Um token tipográfico reutilizável fixa 11 px para microtextos
+e 12 px para conteúdo auxiliar. O contraste do Resumo subiu de 62–72% para
+74–82% nos textos secundários afetados. Doze testes focados, análise estática e
+a suíte completa passaram. Evidência:
+`runs/2026-07-25-ui-ux-quick-win-legibility.md`.
 
 ## Movimento suave e magnetismo acelerado — concluídos em 2026-07-16
 

@@ -2,6 +2,10 @@
 
 ## now
 
+- [x] 2026-07-25: elevar microtextos do menu e Resumo para 11–12 px.
+- [x] 2026-07-25: reforçar contraste auxiliar sem alterar a hierarquia.
+- [x] 2026-07-25: adicionar guardrails de tipografia/contraste e validar a suíte.
+
 - [x] 2026-07-16: Amortecer o efeito interno durante arraste e soltura.
 - [x] 2026-07-16: Acelerar o magnetismo lateral com pouso sem overshoot.
 - [x] 2026-07-16: Cobrir filtro, curva e duração com testes determinísticos.

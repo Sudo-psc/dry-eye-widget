@@ -406,6 +406,25 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
               Expanded(child: _statBox(theme, 'Média diária', _fmtSecs(avg))),
             ],
           ),
+          const SizedBox(height: 20),
+          GlassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionHeader('Tempo de Tela vs. Adesão a Pausas (20-20-20)'),
+                const SizedBox(height: 6),
+                Text(
+                  'Comparativo entre o tempo ativo de uso do computador e o percentual de conclusão das pausas sugeridas.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _ScreenTimeVsBreaksComparison(series: series),
+              ],
+            ),
+          ),
         ],
       ],
     );
@@ -509,6 +528,156 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
     return null;
   }
 }
+
+class _ScreenTimeVsBreaksComparison extends StatelessWidget {
+  const _ScreenTimeVsBreaksComparison({required this.series});
+
+  final List<ScreenTimePoint> series;
+
+  @override
+  Widget build(BuildContext context) {
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
+    final breakStats = context.watch<StorageService>().loadBreakStats();
+    final maxSecs = series.fold<int>(0, (m, p) => p.seconds > m ? p.seconds : m);
+    final safeMaxSecs = maxSecs == 0 ? 1 : maxSecs;
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: AppColors.idleBall,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  'Tempo de Tela',
+                  style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Row(
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: semantic.success,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  'Adesão 20-20-20 (%)',
+                  style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 140,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (final point in series) ...[
+                Expanded(
+                  child: Builder(
+                    builder: (context) {
+                      final dayStat = breakStats.forDay(point.day);
+                      final adherence = dayStat.reminders > 0
+                          ? (dayStat.completed / dayStat.reminders).clamp(0.0, 1.0)
+                          : 0.0;
+                      final screenFraction =
+                          (point.seconds / safeMaxSecs).clamp(0.04, 1.0);
+                      final adherenceFraction =
+                          dayStat.reminders > 0 ? adherence.clamp(0.04, 1.0) : 0.0;
+
+                      final labelDay = point.day.day.toString();
+                      final tooltipMsg =
+                          '${point.day.day}/${point.day.month}: ${_fmtSecs(point.seconds)} de tela | '
+                          'Pausas: ${dayStat.completed}/${dayStat.reminders} (${(adherence * 100).round()}%)';
+
+                      return Tooltip(
+                        message: tooltipMsg,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: FractionallySizedBox(
+                                      alignment: Alignment.bottomCenter,
+                                      heightFactor: screenFraction,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: AppColors.idleBall.withValues(alpha: 0.7),
+                                          borderRadius: const BorderRadius.vertical(
+                                            top: Radius.circular(3),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Expanded(
+                                    child: FractionallySizedBox(
+                                      alignment: Alignment.bottomCenter,
+                                      heightFactor: adherenceFraction == 0.0
+                                          ? 0.004
+                                          : adherenceFraction,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: dayStat.reminders > 0
+                                              ? semantic.success
+                                              : Colors.white12,
+                                          borderRadius: const BorderRadius.vertical(
+                                            top: Radius.circular(3),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              series.length > 14 && point.day.day % 5 != 0
+                                  ? ''
+                                  : labelDay,
+                              style: const TextStyle(
+                                fontSize: 9,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                if (point != series.last) const SizedBox(width: 4),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 
 // ============================================================
 // DashboardScreen principal

@@ -6,6 +6,19 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+- Detecção do idioma do sistema operacional (macOS e Windows) na primeira
+  execução: o app já abre em português ou inglês conforme o SO, respeitando a
+  ordem de preferência de idiomas e caindo em inglês quando o sistema está em
+  um idioma ainda não traduzido. A escolha manual em Configurações continua
+  tendo precedência.
+
+### Corrigido
+- "Ocultar ícone do Dock" não surtia efeito no macOS: a política de ativação
+  era trocada durante a subida do app, quando o AppKit ainda a ignora. A troca
+  agora acontece por canal nativo com a janela pronta, é conferida e repetida
+  se necessário.
+
 ## [1.25.0] - 2026-07-21
 
 ### Melhorado

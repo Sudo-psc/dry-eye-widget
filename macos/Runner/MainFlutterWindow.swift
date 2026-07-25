@@ -161,6 +161,29 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    // Canal do ícone do Dock. O window_manager troca a política de ativação
+    // ainda durante a subida do app, quando o AppKit costuma ignorar a
+    // mudança — o ícone continuava no Dock com "Ocultar ícone do Dock" ligado.
+    // Aqui a troca é aplicada com o app já pronto, conferida e repetida.
+    let dockChannel = FlutterMethodChannel(
+      name: "dry_eye_widget/dock",
+      binaryMessenger: flutterViewController.engine.binaryMessenger)
+    dockChannel.setMethodCallHandler { (call, result) in
+      switch call.method {
+      case "setDockIconVisible":
+        guard let visible = (call.arguments as? [String: Any])?["visible"] as? Bool
+        else {
+          result(FlutterError(code: "bad_args", message: "visible ausente", details: nil))
+          return
+        }
+        DockIcon.setVisible(visible) { applied in result(applied) }
+      case "isDockIconVisible":
+        result(NSApplication.shared.activationPolicy() == .regular)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     // Canal de detecção de tela cheia: indica se o app em primeiro plano (que
     // não seja este widget) ocupa uma tela inteira. Lê apenas metadados de
     // janela (CGWindowList) — não captura conteúdo, então não exige permissão
@@ -260,6 +283,55 @@ class MainFlutterWindow: NSWindow {
     self.hasShadow = false
     self.level = .floating
     self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+  }
+}
+
+/// Presença do app no Dock, via política de ativação do `NSApplication`.
+///
+/// `.regular` = ícone no Dock; `.accessory` = app de bandeja, sem ícone e sem
+/// barra de menus. A troca só vale com o app já lançado e precisa acontecer na
+/// thread principal; por isso cada pedido é aplicado no run loop, conferido e
+/// repetido uma vez antes de reportar falha.
+enum DockIcon {
+  /// Geração do pedido mais recente. Só é lida e escrita na thread principal,
+  /// onde toda a troca acontece.
+  private static var generation = 0
+
+  static func setVisible(_ visible: Bool, completion: @escaping (Bool) -> Void) {
+    let target: NSApplication.ActivationPolicy = visible ? .regular : .accessory
+    DispatchQueue.main.async {
+      generation += 1
+      let mine = generation
+      if apply(target) {
+        completion(true)
+        return
+      }
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+        // Um pedido mais novo já assumiu (alternância rápida da preferência):
+        // repetir aqui reverteria o Dock para o valor antigo.
+        guard mine == generation else {
+          completion(false)
+          return
+        }
+        let applied = apply(target)
+        if !applied {
+          NSLog("[dock] não foi possível aplicar a política \(target.rawValue).")
+        }
+        completion(applied)
+      }
+    }
+  }
+
+  private static func apply(_ target: NSApplication.ActivationPolicy) -> Bool {
+    let app = NSApplication.shared
+    if app.activationPolicy() == target { return true }
+    app.setActivationPolicy(target)
+    if target == .regular {
+      // Voltando ao Dock, o app precisa ser reativado para recuperar o
+      // ícone e a barra de menus imediatamente.
+      app.activate(ignoringOtherApps: true)
+    }
+    return app.activationPolicy() == target
   }
 }
 

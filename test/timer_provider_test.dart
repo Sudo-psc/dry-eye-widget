@@ -419,6 +419,9 @@ class _MemoryStorage implements StorageService {
   int get eyeDropsElapsed => _eyeDropsElapsed;
 
   @override
+  bool get hasStoredSettings => true;
+
+  @override
   WidgetSettings loadSettings() => _settings;
 
   @override

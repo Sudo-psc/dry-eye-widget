@@ -1,5 +1,6 @@
 import 'package:dry_eye_widget/l10n/app_strings.dart';
 import 'package:dry_eye_widget/l10n/feature_strings.dart';
+import 'package:dry_eye_widget/ui/app_theme.dart';
 import 'package:dry_eye_widget/widgets/floating_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -54,6 +55,19 @@ void main() {
     expect(find.text(ptStrings.menuDvrs), findsNothing);
     expect(find.text(ptStrings.menuReports), findsNothing);
     expect(find.text(f.menuMyData), findsNothing);
+
+    final quickLabel = tester.widget<Text>(find.text(f.menuQuickStart));
+    final sectionLabel = tester.widget<Text>(
+      find.text(ptStrings.menuGroupActions.toUpperCase()),
+    );
+    expect(
+      quickLabel.style?.fontSize,
+      greaterThanOrEqualTo(AppTypography.minimumReadable),
+    );
+    expect(
+      sectionLabel.style?.fontSize,
+      greaterThanOrEqualTo(AppTypography.minimumReadable),
+    );
 
     await tester.tap(find.text(f.menuHealthHub));
     await tester.pump();

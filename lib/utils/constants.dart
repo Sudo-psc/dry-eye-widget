@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../ui/design_tokens.dart';
+
 /// Constantes globais do aplicativo: cores, durações e textos.
 ///
 /// Centralizar esses valores facilita o ajuste fino do visual e da
@@ -8,33 +10,34 @@ class AppColors {
   AppColors._();
 
   /// Cor padrão da bolinha no estado IDLE.
-  static const Color idleBall = Color(0xFF4A90E2);
+  static const Color idleBall = AppColorTokens.accent;
 
   /// Cor padrão da bolinha durante alerta e fases de pausa.
-  static const Color alertBall = Color(0xFFFF4444);
+  static const Color alertBall = AppColorTokens.danger;
 
   /// Fundo do overlay de vidro líquido (branco semitransparente).
-  static const Color glassFill = Color(0x26FFFFFF); // 0.15 de opacidade
-  static const Color glassBorder = Color(0x4DFFFFFF); // 0.30 de opacidade
-  static const Color glassShadow = Color(0x4D000000); // 0.30 de opacidade
+  static const Color glassFill = AppColorTokens.surfaceOverlay;
+  static const Color glassBorder = AppColorTokens.border;
+  static const Color glassShadow = AppColorTokens.scrim;
 
-  static const Color textPrimary = Colors.white;
+  static const Color textPrimary = AppColorTokens.textPrimary;
+
   /// Secundário com contraste ≥ ~4.5:1 sobre vidro escuro típico (WCAG AA).
-  static const Color textSecondary = Color(0xE0FFFFFF);
+  static const Color textSecondary = AppColorTokens.textSecondary;
 
   /// Rótulos terciários (headers de seção, meta) — ainda legíveis em vidro.
-  static const Color textMuted = Color(0xB3FFFFFF);
+  static const Color textMuted = AppColorTokens.textMuted;
 
   /// Fundo escuro de diálogos (Sobre, configurações).
-  static const Color surface = Color(0xFF2A2A2A);
+  static const Color surface = AppColorTokens.surface;
 
   /// Realce de hover sobre vidro (menu, botões compactos).
-  static const Color hoverFillTop = Color(0x33FFFFFF);
-  static const Color hoverFillBottom = Color(0x0FFFFFFF);
-  static const Color hoverBorder = Color(0x33FFFFFF);
+  static const Color hoverFillTop = AppColorTokens.surfaceOverlay;
+  static const Color hoverFillBottom = AppColorTokens.surfaceRaised;
+  static const Color hoverBorder = AppColorTokens.border;
 
   /// Divisores e traços sutis.
-  static const Color divider = Color(0x1FFFFFFF);
+  static const Color divider = AppColorTokens.borderSubtle;
 }
 
 /// Paleta de cores sugeridas no seletor de cor das configurações.
@@ -231,8 +234,7 @@ class StorageKeys {
   ///
   /// É estado operacional: não altera as preferências permanentes de aviso
   /// visual ou sonoro.
-  static const String blinkRemindersQuietUntil =
-      'blink_reminders_quiet_until';
+  static const String blinkRemindersQuietUntil = 'blink_reminders_quiet_until';
 
   /// Dia (`AAAA-MM-DD`) em que a notificação de reavaliação do DVRS já foi
   /// enviada — no máximo uma por dia.

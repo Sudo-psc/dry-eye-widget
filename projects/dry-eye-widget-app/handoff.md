@@ -1,5 +1,15 @@
 # Handoff
 
+## Quick win de legibilidade UI/UX — 2026-07-25
+
+O menu flutuante e o Resumo do dia agora usam mínimos explícitos de 11 px para
+microtextos e 12 px para conteúdo auxiliar por meio de `AppTypography`. O menu
+mantém os quatro atalhos e a largura atual; o Resumo ganhou contraste maior em
+rótulos, dicas e aviso educativo. Testes impedem retorno aos tamanhos e
+opacidades anteriores. Doze testes focados, análise estática, suíte completa e
+`git diff --check` passaram. A evidência está em
+`runs/2026-07-25-ui-ux-quick-win-legibility.md`.
+
 ## Movimento e magnetismo lateral — 2026-07-16
 
 `FloatingBall.smoothMotionVector` amortece o vetor interno com resposta padrão

@@ -6,6 +6,7 @@ import '../../providers/settings_provider.dart';
 import '../../services/daily_insight.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/storage_service.dart';
+import '../../ui/app_theme.dart';
 import '../../utils/constants.dart';
 import '../common/panel_entrance.dart';
 import '../common/panel_header.dart';
@@ -158,8 +159,8 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
           s.daySummaryDisclaimer,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 11,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+            fontSize: AppTypography.supporting,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -243,16 +244,16 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 11,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+              fontSize: AppTypography.supporting,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
             ),
           ),
           if (hint != null)
             Text(
               hint,
               style: TextStyle(
-                fontSize: 10,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+                fontSize: AppTypography.minimumReadable,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
               ),
             ),
         ],
