@@ -1,5 +1,35 @@
 # Handoff
 
+## Release multiplataforma 1.25.1 — 2026-07-25
+
+O app, MSIX, landing, README e changelog estão alinhados em 1.25.1+74 /
+1.25.1.0. Os gates locais passaram: análise limpa, 320 testes, smoke da landing,
+captura visual, build macOS Release e DMG. O bundle informa 1.25.1 (build 74);
+o DMG local tem SHA-256
+`d5c95dc8c271342a1fa75b8e371d23ab52444abe31243803f254c1240209a0a3`.
+
+Próxima ação: publicar `main` e a tag `v1.25.1`, aguardar os workflows macOS,
+Windows e MSIX, baixar os quatro ativos da GitHub Release e reconciliar versão,
+estrutura e hashes. Evidência: `runs/2026-07-25-v1.25.1-multiplatform-release.md`.
+
+## Redesign calmo do ciclo — 2026-07-25
+
+O fluxo `idle -> alerta -> fase1 -> conclusão` e seus timers não mudaram. A
+camada visual passou a usar `design_tokens.dart`: paleta escura OKLCH, um único
+acento funcional, escala espacial 4/8 pt, tipografia modular 1,25, contador
+Roboto Mono tabular e motion de 220–400 ms. Overlay e orbe não mantêm animações
+decorativas em loop; progresso, hover, pressão, lembrete e transição continuam
+com feedback finito.
+
+Os componentes de pausa, menu e cartões comuns usam superfícies mais opacas e
+hierarquia de uma decisão. Contraste AA/AAA, alto contraste, live regions,
+teclado, alvo mínimo de 44 px e reduzir movimento têm testes de regressão.
+Análise, 320 testes e build macOS Release de 59,4 MB passaram. Evidência em
+`runs/2026-07-25-calm-cycle-redesign.md`.
+
+Próximo gate externo: ouvir as transições com VoiceOver e repetir a matriz de
+acessibilidade e frame pacing no Windows real.
+
 ## Quick win de legibilidade UI/UX — 2026-07-25
 
 O menu flutuante e o Resumo do dia agora usam mínimos explícitos de 11 px para

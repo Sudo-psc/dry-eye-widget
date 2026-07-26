@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../utils/constants.dart';
 import 'design_tokens.dart';
 
 export 'design_tokens.dart';
@@ -107,7 +106,7 @@ ThemeData buildAppTheme({
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: scheme,
-    fontFamily: 'Inter',
+    fontFamily: AppTypography.family,
     textTheme: textTheme,
     scaffoldBackgroundColor: AppColorTokens.transparent,
     visualDensity: visualDensity,
@@ -124,7 +123,7 @@ ThemeData buildAppTheme({
         border: Border.all(color: AppColorTokens.border),
       ),
       textStyle: const TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: AppTypography.family,
         fontSize: AppTypography.supporting,
         fontWeight: FontWeight.w500,
         color: AppColorTokens.textPrimary,

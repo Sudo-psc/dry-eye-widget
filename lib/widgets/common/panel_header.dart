@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/constants.dart';
+import '../../ui/design_tokens.dart';
 
 /// Cabeçalho unificado de painéis (Resumo, Progresso, DVRS, Dashboard, etc.).
 ///
@@ -38,34 +38,43 @@ class PanelHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface.withValues(alpha: 0.55),
-        border: const Border(
-          bottom: BorderSide(color: AppColors.divider),
+        border: Border(
+          bottom: BorderSide(color: theme.colorScheme.outlineVariant),
         ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 6, 14, 6),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.x1,
+              AppSpace.x2,
+              AppSpace.x4,
+              AppSpace.x2,
+            ),
             child: Row(
               children: [
                 IconButton(
                   icon: Icon(leadingIcon),
                   onPressed: onLeading,
                   tooltip: leadingTooltip,
-                  style: IconButton.styleFrom(minimumSize: const Size(44, 44)),
+                  style: IconButton.styleFrom(
+                    minimumSize: const Size.square(
+                      AppComponentSize.minimumTarget,
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 2),
+                const SizedBox(width: AppSpace.x1),
                 Expanded(
                   child: Text(
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 17,
+                      fontSize: AppTypography.title,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                      color: AppColors.textPrimary,
+                      letterSpacing: -0.25,
+                      color: AppColorTokens.textPrimary,
                     ),
                   ),
                 ),
@@ -73,16 +82,16 @@ class PanelHeader extends StatelessWidget {
                   trailing!
                 else if (trailingIcon != null)
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: AppComponentSize.panelBadge,
+                    height: AppComponentSize.panelBadge,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.idleBall.withValues(alpha: 0.16),
+                      color: AppColorTokens.accent.withValues(alpha: 0.14),
                     ),
                     child: Icon(
                       trailingIcon,
-                      color: AppColors.idleBall,
-                      size: 20,
+                      color: AppColorTokens.accent,
+                      size: AppComponentSize.icon,
                     ),
                   ),
               ],

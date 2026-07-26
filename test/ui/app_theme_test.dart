@@ -20,10 +20,17 @@ void main() {
 
   test('botões padronizados: radius 12 e altura mínima 44', () {
     final theme = buildAppTheme();
-    final shape = theme.filledButtonTheme.style!.shape!.resolve({})
-        as RoundedRectangleBorder;
+    final shape =
+        theme.filledButtonTheme.style!.shape!.resolve({})
+            as RoundedRectangleBorder;
     expect(shape.borderRadius, BorderRadius.circular(AppRadii.sm));
     final minSize = theme.filledButtonTheme.style!.minimumSize!.resolve({})!;
     expect(minSize.height, 44);
+  });
+
+  test('alto contraste reforça superfícies e contorno de foco', () {
+    final theme = buildAppTheme(highContrast: true);
+    expect(theme.colorScheme.surface, AppColorTokens.canvas);
+    expect(theme.colorScheme.outline, AppColorTokens.focus);
   });
 }

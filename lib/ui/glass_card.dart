@@ -23,11 +23,9 @@ class GlassCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: 0.4),
+        color: AppColorTokens.surfaceRaised,
         borderRadius: BorderRadius.circular(AppRadii.md),
-        border: Border.all(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: child,
     );
@@ -37,6 +35,8 @@ class GlassCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.md),
         onTap: onTap,
+        focusColor: AppColorTokens.accent.withValues(alpha: 0.12),
+        hoverColor: AppColorTokens.accent.withValues(alpha: 0.08),
         child: card,
       ),
     );

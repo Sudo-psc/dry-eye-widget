@@ -16,7 +16,7 @@ void main() {
     expect(FloatingBall.ringGapForSize(96), 5.0);
   });
 
-  test('efeitos contínuos usam fases limitadas e anel adaptativo', () {
+  test('progresso ambiental não depende de animação contínua', () {
     final idleFrames = {
       for (var i = 0; i <= 1000; i++)
         FloatingBall.quantizedPhase(i / 1000, FloatingBall.idleOrbPhaseSteps),
@@ -29,10 +29,10 @@ void main() {
     expect(idleFrames.length, lessThanOrEqualTo(65));
     expect(activeFrames.length, lessThanOrEqualTo(46));
     expect(FloatingBall.shouldAnimateRing(0.899), isFalse);
-    expect(FloatingBall.shouldAnimateRing(0.9), isTrue);
+    expect(FloatingBall.shouldAnimateRing(0.9), isFalse);
   });
 
-  testWidgets('anel só mantém animação contínua perto da pausa', (
+  testWidgets('anel permanece estável inclusive perto da pausa', (
     tester,
   ) async {
     Widget app(double progress) => MaterialApp(
@@ -53,8 +53,8 @@ void main() {
     expect(tester.binding.transientCallbackCount, 0);
 
     await tester.pumpWidget(app(0.94));
-    await tester.pump();
-    expect(tester.binding.transientCallbackCount, greaterThan(0));
+    await tester.pumpAndSettle();
+    expect(tester.binding.transientCallbackCount, 0);
   });
 
   testWidgets('botão direito (secondary tap) dispara onSecondaryTap', (
@@ -570,7 +570,11 @@ void main() {
         )
         .painter;
     expect(identical(initialPainter, movingPainter), isFalse);
-    expect(tester.binding.transientCallbackCount, greaterThan(0));
+    expect(
+      tester.binding.transientCallbackCount,
+      greaterThan(0),
+      reason: 'hover e pressão ainda oferecem feedback transitório',
+    );
 
     await tester.pumpWidget(app(reduceMotion: true));
     await tester.pump();
@@ -626,7 +630,11 @@ void main() {
     focusNode.requestFocus();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 240));
-    expect(tester.binding.transientCallbackCount, greaterThan(0));
+    expect(
+      tester.binding.transientCallbackCount,
+      0,
+      reason: 'o alerta usa estado estático e não compete pela atenção',
+    );
 
     await tester.pumpWidget(app(visible: false));
     await tester.pump();

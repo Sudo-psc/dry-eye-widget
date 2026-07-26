@@ -246,9 +246,10 @@ class DryEyeApp extends StatelessWidget {
       builder: (context, child) {
         final settings = context.watch<SettingsProvider>().value;
         final media = MediaQuery.of(context);
-        final themed = Theme.of(
-          context,
-        ).copyWith(visualDensity: settings.uiDensity.visualDensity);
+        final themed = buildAppTheme(
+          visualDensity: settings.uiDensity.visualDensity,
+          highContrast: media.highContrast,
+        );
         return Theme(
           data: themed,
           child: MediaQuery(

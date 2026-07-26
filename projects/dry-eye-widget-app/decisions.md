@@ -1,5 +1,23 @@
 # Decisions
 
+## 2026-07-25 - O ciclo usa uma linguagem visual calma e tokenizada
+
+Decision:
+
+- Manter a paleta de baixa luminância e usar apenas azul como acento funcional.
+- Reservar cores adicionais para estados semânticos acompanhados por texto.
+- Remover loops decorativos do orbe, overlay e contador.
+- Usar feedback finito no início/fim do ciclo, hover, pressão e lembrete.
+- Manter a paleta escura na janela transparente para preservar contraste
+  previsível; respeitar alto contraste e reduzir movimento do sistema.
+
+Rationale:
+
+- Um app de pausa ocular não deve criar uma nova fonte de competição visual.
+- Progresso contínuo e estático é legível pela visão periférica sem exigir
+  vigilância.
+- Tokens e gates automáticos tornam contraste, motion e tipografia verificáveis.
+
 ## 2026-06-15 - Blink reminders use widget-level micronotification
 
 Decision:

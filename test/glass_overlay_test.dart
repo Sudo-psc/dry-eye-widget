@@ -5,6 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('transição de ciclo permanece em live region', (tester) async {
+    final semanticsHandle = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: GlassOverlay(
+            state: AppState.alerta,
+            strings: ptStrings,
+            secondsRemaining: 20,
+            phaseTotalSeconds: 20,
+          ),
+        ),
+      ),
+    );
+
+    final liveRegion = tester.getSemantics(
+      find.byKey(const ValueKey('cycle_live_region')),
+    );
+    expect(liveRegion.getSemanticsData().flagsCollection.isLiveRegion, isTrue);
+    semanticsHandle.dispose();
+  });
+
   testWidgets('conclusão exibe insight proativo quando informado', (
     tester,
   ) async {
@@ -12,7 +35,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    const insight = 'Hoje você concluiu 3 de 4 pausas sugeridas. Cada ciclo conta.';
+    const insight =
+        'Hoje você concluiu 3 de 4 pausas sugeridas. Cada ciclo conta.';
 
     await tester.pumpWidget(
       const MaterialApp(

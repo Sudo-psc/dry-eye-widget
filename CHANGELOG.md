@@ -6,18 +6,41 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.25.1] - 2026-07-25
+
 ### Adicionado
 - Detecção do idioma do sistema operacional (macOS e Windows) na primeira
   execução: o app já abre em português ou inglês conforme o SO, respeitando a
   ordem de preferência de idiomas e caindo em inglês quando o sistema está em
   um idioma ainda não traduzido. A escolha manual em Configurações continua
   tendo precedência.
+- Gráfico comparativo entre tempo de tela ativo e adesão às pausas 20-20-20 no
+  painel de saúde.
+
+### Melhorado
+- Camada visual do ciclo 20-20-20 redesenhada com calm technology, tokens
+  semânticos derivados de OKLCH, escala tipográfica modular 1,25 e espaçamento
+  4/8 pt.
+- Contador com dígitos tabulares, progresso ambiental contínuo e uma única cor
+  de acento funcional.
+- Overlay, pausa suave, menu e orbe com hierarquia de uma decisão e superfícies
+  flutuantes mais legíveis.
+- Loops decorativos removidos das superfícies ativas; hover, pressão, lembrete e
+  transições de ciclo mantêm feedback finito de 220–400 ms.
+- Microtextos e conteúdo auxiliar do menu e do Resumo do dia passam a usar
+  mínimos explícitos de 11–12 px e contraste reforçado.
 
 ### Corrigido
 - "Ocultar ícone do Dock" não surtia efeito no macOS: a política de ativação
   era trocada durante a subida do app, quando o AppKit ainda a ignora. A troca
   agora acontece por canal nativo com a janela pronta, é conferida e repetida
   se necessário.
+
+### Testado
+- Contraste WCAG AA para textos auxiliares e AAA para o contador.
+- Alto contraste, reduzir movimento, live regions, navegação por teclado e
+  alvos mínimos de 44 px.
+- Análise estática, 320 testes Flutter e build macOS Release.
 
 ## [1.25.0] - 2026-07-21
 

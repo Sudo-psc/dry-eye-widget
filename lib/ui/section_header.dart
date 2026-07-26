@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'design_tokens.dart';
+
 /// Título de seção padronizado (14/w600) com espaço para ação à direita.
 class SectionHeader extends StatelessWidget {
   const SectionHeader(this.title, {super.key, this.trailing});
@@ -9,17 +11,21 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+    padding: const EdgeInsets.only(bottom: AppSpace.x3),
+    child: Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: AppTypography.body,
+              fontWeight: FontWeight.w600,
+              color: AppColorTokens.textPrimary,
             ),
-            if (trailing != null) trailing as Widget,
-          ],
+          ),
         ),
-      );
+        if (trailing != null) trailing as Widget,
+      ],
+    ),
+  );
 }

@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'design_tokens.dart';
+
 /// Anel de progresso animado (0→[value] em 800ms, one-shot).
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
@@ -23,13 +25,15 @@ class ProgressRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ringColor = color ?? Theme.of(context).colorScheme.primary;
-    final track = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12);
+    const track = AppColorTokens.progressTrack;
+    final normalized = value.clamp(0.0, 1.0);
     return Semantics(
-      label: 'Progresso: ${(value.clamp(0.0, 1.0) * 100).round()}%',
+      label: 'Progresso',
+      value: '${(normalized * 100).round()}%',
       child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: value.clamp(0.0, 1.0)),
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutCubic,
+        tween: Tween(begin: 0, end: normalized),
+        duration: AppMotion.resolve(context, AppMotion.normal),
+        curve: AppMotion.standard,
         builder: (context, v, _) => CustomPaint(
           size: Size.square(size),
           painter: _RingPainter(

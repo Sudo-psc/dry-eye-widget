@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../ui/app_theme.dart';
-import '../ui/breathing_circle.dart';
 import '../ui/progress_ring.dart';
-import '../utils/constants.dart';
-import 'blinking_eye.dart';
 import 'liquid_glass.dart';
 import 'timer_display.dart';
 
@@ -23,8 +20,8 @@ class GlassOverlay extends StatelessWidget {
     required this.phaseTotalSeconds,
     this.currentStreak = 0,
     this.completionInsight = '',
-    this.fillOpacity = 0.15,
-    this.blur = 20.0,
+    this.fillOpacity = AppDepth.lightOpacity,
+    this.blur = AppDepth.blur,
   });
 
   final AppState state;
@@ -45,32 +42,45 @@ class GlassOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visible = state.isActive;
+    final duration = AppMotion.resolve(context, AppMotion.normal);
 
     return IgnorePointer(
       // Não bloqueia cliques quando invisível (estado IDLE).
       ignoring: !visible,
       child: AnimatedOpacity(
         opacity: visible ? 1.0 : 0.0,
-        duration: AppDurations.fade,
-        curve: Curves.easeInOut,
+        duration: duration,
+        curve: AppMotion.standard,
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(
-              maxWidth: AppSizes.overlayMaxWidth,
-              minWidth: 240,
+              maxWidth: AppComponentSize.overlayMaxWidth,
+              minWidth: AppComponentSize.overlayMinWidth,
             ),
             child: Semantics(
+              key: const ValueKey('cycle_live_region'),
               container: true,
               liveRegion: true,
               label: strings.stateTitle(state),
               child: LiquidGlass(
-                dark: false,
                 blur: blur,
                 fillOpacity: fillOpacity,
                 borderRadius: AppRadii.xl,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-                child: _buildContent(),
+                padding: const EdgeInsets.all(AppSpace.x3),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColorTokens.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppRadii.lg),
+                    border: Border.all(color: AppColorTokens.border),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpace.x6,
+                      vertical: AppSpace.x8,
+                    ),
+                    child: _buildContent(context),
+                  ),
+                ),
               ),
             ),
           ),
@@ -79,9 +89,12 @@ class GlassOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
+    final duration = AppMotion.resolve(context, AppMotion.normal);
     return AnimatedSwitcher(
-      duration: AppDurations.fade,
+      duration: duration,
+      switchInCurve: AppMotion.standard,
+      switchOutCurve: AppMotion.standard,
       transitionBuilder: (child, animation) =>
           FadeTransition(opacity: animation, child: child),
       child: Column(
@@ -89,88 +102,98 @@ class GlassOverlay extends StatelessWidget {
         key: ValueKey(state),
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (state.showsCountdown) ...[
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                const BreathingCircle(size: 150),
-                const BlinkingEye(size: 96),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
+          _StateMark(state: state),
+          const SizedBox(height: AppSpace.x4),
           Text(
             strings.stateTitle(state),
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-              height: 1.3,
+              fontFamily: AppTypography.family,
+              fontSize: AppTypography.headline,
+              fontWeight: FontWeight.w700,
+              color: AppColorTokens.textPrimary,
+              height: 1.2,
+              letterSpacing: -0.35,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpace.x2),
           Text(
             strings.stateSubtitle(state),
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 16,
-              color: AppColors.textSecondary,
-              height: 1.4,
+              fontFamily: AppTypography.family,
+              fontSize: AppTypography.body,
+              color: AppColorTokens.textSecondary,
+              height: 1.45,
             ),
           ),
           if (state == AppState.conclusao) ...[
-            const SizedBox(height: 16),
-            TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.elasticOut,
-              builder: (context, v, child) =>
-                  Transform.scale(scale: v, child: child),
-              child: const Icon(Icons.check_circle,
-                  size: 44, color: AppColors.textPrimary),
-            ),
             if (currentStreak >= 2) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpace.x3),
               Text(
                 // Localizado: reusa o helper existente do "Meu Progresso"
                 // (ex.: "5 dias" / "5 days").
                 '🔥 ${strings.progressDaysCount(currentStreak)}',
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontFamily: AppTypography.family,
+                  fontSize: AppTypography.supporting,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: AppColorTokens.textPrimary,
                 ),
               ),
             ],
             if (completionInsight.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpace.x3),
               Text(
                 completionInsight,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontFamily: AppTypography.family,
+                  fontSize: AppTypography.supporting,
                   height: 1.35,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary.withValues(alpha: 0.9),
+                  color: AppColorTokens.textSecondary,
                 ),
               ),
             ],
           ],
           if (state.showsCountdown) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpace.x6),
             ProgressRing(
               value: phaseTotalSeconds <= 0
                   ? 0
                   : 1 - secondsRemaining / phaseTotalSeconds,
-              size: 118,
-              strokeWidth: 5,
-              color: Colors.white,
+              size: AppComponentSize.overlayProgress,
+              strokeWidth: AppComponentSize.progressStroke,
+              color: AppColorTokens.accent,
               child: TimerDisplay(secondsRemaining: secondsRemaining),
             ),
           ],
         ],
       ),
+    );
+  }
+}
+
+class _StateMark extends StatelessWidget {
+  const _StateMark({required this.state});
+
+  final AppState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final completed = state == AppState.conclusao;
+    final icon = completed ? Icons.check_rounded : Icons.visibility_outlined;
+    final color = completed ? AppColorTokens.success : AppColorTokens.accent;
+    return Container(
+      width: AppComponentSize.minimumTarget,
+      height: AppComponentSize.minimumTarget,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.14),
+        border: Border.all(color: AppColorTokens.border),
+      ),
+      child: Icon(icon, color: color, size: AppTypography.headline),
     );
   }
 }

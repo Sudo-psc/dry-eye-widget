@@ -80,9 +80,13 @@ class LiquidGlass extends StatelessWidget {
     final base = dark
         ? AppColorTokens.surfaceOverlay
         : AppColorTokens.surfaceRaised;
+    final requestedOpacity =
+        fillOpacity ?? (dark ? AppDepth.darkOpacity : AppDepth.lightOpacity);
     final opacity = highContrast
         ? 1.0
-        : fillOpacity ?? (dark ? AppDepth.darkOpacity : AppDepth.lightOpacity);
+        : requestedOpacity
+              .clamp(AppDepth.minimumReadableOpacity, 1.0)
+              .toDouble();
 
     // Blur + saturação compostos num único filtro de backdrop.
     final effectiveBlur = highContrast ? 0.0 : blur;

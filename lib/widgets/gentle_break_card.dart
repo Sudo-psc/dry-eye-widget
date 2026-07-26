@@ -1,9 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
 import '../models/app_state.dart';
 import '../ui/app_theme.dart';
-import '../utils/constants.dart';
 import 'liquid_glass.dart';
 
 /// Cartão compacto de pausa para o "modo suave": aparece no canto superior
@@ -36,14 +37,13 @@ class GentleBreakCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = strings.stateTitle(state);
-    final subtitle =
-        state == AppState.conclusao && completionInsight.isNotEmpty
-            ? completionInsight
-            : strings.stateSubtitle(state);
+    final subtitle = state == AppState.conclusao && completionInsight.isNotEmpty
+        ? completionInsight
+        : strings.stateSubtitle(state);
     return Align(
       alignment: Alignment.topRight,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpace.x3),
         child: Semantics(
           container: true,
           liveRegion: true,
@@ -51,11 +51,12 @@ class GentleBreakCard extends StatelessWidget {
               ? '$title. $_timeText. $subtitle'
               : '$title. $subtitle',
           child: LiquidGlass(
-            width: 404,
+            width: AppComponentSize.gentleBreakWidth,
             borderRadius: AppRadii.xl,
-            blur: 26,
-            fillOpacity: 0.82,
-            padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpace.x4,
+              vertical: AppSpace.x2,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -67,37 +68,37 @@ class GentleBreakCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const _BreakLabel(),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppSpace.x2),
                       Text(
                         title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontFamily: 'Inter',
-                          color: AppColors.textPrimary,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          height: 1.12,
-                          letterSpacing: -0.2,
+                          fontFamily: AppTypography.family,
+                          color: AppColorTokens.textPrimary,
+                          fontSize: AppTypography.title,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
+                          letterSpacing: -0.25,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: AppSpace.x1),
                       Text(
                         subtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontFamily: 'Inter',
-                          color: AppColors.textSecondary,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w500,
-                          height: 1.25,
+                          fontFamily: AppTypography.family,
+                          color: AppColorTokens.textSecondary,
+                          fontSize: AppTypography.supporting,
+                          fontWeight: FontWeight.w400,
+                          height: 1.35,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: AppSpace.x4),
                 if (state.showsCountdown)
                   _CountdownDial(
                     timeText: _timeText,
@@ -122,25 +123,23 @@ class _BreakLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        gradient: LinearGradient(
-          colors: [
-            AppColors.idleBall.withValues(alpha: 0.38),
-            AppColors.alertBall.withValues(alpha: 0.34),
-          ],
-        ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        borderRadius: BorderRadius.circular(AppRadii.pill),
+        color: AppColorTokens.accent.withValues(alpha: 0.14),
+        border: Border.all(color: AppColorTokens.border),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.x3,
+          vertical: AppSpace.x1,
+        ),
         child: Text(
           '20-20-20',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            color: Colors.white.withValues(alpha: 0.92),
-            fontSize: 10.5,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
+          style: const TextStyle(
+            fontFamily: AppTypography.family,
+            color: AppColorTokens.accent,
+            fontSize: AppTypography.supporting,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.4,
           ),
         ),
       ),
@@ -166,11 +165,11 @@ class _CountdownDial extends StatelessWidget {
         : (secondsRemaining / totalSeconds).clamp(0.0, 1.0).toDouble();
 
     return SizedBox.square(
-      dimension: 96,
+      dimension: AppComponentSize.countdownDial,
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: progress, end: progress),
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
+        duration: AppMotion.resolve(context, AppMotion.normal),
+        curve: AppMotion.standard,
         builder: (context, value, child) {
           return CustomPaint(
             painter: _CountdownRingPainter(progress: value),
@@ -178,37 +177,15 @@ class _CountdownDial extends StatelessWidget {
           );
         },
         child: Center(
-          child: Container(
-            width: 76,
-            height: 58,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.18),
-                  Colors.white.withValues(alpha: 0.06),
-                ],
-              ),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.idleBall.withValues(alpha: 0.14),
-                  blurRadius: 18,
-                  spreadRadius: -4,
+          child: SizedBox(
+            width: AppComponentSize.countdownInnerWidth,
+            height: AppComponentSize.countdownInnerHeight,
+            child: Center(
+              child: Text(
+                timeText,
+                style: AppTypography.timerStyle.copyWith(
+                  fontSize: AppTypography.headline,
                 ),
-              ],
-            ),
-            child: Text(
-              timeText,
-              style: const TextStyle(
-                fontFamily: 'RobotoMono',
-                color: AppColors.textPrimary,
-                fontSize: 21,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.3,
               ),
             ),
           ),
@@ -229,23 +206,18 @@ class _StateBadge extends StatelessWidget {
         ? Icons.check_rounded
         : Icons.timer_outlined;
     final color = state == AppState.conclusao
-        ? const Color(0xFF50C878)
-        : AppColors.idleBall;
+        ? AppColorTokens.success
+        : AppColorTokens.accent;
 
     return Container(
-      width: 72,
-      height: 72,
+      width: AppComponentSize.stateBadge,
+      height: AppComponentSize.stateBadge,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color.withValues(alpha: 0.36),
-            color.withValues(alpha: 0.10),
-          ],
-        ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        color: color.withValues(alpha: 0.14),
+        border: Border.all(color: AppColorTokens.border),
       ),
-      child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 30),
+      child: Icon(icon, color: color, size: AppTypography.display),
     );
   }
 }
@@ -258,48 +230,22 @@ class _CountdownRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final radius = size.shortestSide / 2 - 5;
+    final radius = size.shortestSide / 2 - AppComponentSize.progressStroke;
     final rect = Rect.fromCircle(center: center, radius: radius);
 
     final track = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
+      ..strokeWidth = AppComponentSize.progressStroke
       ..strokeCap = StrokeCap.round
-      ..color = Colors.white.withValues(alpha: 0.14);
+      ..color = AppColorTokens.progressTrack;
     canvas.drawCircle(center, radius, track);
-
-    final glow = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8
-      ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7)
-      ..shader = const SweepGradient(
-        startAngle: -1.5708,
-        endAngle: 4.7124,
-        colors: [
-          AppColors.idleBall,
-          Color(0xFF50C878),
-          AppColors.alertBall,
-          AppColors.idleBall,
-        ],
-      ).createShader(rect);
-    canvas.drawArc(rect, -1.5708, 6.2832 * progress, false, glow);
 
     final ring = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
+      ..strokeWidth = AppComponentSize.progressStroke
       ..strokeCap = StrokeCap.round
-      ..shader = const SweepGradient(
-        startAngle: -1.5708,
-        endAngle: 4.7124,
-        colors: [
-          AppColors.idleBall,
-          Color(0xFF50C878),
-          AppColors.alertBall,
-          AppColors.idleBall,
-        ],
-      ).createShader(rect);
-    canvas.drawArc(rect, -1.5708, 6.2832 * progress, false, ring);
+      ..color = AppColorTokens.accent;
+    canvas.drawArc(rect, -math.pi / 2, math.pi * 2 * progress, false, ring);
   }
 
   @override

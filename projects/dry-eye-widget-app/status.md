@@ -2,6 +2,23 @@
 
 Updated: 2026-07-25
 
+## Release multiplataforma 1.25.1 — preparação concluída em 2026-07-25
+
+Metadados sincronizados como 1.25.1+74 e MSIX 1.25.1.0. Análise estática,
+320 testes, smoke da landing, captura determinística do ciclo, build macOS
+Release e geração do DMG passaram. A publicação externa e a reconciliação dos
+artefatos macOS/Windows serão registradas após os workflows da tag `v1.25.1`.
+Evidência: `runs/2026-07-25-v1.25.1-multiplatform-release.md`.
+
+## Redesign calmo do ciclo 20-20-20 — concluído em 2026-07-25
+
+O ciclo manteve estados, timers e ações, mas a camada visual agora usa tokens
+semânticos, escala modular 1,25, contador tabular, uma única progressão ambiental
+e motion finito. Overlay, pausa suave, orbe, menu e componentes comuns deixaram
+de competir por atenção. Gates cobrem contraste AA/AAA, live regions, teclado,
+44 px, alto contraste, reduzir movimento e ausência de loops decorativos.
+Evidência: `runs/2026-07-25-calm-cycle-redesign.md`.
+
 ## Quick win de legibilidade UI/UX — concluído em 2026-07-25
 
 Menu e Resumo do dia não usam mais rótulos visíveis menores que 11 px nos

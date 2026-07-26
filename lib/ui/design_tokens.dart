@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 /// Tokens cromáticos do tema calmo.
@@ -81,6 +79,8 @@ class AppRadii {
 class AppTypography {
   AppTypography._();
 
+  static const String family = 'Inter';
+  static const String timerFamily = 'RobotoMono';
   static const double minimumReadable = 12;
   static const double supporting = 12;
   static const double body = 15;
@@ -90,7 +90,7 @@ class AppTypography {
   static const double timer = 36.62;
 
   static const TextStyle timerStyle = TextStyle(
-    fontFamily: 'RobotoMono',
+    fontFamily: timerFamily,
     fontSize: timer,
     fontWeight: FontWeight.w700,
     color: AppColorTokens.textPrimary,
@@ -122,6 +122,7 @@ class AppDepth {
   static const double blur = 18;
   static const double darkOpacity = 0.92;
   static const double lightOpacity = 0.88;
+  static const double minimumReadableOpacity = 0.88;
   static const List<BoxShadow> floating = [
     BoxShadow(
       color: Color(0x66000000),
@@ -149,4 +150,11 @@ class AppComponentSize {
   static const double countdownInnerHeight = 58;
   static const double stateBadge = 72;
   static const double progressStroke = 5;
+  static const double compactActionHeight = 60;
+  static const double icon = 20;
+  static const double iconLarge = 28;
+  static const double panelBadge = 36;
+  static const double overlayMinWidth = 240;
+  static const double overlayMaxWidth = 400;
+  static const double overlayProgress = 118;
 }

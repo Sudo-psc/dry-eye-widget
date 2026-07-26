@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'design_tokens.dart';
 import 'glass_card.dart';
 import 'progress_ring.dart';
 
@@ -52,17 +53,18 @@ class StatTile extends StatelessWidget {
                     Text(
                       value,
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: AppTypography.headline,
                         fontWeight: FontWeight.bold,
                         height: 1.1,
+                        letterSpacing: -0.35,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpace.x1),
                     Text(
                       label,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      style: const TextStyle(
+                        fontSize: AppTypography.supporting,
+                        color: AppColorTokens.textSecondary,
                       ),
                     ),
                   ],
@@ -70,7 +72,7 @@ class StatTile extends StatelessWidget {
               ),
             ],
           ),
-          if (footer != null) ...[const SizedBox(height: 10), footer!],
+          if (footer != null) ...[const SizedBox(height: AppSpace.x3), footer!],
         ],
       ),
     );

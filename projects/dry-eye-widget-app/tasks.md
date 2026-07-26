@@ -2,6 +2,17 @@
 
 ## now
 
+- [x] 2026-07-25: sincronizar a versão 1.25.1+74 e MSIX 1.25.1.0.
+- [x] 2026-07-25: executar análise, 320 testes, smoke, captura, build e DMG.
+- [ ] 2026-07-25: publicar `main`, tag `v1.25.1` e GitHub Release.
+- [ ] 2026-07-25: concluir workflows e reconciliar os quatro artefatos.
+
+- [x] 2026-07-25: mapear componentes, estados, layouts e temas do ciclo.
+- [x] 2026-07-25: consolidar tokens OKLCH, tipografia, espaço, raio e depth.
+- [x] 2026-07-25: redesenhar orbe, overlay, pausa suave, progresso e menu.
+- [x] 2026-07-25: remover loops decorativos e preservar feedback transitório.
+- [x] 2026-07-25: validar contraste, semantics, teclado, testes e build macOS.
+
 - [x] 2026-07-25: elevar microtextos do menu e Resumo para 11–12 px.
 - [x] 2026-07-25: reforçar contraste auxiliar sem alterar a hierarquia.
 - [x] 2026-07-25: adicionar guardrails de tipografia/contraste e validar a suíte.
@@ -94,6 +105,9 @@
 
 ## next
 
+- [ ] Ouvir as transições do ciclo com VoiceOver em hardware macOS.
+- [ ] Repetir QA de contraste, teclado, movimento e janela em Windows real.
+
 - [x] UX-01: capturar baseline e estado final das superfícies em PT-BR e EN.
 - [ ] UX-02: cronometrar as cinco tarefas de referência no macOS.
 - [x] UX-03: criar o gate automático de linguagem/claims do DVRS.
@@ -133,6 +147,8 @@
 
 ## improve
 
+- Transformar as capturas do ciclo em goldens comparáveis quando o harness não
+  desenhar baselines tipográficas de depuração.
 - Se o selo ad hoc externo voltar a ficar defasado após build limpo, adicionar
   reparo local seguro e `codesign --verify --deep --strict` ao empacotamento.
 - Transformar o harness visual atual em uma matriz PT-BR/EN, 100%/200% e

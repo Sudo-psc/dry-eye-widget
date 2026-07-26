@@ -337,14 +337,9 @@ class _FloatingMenuState extends State<FloatingMenu> {
         container: true,
         label: s.menuSemanticLabel,
         child: LiquidGlass(
-          width: 280,
+          width: AppComponentSize.floatingMenuWidth,
           borderRadius: AppRadii.lg,
-          // Mais translúcido que o padrão (vidro de verdade), compensado com blur e
-          // saturação maiores para manter a vibrância e a profundidade.
-          fillOpacity: 0.58,
-          blur: 32,
-          saturation: 1.6,
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: AppSpace.x2),
           child: AnimatedSwitcher(
             duration: reduceMotion ? Duration.zero : AppMotion.normal,
             switchInCurve: AppMotion.standard,
@@ -378,7 +373,10 @@ class _CompactActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpace.x2,
+        vertical: AppSpace.x1,
+      ),
       child: Row(
         children: [
           for (var index = 0; index < items.length; index++)
@@ -465,8 +463,8 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
                 key: ValueKey('quick-action-${widget.label}'),
                 duration: reduceMotion ? Duration.zero : AppMotion.fast,
                 curve: AppMotion.standard,
-                height: 58,
-                margin: const EdgeInsets.symmetric(horizontal: 3),
+                height: AppComponentSize.compactActionHeight,
+                margin: const EdgeInsets.symmetric(horizontal: AppSpace.x1),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppRadii.sm),
                   gradient: highlighted
@@ -497,7 +495,7 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
                       curve: AppMotion.standard,
                       child: Icon(
                         widget.icon,
-                        size: 20,
+                        size: AppComponentSize.icon,
                         color: highlighted
                             ? AppColors.idleBall
                             : AppColors.textPrimary,
@@ -506,7 +504,7 @@ class _CompactActionButtonState extends State<_CompactActionButton> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpace.x1),
                     Text(
                       widget.label,
                       maxLines: 1,
@@ -563,7 +561,7 @@ class _HeaderAction extends StatelessWidget {
           onPressed: onTap,
           style: TextButton.styleFrom(
             minimumSize: const Size(44, 44),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpace.x2),
             foregroundColor: AppColors.idleBall,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadii.sm),
@@ -573,7 +571,7 @@ class _HeaderAction extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          icon: Icon(icon, size: 16),
+          icon: Icon(icon, size: AppSpace.x4),
           label: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 112),
             child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
