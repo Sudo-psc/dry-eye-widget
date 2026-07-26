@@ -2,13 +2,16 @@
 
 Updated: 2026-07-25
 
-## Release multiplataforma 1.25.1 — preparação concluída em 2026-07-25
+## Release multiplataforma 1.25.1 — publicada em 2026-07-25
 
 Metadados sincronizados como 1.25.1+74 e MSIX 1.25.1.0. Análise estática,
 320 testes, smoke da landing, captura determinística do ciclo, build macOS
-Release e geração do DMG passaram. A publicação externa e a reconciliação dos
-artefatos macOS/Windows serão registradas após os workflows da tag `v1.25.1`.
-Evidência: `runs/2026-07-25-v1.25.1-multiplatform-release.md`.
+Release e geração do DMG passaram. O commit `813afcf`, a tag `v1.25.1` e a
+GitHub Release pública foram enviados. CI, Pages, macOS, Windows e MSIX passaram;
+os quatro artefatos foram baixados e reconciliados por hash, integridade e
+metadados. O DMG permanece sem Developer ID/notarização e o instalador sem
+Authenticode porque os respectivos segredos não estão configurados. Evidência:
+`runs/2026-07-25-v1.25.1-multiplatform-release.md`.
 
 ## Redesign calmo do ciclo 20-20-20 — concluído em 2026-07-25
 

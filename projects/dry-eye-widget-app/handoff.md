@@ -8,9 +8,13 @@ captura visual, build macOS Release e DMG. O bundle informa 1.25.1 (build 74);
 o DMG local tem SHA-256
 `d5c95dc8c271342a1fa75b8e371d23ab52444abe31243803f254c1240209a0a3`.
 
-Próxima ação: publicar `main` e a tag `v1.25.1`, aguardar os workflows macOS,
-Windows e MSIX, baixar os quatro ativos da GitHub Release e reconciliar versão,
-estrutura e hashes. Evidência: `runs/2026-07-25-v1.25.1-multiplatform-release.md`.
+A `main`, a tag `v1.25.1` e a GitHub Release foram publicadas. CI, Pages, macOS,
+Windows e MSIX concluíram com sucesso. Os quatro ativos foram baixados; hashes
+coincidem com os digests do GitHub, ZIP/MSIX estão íntegros, MSIX informa
+1.25.1.0 e o bundle do DMG informa 1.25.1+74. O DMG usa assinatura ad hoc, sem
+Developer ID/notarização; o instalador Windows não tem Authenticode porque o
+SignPath não está configurado. Evidência:
+`runs/2026-07-25-v1.25.1-multiplatform-release.md`.
 
 ## Redesign calmo do ciclo — 2026-07-25
 

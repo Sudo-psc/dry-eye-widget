@@ -4,8 +4,8 @@
 
 - [x] 2026-07-25: sincronizar a versão 1.25.1+74 e MSIX 1.25.1.0.
 - [x] 2026-07-25: executar análise, 320 testes, smoke, captura, build e DMG.
-- [ ] 2026-07-25: publicar `main`, tag `v1.25.1` e GitHub Release.
-- [ ] 2026-07-25: concluir workflows e reconciliar os quatro artefatos.
+- [x] 2026-07-25: publicar `main`, tag `v1.25.1` e GitHub Release.
+- [x] 2026-07-25: concluir workflows e reconciliar os quatro artefatos.
 
 - [x] 2026-07-25: mapear componentes, estados, layouts e temas do ciclo.
 - [x] 2026-07-25: consolidar tokens OKLCH, tipografia, espaço, raio e depth.
