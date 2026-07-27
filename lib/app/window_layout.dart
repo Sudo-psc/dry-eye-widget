@@ -100,6 +100,38 @@ MenuWindowPlacement placeMenuWindow({
   );
 }
 
+/// Traz [savedPosition] de volta para uma tela conectada.
+///
+/// A posição salva vem da sessão anterior, que pode ter acontecido em um
+/// monitor que não existe mais: uma bolinha deixada em `x = 2560` reapareceria
+/// fora da tela — invisível e inalcançável — depois de desconectar o monitor
+/// externo. Escolhe a tela mais próxima da posição salva e a recorta lá dentro.
+///
+/// Devolve [savedPosition] intacta quando ela já está visível, e `null` quando
+/// não há tela alguma para decidir (o chamador mantém o que tinha).
+Offset? resolveRestoredPosition({
+  required Offset savedPosition,
+  required Size windowSize,
+  required Iterable<Rect> screens,
+}) {
+  final valid = screens
+      .where((screen) => screen.width > 0 && screen.height > 0)
+      .toList(growable: false);
+  if (valid.isEmpty) return null;
+
+  final screen = closestScreenForWindow(
+    windowPosition: savedPosition,
+    windowSize: windowSize,
+    screens: valid,
+  );
+  final maxX = math.max(screen.left, screen.right - windowSize.width);
+  final maxY = math.max(screen.top, screen.bottom - windowSize.height);
+  return Offset(
+    savedPosition.dx.clamp(screen.left, maxX).toDouble(),
+    savedPosition.dy.clamp(screen.top, maxY).toDouble(),
+  );
+}
+
 /// Seleciona a tela que contém o centro da janela ou, quando ela está em um
 /// espaço entre monitores, a tela geometricamente mais próxima.
 ///
@@ -159,10 +191,8 @@ class WindowSizes {
   static Size menu(double ballSize) =>
       Size(300, ballSize + 24 + menuPanelHeight + 8);
 
-  static Size blinkReminder(double ballSize) => Size(
-    math.max(ballSize + 156, 176.0).toDouble(),
-    math.max(ballSize + 24, 52.0).toDouble(),
-  );
+  // O tamanho do lembrete de piscada vive em `FloatingBall.blinkReminderSize`:
+  // ele depende do texto medido, não só do diâmetro da bolinha.
 
   /// Tamanho alvo para um [WindowLayout] (exceto ball/menu que dependem da bolinha).
   static Size? fixedSizeFor(WindowLayout layout) {

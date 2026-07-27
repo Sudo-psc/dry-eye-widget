@@ -82,6 +82,53 @@ class FloatingBall extends StatefulWidget {
   static double ringGapForSize(double size) =>
       (size * 0.09).clamp(3.0, 5.0).toDouble();
 
+  /// Rótulo da pílula do lembrete. Fica aqui porque a mesma definição precisa
+  /// desenhar o texto e medi-lo para dimensionar a pílula e a janela.
+  static const TextStyle blinkReminderTextStyle = TextStyle(
+    color: AppColorTokens.textPrimary,
+    fontFamily: AppTypography.family,
+    fontSize: AppTypography.supporting,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0,
+  );
+
+  /// Tamanho exato da pílula do lembrete de piscada.
+  ///
+  /// A largura acompanha o texto medido em vez de uma constante: rótulos curtos
+  /// como "Pisque" e "Blink" deixavam uma sobra vazia à direita, porque a
+  /// fórmula antiga reservava espaço fixo independentemente do conteúdo.
+  ///
+  /// A janela nativa usa este mesmo cálculo — se as duas contas divergirem, a
+  /// pílula sobra na janela ou é cortada por ela.
+  static Size blinkReminderSize({
+    required double ballSize,
+    required String text,
+    required bool showRing,
+    TextScaler textScaler = TextScaler.noScaling,
+  }) {
+    final visualWidth = showRing
+        ? ballSize +
+              (ringGapForSize(ballSize) + ringStrokeForSize(ballSize)) * 2
+        : ballSize;
+    final painter = TextPainter(
+      text: TextSpan(text: text.trim(), style: blinkReminderTextStyle),
+      textDirection: TextDirection.ltr,
+      textScaler: textScaler,
+      maxLines: 1,
+    )..layout();
+
+    final padLeft = showRing ? AppSpace.x1 : AppSpace.x2;
+    final width =
+        padLeft + visualWidth + AppSpace.x2 + painter.width + AppSpace.x3;
+    // Altura acomoda a bolinha e o texto: com escala de texto grande o rótulo
+    // passa a mandar.
+    final height = math.max(
+      math.max(ballSize + AppSpace.x6, 52.0),
+      painter.height + AppSpace.x1 * 2,
+    );
+    return Size(width.ceilToDouble(), height.ceilToDouble());
+  }
+
   static const double ringAnimationThreshold = 0.9;
   static const double minimumHitTargetExtent = 44.0;
   static const int idleOrbPhaseSteps = 32;
@@ -531,11 +578,15 @@ class _FloatingBallState extends State<FloatingBall>
       );
     }
     if (reminderVisible) {
-      final pillWidth = math.max(widget.size + 156, 176.0).toDouble();
-      final pillHeight = math.max(widget.size + 24, 52.0).toDouble();
+      final pillSize = FloatingBall.blinkReminderSize(
+        ballSize: widget.size,
+        text: widget.blinkReminderText,
+        showRing: ringVisible,
+        textScaler: MediaQuery.textScalerOf(context),
+      );
       visual = _BlinkReminderPill(
-        width: pillWidth,
-        height: pillHeight,
+        width: pillSize.width,
+        height: pillSize.height,
         color: color,
         text: widget.blinkReminderText,
         progressRingVisible: ringVisible,
@@ -815,12 +866,9 @@ class _BlinkReminderPill extends StatelessWidget {
                         text,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColorTokens.textPrimary,
-                          fontSize: AppTypography.supporting,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0,
-                        ),
+                        // Mesmo estilo usado na medição da largura; separá-los
+                        // faria a pílula sobrar ou cortar o texto.
+                        style: FloatingBall.blinkReminderTextStyle,
                       ),
                     ),
                   ],

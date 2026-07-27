@@ -6,6 +6,34 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.25.2] - 2026-07-26
+
+### Melhorado
+- Soltura da bolinha alinhada ao quadro da tela em vez de um temporizador de
+  16 ms. Medido em painel de 120 Hz: a cadência sai de 18,8 ms (120 de 120
+  iterações acima do alvo, picos de 137 ms) para 8,3 ms de mediana com p95 de
+  8,6 ms — o arremesso passa a receber 21–41 atualizações de posição onde antes
+  recebia 8–15. Um teto de 32 ms cobre o caso em que o macOS deixa de produzir
+  quadros com a janela ocluída ou a tela dormindo.
+
+### Corrigido
+- A bolinha não reaparece mais fora da tela quando o monitor em que ela estava
+  é desconectado: a posição salva passa a ser validada contra os monitores
+  conectados na inicialização e trazida de volta para a área visível.
+- A pílula do lembrete de piscada acompanha o texto em vez de reservar largura
+  fixa: rótulos curtos como "Pisque" e "Blink" deixavam uma sobra vazia à
+  direita. A janela nativa usa a mesma medida, então pílula e janela não
+  divergem mais.
+
+### Testado
+- Cadência do loop de soltura medida em build profile e painel de 120 Hz,
+  comparando temporizador fixo e alinhamento ao quadro.
+- Posição restaurada contra monitor desconectado, origem negativa e janela
+  maior que a tela.
+- Largura da pílula medida contra o texto real, incluindo escala de texto e
+  ausência do anel de progresso.
+- Análise estática e 334 testes Flutter.
+
 ## [1.25.1] - 2026-07-25
 
 ### Adicionado

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_retriever/screen_retriever.dart';
@@ -200,12 +201,43 @@ Future<void> _restoreBallPosition(
   final savedX = storage.ballX;
   final savedY = storage.ballY;
   if (savedX != null && savedY != null) {
-    await windowManager.setPosition(Offset(savedX, savedY));
+    final saved = Offset(savedX, savedY);
+    final visible = await _visiblePosition(saved, windowSize);
+    await windowManager.setPosition(visible);
+    // A posição recortada vira a nova verdade: sem isso a bolinha voltaria
+    // para fora da tela no próximo início.
+    if (visible != saved) {
+      await storage.saveBallPosition(visible.dx, visible.dy);
+    }
     return;
   }
   await windowManager.setPosition(
     await _cornerOffset(settings.defaultCorner, windowSize),
   );
+}
+
+/// Recorta [position] para uma tela conectada; devolve-a intacta se não der
+/// para consultar os monitores.
+Future<Offset> _visiblePosition(Offset position, Size windowSize) async {
+  try {
+    final displays = await screenRetriever.getAllDisplays();
+    final screens = displays
+        .map(
+          (display) =>
+              (display.visiblePosition ?? Offset.zero) &
+              (display.visibleSize ?? display.size),
+        )
+        .toList(growable: false);
+    return resolveRestoredPosition(
+          savedPosition: position,
+          windowSize: windowSize,
+          screens: screens,
+        ) ??
+        position;
+  } catch (e) {
+    debugPrint('Não foi possível validar a posição salva: $e');
+    return position;
+  }
 }
 
 /// Calcula o canto da tela primária para um dado tamanho de janela.
@@ -938,8 +970,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
           _compactWindowAnchor = null;
           break;
         case WindowLayout.blinkReminder:
-          final reminderSize = WindowSizes.blinkReminder(
-            _settings.value.ballSize,
+          // Mesmo cálculo da pílula: a janela acompanha o texto real. Este
+          // layout só é aplicado com a bolinha solta, então o anel aparece
+          // sempre que estiver ligado e não houver pausa em curso.
+          final reminderSize = FloatingBall.blinkReminderSize(
+            ballSize: _settings.value.ballSize,
+            text: _settings.strings.blinkReminderText,
+            showRing:
+                _settings.value.showProgressRing && !_timer.state.isActive,
+            textScaler: TextScaler.linear(_settings.value.uiScale),
           );
           await windowManager.setSize(reminderSize);
           await windowManager.setPosition(_ballPosition);
@@ -1157,6 +1196,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
       final generation = ++_ballReleaseGeneration;
 
       if (!reduceMotion && plan.velocity.distance >= 40) {
+        // Cadência do vsync, não um timer de 16 ms: o temporizador do Dart não
+        // é alinhado à tela e media 20 ms por iteração — 120 de 120 acima do
+        // alvo, com picos de 137 ms —, entregando 8–15 posições onde cabiam
+        // 21–41 em painel de 120 Hz. Daí o tranco no arremesso. Alinhado ao
+        // quadro a mediana cai para 8,3 ms; `setPosition` custa ~0,35 ms.
+        //
+        // O teto existe porque o macOS deixa de produzir quadros com a janela
+        // ocluída ou a tela dormindo: medimos `endOfFrame` levando 10 s nesse
+        // estado. Sem o limite a bolinha ficaria pendurada no meio do voo.
         final stopwatch = Stopwatch()..start();
         while (mounted && generation == _ballReleaseGeneration) {
           final t =
@@ -1164,7 +1212,10 @@ class _HomePageState extends State<HomePage> with TrayListener {
               (plan.duration.inMicroseconds.toDouble());
           await windowManager.setPosition(orbReleasePosition(plan, t));
           if (t >= 1) break;
-          await Future<void>.delayed(const Duration(milliseconds: 16));
+          await Future.any([
+            SchedulerBinding.instance.endOfFrame,
+            Future<void>.delayed(const Duration(milliseconds: 32)),
+          ]);
         }
       }
       if (!mounted || generation != _ballReleaseGeneration) return;
