@@ -1,5 +1,67 @@
 # Handoff
 
+## Release multiplataforma 1.26.0 — 2026-07-29
+
+A versão local permanece em 1.26.0+76 / MSIX 1.26.0.0. O DVRS mantém campos
+agregados somente para compatibilidade estrutural interna;
+`educationalMessage` e `safetyAlertMessage` foram removidos do modelo
+serializado. No primeiro carregamento, o storage remove ambos de payloads
+antigos. UI, narrativa e relatórios derivam texto atual e localizado por chave
+semântica e `safetyAlertLevel`; o PDF deriva texto PT atual somente do nível.
+Progresso, instruções, títulos, enunciados, opções, acessibilidade e alertas das
+16 perguntas são resolvidos por ids estáveis em PT/EN.
+
+Os workflows de plataforma têm `contents: read`, não recebem secrets e apenas
+produzem artefatos internos. O `release-fan-in.yml` é carregado da default
+branch, valida source/tag/ancestralidade em job somente leitura, consulta os três
+runs pelo mesmo source SHA e preserva o bundle validado como evidência. Não
+existe job de publicação, `contents: write`, environment de release ou chamada
+a `gh release` nos Actions. O publicador é exclusivamente manual e falha antes
+de consultar o remoto sem
+`RELEASE_MANUAL_APPROVAL=publish:<tag>@<commit>#<bundle-digest>`, onde o digest
+canônico cobre os quatro artefatos e três manifestos revisados.
+
+O DVRS removeu `compareDvrsTrend`, `DvrsTrend` e os rótulos agregados de
+melhora/estabilidade/piora. As superfícies usam deltas neutros por domínio e
+rótulos localizados. A landing reconstrói os dots após troca PT/EN. Os marcadores
+ativos de versão estão em 1.26.0 e o gate rejeita regressão editorial. A
+reconciliação pós-publicação escolhe a maior SemVer estável, inclusive quando
+duas versões são processadas em ordens opostas.
+
+Gates locais aprovados: 77 testes focados, `flutter analyze`, 356 testes,
+smoke da landing,
+build Science, actionlint 1.7.12, readiness 1.26.0, testes do pipeline, build
+macOS Release universal 1.26.0+76, codesign deep/strict e DMG válido. O segundo
+build exigiu renovação do selo ad hoc externo e passou a verificação
+deep/strict preservando identificador, entitlements e flags. O DMG tem
+29.177.791 bytes, SHA-256
+`b6b69044374316c6cd7632bfb4266e190f23e424c3deeaa0f2c9f794baf5854f`
+e o app tem CDHash `d6464c6e03b47adda7a2b4efeba946cf01a22c18`.
+
+Base do diff: `71296726616d5c67d47204c8474ca519bcbd2de7`; o estado revisável é
+essa base contra o worktree atual, incluindo arquivos novos não rastreados do
+pipeline e excluindo
+`/Users/philipecruz/app_dry_eye_widget/gemini_generated_video_B3916D35.mp4`.
+O vídeo foi preservado com SHA-256
+`72f74a1f3ded76933117b3fbc8c8694235853633936f4e54e879278a82c4f385`.
+
+A quarta revisão independente somente leitura foi concluída com
+`P0=0 / P1=0 / P2=0` e nenhum achado confirmado. O freeze revisado registrou
+49 rastreados modificados, 13 não rastreados, staging vazio, fingerprint
+rastreado
+`814ac7d3339a3c039b0c712c15ddc5ba297f4265b301945cdf4e1f3846006c2e`
+e inventário dos 12 não rastreados do patch
+`8e7974a3e7567ab3b86c0e289a92e27bac4afc40c7a6ec93df535f5e03f4ec0b`.
+O revisor confirmou ausência de mutação local ou remota.
+
+Próxima ação: solicitar autorização explícita separada para commit, push e tag
+`v1.26.0`. Depois que os runners macOS/Windows/MSIX e o fan-in read-only
+produzirem o bundle, revisar os quatro artefatos e três manifestos e solicitar
+outra aprovação explícita vinculada a `tag+commit+digest` antes de executar o
+publicador manual. Não fazer commit, push, tag, upload ou publicação sem a
+autorização correspondente. A integração HealthKit citada abaixo é contexto
+histórico de uma branch anterior e não está presente na `main` atual.
+
 ## Release multiplataforma 1.25.1 — 2026-07-25
 
 O app, MSIX, landing, README e changelog estão alinhados em 1.25.1+74 /

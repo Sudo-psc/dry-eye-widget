@@ -40,7 +40,7 @@ class HealthDataService {
       'instrument': {
         'id': 'DVRS',
         'version': DvrsResult.dvrsVersion,
-        'role': 'educational_screening',
+        'role': 'educational_self_log',
         'isDiagnostic': false,
       },
       'privacy': {'localOnly': true, 'telemetry': false},
@@ -65,13 +65,6 @@ class HealthDataService {
     final metrics = <Map<String, dynamic>>[];
     if (history.isNotEmpty) {
       final latest = history.last;
-      metrics.add({
-        'metricId': 'dvrs.total_score',
-        'value': latest.totalScore,
-        'unit': 'score_0_100',
-        'observedAt': latest.createdAt.toIso8601String(),
-        'instrumentVersion': latest.version,
-      });
       for (final d in DvrsDomain.values) {
         metrics.add({
           'metricId': 'dvrs.domain.${d.id}',

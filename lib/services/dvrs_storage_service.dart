@@ -20,10 +20,47 @@ class DvrsStorageService {
 
   static Future<DvrsStorageService> init() async {
     final prefs = await SharedPreferences.getInstance();
-    return DvrsStorageService._(prefs);
+    final service = DvrsStorageService._(prefs);
+    await service._migrateLegacyPresentationFields();
+    return service;
   }
 
   // --- Leitura interna ----------------------------------------------------
+
+  /// Remove campos de apresentação persistidos por versões antigas.
+  ///
+  /// Mensagens públicas são sempre derivadas da chave semântica atual na UI ou
+  /// do texto neutro atual no PDF. Assim, um payload legado não consegue
+  /// reintroduzir linguagem obsoleta depois do upgrade.
+  Future<void> _migrateLegacyPresentationFields() async {
+    final raw = _prefs.getString(StorageKeys.dvrsResults);
+    if (raw == null || raw.isEmpty) return;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return;
+      var changed = false;
+      const legacyPresentationFields = <String>{
+        'educationalMessage',
+        'safetyAlertMessage',
+      };
+      for (final item in decoded) {
+        if (item is Map) {
+          for (final field in legacyPresentationFields) {
+            if (item.containsKey(field)) {
+              item.remove(field);
+              changed = true;
+            }
+          }
+        }
+      }
+      if (changed) {
+        await _prefs.setString(StorageKeys.dvrsResults, jsonEncode(decoded));
+      }
+    } catch (_) {
+      // Mantém a política existente: payload integralmente corrompido é
+      // ignorado na leitura, sem substituir dados que possam ser recuperados.
+    }
+  }
 
   List<DvrsResult> _readAll() {
     final raw = _prefs.getString(StorageKeys.dvrsResults);
@@ -69,8 +106,7 @@ class DvrsStorageService {
 
   /// Histórico ordenado por data (mais antigo → mais recente).
   List<DvrsResult> getDvrsHistory() {
-    final all = _readAll()
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final all = _readAll()..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return List<DvrsResult>.unmodifiable(all);
   }
 

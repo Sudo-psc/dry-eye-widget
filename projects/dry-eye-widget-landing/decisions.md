@@ -1,5 +1,38 @@
 # Decisions
 
+## 2026-07-29 — Release fan-in and retry safety
+
+- Keep platform workflows and the `workflow_run` fan-in read-only. The fan-in
+  only reconciles macOS, Windows and MSIX for the same source SHA and uploads a
+  validated evidence bundle.
+- Never expose signing secrets to workflows loaded from an arbitrary tag.
+- Checkout and execute release-control scripts only from the default branch;
+  validate annotated tag, source SHA, metadata and main ancestry without a
+  privileged follow-up job.
+- Keep GitHub Release publication outside Actions until remote rulesets,
+  protected refs and protected environments are explicitly authorized. The
+  manual publisher requires approval bound to the exact reviewed tag, commit
+  and canonical digest of the four artifacts plus three manifests before any
+  remote call.
+- Treat a matching published release as an idempotent success, with no upload
+  or edit. Remove unexpected assets only from a draft.
+- After publication, reconcile `latest` to the greatest published stable
+  SemVer; opposite publication orders must converge to the same result.
+- Accept exactly four release binaries and three manifests. Reject extra files,
+  including the unrelated local video, before any release mutation.
+- Reconcile local and remote assets by both byte size and SHA-256 digest.
+
+## 2026-07-27 — PDF, startup and release reliability
+
+- Treat packaged PDF fonts as required inputs, not optional fallbacks. Cache
+  them only after the complete family is available so one failed load cannot
+  degrade later reports silently.
+- Keep native screen/window APIs behind an injectable startup-restoration
+  boundary; geometry and failure behavior must be testable without a desktop.
+- Separate release readiness into local metadata, tag-at-HEAD and public
+  artifact gates. Passing an earlier gate never implies a later one passed.
+- Keep commit, push, tag and publication as separately authorized actions.
+
 ## 2026-06-09
 
 - Keep download links on GitHub Releases for open-source transparency and simple update behavior.

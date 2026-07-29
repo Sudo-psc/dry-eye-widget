@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>A gentle 20-20-20 reminder for digital eye strain and dry eye.</em><br>
-  <strong>Version 1.24.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Version 1.26.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
@@ -39,7 +39,7 @@
 
 An always-on-top floating ball that applies the **20-20-20 rule** to your workday: every 20 minutes, it reminds you to look about 6 meters away for 20 seconds. Built by an **ophthalmologist** to support preventive habits — **it does not diagnose and does not replace a clinical visit**.
 
-Runs **offline**, with no usage telemetry by default. Breaks, DVRS scores and screen-time data stay on your machine.
+Runs **offline**, with no usage telemetry by default. Breaks, DVRS self-reports and screen-time data stay on your machine.
 
 ---
 
@@ -64,7 +64,7 @@ First-line prevention is the **20-20-20 rule**. The real barrier is **adherence*
 
 ---
 
-## Features (1.23)
+## Features (1.26.0)
 
 - **Floating widget** with progress ring, always-on-top, system tray  
 - **Configurable cycles and look** (interval, colors, opacity, glass)  
@@ -72,7 +72,7 @@ First-line prevention is the **20-20-20 rule**. The real barrier is **adherence*
 - **Guided break** (full overlay or gentle corner card)  
 - **Blink reminder** (visual and/or sound; adjustable frequency)  
 - **Meeting mode** — stretch the cycle for 1 hour  
-- **DVRS** — Digital Visual Risk Index (16-question educational screen, **not a diagnosis**)  
+- **DVRS** — 16-question educational self-report of symptoms and habits (**not a diagnosis**)
 - **Day summary** and local insights  
 - **PDF report** for your ophthalmologist (generated locally)  
 - **Screen time** and activity (opt-in)  
@@ -122,7 +122,7 @@ All builds: **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
   <img src="site/assets/shots/day-summary.webp" alt="Daily summary with breaks, streak, adherence and DVRS access on macOS" width="405">
 </p>
 
-<p align="center"><sub>Current v1.24 interface · widget, quick actions, menu and daily summary · <a href="https://olhossecos.com.br/app/#capturas">see all macOS and Windows screenshots</a></sub></p>
+<p align="center"><sub>Current v1.26.0 interface · widget, quick actions, menu and daily summary · <a href="https://olhossecos.com.br/app/#capturas">see all macOS and Windows screenshots</a></sub></p>
 
 ---
 

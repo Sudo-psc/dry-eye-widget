@@ -1,6 +1,69 @@
 # Status
 
-Updated: 2026-07-25
+Updated: 2026-07-29
+
+## Release multiplataforma 1.26.0 — quarta revisão concluída
+
+Metadados estão sincronizados em 1.26.0+76 e MSIX 1.26.0.0. Análise estática,
+356 testes, smoke da landing, gate de metadados, build macOS Release universal,
+assinatura ad hoc deep/strict e integridade do DMG passaram. A release também
+retira o total DVRS das superfícies educativas, corrige restauração em monitores
+desconectados e melhora reduzir movimento e acessibilidade da landing.
+
+Após o parecer independente, os workflows acionados por tag deixaram de receber
+secrets. O fan-in usa a default branch confiável, valida tag, source SHA e
+ancestralidade de `main` em um único job somente leitura e produz apenas um
+bundle de evidência. Nenhum workflow possui `contents: write` ou chama o
+publicador de GitHub Release. A publicação ficou como operação manual separada,
+bloqueada por aprovação explícita vinculada à tag, ao commit e ao digest
+canônico dos quatro artefatos e três manifestos revisados.
+
+O DVRS não deriva mais melhora/estabilidade/piora do total legado. Dashboard e
+histórico usam perfil e deltas neutros por domínio com rótulos PT/EN. Mensagens
+educativas e alertas públicos são derivados por chave semântica localizada e
+`safetyAlertLevel`; nenhum texto público integra o modelo serializado. O
+carregamento remove `educationalMessage` e `safetyAlertMessage` legados antes
+de expor o histórico. O PDF deriva texto PT atual apenas do nível. As 16
+perguntas, opções, instruções, progresso, acessibilidade e alertas do DVRS são
+cobertos em PT/EN. A landing reconstrói os `aria-labels` dos dots quando o
+idioma muda. O vídeo
+`gemini_generated_video_B3916D35.mp4` permanece não rastreado e é rejeitado pelo
+gate caso apareça no bundle.
+
+O build macOS da quarta remediação exigiu renovar o selo ad hoc externo após o
+Xcode deixar `App.framework` posterior à assinatura. A verificação deep/strict
+passou depois da resselagem, preservando identificador, entitlements e flags.
+O DMG atual tem 29.177.791 bytes e SHA-256
+`b6b69044374316c6cd7632bfb4266e190f23e424c3deeaa0f2c9f794baf5854f`.
+
+O publicador manual agora falha localmente se a aprovação não corresponder aos
+bytes exatos dos sete arquivos, inclusive quando todos os artefatos e manifests
+são substituídos de forma internamente coerente. Após publicar, a reconciliação
+converge `latest` para a maior SemVer estável em qualquer ordem testada.
+
+A quarta revisão independente somente leitura terminou com
+`P0=0 / P1=0 / P2=0` e nenhum achado confirmado. O snapshot revisado permaneceu
+em `HEAD 71296726616d5c67d47204c8474ca519bcbd2de7`, com 49 rastreados
+modificados, 13 não rastreados, staging vazio, fingerprint do diff rastreado
+`814ac7d3339a3c039b0c712c15ddc5ba297f4265b301945cdf4e1f3846006c2e`
+e inventário dos 12 não rastreados do patch
+`8e7974a3e7567ab3b86c0e289a92e27bac4afc40c7a6ec93df535f5e03f4ec0b`.
+O revisor confirmou que não alterou arquivos nem estado remoto.
+
+Próximo passo: solicitar autorização explícita e separada para
+commit/push/tag. Somente depois dos runners e do fan-in read-only produzirem o
+bundle validado, revisar os sete arquivos e solicitar nova aprovação explícita
+`tag+commit+digest` para a publicação manual. Commit, push, tag, upload e
+publicação continuam proibidos até as respectivas autorizações. A integração
+HealthKit descrita em registros antigos pertenceu a uma branch histórica e não
+existe na `main` atual.
+
+## Release multiplataforma 1.25.2 — publicada em 2026-07-29
+
+A v1.25.2 foi preparada em worktree isolado para não misturar o patch local da
+1.26.0. O commit `25bf6b04c582e59dd75fe95f18383f893c2bdf8f`, a tag anotada
+`v1.25.2` e a GitHub Release pública existem com os quatro artefatos esperados.
+Evidência: `runs/2026-07-29-v1.25.2-release.md`.
 
 ## Release multiplataforma 1.25.1 — publicada em 2026-07-25
 

@@ -59,7 +59,7 @@ document.documentElement.setAttribute("data-theme",t);})();
     "url": "https://olhossecos.com.br/app/",
     "downloadUrl": "https://github.com/Sudo-psc/dry-eye-widget/releases/latest",
     "screenshot": "https://olhossecos.com.br/app/assets/twitter-card.jpg",
-    "softwareVersion": "1.25.2",
+    "softwareVersion": "1.26.0",
     "fileSize": "28MB",
     "author": {
       "@type": "Physician",
@@ -88,7 +88,7 @@ document.documentElement.setAttribute("data-theme",t);})();
         "name": "O que é a regra 20-20-20?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Uma recomendação clínica simples: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) de distância por 20 segundos. Isso relaxa a musculatura ciliar e estimula piscadas completas, melhorando a lubrificação."
+          "text": "Uma estratégia opcional: a cada 20 minutos de uso de tela, olhar para algo a 20 pés (cerca de 6 metros) por 20 segundos. Ela interrompe periodicamente o foco de perto e pode servir como lembrete de pausa, sem garantir prevenção ou tratamento."
         }
       },
       {
@@ -112,7 +112,7 @@ document.documentElement.setAttribute("data-theme",t);})();
         "name": "O app substitui o tratamento médico?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Não. Ele é uma ferramenta preventiva de mudança comportamental. Se você tem sintomas persistentes de olho seco, consulte um oftalmologista para diagnóstico e prescrição de colírios adequados."
+          "text": "Não. Ele oferece lembretes e educação, sem prevenir ou tratar doença. Sintomas persistentes, recorrentes ou importantes merecem avaliação profissional."
         }
       },
       {
@@ -125,10 +125,10 @@ document.documentElement.setAttribute("data-theme",t);})();
       },
       {
         "@type": "Question",
-        "name": "O que há de novo na versão 1.25.1?",
+        "name": "O que há de novo na versão 1.26.0?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Interface 20-20-20 mais calma e acessível, com tokens de design, contador tabular, progresso ambiental contínuo, contraste AA/AAA e animações finitas."
+          "text": "Movimento e restauração multimonitor mais confiáveis, PDFs com fontes Unicode, histórico DVRS por domínios e processo de release mais seguro."
         }
       },
       {
@@ -219,7 +219,7 @@ document.documentElement.setAttribute("data-theme",t);})();
   <div class="wrap">
     <div class="hero-copy">
       <span class="hero-badge glass"><span class="dot"></span><span data-i18n="hero.badge">Open source · MIT · macOS &amp; Windows</span></span>
-      <p class="version-pill" aria-label="Versão atual" data-i18n-aria="hero.version.aria"><span data-i18n="hero.version">Versão</span> <strong id="app-version">1.25.2</strong></p>
+      <p class="version-pill" aria-label="Versão atual" data-i18n-aria="hero.version.aria"><span data-i18n="hero.version">Versão</span> <strong id="app-version">1.26.0</strong></p>
       <h1 data-i18n="hero.title">Sua tela não avisa quando seus olhos <em>precisam de pausa</em>. Este widget avisa.</h1>
       <p class="hero-sub" data-i18n="hero.sub">Um lembrete gentil e flutuante para apoiar pausas e hábitos de conforto visual — desenvolvido por um médico oftalmologista, sem promessa de prevenção ou tratamento.</p>
       <div class="dl-row">
@@ -343,7 +343,7 @@ document.documentElement.setAttribute("data-theme",t);})();
       <div class="rule-card glass reveal">
         <div class="rule-num">20<small data-i18n="rule.unit.ft">pés</small></div>
         <h3 data-i18n="rule.2.title">Olhe a 20 pés (6 m)</h3>
-        <p data-i18n="rule.2.body">Focar longe relaxa o músculo ciliar e desfaz o esforço de convergência acumulado na visão de perto.</p>
+        <p data-i18n="rule.2.body">Olhar para longe interrompe temporariamente o foco de perto e varia a demanda acomodativa, sem garantir benefício clínico.</p>
       </div>
       <div class="rule-card glass reveal">
         <div class="rule-num">20<small data-i18n="rule.unit.s">s</small></div>
@@ -352,7 +352,7 @@ document.documentElement.setAttribute("data-theme",t);})();
       </div>
     </div>
     <figure class="glass reveal figure-frame">
-      <img src="assets/pausa-2020.jpg" alt="Ilustração: pessoa em pausa visual olhando pela janela, com anel do temporizador ao lado do monitor" width="900" height="900" loading="lazy" decoding="async" >
+      <img src="assets/pausa-2020.jpg" alt="Ilustração: pessoa em pausa visual olhando pela janela, com anel do temporizador ao lado do monitor" data-i18n-alt="alt.rule" width="900" height="900" loading="lazy" decoding="async" >
     </figure>
   </div>
 </section>
@@ -403,8 +403,8 @@ document.documentElement.setAttribute("data-theme",t);})();
         <p data-i18n="ev.p2.body">A doença do olho seco não é só desconforto: reduz velocidade de leitura, eleva presenteísmo e concentra risco exatamente onde o trabalho de alto valor acontece — em frentes de tela. Em revisões de fadiga visual digital, sintomas acometem grande parte dos usuários intensivos de computador. [1–4,8]</p>
       </article>
       <article class="evidence-pillar glass reveal">
-        <h3 data-i18n="ev.p3.title">Prevenção: pausas estruturadas</h3>
-        <p data-i18n="ev.p3.body">A regra 20-20-20 (a cada 20 minutos, olhar para ~6 m por 20 segundos) atua nos dois eixos do desconforto digital: relaxa acomodação/convergência e restaura piscadas completas que recompõem o filme lacrimal. O desafio clínico não é o conhecimento — é a adesão no meio da tarefa. [7,9]</p>
+          <h3 data-i18n="ev.p3.title">Estratégia: pausas estruturadas</h3>
+          <p data-i18n="ev.p3.body">A regra 20-20-20 é uma estratégia simples para interromper periodicamente a visão de perto e lembrar de piscar. Os estudos sobre benefício clínico são limitados e conflitantes; o widget apoia a adesão, sem prometer prevenção ou tratamento. [7,9]</p>
       </article>
     </div>
 
@@ -415,7 +415,7 @@ document.documentElement.setAttribute("data-theme",t);})();
         <li data-i18n="ev.take.2">O prejuízo principal no trabalho é o presenteísmo, não o absenteísmo. [2]</li>
         <li data-i18n="ev.take.3">Leitura e função visual degradam com tempo contínuo de exposição e superfície ocular instável. [3,4,6]</li>
         <li data-i18n="ev.take.4">Redução do piscar (e piscadas incompletas) é o elo mecânico entre tela e ressecamento. [5,8]</li>
-        <li data-i18n="ev.take.5">Pausas curtas e regulares são a intervenção de melhor custo-benefício comportamental; o widget existe para fechar a lacuna entre saber e fazer. [7,9]</li>
+          <li data-i18n="ev.take.5">Pausas curtas e regulares são uma estratégia prática e de baixo custo, embora a magnitude do benefício clínico permaneça incerta. [7,9]</li>
       </ul>
     </div>
 
@@ -482,7 +482,7 @@ document.documentElement.setAttribute("data-theme",t);})();
     <figure class="cost-info reveal">
       <picture>
         <source srcset="assets/custo-oculto-telas.webp" type="image/webp">
-        <img src="assets/custo-oculto-telas.jpg" width="1600" height="893" loading="lazy" decoding="async"
+        <img src="assets/custo-oculto-telas.jpg" width="1600" height="893" loading="lazy" decoding="async" data-i18n-alt="alt.cost"
              alt="Infográfico: O custo oculto das telas — prevalência de olho seco, horas de produtividade perdidas, dinâmica do piscar e a regra 20-20-20.">
       </picture>
       <figcaption data-i18n="cost.caption">Panorama completo: impacto na saúde ocular e na produtividade, causas e estratégias de proteção.</figcaption>
@@ -590,7 +590,7 @@ document.documentElement.setAttribute("data-theme",t);})();
       <div class="carousel-track" id="shots-track">
 
         <figure class="shot" data-platform="macos">
-          <div class="shot-frame"><img src="assets/shots/ball-menu.webp" alt="Bolinha líquida com anel de progresso e novo menu flutuante no macOS" loading="lazy" width="1280" height="800"></div>
+          <div class="shot-frame"><img src="assets/shots/ball-menu.webp" alt="Bolinha líquida com anel de progresso e novo menu flutuante no macOS" data-i18n-alt="alt.shot.1" loading="lazy" width="1280" height="800"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.1.t">Bolinha + menu flutuante</strong>
             <span data-i18n="shot.1.s">Anel de progresso renovado, ações rápidas e acesso direto à saúde visual.</span>
@@ -598,7 +598,7 @@ document.documentElement.setAttribute("data-theme",t);})();
         </figure>
 
         <figure class="shot" data-platform="macos">
-          <div class="shot-frame"><img class="wide" src="assets/shots/break-card.jpg" alt="Aviso de pausa com anel de progresso e cronômetro no macOS" loading="lazy" width="1040" height="480"></div>
+          <div class="shot-frame"><img class="wide" src="assets/shots/break-card.jpg" alt="Aviso de pausa com anel de progresso e cronômetro no macOS" data-i18n-alt="alt.shot.2" loading="lazy" width="1040" height="480"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.2.t">Aviso gentil</strong>
             <span data-i18n="shot.2.s">Notificação suave no canto da tela — sem bloquear, sem alarmismo.</span>
@@ -606,7 +606,7 @@ document.documentElement.setAttribute("data-theme",t);})();
         </figure>
 
         <figure class="shot" data-platform="macos">
-          <div class="shot-frame"><img src="assets/shots/settings.png" alt="Janela de configurações do widget no macOS" loading="lazy" width="557" height="900"></div>
+          <div class="shot-frame"><img src="assets/shots/settings.png" alt="Janela de configurações do widget no macOS" data-i18n-alt="alt.shot.3" loading="lazy" width="557" height="900"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.3.t">Configurações</strong>
             <span data-i18n="shot.3.s">Idioma, ciclos, tamanho e cores da bolinha — tudo ajustável.</span>
@@ -614,7 +614,7 @@ document.documentElement.setAttribute("data-theme",t);})();
         </figure>
 
         <figure class="shot" data-platform="macos">
-          <div class="shot-frame"><img src="assets/shots/guidance.png" alt="Orientações de saúde ocular digital no macOS" loading="lazy" width="639" height="900"></div>
+          <div class="shot-frame"><img src="assets/shots/guidance.png" alt="Orientações educativas sobre saúde ocular digital no macOS" data-i18n-alt="alt.shot.4" loading="lazy" width="639" height="900"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.4.t">Orientações clínicas</strong>
             <span data-i18n="shot.4.s">Conteúdo educativo sobre saúde ocular digital, dentro do app.</span>
@@ -622,14 +622,14 @@ document.documentElement.setAttribute("data-theme",t);})();
         </figure>
 
         <figure class="shot" data-platform="macos">
-          <div class="shot-frame"><img src="assets/shots/dvrs.jpg" alt="Resultado do DVRS com medidor de score e domínios no macOS" loading="lazy" width="1440" height="1720"></div>
+          <div class="shot-frame"><img src="assets/shots/dvrs.jpg" alt="Perfil educativo do DVRS organizado por domínios no macOS" data-i18n-alt="alt.shot.5" loading="lazy" width="1440" height="1720"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.5.t">Registro visual digital — DVRS</strong>
             <span data-i18n="shot.5.s">Acompanhe os sintomas de olho seco ao longo do tempo, com histórico.</span>
           </figcaption>
         </figure>
         <figure class="shot" data-platform="macos">
-          <div class="shot-frame"><img src="assets/shots/day-summary.webp" alt="Resumo do dia com pausas, sequência, adesão e acesso ao DVRS no macOS" loading="lazy" width="1280" height="800"></div>
+          <div class="shot-frame"><img src="assets/shots/day-summary.webp" alt="Resumo do dia com pausas, sequência, adesão e acesso ao DVRS no macOS" data-i18n-alt="alt.shot.6" loading="lazy" width="1280" height="800"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.6.t">Resumo do dia</strong>
             <span data-i18n="shot.6.s">Pausas, sequência, adesão e próximos passos em uma visão compacta.</span>
@@ -637,35 +637,35 @@ document.documentElement.setAttribute("data-theme",t);})();
         </figure>
 
         <figure class="shot" data-platform="windows">
-          <div class="shot-frame"><img class="wide" src="assets/shots/windows-ball-menu.jpg" alt="Widget e menu flutuante no desktop Windows" loading="lazy" width="1280" height="800"></div>
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-ball-menu.jpg" alt="Widget e menu flutuante no desktop Windows" data-i18n-alt="alt.shot.7" loading="lazy" width="1280" height="800"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.w1.t">Windows — bolinha + menu</strong>
             <span data-i18n="shot.w1.s">Mesma UI Flutter do app, enquadrada no desktop Windows 10/11.</span>
           </figcaption>
         </figure>
         <figure class="shot" data-platform="windows">
-          <div class="shot-frame"><img class="wide" src="assets/shots/windows-break-card.jpg" alt="Aviso de pausa do widget no desktop Windows" loading="lazy" width="1280" height="800"></div>
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-break-card.jpg" alt="Aviso de pausa do widget no desktop Windows" data-i18n-alt="alt.shot.8" loading="lazy" width="1280" height="800"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.w2.t">Windows — aviso de pausa</strong>
             <span data-i18n="shot.w2.s">Micronotificação de pausa sobre o desktop Windows, sem bloquear o fluxo.</span>
           </figcaption>
         </figure>
         <figure class="shot" data-platform="windows">
-          <div class="shot-frame"><img class="wide" src="assets/shots/windows-settings.jpg" alt="Configurações do widget em janela no Windows" loading="lazy" width="1280" height="800"></div>
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-settings.jpg" alt="Configurações do widget em janela no Windows" data-i18n-alt="alt.shot.9" loading="lazy" width="1280" height="800"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.w3.t">Windows — configurações</strong>
             <span data-i18n="shot.w3.s">Janela de preferências com chrome de janela Windows.</span>
           </figcaption>
         </figure>
         <figure class="shot" data-platform="windows">
-          <div class="shot-frame"><img class="wide" src="assets/shots/windows-dashboard.jpg" alt="Painel de acompanhamento no Windows" loading="lazy" width="1280" height="800"></div>
+          <div class="shot-frame"><img class="wide" src="assets/shots/windows-dashboard.jpg" alt="Painel de acompanhamento no Windows" data-i18n-alt="alt.shot.10" loading="lazy" width="1280" height="800"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.w4.t">Windows — painel</strong>
             <span data-i18n="shot.w4.s">Adesão, tempo de tela e DVRS no desktop Windows.</span>
           </figcaption>
         </figure>
         <figure class="shot" data-platform="windows">
-          <div class="shot-frame"><img src="assets/shots/windows-store-poster.jpg" alt="Arte da Microsoft Store do Dry Eye Widget para Windows" loading="lazy" width="1000" height="1280"></div>
+          <div class="shot-frame"><img src="assets/shots/windows-store-poster.jpg" alt="Arte da Microsoft Store do Dry Eye Widget para Windows" data-i18n-alt="alt.shot.11" loading="lazy" width="1000" height="1280"></div>
           <figcaption class="shot-caption">
             <strong data-i18n="shot.w5.t">Microsoft Store</strong>
             <span data-i18n="shot.w5.s">Disponível na Microsoft Store para Windows 10 e 11.</span>
@@ -688,7 +688,7 @@ document.documentElement.setAttribute("data-theme",t);})();
     <div class="faq-list reveal">
       <details class="glass">
         <summary data-i18n="faq.1.q">O que é a regra 20-20-20?</summary>
-        <p data-i18n="faq.1.a">Uma recomendação clínica simples: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) de distância por 20 segundos. Isso relaxa a musculatura ciliar e estimula piscadas completas, melhorando a lubrificação.</p>
+        <p data-i18n="faq.1.a">Uma estratégia opcional: a cada 20 minutos de uso de tela, olhe para algo a 20 pés (cerca de 6 metros) por 20 segundos. Ela interrompe periodicamente o foco de perto e pode servir como lembrete de pausa, sem garantir prevenção ou tratamento.</p>
       </details>
       <details class="glass">
         <summary data-i18n="faq.2.q">O widget coleta meus dados?</summary>
@@ -707,8 +707,8 @@ document.documentElement.setAttribute("data-theme",t);})();
         <p data-i18n="faq.5.a">O DVRS é um autorregistro educativo de 16 perguntas para acompanhar respostas ao longo do tempo. Não foi validado como instrumento clínico e não produz diagnóstico, aptidão ou decisão empresarial.</p>
       </details>
       <details class="glass">
-        <summary data-i18n="faq.6.q">O que há de novo na versão 1.25.1?</summary>
-        <p data-i18n="faq.6.a">Interface 20-20-20 mais calma e acessível, com contador tabular, progresso ambiental contínuo, contraste AA/AAA e animações finitas.</p>
+        <summary data-i18n="faq.6.q">O que há de novo na versão 1.26.0?</summary>
+        <p data-i18n="faq.6.a">Movimento e restauração multimonitor mais confiáveis, PDFs com fontes Unicode, histórico DVRS por domínios e processo de release mais seguro.</p>
       </details>
       <details class="glass">
         <summary data-i18n="faq.7.q">O Windows ou o macOS bloqueiam a instalação?</summary>
@@ -726,7 +726,7 @@ document.documentElement.setAttribute("data-theme",t);})();
       <h2 data-i18n="dr.title">Do consultório para a sua tela</h2>
     </div>
     <div class="doctor-card glass reveal">
-      <img class="doctor-avatar" src="assets/doctor.png" alt="Dr. Philipe Saraiva Cruz" width="148" height="148" loading="lazy" decoding="async">
+      <img class="doctor-avatar" src="assets/doctor.png" alt="Dr. Philipe Saraiva Cruz" data-i18n-alt="alt.doctor" width="148" height="148" loading="lazy" decoding="async">
       <div class="bio">
         <h3 data-i18n="dr.name">Dr. Philipe Saraiva Cruz</h3>
         <div class="doctor-creds">
@@ -736,7 +736,7 @@ document.documentElement.setAttribute("data-theme",t);})();
           <a class="cred-chip" href="https://portal.cfm.org.br/busca-medicos/" target="_blank" rel="noopener noreferrer">RQE 71.903</a>
           <a class="cred-chip github" href="https://github.com/Sudo-psc" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.15 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path></svg> GitHub</a>
         </div>
-        <p class="about" data-i18n="dr.about">Concebido, desenvolvido e documentado clinicamente em resposta à crescente incidência de fadiga visual digital na prática clínica diária. O objetivo: transpor as recomendações preventivas baseadas em evidências do ambiente clínico para uma ferramenta digital gratuita, integrada ao fluxo de trabalho de quem vive em frente a telas.</p>
+        <p class="about" data-i18n="dr.about">Concebido, desenvolvido e documentado por um oftalmologista para apoiar pausas e hábitos de conforto visual durante o uso de telas. É uma ferramenta educativa gratuita, sem promessa de prevenção, diagnóstico ou tratamento.</p>
       </div>
     </div>
   </div>
@@ -797,7 +797,7 @@ document.documentElement.setAttribute("data-theme",t);})();
     </div>
     <div class="clinical-note glass reveal">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 7.8v.4"></path></svg>
-      <p data-i18n="note.body">O Dry Eye Widget é uma ferramenta de apoio preventivo — não substitui avaliação médica. Em caso de desconforto ocular persistente, visão turva ou olhos secos crônicos, procure um oftalmologista.</p>
+      <p data-i18n="note.body">O Dry Eye Widget é uma ferramenta educativa de apoio a pausas — não previne nem trata doença e não substitui avaliação médica. Sintomas persistentes, recorrentes ou importantes merecem avaliação profissional.</p>
     </div>
   </div>
 </section>

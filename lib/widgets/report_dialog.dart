@@ -466,10 +466,7 @@ class _ReportDialogState extends State<ReportDialog> {
     final lines = <(String, String)>[];
     final dvrs = data.dvrs;
     if (dvrs != null) {
-      lines.add((
-        'DVRS',
-        '${dvrs.latest.totalScore}/100 · ${dvrs.latest.classificationLabel}',
-      ));
+      lines.add(('DVRS', 'Perfil educativo por domínios incluído'));
     }
     if (data.screenTime.hasData) {
       lines.add((

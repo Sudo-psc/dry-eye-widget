@@ -46,6 +46,11 @@ for (const path of walk(root, (p) => p.endsWith(".html"))) {
     if (!ptKeys.has(key)) fail(`${rel}: missing PT i18n key ${key}`);
     if (!enKeys.has(key)) fail(`${rel}: missing EN i18n key ${key}`);
   }
+  for (const match of html.matchAll(/data-i18n-alt="([^"]+)"/g)) {
+    const key = match[1];
+    if (!ptKeys.has(key)) fail(`${rel}: missing PT alt i18n key ${key}`);
+    if (!enKeys.has(key)) fail(`${rel}: missing EN alt i18n key ${key}`);
+  }
 
   const i18nIndex = html.indexOf("scripts/i18n.js");
   const landingIndex = html.indexOf("scripts/landing.js");
@@ -60,6 +65,17 @@ if (!landingJs.includes('typeof window.dewInitLang === "function"')) {
 }
 if (!landingJs.includes('typeof window.dewSetLang === "function"')) {
   fail("landing.js must guard dewSetLang so article pages without i18n do not break.");
+}
+if (!i18n.includes('querySelectorAll("[data-i18n-alt]")')) {
+  fail("i18n.js must translate localized image alt attributes.");
+}
+if (!i18n.includes('new CustomEvent("dew:langchange"')) {
+  fail("i18n.js must notify components after the active language changes.");
+}
+if (!landingJs.includes(
+  'document.addEventListener("dew:langchange", rebuildDots)',
+)) {
+  fail("landing.js must rebuild carousel dot labels after language changes.");
 }
 
 const indexHtml = read(join(root, "index.html"));

@@ -1,5 +1,4 @@
 import '../models/dvrs_assessment.dart';
-import '../models/dvrs_definitions.dart';
 import '../models/report_options.dart';
 
 /// Engine PURO de cálculo, classificação, mensagens e alertas do DVRS.
@@ -67,10 +66,6 @@ DvrsClassification classifyDvrs(int totalScore) {
   return DvrsClassification.veryHighRisk;
 }
 
-/// Mensagem educativa correspondente a uma [classification].
-String getDvrsEducationalMessage(DvrsClassification classification) =>
-    kDvrsEducationalMessages[classification] ?? '';
-
 /// Alerta de segurança clínica derivado da resposta da pergunta 16 (0–4).
 ///
 /// Independe do score total (regra de segurança da especificação):
@@ -86,7 +81,7 @@ DvrsSafetyAlert getDvrsSafetyAlert(int answerQ16) {
   } else {
     level = DvrsSafetyAlertLevel.none;
   }
-  return DvrsSafetyAlert(level: level, message: kDvrsSafetyAlertMessages[level]);
+  return DvrsSafetyAlert(level: level);
 }
 
 /// Avalia um conjunto completo de 16 respostas e devolve o [DvrsResult].
@@ -130,9 +125,7 @@ DvrsResult evaluateDvrs({
     totalScore: totalScore,
     classification: classification,
     classificationLabel: classification.label,
-    educationalMessage: getDvrsEducationalMessage(classification),
     safetyAlertLevel: alert.level,
-    safetyAlertMessage: alert.message,
     includeInPdf: includeInPdf,
   );
 }
@@ -146,25 +139,4 @@ DvrsReportData? prepareDvrsForPdf(List<DvrsResult> history) {
   final sorted = [...history]
     ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
   return DvrsReportData(latest: sorted.last, history: sorted);
-}
-
-/// Compara dois resultados e devolve a variação de score (atual - anterior),
-/// ou `null` se não houver [previous].
-int? compareDvrsResults(DvrsResult? previous, DvrsResult current) {
-  if (previous == null) return null;
-  return current.totalScore - previous.totalScore;
-}
-
-/// Converte a variação de score em tendência. Score MAIOR = mais risco, logo
-/// aumento significa piora. [margin] cria uma zona morta para "estável".
-DvrsTrend? compareDvrsTrend(
-  DvrsResult? previous,
-  DvrsResult current, {
-  int margin = 1,
-}) {
-  final delta = compareDvrsResults(previous, current);
-  if (delta == null) return null;
-  if (delta > margin) return DvrsTrend.worsening;
-  if (delta < -margin) return DvrsTrend.improving;
-  return DvrsTrend.stable;
 }

@@ -1,0 +1,62 @@
+# Reconcilia o bundle somente depois que macOS, Windows e MSIX concluírem.
+#
+# workflow_run sempre carrega esta definição da default branch. O único job usa
+# somente leitura e executa scripts dessa branch confiável. Publicação é uma
+# operação manual separada, condicionada a revisão e aprovação explícita.
+
+name: Release Bundle Fan-in
+
+on:
+  workflow_run:
+    workflows:
+      - macOS Build
+      - Windows Build
+      - Windows MSIX (Store)
+    types:
+      - completed
+
+permissions: {}
+
+concurrency:
+  group: release-validation-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: ${{ github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      ready: ${{ steps.fan-in.outputs.ready }}
+      source_sha: ${{ steps.fan-in.outputs.source_sha }}
+      tag: ${{ steps.fan-in.outputs.tag }}
+    steps:
+      - name: Checkout da default branch confiável
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validar source e reconciliar os três builds
+        id: fan-in
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          bash scripts/release_fan_in.sh \
+            "$SOURCE_SHA" \
+            "$RUNNER_TEMP/validated-release"
+
+      - name: Preservar bundle validado entre jobs
+        if: ${{ steps.fan-in.outputs.ready == 'true' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validated-release-${{ steps.fan-in.outputs.source_sha }}
+          path: ${{ runner.temp }}/validated-release
+          if-no-files-found: error
+          retention-days: 1

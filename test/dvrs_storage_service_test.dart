@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:dry_eye_widget/models/dvrs_assessment.dart';
 import 'package:dry_eye_widget/services/dvrs_engine.dart';
 import 'package:dry_eye_widget/services/dvrs_storage_service.dart';
+import 'package:dry_eye_widget/utils/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,12 +19,12 @@ DvrsResult _result({
         domain: i < 6
             ? DvrsDomain.symptoms
             : i < 9
-                ? DvrsDomain.functional
-                : i < 12
-                    ? DvrsDomain.exposure
-                    : i < 15
-                        ? DvrsDomain.environment
-                        : DvrsDomain.warning,
+            ? DvrsDomain.functional
+            : i < 12
+            ? DvrsDomain.exposure
+            : i < 15
+            ? DvrsDomain.environment
+            : DvrsDomain.warning,
         value: value,
         label: 'opt',
       ),
@@ -49,11 +52,43 @@ void main() {
       expect(history.first.version, 'DVRS_v1.1');
     });
 
+    test('migra payload legado e elimina textos públicos obsoletos', () async {
+      const legacyClaim = 'risco visual digital elevado';
+      const tamperedSafety = 'ALERTA LEGADO ADULTERADO';
+      final legacy =
+          _result(id: 'legacy', createdAt: DateTime.utc(2026, 6, 1)).toMap()
+            ..['educationalMessage'] = legacyClaim
+            ..['safetyAlertMessage'] = tamperedSafety;
+      SharedPreferences.setMockInitialValues({
+        StorageKeys.dvrsResults: jsonEncode([legacy]),
+      });
+
+      final storage = await DvrsStorageService.init();
+      final history = storage.getDvrsHistory();
+      final prefs = await SharedPreferences.getInstance();
+      final migrated = prefs.getString(StorageKeys.dvrsResults)!;
+
+      expect(history, hasLength(1));
+      expect(history.single.id, 'legacy');
+      expect(history.single.toMap(), isNot(contains('educationalMessage')));
+      expect(history.single.toMap(), isNot(contains('safetyAlertMessage')));
+      expect(migrated, isNot(contains('educationalMessage')));
+      expect(migrated, isNot(contains('safetyAlertMessage')));
+      expect(migrated.toLowerCase(), isNot(contains(legacyClaim)));
+      expect(migrated, isNot(contains(tamperedSafety)));
+    });
+
     test('histórico ordenado por data (mais antigo → mais recente)', () async {
       final storage = await DvrsStorageService.init();
-      await storage.saveDvrsResult(_result(id: 'b', createdAt: DateTime.utc(2026, 6, 2)));
-      await storage.saveDvrsResult(_result(id: 'a', createdAt: DateTime.utc(2026, 6, 1)));
-      await storage.saveDvrsResult(_result(id: 'c', createdAt: DateTime.utc(2026, 6, 3)));
+      await storage.saveDvrsResult(
+        _result(id: 'b', createdAt: DateTime.utc(2026, 6, 2)),
+      );
+      await storage.saveDvrsResult(
+        _result(id: 'a', createdAt: DateTime.utc(2026, 6, 1)),
+      );
+      await storage.saveDvrsResult(
+        _result(id: 'c', createdAt: DateTime.utc(2026, 6, 3)),
+      );
 
       final ids = storage.getDvrsHistory().map((r) => r.id).toList();
       expect(ids, ['a', 'b', 'c']);
@@ -61,8 +96,12 @@ void main() {
 
     test('getLatestDvrsResult devolve o mais recente', () async {
       final storage = await DvrsStorageService.init();
-      await storage.saveDvrsResult(_result(id: 'old', createdAt: DateTime.utc(2026, 6, 1)));
-      await storage.saveDvrsResult(_result(id: 'new', createdAt: DateTime.utc(2026, 6, 5)));
+      await storage.saveDvrsResult(
+        _result(id: 'old', createdAt: DateTime.utc(2026, 6, 1)),
+      );
+      await storage.saveDvrsResult(
+        _result(id: 'new', createdAt: DateTime.utc(2026, 6, 5)),
+      );
       expect(storage.getLatestDvrsResult()?.id, 'new');
     });
 
@@ -73,8 +112,12 @@ void main() {
 
     test('salvar com id existente substitui', () async {
       final storage = await DvrsStorageService.init();
-      await storage.saveDvrsResult(_result(id: 'x', createdAt: DateTime.utc(2026, 6, 1), value: 0));
-      await storage.saveDvrsResult(_result(id: 'x', createdAt: DateTime.utc(2026, 6, 1), value: 4));
+      await storage.saveDvrsResult(
+        _result(id: 'x', createdAt: DateTime.utc(2026, 6, 1), value: 0),
+      );
+      await storage.saveDvrsResult(
+        _result(id: 'x', createdAt: DateTime.utc(2026, 6, 1), value: 4),
+      );
       final history = storage.getDvrsHistory();
       expect(history, hasLength(1));
       expect(history.first.totalScore, 100);
@@ -82,8 +125,12 @@ void main() {
 
     test('deleteDvrsResult remove pelo id', () async {
       final storage = await DvrsStorageService.init();
-      await storage.saveDvrsResult(_result(id: 'a', createdAt: DateTime.utc(2026, 6, 1)));
-      await storage.saveDvrsResult(_result(id: 'b', createdAt: DateTime.utc(2026, 6, 2)));
+      await storage.saveDvrsResult(
+        _result(id: 'a', createdAt: DateTime.utc(2026, 6, 1)),
+      );
+      await storage.saveDvrsResult(
+        _result(id: 'b', createdAt: DateTime.utc(2026, 6, 2)),
+      );
       await storage.deleteDvrsResult('a');
       final ids = storage.getDvrsHistory().map((r) => r.id).toList();
       expect(ids, ['b']);
@@ -91,23 +138,31 @@ void main() {
 
     test('clearAll esvazia o histórico', () async {
       final storage = await DvrsStorageService.init();
-      await storage.saveDvrsResult(_result(id: 'a', createdAt: DateTime.utc(2026, 6, 1)));
+      await storage.saveDvrsResult(
+        _result(id: 'a', createdAt: DateTime.utc(2026, 6, 1)),
+      );
       await storage.clearAll();
       expect(storage.getDvrsHistory(), isEmpty);
     });
 
-    test('retém no máximo maxRetainedResults (descarta os mais antigos)', () async {
-      final storage = await DvrsStorageService.init();
-      final n = DvrsStorageService.maxRetainedResults + 5;
-      for (var i = 0; i < n; i++) {
-        await storage.saveDvrsResult(
-          _result(id: 'id$i', createdAt: DateTime.utc(2026, 1, 1).add(Duration(days: i))),
-        );
-      }
-      final history = storage.getDvrsHistory();
-      expect(history.length, DvrsStorageService.maxRetainedResults);
-      // Os 5 mais antigos foram descartados.
-      expect(history.first.id, 'id5');
-    });
+    test(
+      'retém no máximo maxRetainedResults (descarta os mais antigos)',
+      () async {
+        final storage = await DvrsStorageService.init();
+        final n = DvrsStorageService.maxRetainedResults + 5;
+        for (var i = 0; i < n; i++) {
+          await storage.saveDvrsResult(
+            _result(
+              id: 'id$i',
+              createdAt: DateTime.utc(2026, 1, 1).add(Duration(days: i)),
+            ),
+          );
+        }
+        final history = storage.getDvrsHistory();
+        expect(history.length, DvrsStorageService.maxRetainedResults);
+        // Os 5 mais antigos foram descartados.
+        expect(history.first.id, 'id5');
+      },
+    );
   });
 }

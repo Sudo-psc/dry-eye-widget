@@ -5,7 +5,6 @@ import '../../l10n/app_strings.dart';
 import '../../l10n/feature_strings.dart';
 import '../../models/screen_time_data.dart';
 import '../../providers/settings_provider.dart';
-import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/storage_service.dart';
@@ -144,6 +143,8 @@ class _OverviewTab extends StatelessWidget {
     final theme = Theme.of(context);
     final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     final screenTime = context.watch<ScreenTimeService>();
+    final settings = context.watch<SettingsProvider>();
+    final featureStrings = FeatureStrings.of(settings.value.languageCode);
     final now = DateTime.now();
     final todaySecs = screenTime.data.secondsForDay(now);
     final screenTodayLabel = _fmtSecs(todaySecs);
@@ -151,12 +152,6 @@ class _OverviewTab extends StatelessWidget {
     // DVRS — reusa as variáveis que a aba já usava.
     final dvrsHistory = context.read<DvrsStorageService>().getDvrsHistory();
     final latest = dvrsHistory.isNotEmpty ? dvrsHistory.last : null;
-    final previous = dvrsHistory.length >= 2
-        ? dvrsHistory[dvrsHistory.length - 2]
-        : null;
-    final trend = (latest != null && previous != null)
-        ? compareDvrsTrend(previous, latest)
-        : null;
 
     // Adesão às pausas — 7 dias.
     final breakStats = context.read<StorageService>().loadBreakStats();
@@ -219,10 +214,10 @@ class _OverviewTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionHeader('Registro visual digital — DVRS'),
+              SectionHeader(featureStrings.dashboardDvrsTitle),
               if (latest == null)
                 Text(
-                  'Use o registro para acompanhar sintomas e hábitos relatados.',
+                  featureStrings.dashboardDvrsEmpty,
                   style: TextStyle(
                     color: Theme.of(
                       context,
@@ -231,16 +226,12 @@ class _OverviewTab extends StatelessWidget {
                 )
               else ...[
                 Text(
-                  latest.classificationLabel,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  featureStrings.dvrsEducationalProfile,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Perfil educativo autorrelatado; não é risco clínico, '
-                  'diagnóstico ou medida para decisões corporativas.',
+                  featureStrings.dvrsEducationalProfileNote,
                   style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(
@@ -248,34 +239,12 @@ class _OverviewTab extends StatelessWidget {
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
-                // Linha de tendência (compareDvrsTrend) — mantida da versão anterior.
-                if (trend != null) ...[
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(
-                        DvrsUi.trendIcon(trend),
-                        size: 16,
-                        color: DvrsUi.trendColor(trend),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        DvrsUi.trendLabel(trend),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: DvrsUi.trendColor(trend),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ],
             ],
           ),
         ),
         const SizedBox(height: 12),
-        DvrsUi.disclaimerBanner(theme),
+        DvrsUi.disclaimerBanner(theme, text: featureStrings.dvrsDisclaimer),
       ],
     );
   }
@@ -411,7 +380,9 @@ class _ScreenTimeTabState extends State<_ScreenTimeTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SectionHeader('Tempo de Tela vs. Adesão a Pausas (20-20-20)'),
+                const SectionHeader(
+                  'Tempo de Tela vs. Adesão a Pausas (20-20-20)',
+                ),
                 const SizedBox(height: 6),
                 Text(
                   'Comparativo entre o tempo ativo de uso do computador e o percentual de conclusão das pausas sugeridas.',
@@ -538,7 +509,10 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
   Widget build(BuildContext context) {
     final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     final breakStats = context.watch<StorageService>().loadBreakStats();
-    final maxSecs = series.fold<int>(0, (m, p) => p.seconds > m ? p.seconds : m);
+    final maxSecs = series.fold<int>(
+      0,
+      (m, p) => p.seconds > m ? p.seconds : m,
+    );
     final safeMaxSecs = maxSecs == 0 ? 1 : maxSecs;
 
     return Column(
@@ -559,7 +533,10 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
                 const SizedBox(width: 4),
                 const Text(
                   'Tempo de Tela',
-                  style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -577,7 +554,10 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
                 const SizedBox(width: 4),
                 const Text(
                   'Adesão 20-20-20 (%)',
-                  style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -595,12 +575,16 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
                     builder: (context) {
                       final dayStat = breakStats.forDay(point.day);
                       final adherence = dayStat.reminders > 0
-                          ? (dayStat.completed / dayStat.reminders).clamp(0.0, 1.0)
+                          ? (dayStat.completed / dayStat.reminders).clamp(
+                              0.0,
+                              1.0,
+                            )
                           : 0.0;
-                      final screenFraction =
-                          (point.seconds / safeMaxSecs).clamp(0.04, 1.0);
-                      final adherenceFraction =
-                          dayStat.reminders > 0 ? adherence.clamp(0.04, 1.0) : 0.0;
+                      final screenFraction = (point.seconds / safeMaxSecs)
+                          .clamp(0.04, 1.0);
+                      final adherenceFraction = dayStat.reminders > 0
+                          ? adherence.clamp(0.04, 1.0)
+                          : 0.0;
 
                       final labelDay = point.day.day.toString();
                       final tooltipMsg =
@@ -622,10 +606,13 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
                                       heightFactor: screenFraction,
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: AppColors.idleBall.withValues(alpha: 0.7),
-                                          borderRadius: const BorderRadius.vertical(
-                                            top: Radius.circular(3),
+                                          color: AppColors.idleBall.withValues(
+                                            alpha: 0.7,
                                           ),
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                top: Radius.circular(3),
+                                              ),
                                         ),
                                       ),
                                     ),
@@ -642,9 +629,10 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
                                           color: dayStat.reminders > 0
                                               ? semantic.success
                                               : Colors.white12,
-                                          borderRadius: const BorderRadius.vertical(
-                                            top: Radius.circular(3),
-                                          ),
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                top: Radius.circular(3),
+                                              ),
                                         ),
                                       ),
                                     ),
@@ -677,7 +665,6 @@ class _ScreenTimeVsBreaksComparison extends StatelessWidget {
     );
   }
 }
-
 
 // ============================================================
 // DashboardScreen principal

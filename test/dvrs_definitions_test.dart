@@ -1,7 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
-
+import 'package:dry_eye_widget/l10n/feature_strings.dart';
 import 'package:dry_eye_widget/models/dvrs_assessment.dart';
 import 'package:dry_eye_widget/models/dvrs_definitions.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('kDvrsQuestions', () {
@@ -32,12 +32,12 @@ void main() {
         final expected = i < 6
             ? DvrsDomain.symptoms
             : i < 9
-                ? DvrsDomain.functional
-                : i < 12
-                    ? DvrsDomain.exposure
-                    : i < 15
-                        ? DvrsDomain.environment
-                        : DvrsDomain.warning;
+            ? DvrsDomain.functional
+            : i < 12
+            ? DvrsDomain.exposure
+            : i < 15
+            ? DvrsDomain.environment
+            : DvrsDomain.warning;
         expect(kDvrsQuestions[i].domain, expected, reason: 'q${i + 1}');
       }
     });
@@ -60,6 +60,37 @@ void main() {
       }
     });
 
+    test('chaves semânticas cobrem integralmente o questionário PT/EN', () {
+      final pt = FeatureStrings.of('pt');
+      final en = FeatureStrings.of('en');
+
+      expect(en.dvrsQuestionInstructions, isNot(pt.dvrsQuestionInstructions));
+      expect(en.dvrsAnsweredProgress(3, 16), '3 of 16 answered');
+      expect(en.dvrsQuestionNumber(7), 'Question 7');
+      for (final question in kDvrsQuestions) {
+        expect(pt.dvrsQuestionTitle(question.id), question.title);
+        expect(pt.dvrsQuestionPrompt(question.id), question.text);
+        expect(
+          en.dvrsQuestionTitle(question.id),
+          isNot(equals(question.title)),
+          reason: '${question.id} title',
+        );
+        expect(
+          en.dvrsQuestionPrompt(question.id),
+          isNot(equals(question.text)),
+          reason: '${question.id} prompt',
+        );
+        for (var i = 0; i < question.options.length; i++) {
+          expect(pt.dvrsOptionLabel(question.id, i), question.options[i].label);
+          expect(
+            en.dvrsOptionLabel(question.id, i).trim(),
+            isNotEmpty,
+            reason: '${question.id} option $i',
+          );
+        }
+      }
+    });
+
     test('linguagem não-diagnóstica em todo o conteúdo visível', () {
       const proibidos = [
         'diagnóstico de olho seco',
@@ -71,9 +102,15 @@ void main() {
         'o app detecta doença',
       ];
       final buffer = StringBuffer()
-        ..writeAll(kDvrsQuestions.map((q) => '${q.title} ${q.text} ${q.detail ?? ''}'))
-        ..writeAll(kDvrsEducationalMessages.values)
-        ..writeAll(kDvrsSafetyAlertMessages.values)
+        ..writeAll(
+          kDvrsQuestions.map((q) => '${q.title} ${q.text} ${q.detail ?? ''}'),
+        )
+        ..write(kDvrsPdfEducationalMessage)
+        ..writeAll(
+          DvrsSafetyAlertLevel.values.map(
+            (level) => FeatureStrings.of('pt').dvrsSafetyMessage(level) ?? '',
+          ),
+        )
         ..write(kDvrsIntroDescription)
         ..write(kDvrsIntroDisclaimer)
         ..write(kDvrsPdfLegalNotice);

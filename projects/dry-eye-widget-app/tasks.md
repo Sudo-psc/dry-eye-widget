@@ -2,6 +2,32 @@
 
 ## now
 
+- [x] 2026-07-29: sincronizar app, MSIX, landing e documentação em 1.26.0.
+- [x] 2026-07-29: corrigir claims DVRS, restauração multimonitor, PDF e landing.
+- [x] 2026-07-29: passar análise, 356 testes, smoke, metadados, build e DMG.
+- [x] 2026-07-29: fechar manifests, fan-in, idempotência e bundle allowlist.
+- [x] 2026-07-29: rejeitar arquivo extra e hash divergente em gate determinístico.
+- [x] Obter revisão independente somente leitura do Codex via Maestri.
+- [x] Remediar P1/P2 confirmados sem mutação remota e repetir todos os gates.
+- [x] Remover mensagem DVRS legada da persistência/UI/PDF e migrar payloads.
+- [x] Remover publicação e `contents: write` do fan-in; manter publicador manual.
+- [x] Repetir gates completos e gerar novo DMG da segunda remediação.
+- [x] Gerar o freeze final da segunda remediação para a terceira revisão.
+- [x] Submeter o freeze da segunda remediação à terceira revisão somente leitura.
+- [x] Remover e migrar `safetyAlertMessage`; derivar alertas por nível em PT/EN.
+- [x] Localizar integralmente as 16 perguntas DVRS e seus estados acessíveis.
+- [x] Vincular a aprovação manual ao digest canônico dos sete arquivos.
+- [x] Tornar a reconciliação de `latest` convergente em ordens opostas.
+- [x] Repetir gates completos e gerar novo DMG da quarta remediação.
+- [x] Gerar o freeze final e solicitar a quarta revisão somente leitura.
+- [x] Concluir a quarta revisão independente com P0=0/P1=0/P2=0.
+- [ ] Solicitar autorização explícita separada para commit, push e tag `v1.26.0`.
+- [ ] Após autorização, executar commit/push/tag sem incluir o vídeo.
+- [ ] Concluir os três builds e deixar o fan-in produzir o bundle validado.
+- [ ] Revisar o bundle e solicitar nova aprovação explícita
+      `tag+commit+digest` antes da publicação manual.
+- [ ] Verificar GitHub Pages e registrar a evidência remota final.
+
 - [x] 2026-07-25: sincronizar a versão 1.25.1+74 e MSIX 1.25.1.0.
 - [x] 2026-07-25: executar análise, 320 testes, smoke, captura, build e DMG.
 - [x] 2026-07-25: publicar `main`, tag `v1.25.1` e GitHub Release.
@@ -140,13 +166,19 @@
   local ou envio do commit para GitHub Actions.
 - UX-02, UX-40 e UX-41 dependem de sessões humanas; tempos e hesitações não
   foram simulados como telemetria.
-- Signed macOS release validation remains blocked until signing/provisioning is available for the HealthKit entitlement.
+- Assinatura Developer ID/notarização continua indisponível sem credenciais
+  Apple; HealthKit não integra a `main` atual.
 - Assinatura Authenticode depende da configuração externa do certificado.
 - Atualização de `olhossecos.com.br/app/` depende do acesso ao nginx/VPS; o
   GitHub Pages já está em 1.24.0, mas o host canônico ainda serve 1.23.0.
 
 ## improve
 
+- Adicionar uma face Inter Italic incorporada para recuperar itálico real no PDF
+  sem recorrer a Helvetica limitada a WinAnsi.
+- Avaliar as atualizações menores de audioplayers, screen_retriever,
+  window_manager e msix após a release, em mudança isolada com suíte completa.
+- Acompanhar a futura incompatibilidade SPM do plugin `local_notifier`.
 - Transformar as capturas do ciclo em goldens comparáveis quando o harness não
   desenhar baselines tipográficas de depuração.
 - Se o selo ad hoc externo voltar a ficar defasado após build limpo, adicionar

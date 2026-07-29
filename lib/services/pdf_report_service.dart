@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../l10n/feature_strings.dart';
 import '../models/dvrs_assessment.dart';
 import '../models/dvrs_definitions.dart';
 import '../models/environment_checklist.dart';
@@ -35,6 +36,14 @@ class PdfReportService {
       'gerado localmente no seu dispositivo e não é enviado a terceiros sem '
       'a sua ação explícita.';
 
+  /// Mensagem neutra gerada no momento da exportação, nunca lida do histórico.
+  static const String dvrsEducationalMessage = kDvrsPdfEducationalMessage;
+
+  /// Resolve o alerta de segurança atual em português a partir do nível
+  /// semântico. Texto legado serializado nunca participa da exportação.
+  static String? dvrsSafetyMessageFor(DvrsSafetyAlertLevel level) =>
+      FeatureStrings.of('pt').dvrsSafetyMessage(level);
+
   // --- Estilos (paleta discreta: azul escuro, cinza, branco) --------------
 
   static final _titleStyle = pw.TextStyle(
@@ -54,33 +63,48 @@ class PdfReportService {
     color: PdfColors.grey700,
   );
 
-  // Fonte Unicode embutida (DejaVuSans) usada como *fallback*: a Helvetica
-  // padrão cobre o português acentuado e tem negrito/itálico próprios, mas não
-  // desenha símbolos fora do WinAnsi (em-dash, aspas curvas, etc.) que o
-  // usuário pode colar nas observações. Carregada uma única vez.
-  static pw.Font? _fallbackFont;
-  static bool _fallbackAttempted = false;
+  // Fontes empacotadas são obrigatórias: relatórios podem conter acentos,
+  // travessões e aspas curvas. Usar Helvetica como base e tentar um fallback
+  // opcional permitia gerar um PDF sem alguns glifos quando o primeiro acesso
+  // ao asset bundle falhava. O cache só é preenchido após carregar tudo; uma
+  // falha transitória não envenena as próximas tentativas.
+  static _PdfFonts? _fonts;
 
-  Future<List<pw.Font>> _loadFontFallback() async {
-    if (!_fallbackAttempted) {
-      _fallbackAttempted = true;
-      try {
-        final data = await rootBundle.load('assets/fonts/DejaVuSans.ttf');
-        _fallbackFont = pw.Font.ttf(data);
-      } catch (_) {
-        _fallbackFont = null; // ambientes sem asset bundle (ex.: testes puros)
-      }
-    }
-    return _fallbackFont == null ? const [] : [_fallbackFont!];
+  Future<_PdfFonts> _loadFonts() async {
+    final cached = _fonts;
+    if (cached != null) return cached;
+
+    final regular = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Inter-Regular.ttf'),
+    );
+    final bold = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Inter-Bold.ttf'),
+    );
+    final unicode = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/DejaVuSans.ttf'),
+    );
+    final loaded = _PdfFonts(regular: regular, bold: bold, unicode: unicode);
+    _fonts = loaded;
+    return loaded;
   }
 
   /// Gera o documento PDF em formato binário.
   Future<Uint8List> generateReport(ReportData data) async {
-    final fallback = await _loadFontFallback();
+    final fonts = await _loadFonts();
     final pdf = pw.Document(
       title: 'Relatório de Saúde Visual Digital',
       author: 'Dry Eye Widget',
-      theme: pw.ThemeData.withFont(fontFallback: fallback),
+      theme: pw.ThemeData.withFont(
+        base: fonts.regular,
+        bold: fonts.bold,
+        // O pacote ainda não traz uma face itálica. Reutilizar as faces
+        // incorporadas é preferível a Helvetica oblíqua, que perde Unicode e
+        // emite avisos de glifos. Uma futura face Inter Italic pode substituir
+        // esta associação sem alterar o restante do documento.
+        italic: fonts.regular,
+        boldItalic: fonts.bold,
+        fontFallback: [fonts.unicode],
+      ),
     );
 
     pdf.addPage(
@@ -140,7 +164,10 @@ class PdfReportService {
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text('Relatório de Saúde Visual Digital', style: _titleStyle),
+                pw.Text(
+                  'Relatório de Saúde Visual Digital',
+                  style: _titleStyle,
+                ),
                 pw.SizedBox(height: 2),
                 pw.Text('Dry Eye Widget', style: _mutedStyle),
               ],
@@ -148,8 +175,10 @@ class PdfReportService {
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
-                pw.Text('Emitido em ${_formatDate(data.generatedAt)}',
-                    style: _mutedStyle),
+                pw.Text(
+                  'Emitido em ${_formatDate(data.generatedAt)}',
+                  style: _mutedStyle,
+                ),
                 pw.Text(
                   'Período: ${_formatDate(data.options.startDate)} a ${_formatDate(data.options.endDate)}',
                   style: _mutedStyle,
@@ -203,13 +232,8 @@ class PdfReportService {
     if (data.options.includeDvrs && dvrs != null) {
       rows.add([
         'DVRS mais recente',
-        '${dvrs.latest.totalScore}/100 (${dvrs.latest.classificationLabel})',
+        'Perfil educativo de ${_formatDate(dvrs.latest.createdAt)}',
       ]);
-      if (dvrs.history.length >= 2) {
-        final previous = dvrs.history[dvrs.history.length - 2];
-        final delta = dvrs.latest.totalScore - previous.totalScore;
-        rows.add(['Variação no período', '${_signed(delta.toDouble())} pontos']);
-      }
     }
     if (data.options.includeScreenTime) {
       rows.add([
@@ -261,9 +285,12 @@ class PdfReportService {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
                       pw.Text(r[0], style: _textStyle),
-                      pw.Text(r[1],
-                          style: _textStyle.copyWith(
-                              fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                        r[1],
+                        style: _textStyle.copyWith(
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -277,20 +304,20 @@ class PdfReportService {
   pw.Widget _indicationBanner(OverallIndication indication) {
     final (PdfColor bg, PdfColor fg, String label) = switch (indication) {
       OverallIndication.monitor => (
-          PdfColors.green50,
-          PdfColors.green900,
-          'Indicação geral: acompanhar a evolução.',
-        ),
+        PdfColors.green50,
+        PdfColors.green900,
+        'Indicação geral: acompanhar a evolução.',
+      ),
       OverallIndication.reinforceBreaks => (
-          PdfColors.amber50,
-          PdfColors.orange900,
-          'Indicação geral: reforçar as pausas visuais.',
-        ),
+        PdfColors.amber50,
+        PdfColors.orange900,
+        'Indicação geral: reforçar as pausas visuais.',
+      ),
       OverallIndication.seekEvaluation => (
-          PdfColors.red50,
-          PdfColors.red900,
-          'Indicação geral: considere agendar avaliação oftalmológica.',
-        ),
+        PdfColors.red50,
+        PdfColors.red900,
+        'Indicação geral: considere agendar avaliação oftalmológica.',
+      ),
     };
     return pw.Container(
       width: double.infinity,
@@ -299,106 +326,72 @@ class PdfReportService {
         color: bg,
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
       ),
-      child: pw.Text(label,
-          style: pw.TextStyle(
-              color: fg, fontSize: 12, fontWeight: pw.FontWeight.bold)),
+      child: pw.Text(
+        label,
+        style: pw.TextStyle(
+          color: fg,
+          fontSize: 12,
+          fontWeight: pw.FontWeight.bold,
+        ),
+      ),
     );
   }
 
   // --- DVRS ---------------------------------------------------------------
 
-  /// Seção do DVRS — Índice de Risco Visual Digital (questionário principal).
+  /// Seção do DVRS — autorregistro educativo por domínios.
   pw.Widget _buildDvrsSection(pw.Context context, DvrsReportData dvrs) {
     final latest = dvrs.latest;
-    final color = _dvrsColor(latest.classification);
+    final dvrsStrings = FeatureStrings.of('pt');
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('DVRS — Índice de Risco Visual Digital', style: _headerStyle),
+        pw.Text('DVRS — autorregistro educativo', style: _headerStyle),
         pw.SizedBox(height: 8),
-        pw.Text('Preenchido em ${_formatDate(latest.createdAt)}',
-            style: _mutedStyle),
-        pw.SizedBox(height: 6),
-        pw.Row(
-          crossAxisAlignment: pw.CrossAxisAlignment.end,
-          children: [
-            pw.Text('${latest.totalScore}',
-                style: pw.TextStyle(
-                  color: color,
-                  fontSize: 30,
-                  fontWeight: pw.FontWeight.bold,
-                )),
-            pw.Text(' /100',
-                style: _mutedStyle.copyWith(fontSize: 12)),
-            pw.SizedBox(width: 10),
-            pw.Container(
-              padding:
-                  const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: pw.BoxDecoration(
-                color: PdfColors.grey100,
-                borderRadius: pw.BorderRadius.circular(4),
-                border: pw.Border.all(color: color),
-              ),
-              child: pw.Text(latest.classificationLabel,
-                  style: pw.TextStyle(
-                      color: color, fontWeight: pw.FontWeight.bold)),
-            ),
-          ],
+        pw.Text(
+          'Preenchido em ${_formatDate(latest.createdAt)}. '
+          'Os valores descrevem a carga autorrelatada em cada domínio e não '
+          'constituem escore de risco clínico.',
+          style: _mutedStyle,
         ),
-        pw.SizedBox(height: 12),
-        pw.Text('Scores por domínio', style: _textStyle.copyWith(
-            fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 6),
+        pw.Text(
+          'Perfil por domínio',
+          style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
+        ),
         pw.SizedBox(height: 6),
         pw.TableHelper.fromTextArray(
           context: context,
           cellStyle: _textStyle,
           headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
-          headerDecoration:
-              const pw.BoxDecoration(color: PdfColors.blueGrey50),
-          headers: const ['Domínio', 'Score (0–100)'],
+          headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey50),
+          headers: const ['Domínio', 'Carga relatada (0–100)'],
           data: DvrsDomain.values
-              .map((d) => [
-                    kDvrsDomainLabels[d] ?? d.id,
-                    latest.domainScores.valueFor(d).round().toString(),
-                  ])
+              .map(
+                (d) => [
+                  dvrsStrings.dvrsDomainLabel(d.id),
+                  latest.domainScores.valueFor(d).round().toString(),
+                ],
+              )
               .toList(),
         ),
-        if (dvrs.hasEvolution) ...[
-          pw.SizedBox(height: 12),
-          pw.Text('Evolução do score', style: _textStyle.copyWith(
-              fontWeight: pw.FontWeight.bold)),
-          pw.SizedBox(height: 6),
-          pw.TableHelper.fromTextArray(
-            context: context,
-            cellStyle: _textStyle,
-            headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
-            headerDecoration:
-                const pw.BoxDecoration(color: PdfColors.blueGrey50),
-            headers: const ['Data', 'Score', 'Classificação'],
-            data: dvrs.history
-                .map((r) => [
-                      _formatDate(r.createdAt),
-                      r.totalScore.toString(),
-                      r.classificationLabel,
-                    ])
-                .toList(),
-          ),
-        ],
         pw.SizedBox(height: 10),
-        pw.Text(latest.educationalMessage, style: _textStyle),
-        if (latest.safetyAlertLevel != DvrsSafetyAlertLevel.none &&
-            latest.safetyAlertMessage != null) ...[
+        pw.Text(dvrsEducationalMessage, style: _textStyle),
+        if (dvrsSafetyMessageFor(latest.safetyAlertLevel)
+            case final safetyMessage?) ...[
           pw.SizedBox(height: 10),
           pw.Container(
             width: double.infinity,
             padding: const pw.EdgeInsets.all(8),
             decoration: pw.BoxDecoration(
               color: PdfColors.grey100,
-              border: pw.Border.all(color: _dvrsColor(latest.classification)),
+              border: pw.Border.all(
+                color: _dvrsSafetyColor(latest.safetyAlertLevel),
+              ),
               borderRadius: pw.BorderRadius.circular(4),
             ),
             child: pw.Text(
-              'Atenção: ${latest.safetyAlertMessage}',
+              'Atenção: $safetyMessage',
               style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
             ),
           ),
@@ -409,13 +402,12 @@ class PdfReportService {
     );
   }
 
-  PdfColor _dvrsColor(DvrsClassification c) => switch (c) {
-        DvrsClassification.low => PdfColors.green800,
-        DvrsClassification.mildAttention => PdfColors.orange800,
-        DvrsClassification.moderateRisk => PdfColors.deepOrange,
-        DvrsClassification.highRisk => PdfColors.red,
-        DvrsClassification.veryHighRisk => PdfColors.red900,
-      };
+  PdfColor _dvrsSafetyColor(DvrsSafetyAlertLevel level) => switch (level) {
+    DvrsSafetyAlertLevel.none => PdfColors.blueGrey,
+    DvrsSafetyAlertLevel.attention => PdfColors.orange800,
+    DvrsSafetyAlertLevel.medicalEvaluation => PdfColors.red,
+    DvrsSafetyAlertLevel.priorityEvaluation => PdfColors.red900,
+  };
 
   // --- Tempo de tela ------------------------------------------------------
 
@@ -427,18 +419,23 @@ class PdfReportService {
         pw.Text('3. Tempo de tela ativo', style: _headerStyle),
         pw.SizedBox(height: 8),
         if (!st.hasData)
-          pw.Text('Tempo de tela não registrado neste período.',
-              style: _textStyle)
+          pw.Text(
+            'Tempo de tela não registrado neste período.',
+            style: _textStyle,
+          )
         else ...[
           _kv('Tempo médio diário', _formatDuration(st.averageDailySeconds)),
           _kv('Total no período', _formatDuration(st.totalSeconds)),
           if (st.peakDay != null)
-            _kv('Dia de maior exposição',
-                '${_formatDate(st.peakDay!.day)} (${_formatDuration(st.peakDay!.seconds)})'),
-          _kv('Média em dias úteis',
-              _formatDuration(st.weekdayAverageSeconds)),
-          _kv('Média em fins de semana',
-              _formatDuration(st.weekendAverageSeconds)),
+            _kv(
+              'Dia de maior exposição',
+              '${_formatDate(st.peakDay!.day)} (${_formatDuration(st.peakDay!.seconds)})',
+            ),
+          _kv('Média em dias úteis', _formatDuration(st.weekdayAverageSeconds)),
+          _kv(
+            'Média em fins de semana',
+            _formatDuration(st.weekendAverageSeconds),
+          ),
           pw.SizedBox(height: 8),
           pw.Text(
             'Maior tempo de tela pode estar associado a maior risco de sintomas '
@@ -462,14 +459,18 @@ class PdfReportService {
         pw.Text('4. Pausas visuais', style: _headerStyle),
         pw.SizedBox(height: 8),
         if (!b.hasData)
-          pw.Text('Pausas visuais ainda não foram registradas.',
-              style: _textStyle)
+          pw.Text(
+            'Pausas visuais ainda não foram registradas.',
+            style: _textStyle,
+          )
         else ...[
           _kv('Lembretes emitidos', '${b.reminders}'),
           _kv('Pausas concluídas', '${b.completed}'),
           _kv('Pausas ignoradas', '${b.skipped}'),
-          _kv('Taxa de adesão',
-              '${((b.adherenceRate ?? 0) * 100).toStringAsFixed(0)}%'),
+          _kv(
+            'Taxa de adesão',
+            '${((b.adherenceRate ?? 0) * 100).toStringAsFixed(0)}%',
+          ),
         ],
         pw.SizedBox(height: 8),
         pw.Text(
@@ -514,9 +515,13 @@ class PdfReportService {
         pw.Row(
           children: [
             pw.Text('Classificação do ambiente: ', style: _textStyle),
-            pw.Text(label,
-                style: _textStyle.copyWith(
-                    color: color, fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              label,
+              style: _textStyle.copyWith(
+                color: color,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
           ],
         ),
         pw.SizedBox(height: 8),
@@ -535,15 +540,18 @@ class PdfReportService {
         color: data.alerts.isEmpty ? PdfColors.blueGrey50 : PdfColors.amber50,
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
         border: pw.Border.all(
-          color:
-              data.alerts.isEmpty ? PdfColors.blueGrey200 : PdfColors.orange200,
+          color: data.alerts.isEmpty
+              ? PdfColors.blueGrey200
+              : PdfColors.orange200,
         ),
       ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Quando procurar avaliação oftalmológica',
-              style: _headerStyle),
+          pw.Text(
+            'Quando procurar avaliação oftalmológica',
+            style: _headerStyle,
+          ),
           pw.SizedBox(height: 8),
           if (data.alerts.isEmpty)
             pw.Text(
@@ -553,15 +561,19 @@ class PdfReportService {
               style: _textStyle,
             )
           else ...[
-            pw.Text('Foram identificados os seguintes pontos de atenção:',
-                style: _textStyle),
+            pw.Text(
+              'Foram identificados os seguintes pontos de atenção:',
+              style: _textStyle,
+            ),
             pw.SizedBox(height: 4),
             for (final alert in data.alerts)
               pw.Bullet(text: alert, style: _textStyle),
           ],
           pw.SizedBox(height: 8),
-          pw.Text(mandatoryClosing,
-              style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            mandatoryClosing,
+            style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -616,24 +628,21 @@ class PdfReportService {
   // --- Helpers de layout/formatação --------------------------------------
 
   pw.Widget _kv(String key, String value) => pw.Padding(
-        padding: const pw.EdgeInsets.symmetric(vertical: 1.5),
-        child: pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          children: [
-            pw.Text(key, style: _textStyle),
-            pw.Text(value,
-                style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold)),
-          ],
+    padding: const pw.EdgeInsets.symmetric(vertical: 1.5),
+    child: pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        pw.Text(key, style: _textStyle),
+        pw.Text(
+          value,
+          style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
         ),
-      );
+      ],
+    ),
+  );
 
   String _formatDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
-
-  String _signed(double value, {int decimals = 1}) {
-    final sign = value > 0 ? '+' : '';
-    return '$sign${value.toStringAsFixed(decimals)}';
-  }
 
   String _formatDuration(int totalSeconds) {
     final hours = totalSeconds ~/ 3600;
@@ -665,4 +674,17 @@ class PdfReportService {
     await file.writeAsBytes(pdfData);
     return file;
   }
+}
+
+@immutable
+class _PdfFonts {
+  const _PdfFonts({
+    required this.regular,
+    required this.bold,
+    required this.unicode,
+  });
+
+  final pw.Font regular;
+  final pw.Font bold;
+  final pw.Font unicode;
 }

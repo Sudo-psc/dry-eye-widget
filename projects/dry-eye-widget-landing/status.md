@@ -1,6 +1,56 @@
 # Status
 
-Updated: 2026-07-16
+Updated: 2026-07-29
+
+Release 1.26.0 validada localmente:
+
+- Versão sincronizada em app, MSIX, landing, READMEs e changelog.
+- Copy médica revisada para escopo educativo sem promessa de prevenção,
+  tratamento, causalidade ou prescrição.
+- Alternativas localizadas cobrem imagens informativas; o carrossel respeita
+  `prefers-reduced-motion` e reconstrói os `aria-labels` dos dots após PT/EN.
+- Smoke da landing e gate de metadados passaram.
+- O pipeline local rejeita arquivos extras e hashes divergentes; o fan-in usa
+  código da default branch, valida ancestralidade, aguarda macOS/Windows/MSIX e
+  produz somente o bundle reconciliado. Actions não possui `contents: write`
+  nem publica GitHub Release; a etapa manual exige aprovação explícita da tag,
+  commit e digest canônico dos sete arquivos do snapshot revisado.
+- A v1.25.2 está publicada com quatro artefatos, conforme o run isolado.
+- O publicador manual rejeita substituição integral do bundle após aprovação e
+  reconcilia `latest` para a maior SemVer estável em ordens concorrentes.
+- O DVRS não persiste texto de alerta legado e tem questionário e alertas
+  integralmente localizados em PT/EN.
+- O novo build macOS e DMG passaram; 77 testes focados e 356 testes totais
+  foram aprovados.
+- A quarta revisão independente terminou com `P0=0 / P1=0 / P2=0`, sem
+  achados e sem mutação local ou remota.
+- O freeze revisado registrou HEAD
+  `71296726616d5c67d47204c8474ca519bcbd2de7`, 49 rastreados modificados,
+  13 não rastreados, staging vazio, diff
+  `814ac7d3339a3c039b0c712c15ddc5ba297f4265b301945cdf4e1f3846006c2e`
+  e inventário do patch
+  `8e7974a3e7567ab3b86c0e289a92e27bac4afc40c7a6ec93df535f5e03f4ec0b`.
+- Próximo passo: solicitar autorização explícita separada para commit/push/tag;
+  depois dos runners e fan-in, solicitar nova aprovação
+  `tag+commit+digest` para publicação manual.
+- A integração HealthKit mencionada abaixo é histórica de outra branch; não há
+  código ou entitlement HealthKit na `main` atual.
+
+Release reliability superseding the 2026-07-27 provisional state:
+
+- PDF reports now use packaged Inter fonts plus DejaVu Sans fallback for every
+  document, preventing missing-glyph warnings for accents, curly quotes and
+  dashes. The font cache is committed only after all required assets load.
+- Startup window restoration moved out of `main.dart` into the injectable
+  `BallPositionRestorer`; five new tests cover visible, off-screen,
+  multi-origin and native-query failure paths.
+- Release gates now cover metadata, tag-at-HEAD, strict manifests, a
+  three-platform read-only fan-in and the exact four-file bundle.
+- `flutter analyze` passed with no issues and all 356 Flutter tests passed.
+- Release metadata is synchronized at 1.26.0+76. No commit, push, tag or release
+  publication was performed.
+- A fresh 1.26.0 universal macOS build completed; deep/strict signature and DMG
+  integrity passed. The previous Xcode SDK-probe stall remains historical.
 
 Menu origin and close interaction fix (2026-07-16):
 
@@ -105,7 +155,8 @@ Landing cycles round 1 (2026-07-10):
 - FAQ + schema for DVRS and v1.22 news
 - Sitemap lastmod + smoke-check version sync with pubspec
 
-Previous phase note: the macOS-only HealthKit integration is implemented; signed runtime validation remains pending.
+Previous phase note: HealthKit was prototyped on a historical branch, but is not
+part of the current `main` release.
 
 Completed:
 
@@ -131,7 +182,7 @@ Completed:
 
 In progress:
 
-- Signed runtime validation with real HealthKit permissions and samples is still pending.
+- Publicação e verificação remota da release 1.26.0 e do GitHub Pages.
 - Verification passed on 2026-06-21: `flutter analyze` and full `flutter test`.
 - 2026-07-13: DVRS deixou de apresentar o total como risco clínico validado; UI, site e textos legais explicitam escopo educativo e não diagnóstico.
 - Verificação: `flutter analyze`, smoke do site e 238 testes Flutter aprovados.
@@ -140,5 +191,4 @@ Risks:
 
 - Production Lighthouse for `/app/science/` should be re-run after deployment to verify hosting headers and compression.
 - Production deployment and DNS require external credentials if moving away from GitHub Pages.
-- Signed macOS release build now requires a development/distribution certificate with HealthKit entitlement.
-- Runtime HealthKit availability still needs validation on a signed Mac build with user permission granted.
+- Developer ID/notarização continuam dependentes de credenciais Apple externas.

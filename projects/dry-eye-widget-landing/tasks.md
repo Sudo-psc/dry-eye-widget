@@ -2,6 +2,35 @@
 
 ## now
 
+- [x] 2026-07-29: sincronizar a landing com a versão 1.26.0.
+- [x] 2026-07-29: neutralizar claims médicos incompatíveis com o escopo educativo.
+- [x] 2026-07-29: localizar textos alternativos e respeitar reduzir movimento.
+- [x] 2026-07-29: passar smoke e gate de metadados.
+- [x] 2026-07-29: fechar manifests, fan-in, idempotência e gates locais.
+- [x] Obter revisão independente somente leitura antes de qualquer integração.
+- [x] Remediar os achados P1/P2 e repetir gates sem ação remota.
+- [x] Tornar o fan-in estritamente read-only e separar publicação manual.
+- [x] Concluir o novo freeze após regressão e build macOS.
+- [x] Submeter o freeze anterior à terceira revisão independente somente leitura.
+- [x] Vincular aprovação aos sete arquivos e convergir `latest` por SemVer.
+- [x] Remover texto de alerta DVRS persistido e completar localização PT/EN.
+- [x] Concluir gates e novo build da quarta remediação.
+- [x] Gerar o freeze da quarta remediação.
+- [x] Submeter o novo freeze à quarta revisão independente somente leitura.
+- [x] Concluir a quarta revisão com P0=0/P1=0/P2=0.
+- [ ] Solicitar autorização explícita separada para commit/push/tag.
+- [ ] Após runners/fan-in, revisar o bundle e solicitar nova aprovação
+      `tag+commit+digest` para publicação manual.
+- [ ] Verificar o deploy 1.26.0 no GitHub Pages após o push.
+
+- [x] 2026-07-27: Embed deterministic Unicode-capable fonts in every PDF and
+  add a regression test for accented and typographic text.
+- [x] 2026-07-27: Extract startup window restoration into an injectable service
+  and cover monitor/fallback behavior with five tests.
+- [x] 2026-07-27: Add metadata, tag and published-asset release gates and wire
+  the local/tag gates into GitHub Actions.
+- [x] 2026-07-27: Pass static analysis and the complete 340-test Flutter suite.
+
 - [x] Preserve the orb's visual origin when the expanded menu is clamped to the screen.
 - [x] Position the menu panel above or below according to the available space around the orb.
 - [x] Make the open-menu orb close the menu directly and remove inactive pan recognizers.
@@ -51,9 +80,15 @@
 
 ## next
 
-- [ ] Test a signed macOS build with HealthKit entitlement enabled.
-- [ ] Add a manual QA script for signed HealthKit states: unavailable, denied, authorized and no samples.
-- [ ] Expand the dashboard with local app metrics beyond HealthKit.
+- [x] Re-run the macOS release build after the local Xcode SDK-probe stall and
+  repeat strict signature and DMG integrity QA on the fresh bundle.
+- [ ] Independently review, then commit only with explicit authorization,
+  excluding the unrelated
+  `gemini_generated_video_B3916D35.mp4`.
+- [x] Reconcile the published v1.25.2 release and its four remote artifacts
+  with the isolated evidence run; v1.26.0 is the next release scope.
+- [ ] Decidir separadamente se o protótipo histórico HealthKit deve ser
+  reproposto em uma futura branch; ele não integra a `main` atual.
 - [x] Capture or replace carousel with real app screenshots when available.
 - [x] Add Windows-specific installer/tray screenshots when available.
 - [x] 2026-07-12: Refresh the macOS carousel with the current liquid orb/menu and daily summary UI.
@@ -65,13 +100,20 @@
 
 ## blocked
 
+- Windows/MSIX and real fan-in evidence are blocked until a reviewed commit and
+  tag are separately authorized and run on GitHub Actions.
+- Public v1.26.0 completeness remains blocked by independent review and explicit
+  authorization for each later remote mutation.
 - VPS deployment is blocked until server access and deployment path are provided.
 - DNS configuration is blocked until DNS provider access is provided.
 - Separate landing repo creation is blocked until the desired GitHub organization/name is confirmed.
-- Signed HealthKit runtime validation is blocked until a valid Apple signing identity/provisioning setup is available locally or in CI.
 
 ## improve
 
+- Add a bounded Xcode SDK-health preflight so future macOS builds fail clearly
+  instead of waiting indefinitely during the clang capability probe.
+- [x] Add a read-only fan-in workflow that emits a validated bundle only after
+  all three platform workflows succeed for the same source SHA.
 - [x] Add an automated landing smoke test that checks canonical route, script safety, and i18n coverage.
 - [x] Add CI coverage for the static site smoke check.
 - [x] 2026-07-10: five landing quick-win cycles (version badge, a11y, features, FAQ, sitemap/smoke version sync).

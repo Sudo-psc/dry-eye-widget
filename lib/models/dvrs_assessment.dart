@@ -121,16 +121,12 @@ extension DvrsSafetyAlertLevelId on DvrsSafetyAlertLevel {
   }
 }
 
-/// Resultado de um alerta de segurança (nível + mensagem opcional).
+/// Resultado semântico de alerta. O texto é derivado na superfície ativa.
 @immutable
 class DvrsSafetyAlert {
-  const DvrsSafetyAlert({required this.level, this.message});
+  const DvrsSafetyAlert({required this.level});
 
   final DvrsSafetyAlertLevel level;
-
-  /// Mensagem exibida ao usuário; `null` quando [level] é
-  /// [DvrsSafetyAlertLevel.none].
-  final String? message;
 }
 
 /// Uma resposta dada pelo usuário a uma pergunta do DVRS.
@@ -235,9 +231,7 @@ class DvrsResult {
     required this.totalScore,
     required this.classification,
     required this.classificationLabel,
-    required this.educationalMessage,
     required this.safetyAlertLevel,
-    this.safetyAlertMessage,
     this.userId,
     this.version = dvrsVersion,
     this.isDiagnostic = false,
@@ -259,9 +253,7 @@ class DvrsResult {
   final int totalScore;
   final DvrsClassification classification;
   final String classificationLabel;
-  final String educationalMessage;
   final DvrsSafetyAlertLevel safetyAlertLevel;
-  final String? safetyAlertMessage;
 
   /// Sempre `false`: o DVRS é educativo, nunca diagnóstico.
   final bool isDiagnostic;
@@ -279,9 +271,7 @@ class DvrsResult {
     totalScore: totalScore,
     classification: classification,
     classificationLabel: classificationLabel,
-    educationalMessage: educationalMessage,
     safetyAlertLevel: safetyAlertLevel,
-    safetyAlertMessage: safetyAlertMessage,
     isDiagnostic: isDiagnostic,
     includeInPdf: includeInPdf ?? this.includeInPdf,
   );
@@ -296,9 +286,7 @@ class DvrsResult {
     'totalScore': totalScore,
     'classification': classification.id,
     'classificationLabel': classificationLabel,
-    'educationalMessage': educationalMessage,
     'safetyAlertLevel': safetyAlertLevel.id,
-    if (safetyAlertMessage != null) 'safetyAlertMessage': safetyAlertMessage,
     'isDiagnostic': false,
     'includeInPdf': includeInPdf,
   };
@@ -339,11 +327,9 @@ class DvrsResult {
       classification: classification,
       classificationLabel:
           map['classificationLabel'] as String? ?? classification.label,
-      educationalMessage: map['educationalMessage'] as String? ?? '',
       safetyAlertLevel:
           DvrsSafetyAlertLevelId.fromId(map['safetyAlertLevel'] as String?) ??
           DvrsSafetyAlertLevel.none,
-      safetyAlertMessage: map['safetyAlertMessage'] as String?,
       includeInPdf: map['includeInPdf'] as bool? ?? false,
     );
   }
@@ -361,6 +347,3 @@ class DvrsResult {
     }
   }
 }
-
-/// Tendência de evolução entre dois resultados.
-enum DvrsTrend { improving, stable, worsening }

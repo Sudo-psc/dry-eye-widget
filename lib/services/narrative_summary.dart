@@ -1,4 +1,4 @@
-import '../models/dvrs_assessment.dart';
+import '../l10n/feature_strings.dart';
 import '../models/report_options.dart';
 
 /// Gera 5–8 linhas narrativas educativas para o oftalmologista a partir de
@@ -20,33 +20,26 @@ class NarrativeSummary {
     if (dvrs != null) {
       final latest = dvrs.latest;
       lines.add(
-        'Último DVRS (${latest.version}): score ${latest.totalScore}/100 — '
-        '${latest.classificationLabel}. '
-        'Domínios (0–100): sintomas ${latest.domainScores.symptoms.round()}, '
+        'Último DVRS (${latest.version}), perfil educativo por domínios '
+        '(0–100; números maiores representam maior carga autorrelatada, '
+        'não risco clínico): sintomas ${latest.domainScores.symptoms.round()}, '
         'funcional ${latest.domainScores.functional.round()}, '
         'exposição ${latest.domainScores.exposure.round()}, '
         'ambiente ${latest.domainScores.environment.round()}, '
         'alerta ${latest.domainScores.warning.round()}.',
       );
       if (dvrs.history.length >= 2) {
-        final prev = dvrs.history[dvrs.history.length - 2];
-        final delta = latest.totalScore - prev.totalScore;
-        final trend = delta > 1
-            ? 'piora'
-            : delta < -1
-                ? 'melhora'
-                : 'estabilidade';
         lines.add(
-          'Em relação à avaliação anterior (score ${prev.totalScore}), '
-          'observa-se $trend do score total '
-          '(${delta >= 0 ? '+' : ''}$delta pontos).',
+          'Há ${dvrs.history.length} registros no período para comparação '
+          'descritiva por domínio; o total numérico legado não é apresentado '
+          'como escore clínico.',
         );
       }
-      if (latest.safetyAlertLevel != DvrsSafetyAlertLevel.none &&
-          latest.safetyAlertMessage != null) {
-        lines.add(
-          'Sinal de alerta do questionário (Q16): ${latest.safetyAlertMessage}',
-        );
+      final safetyMessage = FeatureStrings.of(
+        'pt',
+      ).dvrsSafetyMessage(latest.safetyAlertLevel);
+      if (safetyMessage != null) {
+        lines.add('Sinal de alerta do questionário (Q16): $safetyMessage');
       }
     } else {
       lines.add(
@@ -57,8 +50,9 @@ class NarrativeSummary {
 
     if (data.breaks.hasData) {
       final adh = data.breaks.adherenceRate;
-      final adhTxt =
-          adh == null ? 'sem taxa' : '${(adh * 100).toStringAsFixed(0)}% de adesão';
+      final adhTxt = adh == null
+          ? 'sem taxa'
+          : '${(adh * 100).toStringAsFixed(0)}% de adesão';
       lines.add(
         'Pausas 20-20-20 no período: ${data.breaks.completed} concluídas de '
         '${data.breaks.reminders} lembretes ($adhTxt).',

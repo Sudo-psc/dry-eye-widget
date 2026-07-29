@@ -266,11 +266,7 @@ class _DaySummaryScreenState extends State<DaySummaryScreen> {
     final title = s.daySummaryDvrsLabel;
     final body = last == null
         ? s.daySummaryDvrsNever
-        : s.daySummaryDvrsLastText(
-            last.totalScore,
-            last.classificationLabel,
-            snap.daysSinceDvrs ?? 0,
-          );
+        : s.daySummaryDvrsLastText(snap.daysSinceDvrs ?? 0);
 
     final radius = BorderRadius.circular(14);
     return Semantics(

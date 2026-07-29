@@ -106,8 +106,8 @@ void main() {
   });
 
   group('Indicação e alertas', () {
-    test('DVRS elevado gera indicação de avaliação e alerta', () {
-      // value 4 => score 100 => veryHighRisk e Q16=4 => alerta prioritário.
+    test('resposta prioritária Q16 gera indicação de avaliação e alerta', () {
+      // Todas as respostas em 4 incluem Q16=4, o gatilho de segurança.
       final data = build(dvrsHistory: [dvrs(4)]);
       expect(data.indication, OverallIndication.seekEvaluation);
       expect(data.alerts, isNotEmpty);

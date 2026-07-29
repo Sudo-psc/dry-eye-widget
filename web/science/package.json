@@ -27,5 +27,8 @@
     "tailwindcss": "4.3.2",
     "typescript": "7.0.2",
     "vite": "8.1.4"
+  },
+  "overrides": {
+    "postcss": "8.5.18"
   }
 }

@@ -11,6 +11,7 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app/window_layout.dart';
+import 'app/window_restoration.dart';
 import 'l10n/app_strings.dart';
 import 'l10n/feature_strings.dart';
 import 'models/app_state.dart';
@@ -145,7 +146,13 @@ Future<void> main() async {
     } else {
       await Window.setEffect(effect: WindowEffect.transparent);
     }
-    await _restoreBallPosition(storage, settings.value, initialSize);
+    await BallPositionRestorer.desktop(storage).restore(
+      savedX: storage.ballX,
+      savedY: storage.ballY,
+      defaultCorner: settings.value.defaultCorner,
+      windowSize: initialSize,
+      dockEdge: ballDockEdgeFromId(storage.loadDockEdge()),
+    );
     await windowManager.show();
   });
 
@@ -190,79 +197,6 @@ Future<void> main() async {
       child: const DryEyeApp(),
     ),
   );
-}
-
-/// Posiciona a janela na última posição salva ou no canto padrão.
-Future<void> _restoreBallPosition(
-  StorageService storage,
-  WidgetSettings settings,
-  Size windowSize,
-) async {
-  final savedX = storage.ballX;
-  final savedY = storage.ballY;
-  if (savedX != null && savedY != null) {
-    final saved = Offset(savedX, savedY);
-    final visible = await _visiblePosition(saved, windowSize);
-    await windowManager.setPosition(visible);
-    // A posição recortada vira a nova verdade: sem isso a bolinha voltaria
-    // para fora da tela no próximo início.
-    if (visible != saved) {
-      await storage.saveBallPosition(visible.dx, visible.dy);
-    }
-    return;
-  }
-  await windowManager.setPosition(
-    await _cornerOffset(settings.defaultCorner, windowSize),
-  );
-}
-
-/// Recorta [position] para uma tela conectada; devolve-a intacta se não der
-/// para consultar os monitores.
-Future<Offset> _visiblePosition(Offset position, Size windowSize) async {
-  try {
-    final displays = await screenRetriever.getAllDisplays();
-    final screens = displays
-        .map(
-          (display) =>
-              (display.visiblePosition ?? Offset.zero) &
-              (display.visibleSize ?? display.size),
-        )
-        .toList(growable: false);
-    return resolveRestoredPosition(
-          savedPosition: position,
-          windowSize: windowSize,
-          screens: screens,
-        ) ??
-        position;
-  } catch (e) {
-    debugPrint('Não foi possível validar a posição salva: $e');
-    return position;
-  }
-}
-
-/// Calcula o canto da tela primária para um dado tamanho de janela.
-Future<Offset> _cornerOffset(BallCorner corner, Size windowSize) async {
-  const margin = 24.0;
-  try {
-    final display = await screenRetriever.getPrimaryDisplay();
-    final screen = display.visibleSize ?? display.size;
-    final maxX = screen.width - windowSize.width - margin;
-    final maxY = screen.height - windowSize.height - margin;
-    switch (corner) {
-      case BallCorner.topLeft:
-        return const Offset(margin, margin);
-      case BallCorner.topRight:
-        return Offset(maxX, margin);
-      case BallCorner.bottomLeft:
-        return Offset(margin, maxY);
-      case BallCorner.bottomRight:
-        return Offset(maxX, maxY);
-      case BallCorner.center:
-        return Offset(maxX / 2, maxY / 2);
-    }
-  } catch (_) {
-    return const Offset(100, 100);
-  }
 }
 
 class DryEyeApp extends StatelessWidget {

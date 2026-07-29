@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'dvrs_assessment.dart';
 
-/// Conteúdo (textos) do **DVRS — Índice de Risco Visual Digital** v1.0.
+/// Conteúdo do autorregistro educativo **DVRS** v1.0.
 ///
 /// Centraliza enunciados, opções, mensagens educativas, alertas de segurança e
 /// avisos médico-legais. Toda a linguagem é de TRIAGEM e EDUCAÇÃO — nunca
@@ -120,7 +120,9 @@ const List<DvrsQuestion> kDvrsQuestions = [
       DvrsOption(label: 'Pioraram moderadamente', score: 2),
       DvrsOption(label: 'Pioraram bastante', score: 3),
       DvrsOption(
-          label: 'Pioraram quase todos os dias de forma importante', score: 4),
+        label: 'Pioraram quase todos os dias de forma importante',
+        score: 4,
+      ),
     ],
   ),
   // --- Domínio B: Impacto funcional (Q7–Q9) -------------------------------
@@ -257,25 +259,29 @@ const List<DvrsQuestion> kDvrsQuestions = [
     options: [
       DvrsOption(label: 'Nenhum sinal de alerta', score: 0),
       DvrsOption(
-          label:
-              'Sintomas leves persistentes por mais de 2 semanas, sem piora '
-              'importante',
-          score: 1),
+        label:
+            'Sintomas leves persistentes por mais de 2 semanas, sem piora '
+            'importante',
+        score: 1,
+      ),
       DvrsOption(
-          label:
-              'Piora progressiva, sintomas por mais de 4 semanas ou impacto '
-              'funcional relevante',
-          score: 2),
+        label:
+            'Piora progressiva, sintomas por mais de 4 semanas ou impacto '
+            'funcional relevante',
+        score: 2,
+      ),
       DvrsOption(
-          label:
-              'Dor ocular, fotofobia importante, olho vermelho relevante, '
-              'visão embaçada recorrente ou desconforto com lente de contato',
-          score: 3),
+        label:
+            'Dor ocular, fotofobia importante, olho vermelho relevante, '
+            'visão embaçada recorrente ou desconforto com lente de contato',
+        score: 3,
+      ),
       DvrsOption(
-          label:
-              'Perda visual súbita, dor intensa, trauma ocular, secreção '
-              'importante ou olho vermelho doloroso com lente de contato',
-          score: 4),
+        label:
+            'Perda visual súbita, dor intensa, trauma ocular, secreção '
+            'importante ou olho vermelho doloroso com lente de contato',
+        score: 4,
+      ),
     ],
   ),
 ];
@@ -290,65 +296,20 @@ const String kDvrsIntroDisclaimer =
 
 /// Texto curto explicativo da tela inicial.
 const String kDvrsIntroDescription =
-    'O DVRS combina sintomas visuais, impacto funcional, exposição a telas, '
-    'pausas, ambiente e sinais de alerta para estimar risco visual digital '
-    'autorreferido. O resultado é educativo e não substitui avaliação '
-    'oftalmológica.';
+    'O DVRS organiza sintomas visuais, impacto funcional, exposição a telas, '
+    'pausas, ambiente e sinais de alerta em um perfil autorrelatado por '
+    'domínios. O registro é educativo e não substitui avaliação oftalmológica.';
 
 /// Aviso médico-legal obrigatório no relatório PDF.
 const String kDvrsPdfLegalNotice =
-    'O DVRS é uma ferramenta educativa de triagem e acompanhamento de risco '
-    'visual digital. Não confirma diagnóstico e não substitui consulta '
-    'oftalmológica.';
+    'O DVRS é um autorregistro educativo de sintomas e hábitos. Não é '
+    'instrumento clínico validado, não confirma diagnóstico e não substitui '
+    'consulta oftalmológica.';
 
-/// Mensagens educativas por classificação (seção 8 da especificação).
-const Map<DvrsClassification, String> kDvrsEducationalMessages = {
-  DvrsClassification.low:
-      'Seu resultado sugere baixo risco visual digital neste momento. Continue '
-      'acompanhando sintomas, mantendo pausas visuais e revisando seu ambiente '
-      'de trabalho.',
-  DvrsClassification.mildAttention:
-      'Seu resultado sugere sinais iniciais de sobrecarga visual. Ajustar '
-      'pausas, brilho, reflexos, distância da tela e tempo contínuo de uso pode '
-      'ajudar no conforto visual.',
-  DvrsClassification.moderateRisk:
-      'Seu resultado sugere risco visual digital moderado. Reforce pausas '
-      'visuais, revise o ambiente e acompanhe o score nas próximas semanas. Se '
-      'os sintomas persistirem, considere avaliação oftalmológica.',
-  DvrsClassification.highRisk:
-      'Seu resultado sugere risco visual digital elevado. A combinação de '
-      'sintomas, exposição e impacto funcional merece atenção. Considere '
-      'avaliação oftalmológica, principalmente se houver piora, sintomas '
-      'persistentes ou uso frequente de colírios sem orientação.',
-  DvrsClassification.veryHighRisk:
-      'Seu resultado sugere risco visual digital muito elevado. Este '
-      'questionário não realiza diagnóstico, mas recomenda-se avaliação '
-      'oftalmológica, especialmente se houver dor, fotofobia, embaçamento '
-      'recorrente, piora progressiva ou impacto no trabalho.',
-};
-
-/// Mensagens de alerta de segurança por nível (seção 9 da especificação).
-/// Não há mensagem para [DvrsSafetyAlertLevel.none].
-const Map<DvrsSafetyAlertLevel, String> kDvrsSafetyAlertMessages = {
-  DvrsSafetyAlertLevel.attention:
-      'Há sinais de persistência, piora ou impacto funcional. Considere '
-      'avaliação oftalmológica, especialmente se os sintomas continuarem.',
-  DvrsSafetyAlertLevel.medicalEvaluation:
-      'Este questionário identificou sinais que merecem avaliação '
-      'oftalmológica. O resultado não confirma diagnóstico, mas sintomas como '
-      'dor, fotofobia, olho vermelho relevante, visão embaçada recorrente ou '
-      'desconforto com lente de contato devem ser avaliados por um médico.',
-  DvrsSafetyAlertLevel.priorityEvaluation:
-      'Procure atendimento oftalmológico com prioridade. Perda visual súbita, '
-      'dor intensa, trauma ocular, secreção importante ou olho vermelho doloroso '
-      'com lente de contato não devem ser acompanhados apenas por aplicativo.',
-};
-
-/// Rótulos curtos de cada domínio (para gráficos e relatório).
-const Map<DvrsDomain, String> kDvrsDomainLabels = {
-  DvrsDomain.symptoms: 'Sintomas visuais e oculares',
-  DvrsDomain.functional: 'Impacto funcional',
-  DvrsDomain.exposure: 'Exposição digital e pausas',
-  DvrsDomain.environment: 'Ambiente e ergonomia visual',
-  DvrsDomain.warning: 'Sinais de alerta',
-};
+/// Texto neutro e atual usado no PDF, que hoje é emitido apenas em português.
+///
+/// O texto não é persistido no resultado: isso impede que mensagens antigas,
+/// inclusive claims de risco, reapareçam depois de uma atualização do app.
+const String kDvrsPdfEducationalMessage =
+    'Use o perfil por domínio para observar os sintomas, hábitos e condições '
+    'que você relatou ao longo do tempo. Os números não medem risco clínico.';

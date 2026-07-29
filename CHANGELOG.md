@@ -6,7 +6,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
-## [1.25.2] - 2026-07-26
+## [1.26.0] - 2026-07-29
 
 ### Melhorado
 - Soltura da bolinha alinhada ao quadro da tela em vez de um temporizador de
@@ -15,6 +15,14 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
   8,6 ms — o arremesso passa a receber 21–41 atualizações de posição onde antes
   recebia 8–15. Um teto de 32 ms cobre o caso em que o macOS deixa de produzir
   quadros com a janela ocluída ou a tela dormindo.
+- Relatórios PDF usam as fontes empacotadas Inter e DejaVu Sans em todas as
+  plataformas, preservando acentos, aspas curvas e travessões.
+- O histórico do DVRS apresenta perfil e evolução por domínio, sem reintroduzir
+  um total com aparência de escore clínico.
+- Builds de pull request e execução manual deixaram de receber credenciais de
+  assinatura; os workflows de plataforma produzem artefatos internos, e a
+  fan-in somente reúne e valida o bundle. A publicação da GitHub Release ficou
+  como etapa manual separada, após revisão e aprovação explícita do snapshot.
 
 ### Corrigido
 - A bolinha não reaparece mais fora da tela quando o monitor em que ela estava
@@ -24,6 +32,10 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
   fixa: rótulos curtos como "Pisque" e "Blink" deixavam uma sobra vazia à
   direita. A janela nativa usa a mesma medida, então pílula e janela não
   divergem mais.
+- A restauração preserva o encaixe lateral em meia-lua e recalcula o monitor
+  conectado mais próximo sem apagar a posição canônica.
+- A landing deixou de misturar enquadramento educativo com promessas de
+  prevenção, causalidade clínica ou prescrição específica.
 
 ### Testado
 - Cadência do loop de soltura medida em build profile e painel de 120 Hz,
@@ -32,7 +44,7 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
   maior que a tela.
 - Largura da pílula medida contra o texto real, incluindo escala de texto e
   ausência do anel de progresso.
-- Análise estática e 334 testes Flutter.
+- Gate de versão cobre app, MSIX, READMEs, landing, i18n e changelog.
 
 ## [1.25.1] - 2026-07-25
 

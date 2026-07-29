@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/feature_strings.dart';
 import '../../models/dvrs_assessment.dart';
-import '../../models/dvrs_definitions.dart';
 import '../../providers/settings_provider.dart';
-import '../../services/dvrs_engine.dart';
 import '../../services/dvrs_storage_service.dart';
 import '../../ui/glass_card.dart';
 import '../../ui/panel_state_view.dart';
@@ -13,8 +11,10 @@ import '../../ui/section_header.dart';
 import '../../ui/trend_line_chart.dart';
 import 'dvrs_ui.dart';
 
-/// Histórico longitudinal do DVRS: último resultado, variação, gráfico de
-/// evolução do score, evolução por domínio e lista de resultados (com exclusão).
+/// Histórico longitudinal do DVRS por domínio e lista de registros.
+///
+/// O total numérico legado continua no modelo para compatibilidade dos dados,
+/// mas não é apresentado como escore clínico nesta superfície educativa.
 class DvrsHistoryView extends StatefulWidget {
   const DvrsHistoryView({super.key});
 
@@ -68,6 +68,8 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final settings = context.watch<SettingsProvider>();
+    final f = FeatureStrings.of(settings.value.languageCode);
     if (_history.isEmpty) {
       final f = FeatureStrings.of(
         context.read<SettingsProvider>().value.languageCode,
@@ -86,26 +88,14 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     final previous = _history.length >= 2
         ? _history[_history.length - 2]
         : null;
-    final trend = previous == null ? null : compareDvrsTrend(previous, latest);
-    final delta = previous == null
-        ? null
-        : latest.totalScore - previous.totalScore;
-
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        _latestCard(theme, latest, trend, delta),
+        _latestCard(theme, latest),
         if (previous != null) ...[
           const SizedBox(height: 16),
           _domainCompareCard(theme, previous, latest),
         ],
-        const SizedBox(height: 16),
-        _chartCard(
-          title: context.read<SettingsProvider>().strings.dvrsHistoryEvolution,
-          points: [
-            for (final r in _history) (r.createdAt, r.totalScore.toDouble()),
-          ],
-        ),
         const SizedBox(height: 16),
         _domainEvolutionCard(),
         const SizedBox(height: 16),
@@ -119,10 +109,9 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Refaça o DVRS quando for útil para acompanhar mudanças nos '
-                  'sintomas e hábitos que você relatou.',
+                  f.dvrsRetakeHint,
                   style: TextStyle(fontSize: 13, height: 1.35),
                 ),
               ),
@@ -133,83 +122,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     );
   }
 
-  Widget _latestCard(
-    ThemeData theme,
-    DvrsResult latest,
-    DvrsTrend? trend,
-    int? delta,
-  ) {
-    final color = DvrsUi.classificationColor(latest.classification);
-    return GlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Último DVRS · ${DvrsUi.formatDate(latest.createdAt)}',
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${latest.totalScore}',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  height: 1,
-                  color: color,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  '/100',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ),
-              const Spacer(),
-              DvrsUi.classificationChip(latest.classification),
-            ],
-          ),
-          if (trend != null && delta != null) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Icon(
-                  DvrsUi.trendIcon(trend),
-                  size: 16,
-                  color: DvrsUi.trendColor(trend),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '${DvrsUi.trendLabel(trend)} (${delta > 0 ? '+' : ''}$delta '
-                  'desde o anterior)',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: DvrsUi.trendColor(trend),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _chartCard({
-    required String title,
-    required List<(DateTime, double)> points,
-  }) {
+  Widget _latestCard(ThemeData theme, DvrsResult latest) {
     final f = FeatureStrings.of(
       context.read<SettingsProvider>().value.languageCode,
     );
@@ -217,30 +130,27 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionHeader(title),
-          TrendLineChart(points: points, minY: 0, maxY: 100, height: 160),
-          if (points.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                for (final p in points)
-                  Tooltip(
-                    message: f.dvrsTooltipScore
-                        .replaceAll('{score}', p.$2.round().toString())
-                        .replaceAll('{date}', DvrsUi.formatDate(p.$1)),
-                    child: Chip(
-                      visualDensity: VisualDensity.compact,
-                      label: Text(
-                        '${p.$2.round()} · ${DvrsUi.formatDate(p.$1)}',
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    ),
-                  ),
-              ],
+          Text(
+            f.dvrsLatest(DvrsUi.formatDate(latest.createdAt)),
+            style: TextStyle(
+              fontSize: 12,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
-          ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            f.dvrsEducationalProfile,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            f.dvrsHistoryIntro,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.35,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
         ],
       ),
     );
@@ -263,7 +173,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
           for (final d in DvrsDomain.values)
             _domainDeltaRow(
               theme,
-              label: kDvrsDomainLabels[d] ?? d.id,
+              label: f.dvrsDomainLabel(d.id),
               prev: previous.domainScores.valueFor(d),
               next: latest.domainScores.valueFor(d),
             ),
@@ -279,10 +189,8 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
     required double next,
   }) {
     final delta = next - prev;
-    final color = delta > 1
-        ? const Color(0xFFE57373)
-        : delta < -1
-        ? const Color(0xFF81C784)
+    final color = delta.abs() > 1
+        ? theme.colorScheme.primary
         : theme.colorScheme.onSurface.withValues(alpha: 0.55);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -313,7 +221,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
           SizedBox(
             width: 48,
             child: Text(
-              '${delta >= 0 ? '+' : ''}${delta.round()}',
+              'Δ ${delta >= 0 ? '+' : ''}${delta.round()}',
               textAlign: TextAlign.end,
               style: TextStyle(
                 fontSize: 12,
@@ -328,11 +236,13 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
   }
 
   Widget _domainEvolutionCard() {
+    final settings = context.read<SettingsProvider>();
+    final f = FeatureStrings.of(settings.value.languageCode);
     return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader('Evolução por domínio'),
+          SectionHeader(settings.strings.dvrsHistoryEvolution),
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -340,7 +250,7 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
               for (final d in DvrsDomain.values)
                 ChoiceChip(
                   label: Text(
-                    kDvrsDomainLabels[d] ?? d.id,
+                    f.dvrsDomainLabel(d.id),
                     style: const TextStyle(fontSize: 11),
                   ),
                   selected: _selectedDomain == d,
@@ -364,35 +274,30 @@ class _DvrsHistoryViewState extends State<DvrsHistoryView> {
   }
 
   Widget _historyListCard(ThemeData theme) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     final reversed = _history.reversed.toList();
     return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader('Resultados'),
+          SectionHeader(f.dvrsHistoryResults),
           for (final r in reversed)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 children: [
-                  SizedBox(
-                    width: 34,
-                    child: Text(
-                      '${r.totalScore}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: DvrsUi.classificationColor(r.classification),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          r.classificationLabel,
-                          style: const TextStyle(fontSize: 13),
+                          f.dvrsHistoryRecord,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           DvrsUi.formatDate(r.createdAt),

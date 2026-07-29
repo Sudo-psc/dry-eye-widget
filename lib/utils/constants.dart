@@ -214,8 +214,9 @@ class StorageKeys {
   /// JSON serializado com o último checklist ambiental autorreferido.
   static const String environmentChecklist = 'environment_checklist_json';
 
-  /// JSON serializado com o histórico de resultados do DVRS — Índice de Risco
-  /// Visual Digital (questionário principal).
+  /// JSON serializado com o histórico do autorregistro educativo DVRS.
+  ///
+  /// O esquema legado preserva campos agregados apenas para compatibilidade.
   static const String dvrsResults = 'dvrs_results_json';
 
   /// Rascunho parcial do DVRS (respostas incompletas entre sessões).
@@ -246,7 +247,7 @@ class AppInfo {
   AppInfo._();
 
   /// Versão atual (deve acompanhar a `version` do pubspec.yaml).
-  static const String version = '1.25.2';
+  static const String version = '1.26.0';
 
   static const String repoOwner = 'Sudo-psc';
   static const String repoName = 'dry-eye-widget';

@@ -131,10 +131,17 @@
       function rebuildDots() {
         if (!dotsBox) return;
         dotsBox.innerHTML = "";
-        visibleSlides().forEach(function (_, i) {
+        visibleSlides().forEach(function (slide, i) {
           const d = document.createElement("button");
           d.type = "button";
-          d.setAttribute("aria-label", "Slide " + (i + 1));
+          const title = slide.querySelector("figcaption strong");
+          const prefix = document.documentElement.lang.startsWith("pt")
+            ? "Captura"
+            : "Screenshot";
+          d.setAttribute(
+            "aria-label",
+            prefix + " " + (i + 1) + (title ? ": " + title.textContent : ""),
+          );
           d.addEventListener("click", function () { goTo(i); });
           dotsBox.appendChild(d);
         });
@@ -162,7 +169,12 @@
         if (!slides.length) return;
         cur = Math.max(0, Math.min(slides.length - 1, i));
         const s = slides[cur];
-        track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.clientWidth) / 2, behavior: "smooth" });
+        const reduceMotion = window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        track.scrollTo({
+          left: s.offsetLeft - (track.clientWidth - s.clientWidth) / 2,
+          behavior: reduceMotion ? "auto" : "smooth",
+        });
         syncDots();
       }
 
@@ -195,6 +207,7 @@
           applyPlatform(btn.getAttribute("data-platform"));
         });
       }
+      document.addEventListener("dew:langchange", rebuildDots);
       rebuildDots();
     }
 

@@ -128,7 +128,6 @@ void main() {
     test('Q16 = 0 => nenhum alerta', () {
       final alert = getDvrsSafetyAlert(0);
       expect(alert.level, DvrsSafetyAlertLevel.none);
-      expect(alert.message, isNull);
     });
     test('Q16 = 1 => nenhum alerta', () {
       expect(getDvrsSafetyAlert(1).level, DvrsSafetyAlertLevel.none);
@@ -136,66 +135,49 @@ void main() {
     test('Q16 = 2 => atenção', () {
       final alert = getDvrsSafetyAlert(2);
       expect(alert.level, DvrsSafetyAlertLevel.attention);
-      expect(alert.message, isNotNull);
-      expect(alert.message, contains('avaliação oftalmológica'));
     });
     test('Q16 = 3 => avaliação médica', () {
       final alert = getDvrsSafetyAlert(3);
       expect(alert.level, DvrsSafetyAlertLevel.medicalEvaluation);
-      expect(alert.message, contains('não confirma diagnóstico'));
     });
     test('Q16 = 4 => avaliação prioritária', () {
       final alert = getDvrsSafetyAlert(4);
       expect(alert.level, DvrsSafetyAlertLevel.priorityEvaluation);
-      expect(alert.message, contains('prioridade'));
-    });
-  });
-
-  group('getDvrsEducationalMessage', () {
-    test('retorna mensagem não-vazia e não-diagnóstica para cada faixa', () {
-      const proibidos = [
-        'diagnóstico de olho seco',
-        'você tem olho seco',
-        'resultado clínico',
-      ];
-      for (final c in DvrsClassification.values) {
-        final msg = getDvrsEducationalMessage(c).toLowerCase();
-        expect(msg, isNotEmpty);
-        for (final termo in proibidos) {
-          expect(msg.contains(termo), isFalse, reason: 'contém "$termo"');
-        }
-      }
     });
   });
 
   group('evaluateDvrs (resultado completo)', () {
     final now = DateTime(2026, 6, 30, 10);
 
-    test('monta DvrsResult com versão, score, classificação e isDiagnostic false',
-        () {
-      final result = evaluateDvrs(
-        answers: _answers(List<int>.filled(16, 2)),
-        id: 'r1',
-        now: now,
-      );
-      expect(result.version, 'DVRS_v1.1');
-      expect(result.totalScore, 50);
-      expect(result.classification, DvrsClassification.moderateRisk);
-      expect(result.classificationLabel, 'Carga relatada moderada');
-      expect(result.isDiagnostic, isFalse);
-      expect(result.educationalMessage, isNotEmpty);
-      expect(result.createdAt, now);
-      expect(result.answers.length, 16);
-    });
+    test(
+      'monta DvrsResult com versão, score, classificação e isDiagnostic false',
+      () {
+        final result = evaluateDvrs(
+          answers: _answers(List<int>.filled(16, 2)),
+          id: 'r1',
+          now: now,
+        );
+        expect(result.version, 'DVRS_v1.1');
+        expect(result.totalScore, 50);
+        expect(result.classification, DvrsClassification.moderateRisk);
+        expect(result.classificationLabel, 'Carga relatada moderada');
+        expect(result.isDiagnostic, isFalse);
+        expect(result.createdAt, now);
+        expect(result.answers.length, 16);
+      },
+    );
 
     test('alerta de segurança vem da Q16 e independe do score total', () {
       // Score baixo (tudo 0) mas Q16 = 4 => alerta prioritário.
       final values = _filled(0)..[15] = 4;
-      final result = evaluateDvrs(answers: _answers(values), id: 'r2', now: now);
+      final result = evaluateDvrs(
+        answers: _answers(values),
+        id: 'r2',
+        now: now,
+      );
       expect(result.totalScore, 5);
       expect(result.classification, DvrsClassification.low);
       expect(result.safetyAlertLevel, DvrsSafetyAlertLevel.priorityEvaluation);
-      expect(result.safetyAlertMessage, isNotNull);
     });
 
     test('exige exatamente 16 respostas', () {

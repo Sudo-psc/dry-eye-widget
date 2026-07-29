@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>Lembrete gentil da regra 20-20-20 para fadiga visual digital e olho seco.</em><br>
-  <strong>Versão 1.25.2</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Versão 1.26.0</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@ A intervenção de primeira linha recomendada é a **regra 20-20-20**. A barreir
 
 ---
 
-## Recursos (1.23)
+## Recursos (1.26.0)
 
 - **Widget flutuante** com anel de progresso, always-on-top, bandeja do sistema  
 - **Ciclos e aparência** configuráveis (intervalo, cores, opacidade, vidro)  
@@ -72,7 +72,7 @@ A intervenção de primeira linha recomendada é a **regra 20-20-20**. A barreir
 - **Pausa guiada** (overlay ou modo suave no canto)  
 - **Lembrete de piscada** (visual e/ou som; frequência ajustável)  
 - **Modo reunião** — alonga o ciclo por 1 hora  
-- **DVRS** — Índice de Risco Visual Digital (triagem educativa 16 perguntas, **não é diagnóstico**)  
+- **DVRS** — autorregistro educativo de sintomas e hábitos em 16 perguntas (**não é diagnóstico**)
 - **Resumo do dia** e insights locais  
 - **Relatório em PDF** para levar ao oftalmologista (gerado localmente)  
 - **Tempo de tela** e atividade (opt-in)  
@@ -122,7 +122,7 @@ Todas as versões: **[Releases](https://github.com/Sudo-psc/dry-eye-widget/relea
   <img src="site/assets/shots/day-summary.webp" alt="Resumo diário com pausas, sequência, adesão e acesso ao DVRS no macOS" width="405">
 </p>
 
-<p align="center"><sub>Interface atual v1.24 · widget, ações rápidas, menu e resumo diário · <a href="https://olhossecos.com.br/app/#capturas">ver todas as capturas macOS e Windows</a></sub></p>
+<p align="center"><sub>Interface atual v1.26.0 · widget, ações rápidas, menu e resumo diário · <a href="https://olhossecos.com.br/app/#capturas">ver todas as capturas macOS e Windows</a></sub></p>
 
 ---
 

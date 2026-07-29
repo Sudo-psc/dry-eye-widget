@@ -1,3 +1,4 @@
+import '../l10n/feature_strings.dart';
 import '../models/break_stats_data.dart';
 import '../models/dvrs_assessment.dart';
 import '../models/environment_checklist.dart';
@@ -90,7 +91,8 @@ class ReportBuilder {
         daysWithData++;
         if (peak == null || point.seconds > peak.seconds) peak = point;
       }
-      final isWeekend = point.day.weekday == DateTime.saturday ||
+      final isWeekend =
+          point.day.weekday == DateTime.saturday ||
           point.day.weekday == DateTime.sunday;
       if (isWeekend) {
         weekendTotal += point.seconds;
@@ -106,8 +108,12 @@ class ReportBuilder {
       totalSeconds: total,
       averageDailySeconds: daysWithData > 0 ? total ~/ daysWithData : 0,
       daysWithData: daysWithData,
-      weekdayAverageSeconds: weekdayCount > 0 ? weekdayTotal ~/ weekdayCount : 0,
-      weekendAverageSeconds: weekendCount > 0 ? weekendTotal ~/ weekendCount : 0,
+      weekdayAverageSeconds: weekdayCount > 0
+          ? weekdayTotal ~/ weekdayCount
+          : 0,
+      weekendAverageSeconds: weekendCount > 0
+          ? weekendTotal ~/ weekendCount
+          : 0,
       peakDay: peak,
     );
   }
@@ -142,27 +148,11 @@ class ReportBuilder {
     final latest = dvrs?.latest;
 
     if (latest != null) {
-      if (latest.classification == DvrsClassification.highRisk ||
-          latest.classification == DvrsClassification.veryHighRisk) {
-        alerts.add(
-          'DVRS em faixa elevada (${latest.totalScore}/100 — '
-          '${latest.classificationLabel}) na avaliação mais recente.',
-        );
-      }
-      if (latest.safetyAlertLevel != DvrsSafetyAlertLevel.none &&
-          latest.safetyAlertMessage != null) {
-        alerts.add(latest.safetyAlertMessage!);
-      }
-      // Piora relevante do score desde a avaliação anterior.
-      if (dvrs!.history.length >= 2) {
-        final previous = dvrs.history[dvrs.history.length - 2];
-        final delta = latest.totalScore - previous.totalScore;
-        if (delta >= 15) {
-          alerts.add(
-            'Piora relevante do DVRS (+$delta pontos) em relação à avaliação '
-            'anterior.',
-          );
-        }
+      final safetyMessage = FeatureStrings.of(
+        'pt',
+      ).dvrsSafetyMessage(latest.safetyAlertLevel);
+      if (safetyMessage != null) {
+        alerts.add(safetyMessage);
       }
     }
 
@@ -184,23 +174,20 @@ class ReportBuilder {
   }) {
     final latest = dvrs?.latest;
 
-    final highDvrs = latest != null &&
-        (latest.classification == DvrsClassification.highRisk ||
-            latest.classification == DvrsClassification.veryHighRisk);
-    final safetyEvaluation = latest != null &&
+    final safetyEvaluation =
+        latest != null &&
         (latest.safetyAlertLevel == DvrsSafetyAlertLevel.medicalEvaluation ||
             latest.safetyAlertLevel == DvrsSafetyAlertLevel.priorityEvaluation);
-    final moderateDvrs =
-        latest != null && latest.classification == DvrsClassification.moderateRisk;
 
     final highScreen = screen.averageDailySeconds >= highScreenTimeSeconds;
-    final lowAdherence = breaks.adherenceRate != null &&
+    final lowAdherence =
+        breaks.adherenceRate != null &&
         breaks.adherenceRate! < lowAdherenceThreshold;
 
-    if (highDvrs || safetyEvaluation) {
+    if (safetyEvaluation) {
       return OverallIndication.seekEvaluation;
     }
-    if (moderateDvrs || lowAdherence || highScreen) {
+    if (lowAdherence || highScreen) {
       return OverallIndication.reinforceBreaks;
     }
     return OverallIndication.monitor;

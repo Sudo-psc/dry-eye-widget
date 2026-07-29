@@ -675,11 +675,8 @@ class AppStrings {
       .replaceAll('{c}', '$completed')
       .replaceAll('{r}', '$reminders');
 
-  String daySummaryDvrsLastText(int score, String label, int days) =>
-      daySummaryDvrsLast
-          .replaceAll('{score}', '$score')
-          .replaceAll('{label}', label)
-          .replaceAll('{n}', '$days');
+  String daySummaryDvrsLastText(int days) =>
+      daySummaryDvrsLast.replaceAll('{n}', '$days');
 
   String reportsPdfSavedText(String path) =>
       reportsPdfSaved.replaceAll('{path}', path);
@@ -716,7 +713,7 @@ const AppStrings ptStrings = AppStrings(
   daySummaryDvrsLabel: 'DVRS',
   daySummaryDvrsNever:
       'Ainda não há registro. O DVRS é educativo e leva poucos minutos.',
-  daySummaryDvrsLast: 'Último registro · {label} · há {n} dias',
+  daySummaryDvrsLast: 'Último registro educativo · há {n} dias',
   daySummaryNudgeTitle: 'Hora de reavaliar',
   daySummaryNudgeBodyNever:
       'Depois de algumas pausas, use o DVRS para registrar sintomas e hábitos relacionados às telas.',
@@ -779,7 +776,7 @@ const AppStrings ptStrings = AppStrings(
   reportsPreview: 'Prévia do relatório',
   dashboardScreenToday: 'Tela hoje',
   dvrsHistoryDelete: 'Excluir resultado',
-  dvrsHistoryEvolution: 'Evolução do score',
+  dvrsHistoryEvolution: 'Evolução por domínio',
   notifyDoneBodyToday: 'Hoje: {c}/{r} pausas. Lágrimas renovadas!',
   blinkReminderFrequency: 'Frequência do lembrete de piscada',
   blinkReminderFrequencyHint:
@@ -1111,7 +1108,7 @@ const AppStrings enStrings = AppStrings(
   daySummaryDvrsLabel: 'DVRS',
   daySummaryDvrsNever:
       'No entry yet. DVRS is educational and takes a few minutes.',
-  daySummaryDvrsLast: 'Last entry · {label} · {n} days ago',
+  daySummaryDvrsLast: 'Last educational entry · {n} days ago',
   daySummaryNudgeTitle: 'Time to recheck',
   daySummaryNudgeBodyNever:
       'After a few breaks, use DVRS to log screen-related symptoms and habits.',
@@ -1174,7 +1171,7 @@ const AppStrings enStrings = AppStrings(
   reportsPreview: 'Report preview',
   dashboardScreenToday: 'Screen today',
   dvrsHistoryDelete: 'Delete result',
-  dvrsHistoryEvolution: 'Score trend',
+  dvrsHistoryEvolution: 'Domain trends',
   notifyDoneBodyToday: 'Today: {c}/{r} breaks. Tears refreshed!',
   blinkReminderFrequency: 'Blink reminder frequency',
   blinkReminderFrequencyHint:

@@ -4,9 +4,8 @@ import '../../models/dvrs_assessment.dart';
 
 /// Helpers visuais compartilhados pelos widgets do DVRS.
 ///
-/// Centraliza a tradução de [DvrsClassification], [DvrsSafetyAlertLevel] e
-/// [DvrsTrend] em rótulo + ícone + cor — a cor NUNCA é o único indicador
-/// (sempre acompanhada de texto e ícone). Linguagem sempre de triagem.
+/// Centraliza cores, ícones e banners; a cor nunca é o único indicador
+/// (sempre acompanhada de texto e ícone). Linguagem sempre educativa.
 class DvrsUi {
   const DvrsUi._();
 
@@ -103,12 +102,16 @@ class DvrsUi {
 
   /// Banner do alerta de segurança (destaque visual sem tom alarmista).
   /// Devolve `null` quando não há alerta.
-  static Widget? safetyBanner(DvrsSafetyAlertLevel level, String? message) {
+  static Widget? safetyBanner(
+    DvrsSafetyAlertLevel level,
+    String? message, {
+    required String semanticLabel,
+  }) {
     if (level == DvrsSafetyAlertLevel.none || message == null) return null;
     final color = safetyColor(level);
     final priority = level == DvrsSafetyAlertLevel.priorityEvaluation;
     return Semantics(
-      label: 'Alerta de segurança',
+      label: semanticLabel,
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -139,41 +142,6 @@ class DvrsUi {
         ),
       ),
     );
-  }
-
-  // --- Tendência ----------------------------------------------------------
-
-  static String trendLabel(DvrsTrend trend) {
-    switch (trend) {
-      case DvrsTrend.improving:
-        return 'Em melhora';
-      case DvrsTrend.stable:
-        return 'Estável';
-      case DvrsTrend.worsening:
-        return 'Em piora';
-    }
-  }
-
-  static IconData trendIcon(DvrsTrend trend) {
-    switch (trend) {
-      case DvrsTrend.improving:
-        return Icons.trending_down; // menos pontos = melhora
-      case DvrsTrend.stable:
-        return Icons.trending_flat;
-      case DvrsTrend.worsening:
-        return Icons.trending_up;
-    }
-  }
-
-  static Color trendColor(DvrsTrend trend) {
-    switch (trend) {
-      case DvrsTrend.improving:
-        return Colors.green;
-      case DvrsTrend.stable:
-        return Colors.blueGrey;
-      case DvrsTrend.worsening:
-        return Colors.orange;
-    }
   }
 
   /// Ícone de cada domínio do DVRS.
@@ -214,24 +182,24 @@ class DvrsUi {
       'avaliação oftalmológica.';
 
   static Widget disclaimerBanner(ThemeData theme, {String? text}) => Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.errorContainer.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(12),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: theme.colorScheme.errorContainer.withValues(alpha: 0.5),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        Icon(Icons.info_outline, color: theme.colorScheme.error),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text ?? disclaimer,
+            style: TextStyle(fontSize: 12, color: theme.colorScheme.error),
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(Icons.info_outline, color: theme.colorScheme.error),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                text ?? disclaimer,
-                style: TextStyle(fontSize: 12, color: theme.colorScheme.error),
-              ),
-            ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 
   static String formatDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/'
@@ -239,7 +207,6 @@ class DvrsUi {
 
   /// Cores das 5 faixas de classificação em ordem (0–19 … 80–100).
   static List<Color> get classificationSegments => [
-        for (final c in DvrsClassification.values) classificationColor(c),
-      ];
-
+    for (final c in DvrsClassification.values) classificationColor(c),
+  ];
 }

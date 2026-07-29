@@ -95,13 +95,16 @@ class _DvrsScreenState extends State<DvrsScreen> {
 
   void _calculate() {
     if (!_allAnswered) return;
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     final answers = <DvrsAnswer>[
       for (final q in kDvrsQuestions)
         DvrsAnswer(
           questionId: q.id,
           domain: q.domain,
           value: q.options[_selected[q.id]!].score,
-          label: q.options[_selected[q.id]!].label,
+          label: f.dvrsOptionLabel(q.id, _selected[q.id]!),
         ),
     ];
     final now = DateTime.now();
@@ -238,11 +241,14 @@ class _DvrsScreenState extends State<DvrsScreen> {
   }
 
   String get _headerTitle {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     switch (_view) {
       case _DvrsView.history:
-        return 'Histórico do DVRS';
+        return f.dvrsHistoryTitle;
       default:
-        return 'Registro visual digital — DVRS';
+        return f.dvrsHeaderTitle;
     }
   }
 
@@ -276,72 +282,77 @@ class _DvrsScreenState extends State<DvrsScreen> {
 
   // --- Intro --------------------------------------------------------------
 
-  Widget _introView(ThemeData theme) => ListView(
-    padding: const EdgeInsets.all(24),
-    children: [
-      const Text(
-        'Registro educativo de sintomas e hábitos',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        'Autorregistro educativo, não validado para diagnóstico ou decisões '
-        'corporativas · período '
-        'avaliado: $kDvrsPeriodLabel',
-        style: TextStyle(
-          fontSize: 13,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+  Widget _introView(ThemeData theme) {
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        Text(
+          f.dvrsIntroTitle,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-      ),
-      const SizedBox(height: 16),
-      Text(
-        kDvrsIntroDescription,
-        style: const TextStyle(fontSize: 14, height: 1.4),
-      ),
-      const SizedBox(height: 16),
-      DvrsUi.disclaimerBanner(theme, text: kDvrsIntroDisclaimer),
-      if (_selected.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        Text(
+          f.dvrsIntroMeta,
+          style: TextStyle(
+            fontSize: 13,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          f.dvrsIntroDescription,
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
+        const SizedBox(height: 16),
+        DvrsUi.disclaimerBanner(theme, text: f.dvrsIntroDisclaimer),
+        if (_selected.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          _draftBanner(theme),
+        ],
         const SizedBox(height: 12),
-        _draftBanner(theme),
+        Text(
+          '${f.dvrsVersionLabel}: ${DvrsResult.dvrsVersion}',
+          style: TextStyle(
+            fontSize: 12,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 52,
+          child: FilledButton.icon(
+            onPressed: _start,
+            icon: const Icon(Icons.play_arrow),
+            label: Text(context.read<SettingsProvider>().strings.dvrsStart),
+            style: FilledButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 46,
+          child: OutlinedButton.icon(
+            onPressed: () => setState(() => _view = _DvrsView.history),
+            icon: const Icon(Icons.history, size: 18),
+            label: Text(
+              context.read<SettingsProvider>().strings.dvrsViewHistory,
+            ),
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
       ],
-      const SizedBox(height: 12),
-      Text(
-        '${FeatureStrings.of(context.read<SettingsProvider>().value.languageCode).dvrsVersionLabel}: ${DvrsResult.dvrsVersion}',
-        style: TextStyle(
-          fontSize: 12,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
-        ),
-      ),
-      const SizedBox(height: 16),
-      SizedBox(
-        height: 52,
-        child: FilledButton.icon(
-          onPressed: _start,
-          icon: const Icon(Icons.play_arrow),
-          label: Text(context.read<SettingsProvider>().strings.dvrsStart),
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 12),
-      SizedBox(
-        height: 46,
-        child: OutlinedButton.icon(
-          onPressed: () => setState(() => _view = _DvrsView.history),
-          icon: const Icon(Icons.history, size: 18),
-          label: Text(context.read<SettingsProvider>().strings.dvrsViewHistory),
-          style: OutlinedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
+    );
+  }
 
   Widget _draftBanner(ThemeData theme) {
     final f = FeatureStrings.of(
@@ -390,6 +401,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
   Widget _questionsView(ThemeData theme) {
     final total = kDvrsQuestions.length;
     final answered = _answeredCount;
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     return Column(
       children: [
         Padding(
@@ -398,7 +412,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '$answered de $total respondidas',
+                f.dvrsAnsweredProgress(answered, total),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -406,13 +420,17 @@ class _DvrsScreenState extends State<DvrsScreen> {
                 ),
               ),
               const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: answered / total,
-                  minHeight: 6,
-                  backgroundColor: theme.colorScheme.onSurface.withValues(
-                    alpha: 0.08,
+              Semantics(
+                label: f.dvrsProgressSemantics(answered, total),
+                value: '${(answered / total * 100).round()}%',
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: answered / total,
+                    minHeight: 6,
+                    backgroundColor: theme.colorScheme.onSurface.withValues(
+                      alpha: 0.08,
+                    ),
                   ),
                 ),
               ),
@@ -431,9 +449,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Text(
-                  'Responda as 16 perguntas abaixo na mesma página. Role a '
-                  'lista e calcule o resultado quando todas estiverem '
-                  'marcadas.',
+                  f.dvrsQuestionInstructions,
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
@@ -466,6 +482,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
 
   Widget _domainHeader(ThemeData theme, DvrsDomain domain) {
     final color = DvrsUi.domainColor(domain);
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     return Semantics(
       header: true,
       child: Row(
@@ -474,7 +493,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              kDvrsDomainLabels[domain] ?? '',
+              f.dvrsDomainLabel(domain.id),
               style: TextStyle(
                 color: theme.colorScheme.onSurface,
                 fontSize: 15,
@@ -490,6 +509,9 @@ class _DvrsScreenState extends State<DvrsScreen> {
   Widget _questionCard(ThemeData theme, DvrsQuestion q, int questionNumber) {
     final selected = _selected[q.id];
     final domainColor = DvrsUi.domainColor(q.domain);
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     return Container(
       key: _questionKeys[q.id],
       child: Container(
@@ -511,7 +533,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Pergunta $questionNumber',
+                  f.dvrsQuestionNumber(questionNumber),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -537,7 +559,7 @@ class _DvrsScreenState extends State<DvrsScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        kDvrsDomainLabels[q.domain] ?? '',
+                        f.dvrsDomainLabel(q.domain.id),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -551,17 +573,26 @@ class _DvrsScreenState extends State<DvrsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              q.title,
+              f.dvrsQuestionTitle(q.id),
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(q.text, style: const TextStyle(fontSize: 14, height: 1.4)),
+            Text(
+              f.dvrsQuestionPrompt(q.id),
+              style: const TextStyle(fontSize: 14, height: 1.4),
+            ),
             const SizedBox(height: 20),
             for (var i = 0; i < q.options.length; i++) ...[
-              _optionTile(theme, q.options[i].label, selected == i, () {
-                setState(() => _selected[q.id] = i);
-                unawaited(_persistDraft());
-              }),
+              _optionTile(
+                theme,
+                f.dvrsOptionLabel(q.id, i),
+                questionNumber,
+                selected == i,
+                () {
+                  setState(() => _selected[q.id] = i);
+                  unawaited(_persistDraft());
+                },
+              ),
               if (i < q.options.length - 1) const SizedBox(height: 10),
             ],
           ],
@@ -573,14 +604,18 @@ class _DvrsScreenState extends State<DvrsScreen> {
   Widget _optionTile(
     ThemeData theme,
     String label,
+    int questionNumber,
     bool selected,
     VoidCallback onTap,
   ) {
     final color = theme.colorScheme.primary;
+    final f = FeatureStrings.of(
+      context.read<SettingsProvider>().value.languageCode,
+    );
     return Semantics(
       button: true,
       selected: selected,
-      label: label,
+      label: f.dvrsOptionSemantics(questionNumber, label),
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
