@@ -341,11 +341,45 @@ class _FloatingMenuState extends State<FloatingMenu> {
           borderRadius: AppRadii.lg,
           padding: const EdgeInsets.symmetric(vertical: AppSpace.x2),
           child: AnimatedSwitcher(
-            duration: reduceMotion ? Duration.zero : AppMotion.normal,
-            switchInCurve: AppMotion.standard,
-            switchOutCurve: AppMotion.standard,
+            duration: reduceMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 180),
+            reverseDuration: reduceMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 150),
+            switchInCurve: Curves.linear,
+            switchOutCurve: Curves.linear,
+            layoutBuilder: (currentChild, previousChildren) => Stack(
+              alignment: Alignment.topCenter,
+              children: <Widget>[...previousChildren, ?currentChild],
+            ),
+            transitionBuilder: (child, animation) {
+              final pageName = (child.key! as ValueKey<String>).value;
+              final fade = CurvedAnimation(
+                parent: animation,
+                curve: const Interval(0.55, 1, curve: AppMotion.standard),
+                reverseCurve: const Interval(
+                  0.55,
+                  1,
+                  curve: AppMotion.standard,
+                ),
+              );
+              final scale = CurvedAnimation(
+                parent: animation,
+                curve: AppMotion.standard,
+                reverseCurve: AppMotion.standard,
+              );
+              return FadeTransition(
+                key: ValueKey('floating-menu-transition-$pageName'),
+                opacity: fade,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.992, end: 1).animate(scale),
+                  child: child,
+                ),
+              );
+            },
             child: SingleChildScrollView(
-              key: ValueKey(_page),
+              key: ValueKey(_page.name),
               primary: false,
               child: Column(mainAxisSize: MainAxisSize.min, children: children),
             ),

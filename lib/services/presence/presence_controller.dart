@@ -3,7 +3,7 @@ import 'adaptive_threshold_model.dart';
 import 'presence_store.dart';
 
 /// Decide presença/ausência combinando o limiar adaptativo (input) com um
-/// sensor de câmera opcional, e alimenta o modelo nos eventos de retomada.
+/// sensor de câmera opcional.
 class PresenceController {
   PresenceController({
     required this.model,
@@ -61,8 +61,10 @@ class PresenceController {
     return Presence.absent;
   }
 
-  /// Chamado quando o input retoma após um período ocioso. O gap anterior é
-  /// tratado como "presença parada" e alimenta o modelo.
+  /// Registra uma retomada manual durante o período ocioso.
+  ///
+  /// Esse é um sinal explícito de que a pessoa continuava presente. A retomada
+  /// normal do input após uma ausência real não deve chamar este método.
   void onResume({required double previousIdleSeconds, required DateTime now}) {
     model.observePresentGap(now.hour, previousIdleSeconds);
     _lastObservedGap = previousIdleSeconds.round();
@@ -72,7 +74,14 @@ class PresenceController {
   /// Carrega o estado persistido (se houver) para dentro do modelo.
   Future<void> hydrate() async {
     final saved = await store?.load();
-    if (saved != null) model.loadFrom(saved);
+    if (saved == null) return;
+    final savedVersion = (saved['v'] as num?)?.toInt() ?? 1;
+    if (savedVersion < AdaptiveThresholdModel.stateVersion) {
+      await reset();
+      return;
+    }
+    if (savedVersion > AdaptiveThresholdModel.stateVersion) return;
+    model.loadFrom(saved);
   }
 
   /// Apaga todo o aprendizado, em memória e no armazenamento.

@@ -98,40 +98,37 @@ void main() {
       },
     );
 
-    test(
-      'sem tela cheia e notificacoes desligadas, nao notifica a pausa',
-      () {
-        fakeAsync((async) {
-          final storage = _MemoryStorage(
-            WidgetSettings.defaults().copyWith(
-              soundEnabled: false,
-              notificationsEnabled: false,
-              pauseOnInactivity: false,
-            ),
-          );
-          final settings = SettingsProvider(storage: storage);
-          final notifications = _FakeNotificationService()..enabled = false;
-          final timer = TimerProvider(
-            settings: settings,
-            storage: storage,
-            audio: _FakeAudioService(),
-            notifications: notifications,
-            presence: PresenceController(
-              model: AdaptiveThresholdModel(),
-              idleSource: _FakeIdleService().idleSeconds,
-            ),
-            fullscreen: _FakeFullscreen(false),
-          );
-          addTearDown(timer.dispose);
-          timer.start();
+    test('sem tela cheia e notificacoes desligadas, nao notifica a pausa', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(
+            soundEnabled: false,
+            notificationsEnabled: false,
+            pauseOnInactivity: false,
+          ),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final notifications = _FakeNotificationService()..enabled = false;
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: notifications,
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: _FakeIdleService().idleSeconds,
+          ),
+          fullscreen: _FakeFullscreen(false),
+        );
+        addTearDown(timer.dispose);
+        timer.start();
 
-          async.elapse(Duration(seconds: timer.cycleSeconds + 1));
-          async.flushMicrotasks();
+        async.elapse(Duration(seconds: timer.cycleSeconds + 1));
+        async.flushMicrotasks();
 
-          expect(notifications.showCount, 0);
-        });
-      },
-    );
+        expect(notifications.showCount, 0);
+      });
+    });
 
     test(
       'pausa o ciclo apos inatividade do sistema e retoma com a atividade',
@@ -178,6 +175,76 @@ void main() {
         });
       },
     );
+
+    test('retorno após ausência não aumenta o limiar adaptativo', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(0);
+        final presence = PresenceController(
+          model: AdaptiveThresholdModel(minObservations: 1),
+          idleSource: idle.idleSeconds,
+        );
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          presence: presence,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        for (var i = 0; i < 3; i++) {
+          idle.value = (AppDefaults.inactivitySeconds + 20).toDouble();
+          async.elapse(const Duration(seconds: 3));
+          expect(timer.inactivityAlert, isTrue);
+
+          idle.value = 0;
+          async.elapse(const Duration(seconds: 3));
+          expect(timer.inactivityAlert, isFalse);
+        }
+
+        expect(presence.thresholdAt(DateTime.now()), 120);
+        expect(presence.lastObservedGap, isNull);
+      });
+    });
+
+    test('retomada manual ensina presença parada ao modelo', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(pauseOnInactivity: true),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final idle = _MutableIdleService(
+          (AppDefaults.inactivitySeconds + 20).toDouble(),
+        );
+        final presence = PresenceController(
+          model: AdaptiveThresholdModel(minObservations: 1),
+          idleSource: idle.idleSeconds,
+        );
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          presence: presence,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
+
+        async.elapse(const Duration(seconds: 3));
+        expect(timer.inactivityAlert, isTrue);
+
+        timer.resumeFromInactivity();
+
+        expect(timer.inactivityAlert, isFalse);
+        expect(presence.lastObservedGap, greaterThan(120));
+        expect(presence.thresholdAt(DateTime.now()), greaterThan(120));
+      });
+    });
 
     test('com pauseOnInactivity desligado, a inatividade nao pausa', () {
       fakeAsync((async) {
@@ -244,46 +311,43 @@ void main() {
       });
     });
 
-    test(
-      'coleta tempo de tela quando ativo e descarta a inatividade',
-      () {
-        fakeAsync((async) {
-          final storage = _MemoryStorage(
-            WidgetSettings.defaults().copyWith(
-              pauseOnInactivity: true,
-              screenTimeTracking: true,
-            ),
-          );
-          final settings = SettingsProvider(storage: storage);
-          final screenTime = ScreenTimeService(storage: storage);
-          final idle = _MutableIdleService(0);
-          final timer = TimerProvider(
-            settings: settings,
-            storage: storage,
-            audio: _FakeAudioService(),
-            notifications: _FakeNotificationService(),
-            presence: PresenceController(
-              model: AdaptiveThresholdModel(),
-              idleSource: idle.idleSeconds,
-            ),
-            screenTime: screenTime,
-          );
-          addTearDown(timer.dispose);
-          timer.start();
+    test('coleta tempo de tela quando ativo e descarta a inatividade', () {
+      fakeAsync((async) {
+        final storage = _MemoryStorage(
+          WidgetSettings.defaults().copyWith(
+            pauseOnInactivity: true,
+            screenTimeTracking: true,
+          ),
+        );
+        final settings = SettingsProvider(storage: storage);
+        final screenTime = ScreenTimeService(storage: storage);
+        final idle = _MutableIdleService(0);
+        final timer = TimerProvider(
+          settings: settings,
+          storage: storage,
+          audio: _FakeAudioService(),
+          notifications: _FakeNotificationService(),
+          presence: PresenceController(
+            model: AdaptiveThresholdModel(),
+            idleSource: idle.idleSeconds,
+          ),
+          screenTime: screenTime,
+        );
+        addTearDown(timer.dispose);
+        timer.start();
 
-          // Ativo: o tempo de tela acumula.
-          async.elapse(const Duration(seconds: 5));
-          final active = screenTime.data.secondsForDay(DateTime.now());
-          expect(active, greaterThan(0));
+        // Ativo: o tempo de tela acumula.
+        async.elapse(const Duration(seconds: 5));
+        final active = screenTime.data.secondsForDay(DateTime.now());
+        expect(active, greaterThan(0));
 
-          // Inativo acima do limiar: a coleta praticamente para.
-          idle.value = (AppDefaults.inactivitySeconds + 10).toDouble();
-          async.elapse(const Duration(seconds: 10));
-          final afterIdle = screenTime.data.secondsForDay(DateTime.now());
-          expect(afterIdle, lessThan(active + 10));
-        });
-      },
-    );
+        // Inativo acima do limiar: a coleta praticamente para.
+        idle.value = (AppDefaults.inactivitySeconds + 10).toDouble();
+        async.elapse(const Duration(seconds: 10));
+        final afterIdle = screenTime.data.secondsForDay(DateTime.now());
+        expect(afterIdle, lessThan(active + 10));
+      });
+    });
 
     test('com a coleta desligada, o tempo de tela nao acumula', () {
       fakeAsync((async) {

@@ -2,6 +2,19 @@
 
 ## now
 
+- [x] 2026-07-29: corrigir a regressão da pausa automática por inatividade.
+- [x] 2026-07-29: migrar o aprendizado adaptativo contaminado da 1.26.0.
+- [x] 2026-07-29: substituir a transição vertical do menu por fade-through.
+- [x] 2026-07-29: sincronizar app, MSIX, landing e documentação em 1.26.1.
+- [x] 2026-07-29: passar 361 testes, análise, smoke, metadata e pipeline.
+- [x] 2026-07-29: gerar e verificar app macOS universal e DMG 1.26.1.
+- [ ] Commitar e enviar a correção sem incluir o vídeo não rastreado.
+- [ ] Criar e enviar a tag anotada `v1.26.1`.
+- [ ] Aguardar builds macOS, Windows e MSIX e o fan-in read-only.
+- [ ] Revisar quatro binários e três manifestos do bundle validado.
+- [ ] Obter aprovação exata `tag+commit+digest` e publicar manualmente.
+- [ ] Reconciliar GitHub Release, artefatos, Pages e registrar hashes remotos.
+
 - [x] 2026-07-29: sincronizar app, MSIX, landing e documentação em 1.26.0.
 - [x] 2026-07-29: corrigir claims DVRS, restauração multimonitor, PDF e landing.
 - [x] 2026-07-29: passar análise, 356 testes, smoke, metadados, build e DMG.

@@ -155,6 +155,79 @@ void main() {
     );
   });
 
+  testWidgets('subpágina usa fade-through curto ancorado no topo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final f = FeatureStrings.of('pt');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Align(
+          alignment: Alignment.topLeft,
+          child: FloatingMenu(
+            strings: ptStrings,
+            healthHubLabel: f.menuHealthHub,
+            myDataLabel: f.menuMyData,
+            isPaused: false,
+            onStartNow: () {},
+            onReset: () {},
+            onTogglePause: () {},
+            onExtendCycle: () {},
+            onGuidance: () {},
+            onHealthHub: () {},
+            onMyData: () {},
+            onCheckUpdates: () {},
+            onAbout: () {},
+            onSettings: () {},
+            onQuit: () {},
+            onDismiss: () {},
+          ),
+        ),
+      ),
+    );
+
+    final switcher = tester.widget<AnimatedSwitcher>(
+      find.byType(AnimatedSwitcher),
+    );
+    expect(switcher.duration, const Duration(milliseconds: 180));
+
+    await tester.tap(find.text(ptStrings.menuGroupSystem));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 90));
+
+    expect(find.byType(ScaleTransition), findsWidgets);
+    final stack = tester.widget<Stack>(
+      find.descendant(
+        of: find.byType(AnimatedSwitcher),
+        matching: find.byType(Stack),
+      ),
+    );
+    expect(stack.alignment, Alignment.topCenter);
+    final pageTransitions = <FadeTransition>[
+      tester.widget(
+        find.byKey(const ValueKey('floating-menu-transition-main')),
+      ),
+      tester.widget(
+        find.byKey(const ValueKey('floating-menu-transition-system')),
+      ),
+    ];
+    expect(
+      pageTransitions
+          .where((transition) => transition.opacity.value > 0.1)
+          .length,
+      lessThanOrEqualTo(1),
+      reason: pageTransitions
+          .map((transition) => transition.opacity.value.toStringAsFixed(3))
+          .join(', '),
+    );
+
+    await tester.pumpAndSettle();
+    expect(find.text(ptStrings.menuQuit), findsOneWidget);
+  });
+
   testWidgets('rótulos rápidos não causam overflow com escala de 160%', (
     tester,
   ) async {

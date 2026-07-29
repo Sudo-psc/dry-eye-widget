@@ -6,6 +6,23 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.26.1] - 2026-07-29
+
+### Corrigido
+- A pausa automática por inatividade não aprende mais períodos de ausência real
+  como se fossem presença parada. O estado adaptativo antigo é descartado uma
+  vez, restaurando o limiar esperado para instalações afetadas pela 1.26.0.
+- A retomada manual continua alimentando o aprendizado adaptativo, enquanto a
+  volta normal do mouse ou teclado apenas retoma o ciclo.
+- As páginas internas do menu usam um fade-through curto, ancorado no topo e
+  sem conteúdo legível sobreposto, eliminando o salto vertical anterior. A
+  preferência de reduzir movimento continua eliminando a animação.
+
+### Testado
+- Repetições de ausência e retorno não elevam o limiar adaptativo.
+- Migração do estado de presença v1, retomada manual e transições do menu com e
+  sem reduzir movimento.
+
 ## [1.26.0] - 2026-07-29
 
 ### Melhorado

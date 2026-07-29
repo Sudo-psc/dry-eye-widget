@@ -8,6 +8,8 @@ import 'dart:math' as math;
 /// de percentil é O(1) por evento, determinística e interpretável; o estado
 /// total são contagens inteiras (agregado, sem eventos brutos nem timestamps).
 class AdaptiveThresholdModel {
+  static const int stateVersion = 2;
+
   AdaptiveThresholdModel({
     this.targetPercentile = 0.85,
     this.minThreshold = 60,
@@ -16,9 +18,11 @@ class AdaptiveThresholdModel {
     this.minObservations = 5,
     this.binWidth = 30,
     this.maxLearnableGap = 900,
-  })  : _bins = List.generate(_bucketCount,
-            (_) => List<int>.filled(_binCount(maxThreshold, binWidth), 0)),
-        _counts = List<int>.filled(_bucketCount, 0);
+  }) : _bins = List.generate(
+         _bucketCount,
+         (_) => List<int>.filled(_binCount(maxThreshold, binWidth), 0),
+       ),
+       _counts = List<int>.filled(_bucketCount, 0);
 
   final double targetPercentile;
   final int minThreshold;
@@ -76,17 +80,17 @@ class AdaptiveThresholdModel {
   }
 
   Map<String, dynamic> toMap() => {
-        'v': 1,
-        'binWidth': binWidth,
-        'targetPercentile': targetPercentile,
-        'minThreshold': minThreshold,
-        'maxThreshold': maxThreshold,
-        'coldStartThreshold': coldStartThreshold,
-        'minObservations': minObservations,
-        'maxLearnableGap': maxLearnableGap,
-        'counts': _counts,
-        'bins': _bins,
-      };
+    'v': stateVersion,
+    'binWidth': binWidth,
+    'targetPercentile': targetPercentile,
+    'minThreshold': minThreshold,
+    'maxThreshold': maxThreshold,
+    'coldStartThreshold': coldStartThreshold,
+    'minObservations': minObservations,
+    'maxLearnableGap': maxLearnableGap,
+    'counts': _counts,
+    'bins': _bins,
+  };
 
   /// Carrega contagens agregadas de um mapa para dentro deste modelo,
   /// preservando a configuração atual. Estado corrompido -> reset.

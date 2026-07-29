@@ -300,3 +300,29 @@ Previous work (still current): DVRS single-page questionnaire, compact widget vi
 3. Manually inspect DVRS single-page scroll at narrow widths.
 4. Inspect edge docking + blink micronotification on Windows before next Windows package.
 5. Signing / Gatekeeper / SmartScreen remains the main distribution P0 outside product code.
+# Handoff 1.26.1
+
+Data: 2026-07-29
+
+A candidata local 1.26.1+77 corrige a regressão de inatividade e a transição das
+páginas do menu. O retorno natural após uma ausência não alimenta mais o modelo
+adaptativo; somente a retomada manual e a confirmação opcional por câmera são
+sinais de presença parada. O estado persistido v1 é removido no primeiro
+carregamento para recuperar instalações afetadas pela 1.26.0.
+
+O menu usa fade-through curto, ancorado no topo e compatível com reduzir
+movimento. A captura visual foi revisada e os 361 testes, análise, smoke,
+readiness, testes do pipeline, build macOS universal, assinatura deep/strict e
+DMG passaram.
+
+Artefato local: `dist/DryEyeWidget.dmg`, 29.179.098 bytes, SHA-256
+`0c8cd63af10e5762206e834d761b83ffdf474f21c7db0ae80d1bc97926925682`.
+O arquivo `gemini_generated_video_B3916D35.mp4` não pertence ao patch e deve
+permanecer fora de staging, commit e release.
+
+Próxima ação: revisar o commit, enviar `main` e a tag `v1.26.1`, acompanhar os
+três builds e o fan-in. A publicação da GitHub Release continua bloqueada até
+revisar os sete arquivos do bundle e obter a aprovação exata
+`publish:<tag>@<commit>#<bundle-digest>`.
+
+---

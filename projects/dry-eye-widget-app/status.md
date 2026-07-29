@@ -2,6 +2,30 @@
 
 Updated: 2026-07-29
 
+## Release 1.26.1 — candidata local verificada
+
+A correção 1.26.1+77 restaura a pausa por inatividade sem reaprender ausências
+reais como presença parada. O aprendizado adaptativo agora recebe apenas sinais
+explícitos de presença, e o estado v1 potencialmente contaminado pela 1.26.0 é
+descartado uma vez no carregamento. A retomada natural do mouse ou teclado
+continua removendo a pausa automaticamente.
+
+As páginas do menu passaram a usar fade-through de 180 ms, ancorado no topo,
+com escala sutil e sem dois conteúdos legíveis ao mesmo tempo. Reduzir movimento
+continua zerando a transição. A captura revisada está em
+`/Users/philipecruz/.codex/visualizations/2026/07/29/019fb032-c54f-7122-99d3-d1eeb74bb649/menu-transition-v1.26.1.png`.
+
+Passaram análise estática, 361 testes, smoke da landing, readiness de metadados,
+testes do pipeline, diff-check e build macOS Release universal. O app informa
+1.26.1+77; a assinatura ad hoc deep/strict e o DMG passam nas verificações. O
+DMG local tem 29.179.098 bytes e SHA-256
+`0c8cd63af10e5762206e834d761b83ffdf474f21c7db0ae80d1bc97926925682`.
+
+Estado remoto pendente: commit, push, tag, builds Windows/macOS/MSIX, fan-in,
+revisão do bundle e publicação manual. O vídeo
+`gemini_generated_video_B3916D35.mp4` permanece não rastreado e fora do release.
+Evidência: `runs/2026-07-29-v1.26.1-inactivity-menu-release.md`.
+
 ## Release multiplataforma 1.26.0 — quarta revisão concluída
 
 Metadados estão sincronizados em 1.26.0+76 e MSIX 1.26.0.0. Análise estática,

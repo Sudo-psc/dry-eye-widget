@@ -187,7 +187,8 @@ for file in \
 done
 RELEASE_REPO_ROOT="$metadata_root" \
   bash scripts/check_release_readiness.sh --metadata >/dev/null
-perl -pi -e 's/^## Recursos \(1\.26\.0\)$/## Recursos (1.23)/' \
+CURRENT_RELEASE_VERSION="$version" perl -pi -e \
+  'my $current = $ENV{CURRENT_RELEASE_VERSION}; s/^\Q## Recursos ($current)\E$/## Recursos (1.23)/' \
   "$metadata_root/README.md"
 if RELEASE_REPO_ROOT="$metadata_root" \
   bash scripts/check_release_readiness.sh --metadata >/dev/null 2>&1; then

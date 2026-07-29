@@ -28,8 +28,15 @@ class TimerProvider extends ChangeNotifier {
     required PresenceController presence,
     ScreenTimeService? screenTime,
     FullscreenService? fullscreen,
-  }) : this._(settings, storage, audio, notifications, presence, screenTime,
-            fullscreen ?? FullscreenService());
+  }) : this._(
+         settings,
+         storage,
+         audio,
+         notifications,
+         presence,
+         screenTime,
+         fullscreen ?? FullscreenService(),
+       );
 
   TimerProvider._(
     this._settings,
@@ -179,7 +186,8 @@ class TimerProvider extends ChangeNotifier {
     final pauseOn = _settings.value.pauseOnInactivity;
     // A coleta de tempo de tela também precisa do tempo ocioso para descartar
     // inatividade — então consultamos o idle mesmo com a pausa desligada.
-    final trackScreen = _screenTime != null && _settings.value.screenTimeTracking;
+    final trackScreen =
+        _screenTime != null && _settings.value.screenTimeTracking;
     if (!pauseOn) {
       if (_inactivityPaused || _inactivityAlert) _clearInactivityPause();
       if (!trackScreen) return;
@@ -191,8 +199,6 @@ class TimerProvider extends ChangeNotifier {
         final now = DateTime.now();
         final idle = await _presence.idleSeconds();
         if (_disposed) return;
-        // Preserva o idle anterior para o aprendizado de retomada.
-        final previousIdle = _lastIdleSeconds;
         _lastIdleSeconds = idle;
 
         // Sem pausa por inatividade: só mantemos o idle atualizado para a
@@ -217,8 +223,8 @@ class TimerProvider extends ChangeNotifier {
           notifyListeners();
         } else if (_inactivityPaused &&
             idle <= AppDefaults.inactivityResumeSeconds) {
-          // Input retomado: o gap anterior era presença parada -> aprende.
-          _presence.onResume(previousIdleSeconds: previousIdle, now: now);
+          // Input retomado após ausência real: apenas encerra a pausa. Ensinar
+          // este gap como presença parada elevaria o limiar a cada retorno.
           _clearInactivityPause();
         }
       } finally {
@@ -247,6 +253,10 @@ class TimerProvider extends ChangeNotifier {
   /// atividade real, para o botão não ser anulado no tick seguinte.
   void resumeFromInactivity() {
     if (_inactivityPaused || _inactivityAlert) {
+      _presence.onResume(
+        previousIdleSeconds: _lastIdleSeconds,
+        now: DateTime.now(),
+      );
       _suppressRepauseUntilActive = true;
       _clearInactivityPause();
     }
