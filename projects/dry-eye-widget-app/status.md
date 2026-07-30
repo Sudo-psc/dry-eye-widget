@@ -2,7 +2,7 @@
 
 Updated: 2026-07-29
 
-## Release 1.26.1 — candidata local verificada
+## Release 1.26.1 — publicada em 2026-07-29
 
 A correção 1.26.1+77 restaura a pausa por inatividade sem reaprender ausências
 reais como presença parada. O aprendizado adaptativo agora recebe apenas sinais
@@ -21,10 +21,19 @@ testes do pipeline, diff-check e build macOS Release universal. O app informa
 DMG local tem 29.179.098 bytes e SHA-256
 `0c8cd63af10e5762206e834d761b83ffdf474f21c7db0ae80d1bc97926925682`.
 
-Estado remoto pendente: commit, push, tag, builds Windows/macOS/MSIX, fan-in,
-revisão do bundle e publicação manual. O vídeo
-`gemini_generated_video_B3916D35.mp4` permanece não rastreado e fora do release.
-Evidência: `runs/2026-07-29-v1.26.1-inactivity-menu-release.md`.
+O commit `7bb922086b90d4f15a0a3647feab12eb0a2d7a8d`, a tag anotada
+`v1.26.1` e a GitHub Release pública existem. CI, Pages, macOS, Windows, MSIX e
+fan-in passaram. O bundle com quatro binários e três manifestos foi validado
+contra o digest canônico
+`87c17e22a6f16383f0b10c8e3a20d17be4265dea506137fff7d1807e1c9bdd40`
+antes da aprovação e da publicação manual. Os quatro downloads públicos foram
+baixados novamente e reproduziram os hashes dos manifestos. GitHub Pages serve
+1.26.1; o domínio personalizado responde HTTP 200, mas sua página não expõe o
+marcador de versão usado no gate.
+
+O vídeo `gemini_generated_video_B3916D35.mp4` permanece não rastreado e ficou
+fora do commit, tag e release. Evidência:
+`runs/2026-07-29-v1.26.1-inactivity-menu-release.md`.
 
 ## Release multiplataforma 1.26.0 — quarta revisão concluída
 

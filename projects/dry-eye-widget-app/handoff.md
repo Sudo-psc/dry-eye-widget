@@ -320,9 +320,15 @@ Artefato local: `dist/DryEyeWidget.dmg`, 29.179.098 bytes, SHA-256
 O arquivo `gemini_generated_video_B3916D35.mp4` não pertence ao patch e deve
 permanecer fora de staging, commit e release.
 
-Próxima ação: revisar o commit, enviar `main` e a tag `v1.26.1`, acompanhar os
-três builds e o fan-in. A publicação da GitHub Release continua bloqueada até
-revisar os sete arquivos do bundle e obter a aprovação exata
-`publish:<tag>@<commit>#<bundle-digest>`.
+A release foi publicada a partir do commit
+`7bb922086b90d4f15a0a3647feab12eb0a2d7a8d`. CI, Pages, macOS, Windows, MSIX e
+fan-in passaram. O bundle foi aprovado pela identidade exata
+`publish:v1.26.1@7bb922086b90d4f15a0a3647feab12eb0a2d7a8d#87c17e22a6f16383f0b10c8e3a20d17be4265dea506137fff7d1807e1c9bdd40`.
+Os quatro ativos públicos foram baixados novamente e reconciliados por hash.
+
+Próxima ação de produto: confirmar em uso real que a pausa ocorre após dois
+minutos de inatividade em uma instalação atualizada da 1.26.0 e sentir a
+transição do menu com mouse/trackpad. Isso é QA de hardware, não um bloqueio da
+release publicada.
 
 ---
