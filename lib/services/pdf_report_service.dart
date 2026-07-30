@@ -350,8 +350,8 @@ class PdfReportService {
         pw.SizedBox(height: 8),
         pw.Text(
           'Preenchido em ${_formatDate(latest.createdAt)}. '
-          'Os valores descrevem a carga autorrelatada em cada domínio e não '
-          'constituem escore de risco clínico.',
+          'As respostas abaixo reproduzem o autorrelato registrado em cada '
+          'domínio e não constituem escore ou classificação de risco.',
           style: _mutedStyle,
         ),
         pw.SizedBox(height: 6),
@@ -365,18 +365,25 @@ class PdfReportService {
           cellStyle: _textStyle,
           headerStyle: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),
           headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey50),
-          headers: const ['Domínio', 'Carga relatada (0–100)'],
+          headers: const ['Domínio', 'Respostas autorreferidas'],
           data: DvrsDomain.values
               .map(
-                (d) => [
-                  dvrsStrings.dvrsDomainLabel(d.id),
-                  latest.domainScores.valueFor(d).round().toString(),
+                (domain) => [
+                  dvrsStrings.dvrsDomainLabel(domain.id),
+                  latest.answers
+                      .where((answer) => answer.domain == domain)
+                      .map((answer) => answer.label)
+                      .join(' • '),
                 ],
               )
               .toList(),
         ),
         pw.SizedBox(height: 10),
-        pw.Text(dvrsEducationalMessage, style: _textStyle),
+        pw.Text(
+          'Use as respostas por domínio para acompanhar os sintomas, hábitos e '
+          'condições que você relatou ao longo do tempo.',
+          style: _textStyle,
+        ),
         if (dvrsSafetyMessageFor(latest.safetyAlertLevel)
             case final safetyMessage?) ...[
           pw.SizedBox(height: 10),
