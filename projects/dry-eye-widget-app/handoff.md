@@ -300,6 +300,31 @@ Previous work (still current): DVRS single-page questionnaire, compact widget vi
 3. Manually inspect DVRS single-page scroll at narrow widths.
 4. Inspect edge docking + blink micronotification on Windows before next Windows package.
 5. Signing / Gatekeeper / SmartScreen remains the main distribution P0 outside product code.
+# Handoff 1.26.2
+
+Data: 2026-07-30
+
+A candidata 1.26.2+78 está baseada em `origin/main` no commit `f3f575d`. O
+runner Windows pausa o timer de `HWND_TOPMOST` entre `WM_ENTERSIZEMOVE` e
+`WM_EXITSIZEMOVE`, reaplicando o topo uma vez ao final. No Flutter, hover,
+sombra e efeito interno ficam suspensos durante o arraste, e a superfície da
+bolinha usa `RepaintBoundary`.
+
+A sincronização também restaurou a mensagem educativa neutra do DVRS no PDF,
+que era exigida pelo gate de claims mas havia deixado de ser renderizada, e
+corrigiu o smoke da página para caminhos Windows com espaços e CRLF.
+
+Validação local aprovada: teste focado da bolinha com 22 cenários, gate DVRS com
+8 cenários, suíte completa com 358 testes e 5 skips existentes, análise limpa,
+readiness de metadados em 1.26.2, smoke da página e build Windows debug. Binário:
+`build/windows/x64/runner/Debug/dry_eye_widget.exe`.
+
+Próximo passo: testar manualmente o arraste no Windows, especialmente com escala
+125%, 150% e múltiplos monitores. Tag, artefatos e publicação da release ainda
+não foram executados e exigem autorização própria.
+
+---
+
 # Handoff 1.26.1
 
 Data: 2026-07-29

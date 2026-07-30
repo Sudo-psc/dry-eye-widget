@@ -1,8 +1,9 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("..", import.meta.url).pathname;
-const repoRoot = new URL("../..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
+const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
 const failures = [];
 
 function walk(dir, predicate, out = []) {
@@ -28,8 +29,10 @@ function extractKeys(block) {
 }
 
 const i18n = read(join(root, "scripts", "i18n.js"));
-const ptBlock = i18n.match(/pt:\s*\{([\s\S]*?)\n\s*\},\n\s*en:\s*\{/);
-const enBlock = i18n.match(/en:\s*\{([\s\S]*?)\n\s*\}\n\s*\};/);
+const ptBlock = i18n.match(
+  /pt:\s*\{([\s\S]*?)\r?\n\s*\},\r?\n\s*en:\s*\{/,
+);
+const enBlock = i18n.match(/en:\s*\{([\s\S]*?)\r?\n\s*\}\r?\n\s*\};/);
 if (!ptBlock || !enBlock) {
   fail("Could not parse PT/EN dictionaries in site/scripts/i18n.js.");
 }

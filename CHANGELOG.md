@@ -6,6 +6,27 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.26.2] - 2026-07-30
+
+### Corrigido
+- No Windows, o timer que reafirma a janela como sempre visível fica suspenso
+  durante o ciclo nativo de movimentação e é reaplicado uma vez ao soltar. Isso
+  evita chamadas `SetWindowPos` concorrentes que deixavam o arraste pesado ou
+  podiam travar a janela.
+- Durante o arraste, a bolinha pausa hover, sombra e efeito interno, além de
+  manter sua pintura isolada do restante da árvore para reduzir trabalho por
+  quadro sem alterar o feedback de pressão ou a velocidade de soltura.
+- O relatório PDF volta a exibir a mensagem educativa neutra do DVRS derivada
+  do código atual, sem recuperar texto clínico legado do histórico.
+- O smoke test da página resolve caminhos por URL corretamente no Windows,
+  inclusive quando o diretório do projeto contém espaços.
+
+### Testado
+- O efeito interno é removido somente durante o gesto e restaurado ao soltar.
+- Arraste, clique, velocidade de soltura e cursor continuam separados.
+- O runner Windows compila com o controle do ciclo `WM_ENTERSIZEMOVE`.
+- O gate de claims confirma que texto DVRS legado não alcança UI ou PDF.
+
 ## [1.26.1] - 2026-07-29
 
 ### Corrigido

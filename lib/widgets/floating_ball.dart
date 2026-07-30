@@ -303,6 +303,7 @@ class _FloatingBallState extends State<FloatingBall>
 
   void _handlePanStart(DragStartDetails details) {
     setState(() => _dragging = true);
+    _resetController(_hover);
     _setPressed(true);
     widget.onDragStart?.call();
   }
@@ -374,7 +375,7 @@ class _FloatingBallState extends State<FloatingBall>
     final materialHovered =
         widget.hoverReactiveBall && !_dragging && _hover.value > 0.01;
     final hoverBoost = materialHovered ? _hover.value : 0.0;
-    final effectiveOrbIntensity = widget.dynamicOrbEffect
+    final effectiveOrbIntensity = widget.dynamicOrbEffect && !_dragging
         ? (orbIntensity + hoverBoost * 0.28).clamp(0.0, 1.0)
         : 0.0;
 
@@ -445,7 +446,7 @@ class _FloatingBallState extends State<FloatingBall>
                       blurRadius: s * (0.22 + hoverEase * 0.08),
                       offset: Offset(0, s * (0.10 + hoverEase * 0.02)),
                     ),
-                    if (widget.dynamicOrbEffect)
+                    if (widget.dynamicOrbEffect && !_dragging)
                       BoxShadow(
                         color: AppColorTokens.accent.withValues(
                           alpha: 0.16 + effectiveOrbIntensity * 0.22,
@@ -639,6 +640,10 @@ class _FloatingBallState extends State<FloatingBall>
             foregroundDecoration: focusDecoration,
             child: visual,
           );
+    visual = RepaintBoundary(
+      key: const ValueKey<String>('floating_ball_repaint_boundary'),
+      child: visual,
+    );
 
     final canPress = canActivate || canDrag;
     Widget interactive = GestureDetector(

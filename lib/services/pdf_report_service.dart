@@ -355,6 +355,8 @@ class PdfReportService {
           style: _mutedStyle,
         ),
         pw.SizedBox(height: 6),
+        pw.Text(dvrsEducationalMessage, style: _textStyle),
+        pw.SizedBox(height: 6),
         pw.Text(
           'Perfil por domínio',
           style: _textStyle.copyWith(fontWeight: pw.FontWeight.bold),

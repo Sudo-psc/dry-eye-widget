@@ -361,6 +361,54 @@ void main() {
     await gesture.up();
   });
 
+  testWidgets('arraste suspende efeito interno e isola a pintura', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              dynamicOrbEffect: true,
+              orbIntensity: 1,
+              onDragStart: () {},
+              onDragEnd: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey('floating_ball_repaint_boundary')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('floating_ball_inner_effect')),
+      findsOneWidget,
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(FloatingBall)),
+    );
+    await gesture.moveBy(const Offset(36, 18));
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('floating_ball_inner_effect')),
+      findsNothing,
+    );
+
+    await gesture.up();
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('floating_ball_inner_effect')),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('anel líquido expõe progresso e respeita reduzir movimento', (
     tester,
   ) async {

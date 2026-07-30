@@ -2,6 +2,16 @@
 
 ## now
 
+- [x] 2026-07-30: sincronizar a correção de arraste com a `origin/main`.
+- [x] 2026-07-30: portar a contenção do timer topmost para o runner atual.
+- [x] 2026-07-30: suspender efeitos e isolar pintura durante o arraste.
+- [x] 2026-07-30: sincronizar app, MSIX, site e READMEs em 1.26.2+78.
+- [x] 2026-07-30: restaurar a mensagem educativa DVRS no PDF.
+- [x] 2026-07-30: tornar o smoke da página compatível com Windows.
+- [x] 2026-07-30: passar análise, 358 testes, smoke, metadata e build Windows.
+- [ ] Validar manualmente o arraste da bolinha em hardware Windows.
+- [ ] Criar e enviar a tag `v1.26.2` somente após autorização específica.
+
 - [x] 2026-07-29: corrigir a regressão da pausa automática por inatividade.
 - [x] 2026-07-29: migrar o aprendizado adaptativo contaminado da 1.26.0.
 - [x] 2026-07-29: substituir a transição vertical do menu por fade-through.

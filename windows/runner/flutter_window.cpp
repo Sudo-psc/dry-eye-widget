@@ -213,10 +213,20 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
     case WM_FONTCHANGE:
       flutter_controller_->engine()->ReloadSystemFonts();
       break;
+    case WM_ENTERSIZEMOVE:
+      in_size_move_loop_ = true;
+      break;
+    case WM_EXITSIZEMOVE:
+      in_size_move_loop_ = false;
+      if (IsWindowVisible(hwnd)) {
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+      }
+      break;
     case WM_TIMER:
       if (wparam == kTopMostTimerId) {
         // SWP_NOACTIVATE evita roubar o foco do app em primeiro plano.
-        if (IsWindowVisible(hwnd)) {
+        if (IsWindowVisible(hwnd) && !in_size_move_loop_) {
           SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0,
                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }

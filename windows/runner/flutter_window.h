@@ -38,6 +38,8 @@ class FlutterWindow : public Win32Window {
   // Secure storage channel (DPAPI-encrypted blob on disk).
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>>
       secure_store_channel_;
+
+  bool in_size_move_loop_ = false;
 };
 
 #endif  // RUNNER_FLUTTER_WINDOW_H_

@@ -1,6 +1,23 @@
 # Status
 
-Updated: 2026-07-29
+Updated: 2026-07-30
+
+## Candidata 1.26.2 — correção do arraste Windows
+
+A candidata 1.26.2+78 foi preparada sobre a `origin/main` atual. Durante o
+movimento nativo da janela no Windows, a reafirmação periódica de
+`HWND_TOPMOST` fica suspensa e é aplicada uma vez ao final, evitando disputa
+entre `SetWindowPos` e o loop `WM_ENTERSIZEMOVE`. A bolinha também suspende
+hover, sombra e efeito interno durante o gesto e isola sua pintura.
+
+A sincronização revelou e corrigiu duas regressões da base remota: a mensagem
+educativa neutra do DVRS voltou ao PDF, e o smoke da página passou a resolver
+caminhos e finais de linha corretamente no Windows.
+
+Metadados estão alinhados em 1.26.2+78 e MSIX 1.26.2.0. Passaram o teste focado
+da bolinha, o gate DVRS, 358 testes com 5 skips existentes, análise estática,
+readiness de metadados, smoke da página e build Windows debug. O teste manual
+do arraste em hardware continua recomendado antes de criar a tag.
 
 ## Release 1.26.1 — publicada em 2026-07-29
 

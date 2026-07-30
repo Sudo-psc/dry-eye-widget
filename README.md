@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>Lembrete gentil da regra 20-20-20 para fadiga visual digital e olho seco.</em><br>
-  <strong>Versão 1.26.1</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Versão 1.26.2</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@ A intervenção de primeira linha recomendada é a **regra 20-20-20**. A barreir
 
 ---
 
-## Recursos (1.26.1)
+## Recursos (1.26.2)
 
 - **Widget flutuante** com anel de progresso, always-on-top, bandeja do sistema  
 - **Ciclos e aparência** configuráveis (intervalo, cores, opacidade, vidro)  
@@ -122,7 +122,7 @@ Todas as versões: **[Releases](https://github.com/Sudo-psc/dry-eye-widget/relea
   <img src="site/assets/shots/day-summary.webp" alt="Resumo diário com pausas, sequência, adesão e acesso ao DVRS no macOS" width="405">
 </p>
 
-<p align="center"><sub>Interface atual v1.26.1 · widget, ações rápidas, menu e resumo diário · <a href="https://olhossecos.com.br/app/#capturas">ver todas as capturas macOS e Windows</a></sub></p>
+<p align="center"><sub>Interface atual v1.26.2 · widget, ações rápidas, menu e resumo diário · <a href="https://olhossecos.com.br/app/#capturas">ver todas as capturas macOS e Windows</a></sub></p>
 
 ---
 
