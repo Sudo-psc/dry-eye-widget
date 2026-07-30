@@ -4,6 +4,15 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/) e o
 versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+### Corrigido
+- **Windows — arraste da bolinha**: durante o ciclo nativo de mover a janela, o
+  runner pausa a reafirmação periódica de `HWND_TOPMOST` e a reaplica apenas ao
+  final do movimento, evitando chamadas `SetWindowPos` concorrentes durante o
+  drag. A bolinha também pausa efeitos de hover/orb e isola a pintura com
+  `RepaintBoundary` enquanto é arrastada.
+
 ## [1.9.2] - 2026-06-11
 
 ### Corrigido

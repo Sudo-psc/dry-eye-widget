@@ -61,6 +61,7 @@ class _FloatingBallState extends State<FloatingBall>
   late final AnimationController _orb;
   late final Animation<double> _opacity;
   bool _hovered = false;
+  bool _dragging = false;
 
   @override
   void initState() {
@@ -106,13 +107,25 @@ class _FloatingBallState extends State<FloatingBall>
 
   void _syncOrbAnimation() {
     final intensity = widget.orbIntensity.clamp(0.0, 1.0);
-    if (widget.dynamicOrbEffect && intensity > 0) {
+    if (!_dragging && widget.dynamicOrbEffect && intensity > 0) {
       _orb.duration = Duration(milliseconds: widget.isActive ? 1800 : 3200);
       _orb.repeat();
     } else {
       _orb.stop();
       _orb.value = 0;
     }
+  }
+
+  void _setDragging(bool dragging) {
+    if (_dragging == dragging) return;
+    setState(() => _dragging = dragging);
+    _syncOrbAnimation();
+  }
+
+  void _finishDragging() {
+    final wasDragging = _dragging;
+    _setDragging(false);
+    if (wasDragging) widget.onDragEnd?.call();
   }
 
   @override
@@ -132,15 +145,16 @@ class _FloatingBallState extends State<FloatingBall>
 
     final s = widget.size;
     final orbIntensity = widget.orbIntensity.clamp(0.0, 1.0);
-    final hoverBoost = widget.hoverReactiveBall && _hovered ? 1.0 : 0.0;
-    final effectiveOrbIntensity = widget.dynamicOrbEffect
+    final hoverActive = widget.hoverReactiveBall && _hovered && !_dragging;
+    final hoverBoost = hoverActive ? 1.0 : 0.0;
+    final effectiveOrbIntensity = widget.dynamicOrbEffect && !_dragging
         ? (orbIntensity + hoverBoost * 0.25).clamp(0.0, 1.0)
         : 0.0;
 
     Widget circle = AnimatedBuilder(
       animation: Listenable.merge([_opacity, _orb]),
       builder: (context, _) {
-        final hoverScale = widget.hoverReactiveBall && _hovered ? 1.08 : 1.0;
+        final hoverScale = hoverActive ? 1.08 : 1.0;
         final opacity = widget.isActive ? _opacity.value : baseOpacity;
         return Transform.scale(
           scale: hoverScale,
@@ -180,7 +194,7 @@ class _FloatingBallState extends State<FloatingBall>
                       blurRadius: s * (0.32 + effectiveOrbIntensity * 0.16),
                       spreadRadius: effectiveOrbIntensity * 1.5,
                     ),
-                  if (widget.hoverReactiveBall && _hovered)
+                  if (hoverActive)
                     BoxShadow(
                       color: const Color(0xFF79F2D0).withValues(alpha: 0.42),
                       blurRadius: s * 0.46,
@@ -205,7 +219,7 @@ class _FloatingBallState extends State<FloatingBall>
                           phase: _orb.value,
                           baseColor: color,
                           intensity: effectiveOrbIntensity,
-                          hovered: widget.hoverReactiveBall && _hovered,
+                          hovered: hoverActive,
                           isActive: widget.isActive,
                         ),
                       ),
@@ -259,7 +273,7 @@ class _FloatingBallState extends State<FloatingBall>
     }
 
     return MouseRegion(
-      cursor: SystemMouseCursors.grab,
+      cursor: _dragging ? SystemMouseCursors.grabbing : SystemMouseCursors.grab,
       onEnter: (_) {
         if (widget.hoverReactiveBall) setState(() => _hovered = true);
       },
@@ -270,9 +284,13 @@ class _FloatingBallState extends State<FloatingBall>
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         onSecondaryTap: widget.onSecondaryTap,
-        onPanStart: (_) => widget.onDragStart?.call(),
-        onPanEnd: (_) => widget.onDragEnd?.call(),
-        child: visual,
+        onPanStart: (_) {
+          _setDragging(true);
+          widget.onDragStart?.call();
+        },
+        onPanEnd: (_) => _finishDragging(),
+        onPanCancel: _finishDragging,
+        child: RepaintBoundary(child: visual),
       ),
     );
   }

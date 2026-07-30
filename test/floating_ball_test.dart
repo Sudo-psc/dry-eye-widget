@@ -68,4 +68,71 @@ void main() {
     expect(taps, 1);
     await gesture.removePointer();
   });
+
+  testWidgets('drag dispara início e fim sem acionar tap', (tester) async {
+    var dragStarts = 0;
+    var dragEnds = 0;
+    var taps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              onTap: () => taps++,
+              onDragStart: () => dragStarts++,
+              onDragEnd: () => dragEnds++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(FloatingBall)),
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.moveBy(const Offset(32, 0));
+    await tester.pump();
+    await gesture.up();
+    await tester.pump();
+
+    expect(dragStarts, 1);
+    expect(dragEnds, 1);
+    expect(taps, 0);
+  });
+
+  testWidgets('cancelamento de drag finaliza o estado de arraste', (
+    tester,
+  ) async {
+    var dragStarts = 0;
+    var dragEnds = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FloatingBall(
+              isActive: false,
+              onDragStart: () => dragStarts++,
+              onDragEnd: () => dragEnds++,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(FloatingBall)),
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.moveBy(const Offset(32, 0));
+    await tester.pump();
+    await gesture.cancel();
+    await tester.pump();
+
+    expect(dragStarts, 1);
+    expect(dragEnds, 1);
+  });
 }
