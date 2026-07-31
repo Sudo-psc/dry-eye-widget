@@ -210,7 +210,17 @@ void main() {
       );
       expect(resultView, isNot(contains('result.educationalMessage')));
       expect(resultView, isNot(contains('result.safetyAlertMessage')));
-      expect(pdf, contains('pw.Text(dvrsEducationalMessage'));
+      expect(pdf, contains("'DVRS — autorregistro educativo'"));
+      expect(pdf, contains("'Perfil por domínio'"));
+      expect(pdf, contains("'Respostas autorreferidas'"));
+      expect(
+        pdf,
+        contains('não constituem escore ou classificação de risco.'),
+      );
+      expect(pdf, isNot(contains('/100')));
+      expect(pdf, isNot(contains('classificationLabel')));
+      expect(pdf, isNot(contains('Índice de Risco Visual Digital')));
+      expect(pdf, isNot(contains('domainScores')));
       expect(pdf, isNot(contains('latest.educationalMessage')));
       expect(pdf, isNot(contains('latest.safetyAlertMessage')));
     },
