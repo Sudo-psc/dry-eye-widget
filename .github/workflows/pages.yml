@@ -43,7 +43,7 @@ jobs:
         run: npm ci --prefix web/science && npm run build --prefix web/science
 
       - name: Configurar Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Smoke test da landing
         run: node site/scripts/smoke-check.mjs
