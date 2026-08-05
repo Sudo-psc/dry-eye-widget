@@ -175,6 +175,23 @@ if (!indexHtml.includes('rel="manifest" href="site.webmanifest"')) {
 if (!indexHtml.includes('rel="apple-touch-icon"')) {
   fail("site/index.html must declare apple-touch-icon.");
 }
+const latestReleaseBase =
+  "https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/";
+for (const asset of [
+  "DryEyeWidget.dmg",
+  "DryEyeWidget-Setup-x64.exe",
+  "DryEyeWidget-windows-x64.zip",
+]) {
+  if (!indexHtml.includes(`${latestReleaseBase}${asset}`)) {
+    fail(`site/index.html must link the latest release asset: ${asset}`);
+  }
+}
+if (!indexHtml.includes("https://apps.microsoft.com/detail/9nnk9spjz3qv")) {
+  fail("site/index.html must link the canonical Microsoft Store listing.");
+}
+if (!indexHtml.includes('class="download-panel"') || !indexHtml.includes('class="download-app-icon"')) {
+  fail("site/index.html must keep the professional download panel and app icon.");
+}
 if (!indexHtml.includes("og:locale")) {
   fail("site/index.html must declare og:locale for social SEO.");
 }
