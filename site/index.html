@@ -20,8 +20,8 @@ document.documentElement.setAttribute("data-theme",t);})();
 <link rel="dns-prefetch" href="https://apps.microsoft.com">
 <!-- Só as famílias usadas no CSS (Hanken + Roboto Mono). Menos pesos = menos bytes no critical path. -->
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="preload" href="styles/landing.css?v=20260711-qa10" as="style">
-<link rel="stylesheet" href="styles/landing.css?v=20260711-qa10">
+<link rel="preload" href="styles/landing.css?v=20260805-download1" as="style">
+<link rel="stylesheet" href="styles/landing.css?v=20260805-download1">
 <link rel="stylesheet" href="styles/widget-screens.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="styles/widget-screens.css"></noscript>
 <link rel="icon" href="assets/icon-256.png" type="image/png">
@@ -222,21 +222,37 @@ document.documentElement.setAttribute("data-theme",t);})();
       <p class="version-pill" aria-label="Versão atual" data-i18n-aria="hero.version.aria"><span data-i18n="hero.version">Versão</span> <strong id="app-version">1.26.1</strong></p>
       <h1 data-i18n="hero.title">Sua tela não avisa quando seus olhos <em>precisam de pausa</em>. Este widget avisa.</h1>
       <p class="hero-sub" data-i18n="hero.sub">Um lembrete gentil e flutuante para apoiar pausas e hábitos de conforto visual — desenvolvido por um médico oftalmologista, sem promessa de prevenção ou tratamento.</p>
-      <div class="dl-row">
-        <a class="btn-dl" href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.7 12.9c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3.1 2.5 1.2-.1 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.7-4ZM14.4 5.6c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4Z"></path></svg>
-          <span><span data-i18n="hero.dl.mac">Baixar para macOS</span><small data-i18n="hero.dl.mac.small">Universal · Apple Silicon + Intel · .dmg</small></span>
-        </a>
-        <a class="btn-store" href="https://apps.microsoft.com/detail/9nnk9spjz3qv" target="_blank" rel="noopener noreferrer" aria-label="Microsoft Store">
-          <svg class="ms-logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="9.2" height="9.2" fill="#F25022"></rect><rect x="12.8" y="2" width="9.2" height="9.2" fill="#7FBA00"></rect><rect x="2" y="12.8" width="9.2" height="9.2" fill="#00A4EF"></rect><rect x="12.8" y="12.8" width="9.2" height="9.2" fill="#FFB900"></rect></svg>
-          <span><small data-i18n="hero.store.small">Baixe na</small><strong data-i18n="hero.store.big">Microsoft Store</strong></span>
-        </a>
+      <div class="download-panel" aria-label="Opções de download" data-i18n-aria="hero.download.aria">
+        <img class="download-app-icon" src="assets/icon-256.png" alt="Ícone do Dry Eye Widget" width="88" height="88">
+        <div class="download-actions">
+          <div class="windows-download">
+            <a class="btn-store" href="https://apps.microsoft.com/detail/9nnk9spjz3qv" target="_blank" rel="noopener noreferrer" aria-label="Dry Eye Widget na Microsoft Store">
+              <svg class="ms-logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="9.2" height="9.2" fill="#F25022"></rect><rect x="12.8" y="2" width="9.2" height="9.2" fill="#7FBA00"></rect><rect x="2" y="12.8" width="9.2" height="9.2" fill="#00A4EF"></rect><rect x="12.8" y="12.8" width="9.2" height="9.2" fill="#FFB900"></rect></svg>
+              <span><small data-i18n="hero.store.small">Baixe pela</small><strong data-i18n="hero.store.big">Microsoft Store</strong></span>
+              <svg class="download-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+            </a>
+            <span class="download-recommended" data-i18n="hero.store.recommended">Recomendado para Windows 10 e 11</span>
+          </div>
+          <span class="download-divider" aria-hidden="true"></span>
+          <a class="btn-mac" href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget.dmg" aria-label="Baixar a versão mais recente do Dry Eye Widget para macOS">
+            <svg class="apple-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.7 12.9c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3.1 2.5 1.2-.1 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.7-4ZM14.4 5.6c.7-.8 1.1-1.9 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4Z"></path></svg>
+            <span><strong data-i18n="hero.dl.mac">Baixar para macOS</strong><small data-i18n="hero.dl.mac.small">Universal · Apple Silicon + Intel · .dmg</small></span>
+          </a>
+        </div>
       </div>
       <p class="dl-meta">
-        <span data-i18n="hero.meta.or">Também disponível:</span>
-        <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe" data-i18n="hero.meta.exe">instalador Windows (.exe)</a>
-        <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip" data-i18n="hero.meta.zip">versão portátil (.zip)</a>
-        <a href="https://github.com/Sudo-psc/dry-eye-widget/releases" target="_blank" rel="noopener noreferrer" data-i18n="hero.meta.releases">todas as versões</a>
+        <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-Setup-x64.exe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"></path></svg>
+          <span data-i18n="hero.meta.exe">instalador Windows (.exe)</span>
+        </a>
+        <a href="https://github.com/Sudo-psc/dry-eye-widget/releases/latest/download/DryEyeWidget-windows-x64.zip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h16v12H4zM8 7.5V4h8v3.5M8 12h8"></path></svg>
+          <span data-i18n="hero.meta.zip">versão portátil (.zip)</span>
+        </a>
+        <a href="https://github.com/Sudo-psc/dry-eye-widget/releases" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7h11M8 12h11M8 17h11M4 7h.01M4 12h.01M4 17h.01"></path></svg>
+          <span data-i18n="hero.meta.releases">todas as versões</span>
+        </a>
       </p>
       <details class="dl-note hero-mac-note">
         <summary data-i18n="hero.note.mac.summary">macOS: se o .dmg disser “danificado”</summary>
@@ -854,7 +870,7 @@ document.documentElement.setAttribute("data-theme",t);})();
   </div>
 </footer>
 
-<script src="scripts/i18n.js" defer></script>
+<script src="scripts/i18n.js?v=20260805-download1" defer></script>
 <script src="scripts/landing.js" defer></script>
 
 
