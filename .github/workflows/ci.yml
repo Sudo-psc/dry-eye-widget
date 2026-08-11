@@ -19,7 +19,7 @@ jobs:
     name: Flutter analyze & test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
@@ -40,7 +40,7 @@ jobs:
     name: Landing build & smoke
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -59,7 +59,7 @@ jobs:
     name: Versão app ↔ landing
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Conferir metadados de versão
         run: |
@@ -76,7 +76,7 @@ jobs:
     name: Release manifests & idempotency guards
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Validar scripts, manifests e exclusão de arquivos extras
         run: bash scripts/test_release_pipeline.sh
