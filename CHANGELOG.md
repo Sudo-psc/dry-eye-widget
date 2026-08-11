@@ -6,6 +6,14 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.26.2] - 2026-08-11
+
+### Melhorado
+- Profissionalização da estrutura e apresentação dos botões de download da landing page.
+- Atualização e alinhamento de dependências dos workflows de integração contínua (GitHub Actions checkout v7, configure-pages v6, upload-artifact v7, setup-node v7, labeler v7).
+- Reforço no contrato semântico e guardas de testes de relatórios e reivindicações do DVRS.
+
+
 ## [1.26.1] - 2026-07-29
 
 ### Corrigido

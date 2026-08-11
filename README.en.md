@@ -6,7 +6,7 @@
 
 <p align="center">
   <em>A gentle 20-20-20 reminder for digital eye strain and dry eye.</em><br>
-  <strong>Version 1.26.1</strong> · open source (MIT) · 100% local · macOS &amp; Windows
+  <strong>Version 1.26.2</strong> · open source (MIT) · 100% local · macOS &amp; Windows
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@ First-line prevention is the **20-20-20 rule**. The real barrier is **adherence*
 
 ---
 
-## Features (1.26.1)
+## Features (1.26.2)
 
 - **Floating widget** with progress ring, always-on-top, system tray  
 - **Configurable cycles and look** (interval, colors, opacity, glass)  
@@ -122,7 +122,7 @@ All builds: **[Releases](https://github.com/Sudo-psc/dry-eye-widget/releases)**.
   <img src="site/assets/shots/day-summary.webp" alt="Daily summary with breaks, streak, adherence and DVRS access on macOS" width="405">
 </p>
 
-<p align="center"><sub>Current v1.26.1 interface · widget, quick actions, menu and daily summary · <a href="https://olhossecos.com.br/app/#capturas">see all macOS and Windows screenshots</a></sub></p>
+<p align="center"><sub>Current v1.26.2 interface · widget, quick actions, menu and daily summary · <a href="https://olhossecos.com.br/app/#capturas">see all macOS and Windows screenshots</a></sub></p>
 
 ---
 
