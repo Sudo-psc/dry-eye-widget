@@ -6,6 +6,13 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.26.3] - 2026-08-15
+
+### Melhorado
+- Atualização e alinhamento de dependências dos workflows de integração contínua (GitHub Actions `actions/labeler` v7 e `actions/setup-node` v7 via PRs #80 e #81).
+- Preservação da rastreabilidade e histórico de releases sem alterar a tag anotada `v1.26.2`.
+- Auditoria e reconciliação dos registros de documentação do dashboard de saúde e métricas Lighthouse de produção.
+
 ## [1.26.2] - 2026-08-11
 
 ### Melhorado

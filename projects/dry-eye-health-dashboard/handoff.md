@@ -2,23 +2,25 @@
 
 ## Current State
 
-The branch `codex/healthkit-dashboard` defines the first data contract for an integrative Dry Eye Health Dashboard.
+Em 2026-08-15, foi realizada a auditoria e reconciliação da fila do HealthKit dashboard (Issue #65).
+A branch histórica `codex/healthkit-dashboard` definiu o primeiro contrato de dados e spike exploratório.
+A `main` atual não contém serviço nativo ou entitlement do HealthKit; ela executa o Hub de Saúde Visual nativo de forma independente.
 
-## Key Files
+## Key References
 
-- `docs/healthkit-dashboard.md`
-- `lib/models/dry_eye_health_dashboard.dart`
-- `test/dry_eye_health_dashboard_test.dart`
 - `projects/dry-eye-health-dashboard/`
+- Issue #55: Ativar assinatura de código macOS + Windows (secrets)
+- Issue #58: Validar HealthKit em build macOS assinado
+- `projects/dry-eye-widget-landing/handoff.md`
 
-## Next Actions
+## Next Actions (Backlog)
 
-1. Decide target platform path for HealthKit support.
-2. Add a HealthKit permission and import adapter for sleep and heart rate.
-3. Persist local app events needed by the dashboard: pauses, colirio confirmations, blink suggestions, and future symptom entries.
-4. Build the dashboard UI from `DryEyeDashboardPeriod`.
+1. Quando as credenciais de assinatura estiverem ativas (#55), retomar a validação do entitlement HealthKit (#58).
+2. Adicionar o adaptador de serviço e permissões na plataforma Apple.
+3. Persistir eventos adicionais (colírio, piscada guiada) para sincronização opcional.
+4. Integrar visualizações do HealthKit ao Hub de Saúde Visual existente.
 
 ## Blockers
 
-- HealthKit native work needs entitlement and platform-target confirmation.
-- Screen Time import is separate from HealthKit.
+- Dependência direta de assinatura de código e provisionamento na Apple (#55, #58).
+- Screen Time permanece isolado dos dados de saúde.

@@ -2,7 +2,7 @@
 
 Landing com artefato estático servida em **[olhossecos.com.br/app/](https://olhossecos.com.br/app/)** e espelhada no GitHub Pages do repositório. A página principal continua em HTML/CSS/JS sem bundler; a subpágina Science é pré-renderizada a partir de React/TypeScript.
 
-Alinhada ao app **1.26.2** e aos READMEs raiz do projeto.
+Alinhada ao app **1.26.3** e aos READMEs raiz do projeto.
 
 | | |
 |---|---|
@@ -17,7 +17,7 @@ Alinhada ao app **1.26.2** e aos READMEs raiz do projeto.
 
 - Hero com download **macOS (.dmg)**, **Microsoft Store** e links Windows (.exe / .zip)
 - Badge de versão (`#app-version`) + JSON-LD `softwareVersion` (devem bater com `pubspec.yaml`)
-- Recursos 1.26.2: resumo do dia, DVRS, PDF, meia-lua, piscada, modo reunião
+- Recursos 1.26.3: resumo do dia, DVRS, PDF, meia-lua, piscada, modo reunião
 - Carrossel de capturas com filtro **Todas / macOS / Windows**
 - FAQ (incl. instalação Gatekeeper/SmartScreen) + schema FAQPage
 - Autoria médica, evidências, blog bilíngue, dark/light, PT/EN

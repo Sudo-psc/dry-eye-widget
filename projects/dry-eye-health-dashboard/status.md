@@ -1,23 +1,22 @@
 # Status
 
-Updated: 2026-06-19
+Updated: 2026-08-15
 
-Current phase: data-contract foundation.
+Current phase: audited & reconciled (backlog).
 
 Completed:
 
-- Branch created: `codex/healthkit-dashboard`.
-- Dashboard metric model added in `lib/models/dry_eye_health_dashboard.dart`.
-- Metric contract documented in `docs/healthkit-dashboard.md`.
-- Project state files created under `projects/dry-eye-health-dashboard/`.
-- Tests added for metric coverage, HealthKit boundaries, app screen-time source, and missing-data behavior.
+- Branch created: `codex/healthkit-dashboard` (historical spike).
+- Metric catalog and boundary investigation documented.
+- Code audit completed: HealthKit implementation was confined to the historical spike branch and is absent from `main`.
+- In `main`, the local Visual Health Hub (`Resumo do dia`, `Estatísticas de Pausas`, `Tempo de Tela`, `DVRS`) operates independently without requiring HealthKit.
 
 In progress:
 
-- None.
+- None (HealthKit native integration queued in backlog pending signed code build #55/#58).
 
-Risks:
+Risks & Dependencies:
 
-- HealthKit availability and entitlements must be verified for the final Apple target before native integration.
-- Screen Time is not modeled as a HealthKit source in this branch.
-- Click and keystroke counts are privacy-sensitive and should remain aggregate-only and opt-in.
+- HealthKit availability and entitlements must be verified for the final Apple target in a signed macOS build (#55, #58).
+- Screen Time is not modeled as a HealthKit source.
+- Click and keystroke counts remain privacy-sensitive, aggregate-only, and strictly opt-in.
