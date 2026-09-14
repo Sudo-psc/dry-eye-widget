@@ -1,54 +1,20 @@
 #include "flutter_window.h"
 
 #include <windows.h>
-#include <dpapi.h>
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include <flutter/method_channel.h>
 #include <flutter/standard_method_codec.h>
 
 #include "flutter/generated_plugin_registrant.h"
-
-#pragma comment(lib, "Crypt32.lib")
+#include "secure_store_windows.h"
+#include "windows_store_integration.h"
 
 namespace {
-
-// Caminho do arquivo cifrado para uma dada chave, em %APPDATA%\dry_eye_widget.
-std::wstring SecureFilePath(const std::string& key) {
-  wchar_t appdata[MAX_PATH] = {0};
-  DWORD n = GetEnvironmentVariableW(L"APPDATA", appdata, MAX_PATH);
-  std::wstring dir = std::wstring(appdata, n) + L"\\dry_eye_widget";
-  CreateDirectoryW(dir.c_str(), nullptr);
-  std::wstring wkey(key.begin(), key.end());
-  return dir + L"\\" + wkey + L".bin";
-}
-
-bool WriteAllBytes(const std::wstring& path, const BYTE* data, DWORD len) {
-  HANDLE h = CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
-                         FILE_ATTRIBUTE_NORMAL, nullptr);
-  if (h == INVALID_HANDLE_VALUE) return false;
-  DWORD written = 0;
-  bool ok = WriteFile(h, data, len, &written, nullptr) && written == len;
-  CloseHandle(h);
-  return ok;
-}
-
-std::vector<BYTE> ReadAllBytes(const std::wstring& path, bool* ok) {
-  *ok = false;
-  HANDLE h = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
-                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-  if (h == INVALID_HANDLE_VALUE) return {};
-  DWORD size = GetFileSize(h, nullptr);
-  std::vector<BYTE> buf(size);
-  DWORD read = 0;
-  *ok = ReadFile(h, buf.data(), size, &read, nullptr) && read == size;
-  CloseHandle(h);
-  return buf;
-}
 
 std::string ArgString(const flutter::EncodableMap* args, const char* key) {
   if (!args) return "";
@@ -89,6 +55,8 @@ bool FlutterWindow::OnCreate() {
   }
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
+  store_integration_ = std::make_unique<WindowsStoreIntegration>(
+      flutter_controller_->engine()->messenger(), GetHandle());
 
   // Canal de tempo ocioso do sistema (segundos desde a última entrada do
   // usuário em todo o sistema, via GetLastInputInfo).
@@ -125,50 +93,43 @@ bool FlutterWindow::OnCreate() {
          std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>
              result) {
         const auto* args =
-            std::get_if<flutter::EncodableMap>(call.arguments());
+            call.arguments()
+                ? std::get_if<flutter::EncodableMap>(call.arguments())
+                : nullptr;
         std::string key = ArgString(args, "key");
         if (key.empty()) {
           result->Error("bad_args", "key ausente");
           return;
         }
-        std::wstring path = SecureFilePath(key);
         const std::string& method = call.method_name();
+        DWORD error = ERROR_SUCCESS;
         if (method == "write") {
           std::string value = ArgString(args, "value");
-          DATA_BLOB in;
-          in.pbData = reinterpret_cast<BYTE*>(value.data());
-          in.cbData = static_cast<DWORD>(value.size());
-          DATA_BLOB out;
-          if (CryptProtectData(&in, L"dry_eye_widget", nullptr, nullptr,
-                               nullptr, 0, &out)) {
-            WriteAllBytes(path, out.pbData, out.cbData);
-            LocalFree(out.pbData);
-          }
-          result->Success();
+          error = secure_store::Write(key, value);
         } else if (method == "read") {
-          bool ok = false;
-          std::vector<BYTE> enc = ReadAllBytes(path, &ok);
-          if (!ok || enc.empty()) {
-            result->Success();  // null
+          const auto stored = secure_store::Read(key);
+          error = stored.error;
+          if (error == ERROR_SUCCESS) {
+            if (stored.value) {
+              result->Success(flutter::EncodableValue(*stored.value));
+            } else {
+              result->Success();  // A missing key is null, not an error.
+            }
             return;
           }
-          DATA_BLOB in;
-          in.pbData = enc.data();
-          in.cbData = static_cast<DWORD>(enc.size());
-          DATA_BLOB out;
-          if (CryptUnprotectData(&in, nullptr, nullptr, nullptr, nullptr, 0,
-                                 &out)) {
-            std::string value(reinterpret_cast<char*>(out.pbData), out.cbData);
-            LocalFree(out.pbData);
-            result->Success(flutter::EncodableValue(value));
-          } else {
-            result->Success();  // null
-          }
         } else if (method == "delete") {
-          DeleteFileW(path.c_str());
-          result->Success();
+          error = secure_store::Delete(key);
         } else {
           result->NotImplemented();
+          return;
+        }
+        if (error != ERROR_SUCCESS) {
+          // Do not include the path, key or stored contents in diagnostics.
+          result->Error("secure_store_error",
+                        "Windows secure storage " + method + " failed",
+                        flutter::EncodableValue(static_cast<int64_t>(error)));
+        } else {
+          result->Success();
         }
       });
 
@@ -188,6 +149,9 @@ bool FlutterWindow::OnCreate() {
 
 void FlutterWindow::OnDestroy() {
   KillTimer(GetHandle(), kTopMostTimerId);
+  store_integration_.reset();
+  idle_channel_.reset();
+  secure_store_channel_.reset();
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }
@@ -199,6 +163,7 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
+  if (store_integration_ && store_integration_->HandleMessage(message)) return 0;
   // Give Flutter, including plugins, an opportunity to handle window messages.
   if (flutter_controller_) {
     std::optional<LRESULT> result =

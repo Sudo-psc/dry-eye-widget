@@ -9,8 +9,8 @@ import 'presence_store.dart';
 /// (Keychain/DPAPI) via [SecureKeyValueStore].
 ///
 /// Guarda apenas o mapa serializado do modelo (contagens agregadas); nunca
-/// eventos brutos, timestamps ou imagens. Falhas de leitura/parse caem para
-/// `null`, fazendo o modelo recomeçar do cold start.
+/// eventos brutos, timestamps ou imagens. Estado inválido cai para `null`;
+/// falhas de acesso ao SO são propagadas para preservar o estado inacessível.
 class SecurePresenceStore implements PresenceStore {
   SecurePresenceStore(this._secure, {required this.storageKey});
 
@@ -24,8 +24,8 @@ class SecurePresenceStore implements PresenceStore {
     try {
       final decoded = jsonDecode(raw);
       return decoded is Map<String, dynamic> ? decoded : null;
-    } catch (e) {
-      debugPrint('SecurePresenceStore: estado inválido, ignorando ($e).');
+    } catch (_) {
+      debugPrint('SecurePresenceStore: estado inválido, ignorando.');
       return null;
     }
   }

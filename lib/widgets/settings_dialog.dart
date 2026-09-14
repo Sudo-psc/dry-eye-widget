@@ -74,6 +74,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
     setState(() => _resettingLearning = true);
     try {
       await Future<void>.sync(widget.onResetLearning);
+    } catch (_) {
+      if (!mounted) return;
+      final message = _draft.languageCode == 'en'
+          ? 'Could not reset inactivity learning. Please try again.'
+          : 'Não foi possível apagar o aprendizado de inatividade. Tente novamente.';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) setState(() => _resettingLearning = false);
     }

@@ -54,7 +54,7 @@ jobs:
           CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
 
       - name: Gerar MSIX para a Store
-        run: dart run msix:create --store
+        run: dart run msix:create --store --build-windows false
 
       - name: Localizar o .msix
         id: find
@@ -72,6 +72,17 @@ jobs:
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           $target = "dist\dry_eye_widget.msix"
           Copy-Item "${{ steps.find.outputs.path }}" $target -Force
+          $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $target))
+          try {
+            $entry = $archive.GetEntry("AppxManifest.xml")
+            if (-not $entry) { throw "AppxManifest.xml ausente no MSIX." }
+            $reader = [System.IO.StreamReader]::new($entry.Open())
+            try { [xml]$manifest = $reader.ReadToEnd() } finally { $reader.Dispose() }
+            $task = $manifest.SelectSingleNode("//*[local-name()='StartupTask' and @TaskId='DryEyeWidgetStartup']")
+            if (-not $task -or $task.Enabled -ne "false") {
+              throw "StartupTask ausente ou habilitado sem consentimento no MSIX."
+            }
+          } finally { $archive.Dispose() }
           $versionMatch = Select-String -Path "pubspec.yaml" `
             -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)\+\d+'
           if (-not $versionMatch) { throw "Versão do pubspec não encontrada." }

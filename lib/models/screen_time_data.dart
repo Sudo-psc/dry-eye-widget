@@ -54,7 +54,7 @@ class ScreenTimeData {
   List<ScreenTimePoint> dailySeries(DateTime end, int days) {
     final base = DateTime(end.year, end.month, end.day);
     return List<ScreenTimePoint>.generate(days, (i) {
-      final day = base.subtract(Duration(days: days - 1 - i));
+      final day = DateTime(base.year, base.month, base.day - days + 1 + i);
       return ScreenTimePoint(day, secondsForDay(day));
     });
   }
@@ -62,9 +62,9 @@ class ScreenTimeData {
   /// Semana (segunda a domingo) que contém [reference].
   List<ScreenTimePoint> weekSeries(DateTime reference) {
     final ref = DateTime(reference.year, reference.month, reference.day);
-    final monday = ref.subtract(Duration(days: ref.weekday - 1));
+    final monday = DateTime(ref.year, ref.month, ref.day - ref.weekday + 1);
     return List<ScreenTimePoint>.generate(7, (i) {
-      final day = monday.add(Duration(days: i));
+      final day = DateTime(monday.year, monday.month, monday.day + i);
       return ScreenTimePoint(day, secondsForDay(day));
     });
   }
@@ -109,11 +109,7 @@ class ScreenTimeData {
 
   /// Remove dias mais antigos que [maxRetainedDays] contados a partir de [now].
   ScreenTimeData pruned(DateTime now) {
-    final cutoff = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(const Duration(days: maxRetainedDays));
+    final cutoff = DateTime(now.year, now.month, now.day - maxRetainedDays);
     final cutoffKey = dayKey(cutoff);
     final next = <String, int>{};
     for (final entry in secondsByDay.entries) {

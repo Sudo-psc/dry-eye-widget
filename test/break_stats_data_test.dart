@@ -23,19 +23,27 @@ void main() {
   test('sumForRange soma apenas dias dentro do intervalo', () {
     final data = BreakStatsData.empty()
         .incremented(day, reminders: 5, completed: 4)
-        .incremented(day.subtract(const Duration(days: 1)),
-            reminders: 2, completed: 2)
-        .incremented(day.subtract(const Duration(days: 40)),
-            reminders: 9, completed: 9);
-    final sum = data.sumForRange(
-        day.subtract(const Duration(days: 7)), day);
+        .incremented(
+          day.subtract(const Duration(days: 1)),
+          reminders: 2,
+          completed: 2,
+        )
+        .incremented(
+          day.subtract(const Duration(days: 40)),
+          reminders: 9,
+          completed: 9,
+        );
+    final sum = data.sumForRange(day.subtract(const Duration(days: 7)), day);
     expect(sum.reminders, 7);
     expect(sum.completed, 6);
   });
 
   test('serialização round-trip preserva os dados', () {
-    final data = BreakStatsData.empty()
-        .incremented(day, reminders: 3, completed: 2);
+    final data = BreakStatsData.empty().incremented(
+      day,
+      reminders: 3,
+      completed: 2,
+    );
     final restored = BreakStatsData.fromJson(data.toJson());
     expect(restored.forDay(day).reminders, 3);
     expect(restored.forDay(day).completed, 2);
@@ -53,4 +61,23 @@ void main() {
     final pruned = data.pruned(day);
     expect(pruned.byDay, hasLength(1));
   });
+
+  test('currentStreak não pula falha durante entrada do horário de verão', () {
+    // Rodar também com TZ=America/New_York para exercitar as transições reais.
+    final data = BreakStatsData.empty()
+        .incremented(DateTime(2026, 3, 7), reminders: 1, completed: 1)
+        .incremented(DateTime(2026, 3, 8), reminders: 1, completed: 0)
+        .incremented(DateTime(2026, 3, 9), reminders: 1, completed: 1);
+    expect(data.currentStreak(DateTime(2026, 3, 9)), 1);
+  });
+
+  test(
+    'bestStreak não conta mesmo dia duas vezes ao sair do horário de verão',
+    () {
+      final data = BreakStatsData.empty()
+          .incremented(DateTime(2026, 11, 1), reminders: 1, completed: 1)
+          .incremented(DateTime(2026, 11, 2), reminders: 1, completed: 0);
+      expect(data.bestStreak(), 1);
+    },
+  );
 }

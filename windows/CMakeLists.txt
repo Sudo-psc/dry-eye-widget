@@ -78,6 +78,31 @@ endif()
 set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
 set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}")
 
+# The machine that builds the app has the Visual C++ runtime; clean end-user
+# machines may not. Ship the compiler's release redistributables app-local for
+# both manual builds and the Setup/ZIP produced in CI.
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+set(CMAKE_INSTALL_DEBUG_LIBRARIES FALSE)
+set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY FALSE)
+include(InstallRequiredSystemLibraries)
+set(REQUIRED_MSVC_RUNTIME_NAMES msvcp140.dll vcruntime140.dll vcruntime140_1.dll)
+foreach(runtime IN LISTS CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  if(NOT EXISTS "${runtime}")
+    message(FATAL_ERROR "Visual C++ redistributable not found: ${runtime}")
+  endif()
+  get_filename_component(runtime_name "${runtime}" NAME)
+  string(TOLOWER "${runtime_name}" runtime_name)
+  list(REMOVE_ITEM REQUIRED_MSVC_RUNTIME_NAMES "${runtime_name}")
+endforeach()
+if(REQUIRED_MSVC_RUNTIME_NAMES)
+  message(FATAL_ERROR
+    "Missing Visual C++ redistributables: ${REQUIRED_MSVC_RUNTIME_NAMES}. "
+    "Install the Visual Studio C++ redistributable components before building.")
+endif()
+install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+  DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  CONFIGURATIONS Profile;Release COMPONENT Runtime)
+
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
 
