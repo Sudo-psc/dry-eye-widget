@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   window_manager: ^0.5.1
-  screen_retriever: ^0.2.0
+  screen_retriever: ^0.2.2
   flutter_acrylic: ^1.1.4
   audioplayers: ^6.7.1
   local_notifier: ^0.1.5
