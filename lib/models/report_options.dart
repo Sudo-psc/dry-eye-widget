@@ -22,12 +22,7 @@ enum OverallIndication { monitor, reinforceBreaks, seekEvaluation }
 
 @immutable
 class UserProfile {
-  const UserProfile({
-    this.name,
-    this.observations,
-    this.age,
-    this.email,
-  });
+  const UserProfile({this.name, this.observations, this.age, this.email});
 
   final String? name;
   final String? observations;
@@ -51,6 +46,28 @@ class ReportOptions {
     this.includeEnvironment = false,
   });
 
+  /// Período predefinido de N dias civis, incluindo o dia de [endDate].
+  factory ReportOptions.forPeriod({
+    required ReportPeriod period,
+    required DateTime endDate,
+    bool includeEnvironment = false,
+  }) {
+    final days = period.days;
+    if (days == null) {
+      throw ArgumentError.value(
+        period,
+        'period',
+        'Informe um período predefinido.',
+      );
+    }
+    return ReportOptions(
+      period: period,
+      startDate: DateTime(endDate.year, endDate.month, endDate.day - days + 1),
+      endDate: DateTime(endDate.year, endDate.month, endDate.day),
+      includeEnvironment: includeEnvironment,
+    );
+  }
+
   final DateTime startDate;
   final DateTime endDate;
   final ReportPeriod period;
@@ -61,10 +78,12 @@ class ReportOptions {
   final bool includeBreaks;
   final bool includeEnvironment;
 
-  /// Quantidade de dias cobertos pelo intervalo (mínimo 1).
+  /// Dias civis cobertos pelo intervalo, incluindo as duas datas (mínimo 1).
   int get days {
-    final diff = endDate.difference(startDate).inDays;
-    return diff < 1 ? 1 : diff;
+    final start = DateTime.utc(startDate.year, startDate.month, startDate.day);
+    final end = DateTime.utc(endDate.year, endDate.month, endDate.day);
+    final inclusive = end.difference(start).inDays + 1;
+    return inclusive < 1 ? 1 : inclusive;
   }
 }
 
@@ -95,10 +114,7 @@ class ScreenTimeSummary {
 /// Resumo de adesão às pausas visuais no período.
 @immutable
 class BreakSummary {
-  const BreakSummary({
-    required this.reminders,
-    required this.completed,
-  });
+  const BreakSummary({required this.reminders, required this.completed});
 
   final int reminders;
   final int completed;

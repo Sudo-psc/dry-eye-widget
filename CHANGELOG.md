@@ -6,6 +6,26 @@ versionamento é [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+## [1.26.4] - 2026-09-14
+
+### Corrigido
+- Builds Windows incluem o runtime Visual C++ no instalador e no ZIP portátil.
+- Caminhos longos de APPDATA e falhas de leitura/gravação cifrada são tratados
+  sem leitura fora de limites nem substituição parcial do estado anterior.
+- A versão MSIX usa a identidade do pacote para notificações e StartupTask para
+  iniciar com o Windows, refletindo o estado efetivo do sistema nas preferências.
+- Pausas têm prioridade sobre os painéis sem perder o formulário em andamento;
+  o painel e seu tamanho são restaurados ao concluir a pausa.
+- Desligar ou limpar o monitor de atividade invalida consultas pendentes e
+  impede timers duplicados ou a reaparição de dados anteriores à limpeza.
+- Relatórios usam o mesmo intervalo inclusivo para tela e pausas. Séries e
+  sequências percorrem dias civis, inclusive nas transições de horário de verão.
+- A exportação PDF no macOS tem acesso a Downloads e tenta Documentos quando a
+  gravação no destino principal falha.
+- A detecção de tela cheia no macOS considera posição e cobertura do monitor.
+- O modelo de presença preserva o estado anterior quando o armazenamento falha
+  e informa erros ao apagar o aprendizado, sem interromper o aplicativo no boot.
+
 ## [1.26.3] - 2026-08-15
 
 ### Melhorado

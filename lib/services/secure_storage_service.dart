@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 /// Armazenamento chave→valor cifrado em repouso pelo SO.
@@ -13,37 +12,26 @@ abstract class SecureKeyValueStore {
 }
 
 /// Implementação sobre o canal nativo `dry_eye_widget/secure_store`.
+/// Ausência de chave retorna null; falhas do SO são propagadas ao chamador.
 class ChannelSecureStore implements SecureKeyValueStore {
   const ChannelSecureStore();
 
-  static const MethodChannel _channel =
-      MethodChannel('dry_eye_widget/secure_store');
+  static const MethodChannel _channel = MethodChannel(
+    'dry_eye_widget/secure_store',
+  );
 
   @override
   Future<String?> read(String key) async {
-    try {
-      return await _channel.invokeMethod<String>('read', {'key': key});
-    } catch (e) {
-      debugPrint('SecureStore.read indisponível ($e).');
-      return null;
-    }
+    return await _channel.invokeMethod<String>('read', {'key': key});
   }
 
   @override
   Future<void> write(String key, String value) async {
-    try {
-      await _channel.invokeMethod<void>('write', {'key': key, 'value': value});
-    } catch (e) {
-      debugPrint('SecureStore.write indisponível ($e).');
-    }
+    await _channel.invokeMethod<void>('write', {'key': key, 'value': value});
   }
 
   @override
   Future<void> delete(String key) async {
-    try {
-      await _channel.invokeMethod<void>('delete', {'key': key});
-    } catch (e) {
-      debugPrint('SecureStore.delete indisponível ($e).');
-    }
+    await _channel.invokeMethod<void>('delete', {'key': key});
   }
 }

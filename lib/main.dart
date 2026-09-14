@@ -103,7 +103,12 @@ Future<void> main() async {
 
   final startup = StartupService()..init();
   // Garante que o estado do sistema bata com a preferência salva.
-  await startup.setEnabled(settings.value.launchAtLogin);
+  final launchAtLogin = await startup.setEnabled(settings.value.launchAtLogin);
+  if (launchAtLogin != settings.value.launchAtLogin) {
+    await settings.update(
+      settings.value.copyWith(launchAtLogin: launchAtLogin),
+    );
+  }
 
   final tray = TrayService();
   if (!settings.value.hideMenuBarItem) {
@@ -159,13 +164,13 @@ Future<void> main() async {
   // Só depois de a janela existir: no macOS a política de ativação aplicada
   // durante a subida do app é ignorada e o ícone fica no Dock.
   final dockIcon = const DockIconService();
-  final dockSettled = await dockIcon.applyWithRetry(settings.value.hideDockIcon);
+  final dockSettled = await dockIcon.applyWithRetry(
+    settings.value.hideDockIcon,
+  );
   if (dockSettled != null && dockSettled != settings.value.hideDockIcon) {
     // O sistema recusou a troca: a preferência passa a refletir a realidade em
     // vez de mostrar um estado que o Dock não tem.
-    await settings.update(
-      settings.value.copyWith(hideDockIcon: dockSettled),
-    );
+    await settings.update(settings.value.copyWith(hideDockIcon: dockSettled));
   }
 
   runApp(
@@ -777,7 +782,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     );
     if (settled == null || settled == hidden) return;
     if (!mounted || _settings.value.hideDockIcon != hidden) return;
-    debugPrint('Dock: sistema recusou hideDockIcon=$hidden; mantendo $settled.');
+    debugPrint(
+      'Dock: sistema recusou hideDockIcon=$hidden; mantendo $settled.',
+    );
     _lastDockHidden = settled;
     await _settings.update(_settings.value.copyWith(hideDockIcon: settled));
   }
@@ -845,16 +852,27 @@ class _HomePageState extends State<HomePage> with TrayListener {
 
   // --- Layout da janela ---------------------------------------------------
 
+  WindowLayout get _breakLayout => _settings.value.usesFullScreenBreak
+      ? WindowLayout.breakOverlay
+      : WindowLayout.gentleBreak;
+
+  WindowLayout? get _openPanelLayout {
+    if (_onboardingOpen) return WindowLayout.onboarding;
+    if (_dvrsOpen || _screenTimeOpen) return WindowLayout.dvrs;
+    if (_updateOpen) return WindowLayout.settings;
+    if (_reportOpen) return WindowLayout.report;
+    if (_healthHubOpen) return WindowLayout.healthHub;
+    if (_myDataOpen) return WindowLayout.myData;
+    if (_settingsOpen || _aboutOpen || _guidanceOpen) {
+      return WindowLayout.settings;
+    }
+    return null;
+  }
+
   Future<void> _enterBreakLayout() async {
     if (mounted) {
-      setState(() {
-        _menuOpen = false;
-        _settingsOpen = false;
-        _aboutOpen = false;
-        _reportOpen = false;
-        _healthHubOpen = false;
-        _myDataOpen = false;
-      });
+      // Painéis permanecem montados atrás da pausa para preservar rascunhos.
+      setState(() => _menuOpen = false);
     }
     // A pausa aparece mesmo se o widget estiver desabilitado (a janela pode
     // estar escondida); garantimos que ela volte a ser exibida.
@@ -862,11 +880,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
     // [_ballPosition] é a coordenada canônica compacta. Nunca captura aqui a
     // janela nativa atual: a pausa pode começar com Settings/DVRS/Hub aberto,
     // e gravar a posição centralizada faria a bolinha voltar no lugar errado.
-    await _applyLayout(
-      _settings.value.usesFullScreenBreak
-          ? WindowLayout.breakOverlay
-          : WindowLayout.gentleBreak,
-    );
+    await _applyLayout(_breakLayout);
   }
 
   Future<void> _exitBreakLayout() async {
@@ -876,7 +890,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   Future<void> _applyLayout(WindowLayout layout) {
-    final next = _layoutQueue.then((_) => _performLayout(layout));
+    final next = _layoutQueue.then(
+      (_) => _performLayout(_timer.state.isActive ? _breakLayout : layout),
+    );
     _layoutQueue = next;
     return next;
   }
@@ -1435,6 +1451,15 @@ class _HomePageState extends State<HomePage> with TrayListener {
   /// Volta ao layout compacto após fechar um painel, respeitando o estado de
   /// widget desabilitado e um eventual aviso de colírio ainda ativo.
   void _restoreAfterPanel() {
+    if (_timer.state.isActive) {
+      _applyLayout(_breakLayout);
+      return;
+    }
+    final panel = _openPanelLayout;
+    if (panel != null) {
+      _applyLayout(panel);
+      return;
+    }
     if (_timer.eyeDropsAlert) {
       _applyLayout(WindowLayout.settings);
       return;
@@ -1472,6 +1497,9 @@ class _HomePageState extends State<HomePage> with TrayListener {
     final provider = context.watch<SettingsProvider>();
     final settings = provider.value;
     final strings = provider.strings;
+    final breakActive = context.select<TimerProvider, bool>(
+      (timer) => timer.state.isActive,
+    );
 
     Widget body;
     if (_onboardingOpen) {
@@ -1552,7 +1580,27 @@ class _HomePageState extends State<HomePage> with TrayListener {
       );
     }
 
-    return Scaffold(backgroundColor: Colors.transparent, body: body);
+    final coverPanel = breakActive && _openPanelLayout != null;
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          TickerMode(
+            enabled: !coverPanel,
+            child: ExcludeFocus(
+              excluding: coverPanel,
+              child: Offstage(offstage: coverPanel, child: body),
+            ),
+          ),
+          if (coverPanel)
+            Consumer<TimerProvider>(
+              builder: (context, liveTimer, _) =>
+                  _buildTimerSurface(liveTimer, settings, strings),
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildTimerSurface(
@@ -1740,12 +1788,16 @@ class _HomePageState extends State<HomePage> with TrayListener {
         onSave: (next) async {
           final loginChanged =
               next.launchAtLogin != settings.value.launchAtLogin;
-          await settings.update(next);
-          if (loginChanged) await startup.setEnabled(next.launchAtLogin);
+          final launchAtLogin = loginChanged
+              ? await startup.setEnabled(next.launchAtLogin)
+              : next.launchAtLogin;
+          await settings.update(next.copyWith(launchAtLogin: launchAtLogin));
         },
         onReset: () async {
-          await startup.setEnabled(false);
-          await settings.reset();
+          final launchAtLogin = await startup.setEnabled(false);
+          await settings.update(
+            WidgetSettings.defaults().copyWith(launchAtLogin: launchAtLogin),
+          );
           _closeSettings();
         },
         onResetLearning: timer.resetInactivityLearning,

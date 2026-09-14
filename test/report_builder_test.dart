@@ -19,12 +19,12 @@ void main() {
           domain: i < 6
               ? DvrsDomain.symptoms
               : i < 9
-                  ? DvrsDomain.functional
-                  : i < 12
-                      ? DvrsDomain.exposure
-                      : i < 15
-                          ? DvrsDomain.environment
-                          : DvrsDomain.warning,
+              ? DvrsDomain.functional
+              : i < 12
+              ? DvrsDomain.exposure
+              : i < 15
+              ? DvrsDomain.environment
+              : DvrsDomain.warning,
           value: value,
           label: 'opt',
         ),
@@ -41,18 +41,17 @@ void main() {
     ScreenTimeData? screenTime,
     BreakStatsData? breakStats,
     int days = 30,
-  }) =>
-      builder.build(
-        profile: const UserProfile(),
-        options: ReportOptions(
-          startDate: now.subtract(Duration(days: days)),
-          endDate: now,
-        ),
-        screenTime: screenTime ?? ScreenTimeData.empty(),
-        breakStats: breakStats ?? BreakStatsData.empty(),
-        dvrsHistory: dvrsHistory,
-        now: now,
-      );
+  }) => builder.build(
+    profile: const UserProfile(),
+    options: ReportOptions(
+      startDate: now.subtract(Duration(days: days)),
+      endDate: now,
+    ),
+    screenTime: screenTime ?? ScreenTimeData.empty(),
+    breakStats: breakStats ?? BreakStatsData.empty(),
+    dvrsHistory: dvrsHistory,
+    now: now,
+  );
 
   group('DVRS', () {
     test('inclui o DVRS quando há histórico', () {
@@ -68,6 +67,84 @@ void main() {
   });
 
   group('Tempo de tela', () {
+    test(
+      'intervalo personalizado inclui os mesmos dias para tela e pausas',
+      () {
+        final screen = ScreenTimeData({
+          '2026-09-11': 9999,
+          '2026-09-12': 3600,
+          '2026-09-13': 3600,
+          '2026-09-14': 3600,
+          '2026-09-15': 9999,
+        });
+        var breaks = BreakStatsData.empty();
+        for (var day = 11; day <= 15; day++) {
+          breaks = breaks.incremented(
+            DateTime(2026, 9, day),
+            reminders: 1,
+            completed: 1,
+          );
+        }
+        final data = builder.build(
+          profile: const UserProfile(),
+          options: ReportOptions(
+            period: ReportPeriod.custom,
+            startDate: DateTime(2026, 9, 12, 23),
+            endDate: DateTime(2026, 9, 14, 1),
+          ),
+          screenTime: screen,
+          breakStats: breaks,
+        );
+        expect(data.options.days, 3);
+        expect(data.screenTime.series, hasLength(3));
+        expect(data.screenTime.totalSeconds, 10800);
+        expect(data.breaks.reminders, 3);
+        expect(data.breaks.completed, 3);
+      },
+    );
+
+    test('presets cobrem exatamente N dias civis até hoje', () {
+      for (final period in [
+        ReportPeriod.last7,
+        ReportPeriod.last30,
+        ReportPeriod.last90,
+      ]) {
+        final options = ReportOptions.forPeriod(
+          period: period,
+          endDate: DateTime(2026, 3, 9, 12),
+        );
+        final excluded = DateTime(
+          options.startDate.year,
+          options.startDate.month,
+          options.startDate.day - 1,
+        );
+        final data = builder.build(
+          profile: const UserProfile(),
+          options: options,
+          screenTime: ScreenTimeData.empty()
+              .addSeconds(excluded, 9999)
+              .addSeconds(options.startDate, 60)
+              .addSeconds(options.endDate, 120),
+          breakStats: BreakStatsData.empty()
+              .incremented(excluded, reminders: 99)
+              .incremented(options.startDate, reminders: 1)
+              .incremented(options.endDate, reminders: 2),
+        );
+        expect(options.days, period.days);
+        expect(data.screenTime.series, hasLength(period.days!));
+        expect(data.screenTime.totalSeconds, 180);
+        expect(data.breaks.reminders, 3);
+      }
+    });
+
+    test('contagem civil inclui dias de 23h e de 25h', () {
+      // Rodar também com TZ=America/New_York para cobrir as transições reais.
+      for (final start in [DateTime(2026, 3, 8), DateTime(2026, 11, 1)]) {
+        final end = DateTime(start.year, start.month, start.day + 1);
+        expect(ReportOptions(startDate: start, endDate: end).days, 2);
+      }
+    });
+
     test('calcula média diária apenas sobre dias com dados', () {
       final st = ScreenTimeData({
         ScreenTimeData.dayKey(now): 3600,
@@ -89,8 +166,11 @@ void main() {
 
   group('Pausas', () {
     test('calcula taxa de adesão concluídas/lembretes', () {
-      final breaks =
-          BreakStatsData.empty().incremented(now, reminders: 10, completed: 8);
+      final breaks = BreakStatsData.empty().incremented(
+        now,
+        reminders: 10,
+        completed: 8,
+      );
       final data = build(breakStats: breaks);
       expect(data.breaks.reminders, 10);
       expect(data.breaks.completed, 8);
@@ -120,8 +200,11 @@ void main() {
     });
 
     test('baixa adesão sem dados clínicos indica reforçar pausas', () {
-      final breaks =
-          BreakStatsData.empty().incremented(now, reminders: 10, completed: 3);
+      final breaks = BreakStatsData.empty().incremented(
+        now,
+        reminders: 10,
+        completed: 3,
+      );
       final data = build(breakStats: breaks);
       expect(data.indication, OverallIndication.reinforceBreaks);
     });

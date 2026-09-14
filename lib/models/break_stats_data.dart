@@ -39,7 +39,8 @@ class BreakStatsData {
   /// Retenção máxima de dias (cobre o histórico anual com folga).
   static const int maxRetainedDays = 400;
 
-  factory BreakStatsData.empty() => BreakStatsData(const <String, BreakDayStat>{});
+  factory BreakStatsData.empty() =>
+      BreakStatsData(const <String, BreakDayStat>{});
 
   // --- Chaves de dia ------------------------------------------------------
 
@@ -84,12 +85,10 @@ class BreakStatsData {
   static const double defaultMinAdherence = 0.6;
 
   /// Total de pausas concluídas em todo o histórico retido.
-  int get totalCompleted =>
-      byDay.values.fold(0, (acc, s) => acc + s.completed);
+  int get totalCompleted => byDay.values.fold(0, (acc, s) => acc + s.completed);
 
   /// Total de avisos de pausa emitidos em todo o histórico retido.
-  int get totalReminders =>
-      byDay.values.fold(0, (acc, s) => acc + s.reminders);
+  int get totalReminders => byDay.values.fold(0, (acc, s) => acc + s.reminders);
 
   /// Taxa de adesão (0–1) no intervalo [start, end]; 0 se não houve avisos.
   double adherenceForRange(DateTime start, DateTime end) {
@@ -110,12 +109,12 @@ class BreakStatsData {
       final s = forDay(day);
       if (s.reminders == 0) {
         // Dia neutro: pula sem contar nem zerar.
-        day = day.subtract(const Duration(days: 1));
+        day = DateTime(day.year, day.month, day.day - 1);
         continue;
       }
       if (s.completed / s.reminders >= minAdherence) {
         streak++;
-        day = day.subtract(const Duration(days: 1));
+        day = DateTime(day.year, day.month, day.day - 1);
       } else {
         break;
       }
@@ -143,7 +142,7 @@ class BreakStatsData {
       } else {
         run = 0;
       }
-      day = day.add(const Duration(days: 1));
+      day = DateTime(day.year, day.month, day.day + 1);
     }
     return best;
   }
@@ -168,11 +167,7 @@ class BreakStatsData {
 
   /// Remove dias mais antigos que [maxRetainedDays] contados a partir de [now].
   BreakStatsData pruned(DateTime now) {
-    final cutoff = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(const Duration(days: maxRetainedDays));
+    final cutoff = DateTime(now.year, now.month, now.day - maxRetainedDays);
     final next = <String, BreakDayStat>{};
     for (final entry in byDay.entries) {
       if (!_dayFromKey(entry.key).isBefore(cutoff)) {
@@ -186,7 +181,8 @@ class BreakStatsData {
 
   String toJson() => jsonEncode(
     byDay.map(
-      (key, value) => MapEntry(key, {'r': value.reminders, 'c': value.completed}),
+      (key, value) =>
+          MapEntry(key, {'r': value.reminders, 'c': value.completed}),
     ),
   );
 
@@ -203,7 +199,10 @@ class BreakStatsData {
         final reminders = r is num ? r.toInt() : 0;
         final completed = c is num ? c.toInt() : 0;
         if (reminders > 0 || completed > 0) {
-          result[key] = BreakDayStat(reminders: reminders, completed: completed);
+          result[key] = BreakDayStat(
+            reminders: reminders,
+            completed: completed,
+          );
         }
       });
       return BreakStatsData(result);

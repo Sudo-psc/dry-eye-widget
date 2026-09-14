@@ -670,15 +670,27 @@ class PdfReportService {
 
   /// Salva o PDF de forma persistente no dispositivo (Downloads ou Documentos).
   Future<File> savePdfToDevice(Uint8List pdfData, String fileName) async {
-    Directory? dir;
     try {
-      dir = await getDownloadsDirectory();
+      final downloads = await getDownloadsDirectory();
+      if (downloads != null) {
+        return await _writePdfToDirectory(downloads, pdfData, fileName);
+      }
     } catch (_) {
-      dir = null;
+      // Obter um caminho não concede acesso de escrita. Sandbox, permissões
+      // ou indisponibilidade de Downloads também devem tentar Documentos.
     }
-    dir ??= await getApplicationDocumentsDirectory();
+    final documents = await getApplicationDocumentsDirectory();
+    return _writePdfToDirectory(documents, pdfData, fileName);
+  }
+
+  Future<File> _writePdfToDirectory(
+    Directory dir,
+    Uint8List pdfData,
+    String fileName,
+  ) async {
+    await dir.create(recursive: true);
     final file = File('${dir.path}/$fileName.pdf');
-    await file.writeAsBytes(pdfData);
+    await file.writeAsBytes(pdfData, flush: true);
     return file;
   }
 }

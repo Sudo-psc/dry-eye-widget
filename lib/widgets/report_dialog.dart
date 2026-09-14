@@ -68,9 +68,8 @@ class _ReportDialogState extends State<ReportDialog> {
     final includeEnv = _environment != null;
     final days = _period.days;
     if (days != null) {
-      return ReportOptions(
+      return ReportOptions.forPeriod(
         period: _period,
-        startDate: now.subtract(Duration(days: days)),
         endDate: now,
         includeEnvironment: includeEnv,
       );

@@ -23,6 +23,7 @@ on:
       - "scripts/validate_release_bundle.sh"
       - ".github/workflows/windows-build.yml"
       - "win_version/templates/windows-build.yml"
+      - "win_version/templates/dry-eye-widget.iss"
   workflow_dispatch:
 
 permissions:
@@ -60,6 +61,15 @@ jobs:
       - name: Testes
         run: flutter test
 
+      - name: Testes nativos de armazenamento Windows
+        shell: pwsh
+        run: |
+          cmake -S windows/runner/tests -B build/windows-secure-store-tests -A x64
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cmake --build build/windows-secure-store-tests --config Release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir build/windows-secure-store-tests -C Release --output-on-failure
+
       - name: Gerar ícones
         run: dart run flutter_launcher_icons
 
@@ -70,6 +80,37 @@ jobs:
           # como erro (STL1011). audioplayers_windows ainda usa o header antigo;
           # silencia a depreciação em todos os alvos via variável CL do cl.exe.
           CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
+
+      - name: Validar runtime antes de empacotar
+        shell: pwsh
+        run: |
+          $release = "build\windows\x64\runner\Release"
+          foreach ($name in @("msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll")) {
+            $path = Join-Path $release $name
+            if (-not (Test-Path $path -PathType Leaf) -or (Get-Item $path).Length -eq 0) {
+              throw "Visual C++ runtime ausente ou vazio: $name"
+            }
+          }
+
+      - name: Verificar abertura do aplicativo Windows
+        shell: pwsh
+        run: |
+          $release = (Resolve-Path "build\windows\x64\runner\Release").Path
+          $app = Start-Process (Join-Path $release "dry_eye_widget.exe") `
+            -WorkingDirectory $release -PassThru
+          try {
+            $opened = $false
+            for ($attempt = 0; $attempt -lt 30; $attempt++) {
+              Start-Sleep -Seconds 1
+              $app.Refresh()
+              if ($app.HasExited) { throw "O aplicativo encerrou ao abrir: $($app.ExitCode)" }
+              if ($app.MainWindowHandle -ne [IntPtr]::Zero) { $opened = $true; break }
+            }
+            if (-not $opened) { throw "A janela principal não abriu em 30 segundos." }
+            Write-Host "Processo e janela principal verificados."
+          } finally {
+            if (-not $app.HasExited) { Stop-Process -Id $app.Id -Force }
+          }
 
       - name: Gerar ZIP portátil
         shell: pwsh

@@ -179,6 +179,59 @@ void main() {
     expect(saved!.blinkReminderSound, BlinkReminderSound.warmBell);
   });
 
+  for (final language in ['pt', 'en']) {
+    testWidgets(
+      'falha ao apagar aprendizado mostra aviso em $language e permite repetir',
+      (tester) async {
+        var resetCalls = 0;
+        var closeCalls = 0;
+        final strings = AppStrings.of(language);
+        await tester.pumpWidget(
+          host(
+            initial: WidgetSettings.defaults().copyWith(languageCode: language),
+            onSave: (_) {},
+            onClose: () => closeCalls++,
+            onResetLearning: () async {
+              resetCalls++;
+              throw StateError('native-sensitive-detail');
+            },
+          ),
+        );
+
+        await tester.tap(
+          find.byKey(const ValueKey('settings-category-privacy')),
+        );
+        await tester.pumpAndSettle();
+        final button = find.text(strings.resetLearningLabel);
+        await tester.ensureVisible(button);
+        await tester.pump();
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(closeCalls, 0);
+        expect(resetCalls, 1);
+        expect(
+          find.text(
+            language == 'en'
+                ? 'Could not reset inactivity learning. Please try again.'
+                : 'Não foi possível apagar o aprendizado de inatividade. Tente novamente.',
+          ),
+          findsOneWidget,
+        );
+        expect(find.textContaining('native-sensitive-detail'), findsNothing);
+
+        // Espera o aviso sair para alcançar novamente o botão.
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(resetCalls, 2);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets('aparência mostra prévia viva da bolinha', (tester) async {
     await tester.pumpWidget(
       host(initial: WidgetSettings.defaults(), onSave: (_) {}),

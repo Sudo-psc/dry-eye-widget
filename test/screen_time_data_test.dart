@@ -33,8 +33,9 @@ void main() {
       expect(ScreenTimeData.fromJson('[1,2,3]').secondsByDay, isEmpty);
       // Valores negativos/zero são descartados.
       expect(
-        ScreenTimeData.fromJson('{"2026-06-10": -5, "2026-06-11": 0}')
-            .secondsByDay,
+        ScreenTimeData.fromJson(
+          '{"2026-06-10": -5, "2026-06-11": 0}',
+        ).secondsByDay,
         isEmpty,
       );
     });
@@ -50,6 +51,36 @@ void main() {
       expect(ScreenTimeData.dayKey(week.last.day), '2026-06-14');
       // O sábado contém os 600 s.
       expect(week.firstWhere((p) => p.day.weekday == 6).seconds, 600);
+    });
+
+    test('dailySeries não pula dia civil na entrada do horário de verão', () {
+      // Rodar também com TZ=America/New_York para exercitar o dia de 23 horas.
+      final data = ScreenTimeData.empty().addSeconds(DateTime(2026, 3, 8), 123);
+      final series = data.dailySeries(DateTime(2026, 3, 9), 3);
+      expect(series.map((p) => ScreenTimeData.dayKey(p.day)), [
+        '2026-03-07',
+        '2026-03-08',
+        '2026-03-09',
+      ]);
+      expect(series.map((p) => p.seconds), [0, 123, 0]);
+    });
+
+    test('weekSeries não duplica domingo ao sair do horário de verão', () {
+      final data = ScreenTimeData.empty().addSeconds(
+        DateTime(2026, 11, 1),
+        123,
+      );
+      final week = data.weekSeries(DateTime(2026, 11, 1, 12));
+      expect(week.map((p) => ScreenTimeData.dayKey(p.day)), [
+        '2026-10-26',
+        '2026-10-27',
+        '2026-10-28',
+        '2026-10-29',
+        '2026-10-30',
+        '2026-10-31',
+        '2026-11-01',
+      ]);
+      expect(week.last.seconds, 123);
     });
 
     test('monthSeries tem um ponto por dia do mês', () {

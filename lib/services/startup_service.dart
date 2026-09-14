@@ -1,26 +1,48 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 
-/// Controla se o app inicia automaticamente com o sistema (login item).
-///
-/// No macOS usa `SMAppService`; no Windows, uma entrada no registro de
-/// inicialização. Todas as chamadas são tolerantes a falha — em ambiente de
-/// teste ou sem suporte, viram no-op em vez de derrubar o app.
+/// Login item no macOS, registro no Windows comum e StartupTask no MSIX.
+/// O resultado reflete o estado real do SO, inclusive bloqueios do usuário.
 class StartupService {
-  bool _ready = false;
+  StartupService({TargetPlatform? platform})
+    : _platform = platform ?? defaultTargetPlatform;
 
-  /// Configura o pacote com o nome e o caminho do executável atual.
-  /// Deve ser chamado uma vez no boot, após o binding inicializar.
+  static const _windowsStore = MethodChannel('dry_eye_widget/windows_store');
+  final TargetPlatform _platform;
+  bool _ready = false;
+  bool _packaged = false;
+  Future<void>? _initialization;
+
+  /// Inicia a configuração uma vez; operações aguardam sua conclusão.
   void init() {
-    if (kIsWeb) return;
-    if (!(Platform.isMacOS || Platform.isWindows)) return;
+    _initialization ??= _configure();
+  }
+
+  Future<void> _configure() async {
+    if (kIsWeb ||
+        !(_platform == TargetPlatform.macOS ||
+            _platform == TargetPlatform.windows)) {
+      return;
+    }
     try {
-      launchAtStartup.setup(
-        appName: 'Dry Eye Widget',
-        appPath: Platform.resolvedExecutable,
-      );
+      if (_platform == TargetPlatform.windows) {
+        // Se a consulta falhar, não escrever no registro: a identidade do
+        // pacote ainda é desconhecida e a integração comum seria incorreta.
+        final packaged = await _windowsStore.invokeMethod<bool>('isPackaged');
+        if (packaged == null) {
+          throw StateError('Windows did not return its package identity');
+        }
+        _packaged = packaged;
+      }
+      if (!_packaged) {
+        launchAtStartup.setup(
+          appName: 'Dry Eye Widget',
+          appPath: Platform.resolvedExecutable,
+        );
+      }
       _ready = true;
     } catch (e) {
       debugPrint('StartupService: setup falhou ($e).');
@@ -29,8 +51,13 @@ class StartupService {
   }
 
   Future<bool> isEnabled() async {
+    await _initialization;
     if (!_ready) return false;
     try {
+      if (_packaged) {
+        return await _windowsStore.invokeMethod<bool>('getStartupEnabled') ??
+            false;
+      }
       return await launchAtStartup.isEnabled();
     } catch (e) {
       debugPrint('StartupService: isEnabled falhou ($e).');
@@ -38,17 +65,28 @@ class StartupService {
     }
   }
 
-  /// Habilita ou desabilita a inicialização automática.
-  Future<void> setEnabled(bool enabled) async {
-    if (!_ready) return;
+  /// Retorna o estado efetivo, que pode diferir do pedido por política do SO
+  /// ou porque o usuário desabilitou o app no Gerenciador de Tarefas.
+  Future<bool> setEnabled(bool enabled) async {
+    await _initialization;
+    if (!_ready) return false;
     try {
+      if (_packaged) {
+        return await _windowsStore.invokeMethod<bool>(
+              'setStartupEnabled',
+              enabled,
+            ) ??
+            false;
+      }
       if (enabled) {
         await launchAtStartup.enable();
       } else {
         await launchAtStartup.disable();
       }
+      return await launchAtStartup.isEnabled();
     } catch (e) {
       debugPrint('StartupService: setEnabled($enabled) falhou ($e).');
+      return isEnabled();
     }
   }
 }

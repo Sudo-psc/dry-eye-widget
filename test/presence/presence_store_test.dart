@@ -7,15 +7,25 @@ import 'package:dry_eye_widget/services/presence/adaptive_threshold_model.dart';
 class _FakeSecure implements SecureKeyValueStore {
   final Map<String, String> _data = {};
   String? forced; // valor cru a forçar em read (ex.: corrompido)
+  Object? failure;
 
   @override
-  Future<String?> read(String key) async => forced ?? _data[key];
+  Future<String?> read(String key) async {
+    if (failure != null) throw failure!;
+    return forced ?? _data[key];
+  }
 
   @override
-  Future<void> write(String key, String value) async => _data[key] = value;
+  Future<void> write(String key, String value) async {
+    if (failure != null) throw failure!;
+    _data[key] = value;
+  }
 
   @override
-  Future<void> delete(String key) async => _data.remove(key);
+  Future<void> delete(String key) async {
+    if (failure != null) throw failure!;
+    _data.remove(key);
+  }
 }
 
 void main() {
@@ -54,5 +64,18 @@ void main() {
       final store = SecurePresenceStore(secure, storageKey: key);
       expect(await store.load(), isNull);
     });
+
+    test(
+      'erros do armazenamento são propagados em load, save e clear',
+      () async {
+        final error = StateError('secure storage unavailable');
+        final secure = _FakeSecure()..failure = error;
+        final store = SecurePresenceStore(secure, storageKey: key);
+
+        await expectLater(store.load(), throwsA(same(error)));
+        await expectLater(store.save({'v': 2}), throwsA(same(error)));
+        await expectLater(store.clear(), throwsA(same(error)));
+      },
+    );
   });
 }

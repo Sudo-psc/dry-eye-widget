@@ -492,7 +492,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saraivavision.dryEyeWidget.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dry_eye_widget.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/dry_eye_widget";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dry Eye Widget.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dry Eye Widget";
 			};
 			name = Debug;
 		};
@@ -507,7 +507,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saraivavision.dryEyeWidget.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dry_eye_widget.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/dry_eye_widget";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dry Eye Widget.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dry Eye Widget";
 			};
 			name = Release;
 		};
@@ -522,7 +522,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.saraivavision.dryEyeWidget.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dry_eye_widget.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/dry_eye_widget";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dry Eye Widget.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dry Eye Widget";
 			};
 			name = Profile;
 		};

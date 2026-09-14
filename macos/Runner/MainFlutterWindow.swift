@@ -113,25 +113,29 @@ class MainFlutterWindow: NSWindow {
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
-        if status == errSecSuccess, let data = item as? Data {
-          result(String(data: data, encoding: .utf8))
-        } else {
+        if status == errSecItemNotFound {
           result(nil)
+        } else if status != errSecSuccess {
+          result(KeychainWriter.error(operation: "read", status: status))
+        } else if let data = item as? Data, let value = String(data: data, encoding: .utf8) {
+          result(value)
+        } else {
+          result(KeychainWriter.error(operation: "read", status: errSecDecode))
         }
       case "write":
         guard let value = args?["value"] as? String else {
           result(FlutterError(code: "bad_args", message: "value ausente", details: nil))
           return
         }
-        SecItemDelete(base as CFDictionary)
-        var add = base
-        add[kSecValueData as String] = value.data(using: .utf8)
-        add[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-        SecItemAdd(add as CFDictionary, nil)
-        result(nil)
+        let status = KeychainWriter.write(Data(value.utf8), query: base)
+        result(status == errSecSuccess ? nil : KeychainWriter.error(operation: "write", status: status))
       case "delete":
-        SecItemDelete(base as CFDictionary)
-        result(nil)
+        let status = SecItemDelete(base as CFDictionary)
+        if status == errSecSuccess || status == errSecItemNotFound {
+          result(nil)
+        } else {
+          result(KeychainWriter.error(operation: "delete", status: status))
+        }
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -250,7 +254,13 @@ class MainFlutterWindow: NSWindow {
     guard let infoList = CGWindowListCopyWindowInfo(
       [.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
       as? [[String: Any]] else { return false }
-    let screenSizes = NSScreen.screens.map { $0.frame.size }
+    // CGDisplayBounds e CGWindowList usam a mesma origem no canto superior
+    // esquerdo. NSScreen.frame usa outra origem e não serve para esta comparação.
+    let screenBounds = NSScreen.screens.compactMap { screen -> CGRect? in
+      guard let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")]
+        as? NSNumber else { return nil }
+      return CGDisplayBounds(CGDirectDisplayID(number.uint32Value))
+    }
     for info in infoList {
       // Os números do CGWindowList chegam como NSNumber; `as? Int` faz o bridge
       // de forma confiável (`as? pid_t`/Int32 retornaria nil).
@@ -261,11 +271,7 @@ class MainFlutterWindow: NSWindow {
         let boundsDict = info[kCGWindowBounds as String] as? [String: Any],
         let bounds = CGRect(dictionaryRepresentation: boundsDict as CFDictionary)
       else { continue }
-      for size in screenSizes {
-        if bounds.width >= size.width - 1 && bounds.height >= size.height - 1 {
-          return true
-        }
-      }
+      if FullscreenGeometry.coversDisplay(window: bounds, displays: screenBounds) { return true }
     }
     return false
   }
@@ -283,6 +289,41 @@ class MainFlutterWindow: NSWindow {
     self.hasShadow = false
     self.level = .floating
     self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+  }
+}
+
+/// Compara retângulos no espaço global de coordenadas do CoreGraphics.
+enum FullscreenGeometry {
+  static func coversDisplay(window: CGRect, displays: [CGRect]) -> Bool {
+    displays.contains { display in
+      !display.isEmpty && !display.isInfinite && !display.isNull
+        && window.minX <= display.minX + 1 && window.minY <= display.minY + 1
+        && window.maxX >= display.maxX - 1 && window.maxY >= display.maxY - 1
+    }
+  }
+}
+
+/// Atualiza o registro existente sem apagá-lo antes de confirmar a gravação.
+enum KeychainWriter {
+  static func write(
+    _ data: Data,
+    query: [String: Any],
+    update: (CFDictionary, CFDictionary) -> OSStatus = SecItemUpdate,
+    add: (CFDictionary, UnsafeMutablePointer<CFTypeRef?>?) -> OSStatus = SecItemAdd
+  ) -> OSStatus {
+    let attributes: [String: Any] = [kSecValueData as String: data]
+    let status = update(query as CFDictionary, attributes as CFDictionary)
+    guard status == errSecItemNotFound else { return status }
+    var newItem = query.merging(attributes) { _, value in value }
+    newItem[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+    return add(newItem as CFDictionary, nil)
+  }
+
+  static func error(operation: String, status: OSStatus) -> FlutterError {
+    FlutterError(
+      code: "secure_store_failed",
+      message: "Falha no armazenamento seguro.",
+      details: ["operation": operation, "status": Int(status)])
   }
 }
 
@@ -370,6 +411,10 @@ final class ActivityMonitor {
   func stop() {
     if let m = clickMonitor { NSEvent.removeMonitor(m); clickMonitor = nil }
     if let m = keyMonitor { NSEvent.removeMonitor(m); keyMonitor = nil }
+    lock.lock()
+    clicks = 0
+    keys = 0
+    lock.unlock()
   }
 
   /// Devolve as contagens acumuladas + o app em foco, e ZERA os contadores.
