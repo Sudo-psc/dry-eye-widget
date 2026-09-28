@@ -132,8 +132,9 @@ DvrsResult evaluateDvrs({
 
 /// Prepara os dados do DVRS para o relatório PDF a partir do histórico.
 ///
-/// Devolve `null` se [history] estiver vazio. O resultado mais recente é o
-/// último elemento (o histórico deve vir ordenado antigo → recente).
+/// Devolve `null` se [history] estiver vazio.
+/// Ordena defensivamente uma cópia por data (antigo → recente), sem alterar
+/// [history], e usa o último elemento da cópia como resultado mais recente.
 DvrsReportData? prepareDvrsForPdf(List<DvrsResult> history) {
   if (history.isEmpty) return null;
   final sorted = [...history]
